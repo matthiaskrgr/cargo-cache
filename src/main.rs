@@ -1,8 +1,9 @@
+extern crate humansize;
 extern crate walkdir;
 
 use std::fs;
+use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
-
 
 fn main() {
 
@@ -19,10 +20,13 @@ fn main() {
             cumulative_size += fs::metadata(path).unwrap().len();
         }
 
-        //files_to_check.push(path.clone());
-
     }
-    println!("Total size: {} b", cumulative_size );
+    println!("Clippy cache:\n\n");
+    println!("Total size: {} b", cumulative_size);
+    println!(
+        "Total size: {} ",
+        cumulative_size.file_size(options::DECIMAL).unwrap()
+    );
 
 
 }

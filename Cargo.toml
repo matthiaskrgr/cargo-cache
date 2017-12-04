@@ -7,3 +7,4 @@ description = "Manage cargo cache"
 [dependencies]
 clap = "2.28.0"
 walkdir = "2.0.1"
+humansize = "1.0.2"
