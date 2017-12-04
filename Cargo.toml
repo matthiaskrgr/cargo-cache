@@ -1,0 +1,9 @@
+[package]
+name = "cargo_cache"
+version = "0.1.0"
+authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
+description = "Manage cargo cache"
+
+[dependencies]
+clap = "2.28.0"
+walkdir = "2.0.1"
