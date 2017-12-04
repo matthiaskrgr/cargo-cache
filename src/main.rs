@@ -21,7 +21,7 @@ fn main() {
         }
 
     }
-    println!("Clippy cache:\n\n");
+    println!("Cargo cache:\n\n");
     println!("Total size: {} b", cumulative_size);
     println!(
         "Total size: {} ",
