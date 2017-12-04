@@ -8,3 +8,6 @@ description = "Manage cargo cache"
 clap = "2.28.0"
 walkdir = "2.0.1"
 humansize = "1.0.2"
+
+[profile.release]
+lto = true
