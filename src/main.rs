@@ -9,13 +9,14 @@ use walkdir::WalkDir;
 fn main() {
     let cargo_dir = "/home/matthias/.cargo/";
 
+    // make sure we actually have a cargo dir
     if !Path::new(cargo_dir).is_dir() {
         println!("Error, no '~/.cargo/' dir found");
         std::process::exit(1);
     }
 
     let mut cumulative_size = 0;
-
+    // traverse recursively and sum filesizes
     for entry in WalkDir::new(cargo_dir) {
         let entry = entry.unwrap();
         let path = entry.path();
