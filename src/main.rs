@@ -44,6 +44,25 @@ fn main() {
     }
 
 
+    let registry_dir = "/home/matthias/.cargo/registry/";
+    let mut cumulative_registry_size = 0;
+    if Path::new(registry_dir).is_dir() {
+        cumulative_registry_size = cumulative_dir_size(&registry_dir);
+    }
+
+
+    let git_db = "/home/matthias/.cargo/git/db";
+    let mut git_db_size = 0;
+    if Path::new(git_db).is_dir() {
+        git_db_size= cumulative_dir_size(&git_db);
+    }
+
+    let git_checkouts = "/home/matthias/.cargo/git/checkouts";
+    let mut git_checkouts_size = 0;
+    if Path::new(git_checkouts).is_dir() {
+        git_checkouts_size= cumulative_dir_size(&git_checkouts);
+    }
+
 
     println!("Cargo cache:\n\n");
     println!("Total size: {} b", cumulative_size_cargo);
@@ -55,4 +74,19 @@ fn main() {
         "Total size binaries {} ",
         cumulative_bin_size.file_size(options::DECIMAL).unwrap()
     );
+    println!(
+        "Total size registry {} ",
+        cumulative_registry_size.file_size(options::DECIMAL).unwrap()
+    );
+
+    println!(
+        "Total git_db  {} ",
+        git_db_size.file_size(options::DECIMAL).unwrap()
+    );
+
+    println!(
+        "Total git repo checkouts {} ",
+        git_checkouts_size.file_size(options::DECIMAL).unwrap()
+    );
+
 }
