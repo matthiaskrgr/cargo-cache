@@ -1,6 +1,7 @@
 extern crate humansize;
 extern crate walkdir;
 extern crate clap;
+extern crate cargo;
 
 use std::fs;
 use std::path::Path;
@@ -8,7 +9,7 @@ use std::path::Path;
 use clap::App;
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
-
+//use cargo::util::config;
 
 fn cumulative_dir_size(dir: &str) -> u64 {
     //@TODO add some clever caching
@@ -51,6 +52,12 @@ fn main() {
         .get_matches();
 
     let cargo_dir = "/home/matthias/.cargo/";
+    let cfg = cargo::util::config::Config::default().unwrap();
+//    let cfg_home_str =  cfg.home().display()
+    let cfg_home_str =  format!("{}", cfg.home().display()); // fix
+    println!("cfg home str {}", cfg_home_str);
+
+    let cargopath = Path::new(&cfg_home_str);
 
     // make sure we actually have a cargo dir
     if !Path::new(cargo_dir).is_dir() {
