@@ -54,38 +54,38 @@ fn main() {
 
     // make sure we actually have a cargo dir
     if !Path::new(cargo_dir).is_dir() {
-        println!("Error, no '~/.cargo/' dir found");
+        println!("Error, no '{} dir found", cargo_dir);
         std::process::exit(1);
     }
     let cumulative_size_cargo = cumulative_dir_size(&cargo_dir);
 
 
 
-    let bin_dir = "/home/matthias/.cargo/bin/";
+    let bin_dir = cargo_dir.to_owned() + "bin/";
     let mut cumulative_bin_size = 0;
     let mut number_of_bins = 0;
-    if Path::new(bin_dir).is_dir() {
+    if Path::new(&bin_dir).is_dir() {
         cumulative_bin_size = cumulative_dir_size(&bin_dir);
         number_of_bins = get_file_number(&bin_dir);
     }
 
 
-    let registry_dir = "/home/matthias/.cargo/registry/";
+    let registry_dir = cargo_dir.to_owned() + "registry/";
     let mut cumulative_registry_size = 0;
-    if Path::new(registry_dir).is_dir() {
+    if Path::new(&registry_dir).is_dir() {
         cumulative_registry_size = cumulative_dir_size(&registry_dir);
     }
 
 
-    let git_db = "/home/matthias/.cargo/git/db";
+    let git_db = cargo_dir.to_owned() + "git/db/";
     let mut git_db_size = 0;
-    if Path::new(git_db).is_dir() {
+    if Path::new(&git_db).is_dir() {
         git_db_size = cumulative_dir_size(&git_db);
     }
 
-    let git_checkouts = "/home/matthias/.cargo/git/checkouts";
+    let git_checkouts =  cargo_dir.to_owned() + "git/checkouts/";
     let mut git_checkouts_size = 0;
-    if Path::new(git_checkouts).is_dir() {
+    if Path::new(&git_checkouts).is_dir() {
         git_checkouts_size = cumulative_dir_size(&git_checkouts);
     }
 
