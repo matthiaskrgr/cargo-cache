@@ -1,8 +1,11 @@
 extern crate humansize;
 extern crate walkdir;
+extern crate clap;
 
 use std::fs;
 use std::path::Path;
+
+use clap::App;
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
 
@@ -40,6 +43,13 @@ fn get_file_number(dir: &str) -> u64 {
 }
 
 fn main() {
+
+    App::new("cargo-show")
+        .version("0.1")
+        .about("Manage cargo cache")
+        .author("matthiaskrgr")
+        .get_matches();
+
     let cargo_dir = "/home/matthias/.cargo/";
 
     // make sure we actually have a cargo dir
