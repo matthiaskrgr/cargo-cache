@@ -61,14 +61,13 @@ fn main() {
         println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
-    println!("cargo home str: {}", cargo_home_str);
+    println!("cargo home: {}", cargo_home_str);
     let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str);
 
 
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
     println!("bin dir: {}", bin_dir_str);
-
     let mut cumulative_bin_size = 0;
     let mut number_of_bins = 0;
     if bin_dir.is_dir() {
@@ -111,7 +110,6 @@ fn main() {
 
 
     println!("\nCargo cache:\n");
-    //println!("Total size: {} b", cumulative_size_cargo);
     println!(
         "Total size: {} ",
         cumulative_size_cargo.file_size(options::DECIMAL).unwrap()
@@ -127,12 +125,10 @@ fn main() {
             .file_size(options::DECIMAL)
             .unwrap()
     );
-
     println!(
         "Size of git db  {} ",
         git_db_size.file_size(options::DECIMAL).unwrap()
     );
-
     println!(
         "Size of git repo checkouts {} ",
         git_checkouts_size.file_size(options::DECIMAL).unwrap()
