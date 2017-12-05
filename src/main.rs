@@ -6,7 +6,7 @@ extern crate cargo; // obtain CARGO_DIR
 use std::fs;
 use std::path::Path;
 
-use clap::App;
+use clap::{Arg, App};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
 //use cargo::util::config;
@@ -45,11 +45,19 @@ fn get_file_number(dir: &str) -> u64 {
 
 fn main() {
 
-    App::new("cargo-show")
+    let cargo_show_cfg = App::new("cargo-show")
         .version("0.1")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
+        .arg(
+            Arg::with_name("print-dirs")
+                .short("d")
+                .long("dirs")
+                .help("Show found directory paths."),
+        )
         .get_matches();
+
+
 
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
@@ -61,13 +69,11 @@ fn main() {
         println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
-    println!("cargo home: {}", cargo_home_str);
     let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str);
 
 
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
-    println!("bin dir: {}", bin_dir_str);
     let mut cumulative_bin_size = 0;
     let mut number_of_bins = 0;
     if bin_dir.is_dir() {
@@ -81,7 +87,6 @@ fn main() {
         .into_os_string()
         .into_string()
         .unwrap();
-    println!("registry dir: {}", registry_dir_str);
     let mut cumulative_registry_size = 0;
     if registry_dir.is_dir() {
         cumulative_registry_size = cumulative_dir_size(&registry_dir_str);
@@ -90,7 +95,6 @@ fn main() {
 
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
-    println!("git db dir: {}", git_db_str);
     let mut git_db_size = 0;
     if git_db.is_dir() {
         git_db_size = cumulative_dir_size(&git_db_str);
@@ -101,10 +105,17 @@ fn main() {
         .into_os_string()
         .into_string()
         .unwrap();
-    println!("checkouts dir: {}", git_checkouts_size_str);
     let mut git_checkouts_size = 0;
     if git_checkouts.is_dir() {
         git_checkouts_size = cumulative_dir_size(&git_checkouts_size_str);
+    }
+
+    if cargo_show_cfg.is_present("print-dirs") {
+        println!("cargo home: {}", cargo_home_str);
+        println!("bin dir: {}", bin_dir_str);
+        println!("registry dir: {}", registry_dir_str);
+        println!("git db dir: {}", git_db_str);
+        println!("checkouts dir: {}", git_checkouts_size_str);
     }
 
 
