@@ -97,24 +97,24 @@ fn main() {
         cumulative_size_cargo.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Total size of {} binaries {} ",
+        "Size of {} installed binaries {} ",
         number_of_bins,
         cumulative_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Total size registry {} ",
+        "Size of registry {} ",
         cumulative_registry_size
             .file_size(options::DECIMAL)
             .unwrap()
     );
 
     println!(
-        "Total git_db  {} ",
+        "Size of git db  {} ",
         git_db_size.file_size(options::DECIMAL).unwrap()
     );
 
     println!(
-        "Total git repo checkouts {} ",
+        "Size of git repo checkouts {} ",
         git_checkouts_size.file_size(options::DECIMAL).unwrap()
     );
 
