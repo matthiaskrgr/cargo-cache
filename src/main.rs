@@ -70,13 +70,13 @@ fn main() {
     let git_db = "/home/matthias/.cargo/git/db";
     let mut git_db_size = 0;
     if Path::new(git_db).is_dir() {
-        git_db_size= cumulative_dir_size(&git_db);
+        git_db_size = cumulative_dir_size(&git_db);
     }
 
     let git_checkouts = "/home/matthias/.cargo/git/checkouts";
     let mut git_checkouts_size = 0;
     if Path::new(git_checkouts).is_dir() {
-        git_checkouts_size= cumulative_dir_size(&git_checkouts);
+        git_checkouts_size = cumulative_dir_size(&git_checkouts);
     }
 
 
@@ -88,11 +88,14 @@ fn main() {
     );
     println!(
         "Total size of {} binaries {} ",
-         number_of_bins ,cumulative_bin_size.file_size(options::DECIMAL).unwrap()
+        number_of_bins,
+        cumulative_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
         "Total size registry {} ",
-        cumulative_registry_size.file_size(options::DECIMAL).unwrap()
+        cumulative_registry_size
+            .file_size(options::DECIMAL)
+            .unwrap()
     );
 
     println!(
