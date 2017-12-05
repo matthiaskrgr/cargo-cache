@@ -51,53 +51,60 @@ fn main() {
         .author("matthiaskrgr")
         .get_matches();
 
-    let cargo_dir = "/home/matthias/.cargo/";
-    let cfg = cargo::util::config::Config::default().unwrap();
-//    let cfg_home_str =  cfg.home().display()
-    let cfg_home_str =  format!("{}", cfg.home().display()); // fix
-    println!("cfg home str {}", cfg_home_str);
+    let cargo_cfg = cargo::util::config::Config::default().unwrap();
+    let cargo_home_str =  format!("{}", cargo_cfg.home().display());
+    let cargo_home_path = Path::new(&cargo_home_str);
 
-    let cargopath = Path::new(&cfg_home_str);
 
     // make sure we actually have a cargo dir
-    if !Path::new(cargo_dir).is_dir() {
-        println!("Error, no '{} dir found", cargo_dir);
+    if !cargo_home_path.is_dir() {
+        println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
-    let cumulative_size_cargo = cumulative_dir_size(&cargo_dir);
+    println!("cargo home str: {}", cargo_home_str);
+    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str);
 
 
+    let bin_dir = (cargo_home_path.clone()).join("bin/");
+    let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
+    println!("bin dir: {}", bin_dir_str);
 
-    let bin_dir = cargo_dir.to_owned() + "bin/";
     let mut cumulative_bin_size = 0;
     let mut number_of_bins = 0;
-    if Path::new(&bin_dir).is_dir() {
-        cumulative_bin_size = cumulative_dir_size(&bin_dir);
-        number_of_bins = get_file_number(&bin_dir);
+    if bin_dir.is_dir() {
+        cumulative_bin_size = cumulative_dir_size(&bin_dir_str);
+        number_of_bins = get_file_number(&bin_dir_str);
     }
 
 
-    let registry_dir = cargo_dir.to_owned() + "registry/";
+    let registry_dir = (cargo_home_path.clone()).join("registry/");
+    let registry_dir_str = (registry_dir.clone()).into_os_string().into_string().unwrap();
+    println!("registry dir: {}", registry_dir_str);
     let mut cumulative_registry_size = 0;
-    if Path::new(&registry_dir).is_dir() {
-        cumulative_registry_size = cumulative_dir_size(&registry_dir);
+    if registry_dir.is_dir() {
+        cumulative_registry_size = cumulative_dir_size(&registry_dir_str);
     }
 
 
-    let git_db = cargo_dir.to_owned() + "git/db/";
+    let git_db = (cargo_home_path.clone()).join("git/db/");
+    let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
+    println!("git db dir: {}", git_db_str);
     let mut git_db_size = 0;
-    if Path::new(&git_db).is_dir() {
-        git_db_size = cumulative_dir_size(&git_db);
+    if git_db.is_dir() {
+        git_db_size = cumulative_dir_size(&git_db_str);
     }
 
-    let git_checkouts =  cargo_dir.to_owned() + "git/checkouts/";
+    let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
+    let git_checkouts_size_str = (git_checkouts.clone()).into_os_string().into_string().unwrap();
+    println!("checkouts dir: {}", git_checkouts_size_str);
     let mut git_checkouts_size = 0;
-    if Path::new(&git_checkouts).is_dir() {
-        git_checkouts_size = cumulative_dir_size(&git_checkouts);
+    if git_checkouts.is_dir() {
+        git_checkouts_size = cumulative_dir_size(&git_checkouts_size_str);
     }
 
 
-    println!("Cargo cache:\n\n");
+
+    println!("\nCargo cache:\n");
     //println!("Total size: {} b", cumulative_size_cargo);
     println!(
         "Total size: {} ",
