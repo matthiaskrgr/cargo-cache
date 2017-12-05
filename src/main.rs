@@ -25,6 +25,20 @@ fn cumulative_dir_size(dir: &str) -> u64 {
     cumulative_size
 }
 
+fn get_file_number(dir: &str) -> u64 {
+    let mut number_of_files = 0;
+    for entry in WalkDir::new(dir) {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        //println!("{}", path.display());
+
+        if path.is_file() {
+            number_of_files += 1;
+        }
+    } // walkdir
+    number_of_files
+}
+
 fn main() {
     let cargo_dir = "/home/matthias/.cargo/";
 
@@ -39,8 +53,10 @@ fn main() {
 
     let bin_dir = "/home/matthias/.cargo/bin/";
     let mut cumulative_bin_size = 0;
+    let mut number_of_bins = 0;
     if Path::new(bin_dir).is_dir() {
         cumulative_bin_size = cumulative_dir_size(&bin_dir);
+        number_of_bins = get_file_number(&bin_dir);
     }
 
 
@@ -65,14 +81,14 @@ fn main() {
 
 
     println!("Cargo cache:\n\n");
-    println!("Total size: {} b", cumulative_size_cargo);
+    //println!("Total size: {} b", cumulative_size_cargo);
     println!(
         "Total size: {} ",
         cumulative_size_cargo.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Total size binaries {} ",
-        cumulative_bin_size.file_size(options::DECIMAL).unwrap()
+        "Total size of {} binaries {} ",
+         number_of_bins ,cumulative_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
         "Total size registry {} ",
