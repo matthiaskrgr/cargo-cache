@@ -1,7 +1,7 @@
-extern crate humansize;
-extern crate walkdir;
-extern crate clap;
-extern crate cargo;
+extern crate humansize; // convert bytes to whatever
+extern crate walkdir; // walk CARGO_DIR recursively
+extern crate clap; // cmdline arg parsing
+extern crate cargo; // obtain CARGO_DIR
 
 use std::fs;
 use std::path::Path;
