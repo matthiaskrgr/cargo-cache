@@ -52,7 +52,7 @@ fn main() {
         .get_matches();
 
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
-    let cargo_home_str =  format!("{}", cargo_cfg.home().display());
+    let cargo_home_str = format!("{}", cargo_cfg.home().display());
     let cargo_home_path = Path::new(&cargo_home_str);
 
 
@@ -78,7 +78,10 @@ fn main() {
 
 
     let registry_dir = (cargo_home_path.clone()).join("registry/");
-    let registry_dir_str = (registry_dir.clone()).into_os_string().into_string().unwrap();
+    let registry_dir_str = (registry_dir.clone())
+        .into_os_string()
+        .into_string()
+        .unwrap();
     println!("registry dir: {}", registry_dir_str);
     let mut cumulative_registry_size = 0;
     if registry_dir.is_dir() {
@@ -95,7 +98,10 @@ fn main() {
     }
 
     let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
-    let git_checkouts_size_str = (git_checkouts.clone()).into_os_string().into_string().unwrap();
+    let git_checkouts_size_str = (git_checkouts.clone())
+        .into_os_string()
+        .into_string()
+        .unwrap();
     println!("checkouts dir: {}", git_checkouts_size_str);
     let mut git_checkouts_size = 0;
     if git_checkouts.is_dir() {
