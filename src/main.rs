@@ -24,7 +24,7 @@ struct CacheDirCollector<'a> {
     git_checkouts: &'a CacheDir<'a>,
     git_db: &'a CacheDir<'a>,
     registry: &'a CacheDir<'a>,
-    bin_dir: &'a CacheDir<'a>,
+    //bin_dir: &'a CacheDir<'a>,
 }
 
 
@@ -217,10 +217,10 @@ fn main() {
     }
 
     //    let cargo_home_cache = CacheDir { path: &cargo_home_path, string:  &cargo_home_str };
-    let bin_dir_cache = CacheDir {
+    /*let bin_dir_cache = CacheDir {
         path: &bin_dir,
         string: &bin_dir_str,
-    };
+    };*/
     let registry_dir_cache = CacheDir {
         path: &registry_dir,
         string: &registry_dir_str,
@@ -238,7 +238,7 @@ fn main() {
         git_checkouts: &checkouts_cache,
         git_db: &git_db_cache,
         registry: &registry_dir_cache,
-        bin_dir: &bin_dir_cache,
+        //bin_dir: &bin_dir_cache,
     };
 
 
