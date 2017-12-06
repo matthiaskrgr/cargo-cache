@@ -232,7 +232,7 @@ fn main() {
         path: &git_checkouts,
         string: &git_checkouts_str,
     };
-
+    // link everything into the CacheDirCollector
     let cargo_cache = CacheDirCollector {
         git_checkouts: &checkouts_cache,
         git_db: &git_db_cache,
@@ -240,14 +240,6 @@ fn main() {
         bin_dir: &bin_dir_cache,
     };
 
-    /*
-
-
-GitCheckouts: &'a CacheDir<'a>,
-GitDB: &'a CacheDir<'a>,
-Registry: &'a CacheDir<'a>,
-BinDir: &'a CacheDir<'a>,
-*/
 
     println!("\nCargo cache:\n");
     println!(
@@ -273,8 +265,6 @@ BinDir: &'a CacheDir<'a>,
         "Size of git repo checkouts {} ",
         git_checkouts_size.file_size(options::DECIMAL).unwrap()
     );
-
-
 
 
     if cargo_show_cfg.is_present("remove-dirs") {
