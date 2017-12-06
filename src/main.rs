@@ -50,7 +50,10 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         }
     } // walkdir
 
-    DirInfoObj { dir_size: cumulative_size, file_number: number_of_files }
+    DirInfoObj {
+        dir_size: cumulative_size,
+        file_number: number_of_files,
+    }
 }
 
 
