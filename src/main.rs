@@ -21,10 +21,10 @@ struct CacheDir<'a> {
 struct CacheDirCollector<'a> {
     // an object containing all the relevant cache dirs
     // for easy pasing around to functions
-    GitCheckouts: &'a CacheDir<'a>,
-    GitDB: &'a CacheDir<'a>,
-    Registry: &'a CacheDir<'a>,
-    BinDir: &'a CacheDir<'a>,
+    git_checkouts: &'a CacheDir<'a>,
+    git_db: &'a CacheDir<'a>,
+    registry: &'a CacheDir<'a>,
+    bin_dir: &'a CacheDir<'a>,
 }
 
 
@@ -65,7 +65,7 @@ fn get_file_number(dir: &str) -> u64 {
 
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
-    let mut dir_to_delete: &CacheDir;
+    let dir_to_delete: &CacheDir;
 
     println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'all'.");
     println!("'abort' to abort.");
@@ -79,15 +79,15 @@ fn rm_dir(cache: &CacheDirCollector) {
         // check what dir we are supposed to delete now
         match input.trim() {
             "git-checkouts" => {
-                dir_to_delete = cache.GitCheckouts;
+                dir_to_delete = cache.git_checkouts;
                 break;
             }
             "git-db" => {
-                dir_to_delete = cache.GitDB;
+                dir_to_delete = cache.git_db;
                 break;
             }
             "registry" => {
-                dir_to_delete = cache.Registry;
+                dir_to_delete = cache.registry;
                 break;
             }
             "bin-dir" => println!("Please use 'cargo uninstall'."),
@@ -110,10 +110,10 @@ fn rm_dir(cache: &CacheDirCollector) {
         );
         if input.trim() == "yes" {
             println!("deleting {}", dir_to_delete.string);
-
-            // rm
-            // @TODO https://doc.rust-lang.org/std/fs/fn.remove_dir_all.html
-
+            if dir_to_delete.path.is_dir() {
+                // rm
+                // @TODO https://doc.rust-lang.org/std/fs/fn.remove_dir_all.html
+            }
             break;
         } else if input == "no" {
             println!("keeping {}", dir_to_delete.string);
@@ -228,10 +228,10 @@ fn main() {
     };
 
     let cargo_cache = CacheDirCollector {
-        GitCheckouts: &checkouts_cache,
-        GitDB: &git_db_cache,
-        Registry: &registry_dir_cache,
-        BinDir: &bin_dir_cache,
+        git_checkouts: &checkouts_cache,
+        git_db: &git_db_cache,
+        registry: &registry_dir_cache,
+        bin_dir: &bin_dir_cache,
     };
 
     /*
