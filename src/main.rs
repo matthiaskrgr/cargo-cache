@@ -111,8 +111,9 @@ fn rm_dir(cache: &CacheDirCollector) {
         if input.trim() == "yes" {
             println!("deleting {}", dir_to_delete.string);
             if dir_to_delete.path.is_dir() {
-                // rm
-                // @TODO https://doc.rust-lang.org/std/fs/fn.remove_dir_all.html
+                fs::remove_dir_all(dir_to_delete.string).unwrap();
+            } else {
+                println!("WARNING: dir did not exist???");
             }
             break;
         } else if input == "no" {
