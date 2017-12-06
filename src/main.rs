@@ -72,7 +72,7 @@ fn rm_dir(cache: &CacheDirCollector) {
 
     'inputStrLoop: loop {
         let mut input = String::new();
-        io::stdin().read_line(&mut input).ok().expect(
+        io::stdin().read_line(&mut input).expect(
             "Couldn't read input",
         );
 
@@ -105,7 +105,7 @@ fn rm_dir(cache: &CacheDirCollector) {
 
     loop {
         let mut input = String::new();
-        io::stdin().read_line(&mut input).ok().expect(
+        io::stdin().read_line(&mut input).expect(
             "Couldn't read line",
         );
         if input.trim() == "yes" {
@@ -166,11 +166,14 @@ fn main() {
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
     let mut cumulative_bin_size = 0;
-    let mut number_of_bins = 0;
-    if bin_dir.is_dir() {
+
+    let number_of_bins = if bin_dir.is_dir() {
         cumulative_bin_size = cumulative_dir_size(&bin_dir_str);
-        number_of_bins = get_file_number(&bin_dir_str);
-    }
+        get_file_number(&bin_dir_str)
+    } else {
+        0
+    };
+
 
 
     let registry_dir = (cargo_home_path.clone()).join("registry/");
@@ -178,28 +181,31 @@ fn main() {
         .into_os_string()
         .into_string()
         .unwrap();
-    let mut cumulative_registry_size = 0;
-    if registry_dir.is_dir() {
-        cumulative_registry_size = cumulative_dir_size(&registry_dir_str);
-    }
-
+    let cumulative_registry_size = if registry_dir.is_dir() {
+        cumulative_dir_size(&registry_dir_str)
+    } else {
+        0
+    };
 
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
-    let mut git_db_size = 0;
-    if git_db.is_dir() {
-        git_db_size = cumulative_dir_size(&git_db_str);
-    }
+    let git_db_size = if git_db.is_dir() {
+        cumulative_dir_size(&git_db_str)
+    } else {
+        0
+    };
 
     let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
     let git_checkouts_str = (git_checkouts.clone())
         .into_os_string()
         .into_string()
         .unwrap();
-    let mut git_checkouts_size = 0;
-    if git_checkouts.is_dir() {
-        git_checkouts_size = cumulative_dir_size(&git_checkouts_str);
-    }
+
+    let git_checkouts_size = if git_checkouts.is_dir() {
+        cumulative_dir_size(&git_checkouts_str)
+    } else {
+        0
+    };
 
     if cargo_show_cfg.is_present("print-dirs") {
         println!("cargo home: {}", cargo_home_str);
