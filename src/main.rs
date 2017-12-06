@@ -27,11 +27,17 @@ struct CacheDirCollector<'a> {
     //bin_dir: &'a CacheDir<'a>,
 }
 
+struct DirInfoObj {
+    // make sure we do not accidentally confuse dir_size and file_number
+    dir_size: u64,
+    file_number: u64,
+}
 
-fn cumulative_dir_size(dir: &str) -> u64 {
+
+fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     //@TODO add some clever caching
     let mut cumulative_size = 0;
-
+    let mut number_of_files = 0;
     // traverse recursively and sum filesizes
     for entry in WalkDir::new(dir) {
         let entry = entry.unwrap();
@@ -40,25 +46,14 @@ fn cumulative_dir_size(dir: &str) -> u64 {
 
         if path.is_file() {
             cumulative_size += fs::metadata(path).unwrap().len();
-        }
-    } // walkdir
-
-    cumulative_size
-}
-
-fn get_file_number(dir: &str) -> u64 {
-    let mut number_of_files = 0;
-    for entry in WalkDir::new(dir) {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        //println!("{}", path.display());
-
-        if path.is_file() {
             number_of_files += 1;
         }
     } // walkdir
-    number_of_files
+
+    DirInfoObj { dir_size: cumulative_size, file_number: number_of_files }
 }
+
+
 
 
 
@@ -161,16 +156,16 @@ fn main() {
         println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
-    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str);
-
+    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str).dir_size;
 
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
     let mut cumulative_bin_size = 0;
 
     let number_of_bins = if bin_dir.is_dir() {
-        cumulative_bin_size = cumulative_dir_size(&bin_dir_str);
-        get_file_number(&bin_dir_str)
+        let tmp = cumulative_dir_size(&bin_dir_str);
+        cumulative_bin_size = tmp.dir_size;
+        tmp.file_number
     } else {
         0
     };
@@ -183,7 +178,7 @@ fn main() {
         .into_string()
         .unwrap();
     let cumulative_registry_size = if registry_dir.is_dir() {
-        cumulative_dir_size(&registry_dir_str)
+        cumulative_dir_size(&registry_dir_str).dir_size
     } else {
         0
     };
@@ -191,7 +186,7 @@ fn main() {
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
     let git_db_size = if git_db.is_dir() {
-        cumulative_dir_size(&git_db_str)
+        cumulative_dir_size(&git_db_str).dir_size
     } else {
         0
     };
@@ -203,7 +198,7 @@ fn main() {
         .unwrap();
 
     let git_checkouts_size = if git_checkouts.is_dir() {
-        cumulative_dir_size(&git_checkouts_str)
+        cumulative_dir_size(&git_checkouts_str).dir_size
     } else {
         0
     };
