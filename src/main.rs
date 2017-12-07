@@ -36,6 +36,14 @@ struct DirInfoObj {
     file_number: u64,
 }
 
+struct DirSizesCollector {
+    total_size: u64, // total size of cargo root dir
+    numb_bins: u64, // number of binaries found
+    total_bin_size: u64, // total size of binaries found
+    total_reg_size: u64, // registry size
+    total_git_db_size: u64, // git db size
+    total_git_chk_size: u64, // git checkout size
+}
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     let dir_path = std::path::Path::new(dir);
@@ -144,6 +152,31 @@ fn rm_dir(cache: &CacheDirCollector) {
     } // loop
 } // fn rm_dir
 
+fn print_dir_sizes(sizes: &DirSizesCollector) {
+    let s = sizes;
+    println!("\nCargo cache:\n");
+    println!(
+        "Total size: {} ",
+        s.total_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of {} installed binaries {} ",
+        s.numb_bins,
+        s.total_bin_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of registry {} ",
+        s.total_reg_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of git db  {} ",
+        s.total_git_db_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of git repo checkouts {} ",
+        s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
+    );
+}
 
 
 fn main() {
@@ -194,12 +227,15 @@ fn main() {
         .into_string()
         .unwrap();
 
-    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str).dir_size;
-    let tmp = cumulative_dir_size(&bin_dir_str);
-    let (number_of_bins, cumulative_bin_size) = (tmp.dir_size, tmp.file_number);
-    let cumulative_registry_size = cumulative_dir_size(&registry_dir_str).dir_size;
-    let git_db_size = cumulative_dir_size(&git_db_str).dir_size;
-    let git_checkouts_size = cumulative_dir_size(&git_checkouts_str).dir_size;
+    let bindir = cumulative_dir_size(&bin_dir_str);
+    let dir_sizes = DirSizesCollector {
+        total_size: cumulative_dir_size(&cargo_home_str).dir_size,
+        numb_bins: bindir.file_number,
+        total_bin_size: bindir.dir_size,
+        total_reg_size: cumulative_dir_size(&registry_dir_str).dir_size,
+        total_git_db_size: cumulative_dir_size(&git_db_str).dir_size,
+        total_git_chk_size: cumulative_dir_size(&git_checkouts_str).dir_size,
+    };
 
 
     if cargo_show_cfg.is_present("print-dirs") {
@@ -211,7 +247,7 @@ fn main() {
     }
 
 
-    // link everything into the CacheDirCollector
+    // link everything into the CacheDirCollector which we can easily pass around to functions
     let cargo_cache = CacheDirCollector {
         git_checkouts: &CacheDir {
             path: &git_checkouts,
@@ -228,34 +264,10 @@ fn main() {
     };
 
 
-    println!("\nCargo cache:\n");
-    println!(
-        "Total size: {} ",
-        cumulative_size_cargo.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of {} installed binaries {} ",
-        number_of_bins,
-        cumulative_bin_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of registry {} ",
-        cumulative_registry_size
-            .file_size(options::DECIMAL)
-            .unwrap()
-    );
-    println!(
-        "Size of git db  {} ",
-        git_db_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of git repo checkouts {} ",
-        git_checkouts_size.file_size(options::DECIMAL).unwrap()
-    );
-
-
     if cargo_show_cfg.is_present("remove-dirs") {
+        print_dir_sizes(&dir_sizes);
         rm_dir(&cargo_cache);
     }
 
+    print_dir_sizes(&dir_sizes);
 }
