@@ -62,7 +62,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
 
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
-    let dir_to_delete: &CacheDir;
+    let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
     println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry'.");
     println!("'abort' to abort.");
@@ -76,15 +76,17 @@ fn rm_dir(cache: &CacheDirCollector) {
         // check what dir we are supposed to delete now
         match input.trim() {
             "git-checkouts" => {
-                dir_to_delete = cache.git_checkouts;
+                dirs_to_delete.push(cache.git_checkouts);
                 break;
             }
-            "git-db" => {
-                dir_to_delete = cache.git_db;
+            "git" => {
+                // @TODO make sure we print that we are rming bare repos AND checkouts
+                dirs_to_delete.push(cache.git_checkouts);
+                dirs_to_delete.push(cache.git_db);
                 break;
             }
             "registry" => {
-                dir_to_delete = cache.registry;
+                dirs_to_delete.push(cache.registry);
                 break;
             }
             "bin-dir" => println!("Please use 'cargo uninstall'."),
@@ -97,8 +99,9 @@ fn rm_dir(cache: &CacheDirCollector) {
     } // 'inputStrLoop
 
 
-    println!("Trying to delete {}", dir_to_delete.string);
-    println!("Really delete dir {} ? (yes/no)", dir_to_delete.string);
+
+    println!("Trying to delete {}", dirs_to_delete.first().unwrap().string);
+    println!("Really delete dir {} ? (yes/no)", dirs_to_delete.first().unwrap().string);
 
     loop {
         let mut input = String::new();
@@ -106,19 +109,21 @@ fn rm_dir(cache: &CacheDirCollector) {
             "Couldn't read line",
         );
         if input.trim() == "yes" {
-            println!("deleting {}", dir_to_delete.string);
-            if dir_to_delete.path.is_dir() {
-                fs::remove_dir_all(dir_to_delete.string).unwrap();
-            } else {
-                println!("WARNING: dir did not exist???");
+            println!("deleting {}", dirs_to_delete.first().unwrap().string);
+            for dir in dirs_to_delete {
+                if dir.path.is_dir() {
+                    fs::remove_dir_all(dir.string).unwrap();
+                } else {
+                    println!("ERROR: dir is not a directory??");
+                }
             }
             break;
         } else if input == "no" {
-            println!("keeping {}", dir_to_delete.string);
+            println!("keeping {}", dirs_to_delete.first().unwrap().string);
             break;
         } else {
             println!("Invalid input: {}", input);
-            println!("Please use 'yes' or 'no'");
+            println!("please use 'yes' or 'no'");
         }
     } // loop
 } // fn rm_dir
@@ -127,6 +132,7 @@ fn rm_dir(cache: &CacheDirCollector) {
 
 fn main() {
 
+    // parse args
     let cargo_show_cfg = App::new("cargo-show")
         .version("0.1")
         .about("Manage cargo cache")
@@ -142,7 +148,7 @@ fn main() {
         )
         .get_matches();
 
-
+    // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
     let cargo_home_path = Path::new(&cargo_home_str);
