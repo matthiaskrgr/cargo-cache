@@ -27,6 +27,7 @@ struct CacheDirCollector<'a> {
 
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
+    // since both are of the same type
     dir_size: u64,
     file_number: u64,
 }
@@ -59,7 +60,7 @@ fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
     let dir_to_delete: &CacheDir;
 
-    println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'all'.");
+    println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry'.");
     println!("'abort' to abort.");
 
     'inputStrLoop: loop {
