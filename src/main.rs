@@ -162,18 +162,18 @@ fn main() {
         println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
+
+
     let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str).dir_size;
 
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
-    let mut cumulative_bin_size = 0;
 
-    let number_of_bins = if bin_dir.is_dir() {
+    let (number_of_bins, cumulative_bin_size) = if bin_dir.is_dir() {
         let tmp = cumulative_dir_size(&bin_dir_str);
-        cumulative_bin_size = tmp.dir_size;
-        tmp.file_number
+        (tmp.file_number, tmp.dir_size)
     } else {
-        0
+        (0,0)
     };
 
 
