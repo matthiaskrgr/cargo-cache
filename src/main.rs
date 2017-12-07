@@ -208,6 +208,10 @@ fn main() {
         std::process::exit(1);
     }
 
+    if !cargo_show_cfg.is_present("print-dirs") {
+        println!("Found CARGO_HOME: {}", cargo_home_str);
+    }
+
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
 
