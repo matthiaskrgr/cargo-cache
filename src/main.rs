@@ -64,7 +64,7 @@ fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
     let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
-    println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry'.");
+    println!("Possile directories to delete: 'git-checkouts', 'git', 'registry'.");
     println!("'abort' to abort.");
 
     'inputStrLoop: loop {
@@ -81,8 +81,8 @@ fn rm_dir(cache: &CacheDirCollector) {
             }
             "git" => {
                 // @TODO make sure we print that we are rming bare repos AND checkouts
-                dirs_to_delete.push(cache.git_checkouts);
                 dirs_to_delete.push(cache.git_db);
+                dirs_to_delete.push(cache.git_checkouts);
                 break;
             }
             "registry" => {
@@ -111,10 +111,12 @@ fn rm_dir(cache: &CacheDirCollector) {
         if input.trim() == "yes" {
             println!("deleting {}", dirs_to_delete.first().unwrap().string);
             for dir in dirs_to_delete {
-                if dir.path.is_dir() {
+                if dir.path.is_file() {
+                    println!("ERROR: {} is not a directory but a file??", dir.string);
+                } else if dir.path.is_dir() {
                     fs::remove_dir_all(dir.string).unwrap();
                 } else {
-                    println!("ERROR: dir is not a directory??");
+                    println!("Directory {} does not exist, skipping", dir.string);
                 }
             }
             break;
