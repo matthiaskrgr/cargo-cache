@@ -38,6 +38,13 @@ struct DirInfoObj {
 
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
+    let dir_path = std::path::Path::new(dir);
+    if !dir_path.is_dir() {
+        return DirInfoObj {
+            dir_size: 0,
+            file_number: 0,
+        }
+    }
     //@TODO add some clever caching
     let mut cumulative_size = 0;
     let mut number_of_files = 0;
