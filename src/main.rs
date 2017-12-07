@@ -186,8 +186,8 @@ fn main() {
         .version("0.1")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .arg(Arg::with_name("print-dirs").short("d").long("dirs").help(
-            "Show found directory paths.",
+        .arg(Arg::with_name("print-dirs").short("p").long("print-dirs").help(
+            "Pring found directory paths.",
         ))
         .arg(
             Arg::with_name("remove-dirs")
