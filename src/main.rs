@@ -43,7 +43,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         return DirInfoObj {
             dir_size: 0,
             file_number: 0,
-        }
+        };
     }
     //@TODO add some clever caching
     let mut cumulative_size = 0;
@@ -107,8 +107,14 @@ fn rm_dir(cache: &CacheDirCollector) {
 
 
 
-    println!("Trying to delete {}", dirs_to_delete.first().unwrap().string);
-    println!("Really delete dir {} ? (yes/no)", dirs_to_delete.first().unwrap().string);
+    println!(
+        "Trying to delete {}",
+        dirs_to_delete.first().unwrap().string
+    );
+    println!(
+        "Really delete dir {} ? (yes/no)",
+        dirs_to_delete.first().unwrap().string
+    );
 
     loop {
         let mut input = String::new();
@@ -176,13 +182,8 @@ fn main() {
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
 
-    let (number_of_bins, cumulative_bin_size) = if bin_dir.is_dir() {
-        let tmp = cumulative_dir_size(&bin_dir_str);
-        (tmp.file_number, tmp.dir_size)
-    } else {
-        (0,0)
-    };
-
+    let tmp = cumulative_dir_size(&bin_dir_str);
+    let (number_of_bins, cumulative_bin_size) = (tmp.dir_size, tmp.file_number);
 
 
     let registry_dir = (cargo_home_path.clone()).join("registry/");
@@ -190,19 +191,14 @@ fn main() {
         .into_os_string()
         .into_string()
         .unwrap();
-    let cumulative_registry_size = if registry_dir.is_dir() {
-        cumulative_dir_size(&registry_dir_str).dir_size
-    } else {
-        0
-    };
+
+    let cumulative_registry_size = cumulative_dir_size(&registry_dir_str).dir_size;
+
 
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
-    let git_db_size = if git_db.is_dir() {
-        cumulative_dir_size(&git_db_str).dir_size
-    } else {
-        0
-    };
+    let git_db_size = cumulative_dir_size(&git_db_str).dir_size;
+
 
     let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
     let git_checkouts_str = (git_checkouts.clone())
@@ -210,11 +206,8 @@ fn main() {
         .into_string()
         .unwrap();
 
-    let git_checkouts_size = if git_checkouts.is_dir() {
-        cumulative_dir_size(&git_checkouts_str).dir_size
-    } else {
-        0
-    };
+    let git_checkouts_size = cumulative_dir_size(&git_checkouts_str).dir_size;
+
 
     if cargo_show_cfg.is_present("print-dirs") {
         println!("cargo home: {}", cargo_home_str);
