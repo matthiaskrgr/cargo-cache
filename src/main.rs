@@ -1,6 +1,10 @@
+// https://github.com/LeopoldArkham/humansize
 extern crate humansize; // convert bytes to whatever
+// https://github.com/BurntSushi/walkdir
 extern crate walkdir; // walk CARGO_DIR recursively
+// https://github.com/kbknapp/clap-rs
 extern crate clap; // cmdline arg parsing
+// https://github.com/rust-lang/cargo
 extern crate cargo; // obtain CARGO_DIR
 
 use std::fs;
