@@ -113,6 +113,7 @@ fn rm_dir(cache: &CacheDirCollector) {
             for dir in dirs_to_delete {
                 if dir.path.is_file() {
                     println!("ERROR: {} is not a directory but a file??", dir.string);
+                    println!("Doing nothing.");
                 } else if dir.path.is_dir() {
                     fs::remove_dir_all(dir.string).unwrap();
                 } else {
