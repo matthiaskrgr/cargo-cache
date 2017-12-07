@@ -105,6 +105,10 @@ fn rm_dir(cache: &CacheDirCollector) {
                 break;
             }
             "bin-dir" => println!("Please use 'cargo uninstall'."),
+            "abort" => {
+                println!("Terminating...");
+                std::process::exit(0);
+            }
             _ => {
                 println!("Invalid input.");
                 println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry'.");
@@ -186,9 +190,12 @@ fn main() {
         .version("0.1")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .arg(Arg::with_name("print-dirs").short("p").long("print-dirs").help(
-            "Pring found directory paths.",
-        ))
+        .arg(
+            Arg::with_name("print-dirs")
+                .short("p")
+                .long("print-dirs")
+                .help("Pring found directory paths."),
+        )
         .arg(
             Arg::with_name("remove-dirs")
                 .short("r")
