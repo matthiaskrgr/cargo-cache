@@ -211,24 +211,20 @@ fn main() {
     }
 
 
-    let registry_dir_cache = CacheDir {
-        path: &registry_dir,
-        string: &registry_dir_str,
-    };
-    let git_db_cache = CacheDir {
-        path: &git_db,
-        string: &git_db_str,
-    };
-    let checkouts_cache = CacheDir {
-        path: &git_checkouts,
-        string: &git_checkouts_str,
-    };
     // link everything into the CacheDirCollector
     let cargo_cache = CacheDirCollector {
-        git_checkouts: &checkouts_cache,
-        git_db: &git_db_cache,
-        registry: &registry_dir_cache,
-        //bin_dir: &bin_dir_cache,
+        git_checkouts: &CacheDir {
+            path: &git_checkouts,
+            string: &git_checkouts_str,
+        },
+        git_db: &CacheDir {
+            path: &git_db,
+            string: &git_db_str,
+        },
+        registry: &CacheDir {
+            path: &registry_dir,
+            string: &registry_dir_str,
+        },
     };
 
 
