@@ -10,8 +10,6 @@ use std::io;
 use clap::{Arg, App};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
-//use cargo::util::config;
-
 
 struct CacheDir<'a> {
     path: &'a std::path::Path, // path object of the dir
@@ -55,10 +53,6 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         file_number: number_of_files,
     }
 }
-
-
-
-
 
 
 fn rm_dir(cache: &CacheDirCollector) {
@@ -122,10 +116,7 @@ fn rm_dir(cache: &CacheDirCollector) {
             println!("Please use 'yes' or 'no'");
         }
     } // loop
-
-
 } // fn rm_dir
-
 
 
 
@@ -150,8 +141,6 @@ fn main() {
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
     let cargo_home_path = Path::new(&cargo_home_str);
-
-
 
 
     // make sure we actually have a cargo dir
