@@ -169,21 +169,14 @@ fn main() {
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
     let cargo_home_path = Path::new(&cargo_home_str);
 
-
     // make sure we actually have a cargo dir
     if !cargo_home_path.is_dir() {
         println!("Error, no '{} dir found", &cargo_home_str);
         std::process::exit(1);
     }
 
-
-    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str).dir_size;
-
     let bin_dir = (cargo_home_path.clone()).join("bin/");
     let bin_dir_str = bin_dir.clone().into_os_string().into_string().unwrap();
-
-    let tmp = cumulative_dir_size(&bin_dir_str);
-    let (number_of_bins, cumulative_bin_size) = (tmp.dir_size, tmp.file_number);
 
 
     let registry_dir = (cargo_home_path.clone()).join("registry/");
@@ -192,13 +185,8 @@ fn main() {
         .into_string()
         .unwrap();
 
-    let cumulative_registry_size = cumulative_dir_size(&registry_dir_str).dir_size;
-
-
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
-    let git_db_size = cumulative_dir_size(&git_db_str).dir_size;
-
 
     let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
     let git_checkouts_str = (git_checkouts.clone())
@@ -206,6 +194,11 @@ fn main() {
         .into_string()
         .unwrap();
 
+    let cumulative_size_cargo = cumulative_dir_size(&cargo_home_str).dir_size;
+    let tmp = cumulative_dir_size(&bin_dir_str);
+    let (number_of_bins, cumulative_bin_size) = (tmp.dir_size, tmp.file_number);
+    let cumulative_registry_size = cumulative_dir_size(&registry_dir_str).dir_size;
+    let git_db_size = cumulative_dir_size(&git_db_str).dir_size;
     let git_checkouts_size = cumulative_dir_size(&git_checkouts_str).dir_size;
 
 
@@ -217,11 +210,7 @@ fn main() {
         println!("checkouts dir: {}", git_checkouts_str);
     }
 
-    //    let cargo_home_cache = CacheDir { path: &cargo_home_path, string:  &cargo_home_str };
-    /*let bin_dir_cache = CacheDir {
-        path: &bin_dir,
-        string: &bin_dir_str,
-    };*/
+
     let registry_dir_cache = CacheDir {
         path: &registry_dir,
         string: &registry_dir_str,
