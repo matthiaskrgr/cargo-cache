@@ -20,7 +20,6 @@ use std::io::stdout;
 use clap::{Arg, App, SubCommand};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
-use git2::ObjectType;
 
 struct CacheDir<'a> {
     path: &'a std::path::Path, // path object of the dir
@@ -61,10 +60,10 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
 
     // get size before
     let size_before = cumulative_dir_size(&pathstr).dir_size;
-    let SB_human_readable = size_before.file_size(options::DECIMAL).unwrap();
-    print!("{} => ", SB_human_readable);
+    let sb_human_readable = size_before.file_size(options::DECIMAL).unwrap();
+    print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
-    stdout().flush();
+    stdout().flush().unwrap();
     let repo = git2::Repository::open(path).unwrap();
     match Command::new("git")
         .arg("gc")
@@ -72,25 +71,24 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
         .arg("--prune=now")
         .current_dir(repo.path())
         .output() {
-        Ok(out) => {
-            /*
-        println!("git gc error\nstatus: {}", out.status);
+        Ok(_out) => {}
+        /* println!("git gc error\nstatus: {}", out.status);
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
-            //if out.status.success() {} */
-        }
+            //if out.status.success() {}
+        } */
         Err(e) => println!("git-gc failed {}", e),
     }
     let size_after = cumulative_dir_size(&pathstr).dir_size;
-    let SA_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    let mut size_diff = ((size_after - size_before) as i64);
+    let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
+    let mut size_diff = (size_after - size_before) as i64;
     let mut sign = "+";
     if size_diff < 0 {
         sign = "-";
         size_diff *= -1;
     }
-    let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
-    println!("{} ({}{})", SA_human_readable, sign, SD_human_readable);
+    let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+    println!("{} ({}{})", sa_human_readable, sign, sd_human_readable);
     (size_before, size_after)
 }
 
@@ -256,7 +254,7 @@ fn main() {
         ))
         .subcommand(
             // this is needed so "cargo cache" works
-            SubCommand::with_name("cache")
+            SubCommand::with_name("cache"),
         )
         .get_matches();
 
@@ -375,14 +373,14 @@ fn main() {
             sign = "-";
             size_diff *= -1;
         }
-        let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
 
         println!(
             "Compressed {} to {}, ({}{})",
             total_size_before.file_size(options::DECIMAL).unwrap(),
             total_size_after.file_size(options::DECIMAL).unwrap(),
             sign,
-            SD_human_readable
+            sd_human_readable
         );
     } // gc
 }
