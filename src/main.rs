@@ -59,7 +59,7 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
     }
 
     // get size before
-    let size_before = cumulative_dir_size(&pathstr).dir_size;
+    let size_before = cumulative_dir_size(pathstr).dir_size;
     let sb_human_readable = size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
@@ -79,7 +79,7 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
         } */
         Err(e) => println!("git-gc failed {}", e),
     }
-    let size_after = cumulative_dir_size(&pathstr).dir_size;
+    let size_after = cumulative_dir_size(pathstr).dir_size;
     let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
     let mut size_diff = (size_after - size_before) as i64;
     let mut sign = "+";
