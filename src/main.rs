@@ -325,9 +325,9 @@ fn main() {
             string: &registry_dir_str,
         },
     };
+    print_dir_sizes(&dir_sizes);
 
     if cargo_show_cfg.is_present("remove-dirs") {
-        print_dir_sizes(&dir_sizes);
         rm_dir(&cargo_cache);
     }
 
