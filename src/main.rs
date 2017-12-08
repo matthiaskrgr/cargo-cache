@@ -236,13 +236,13 @@ fn main() {
             Arg::with_name("print-dirs")
                 .short("p")
                 .long("print-dirs")
-                .help("Pring found directory paths."),
+                .help("Print found directory paths."),
         )
         .arg(
             Arg::with_name("remove-dirs")
                 .short("r")
                 .long("remove")
-                .help("Remove directories in the cache."),
+                .help("Select directories in the cache to be removed."),
         )
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
             "Recompress git repositories (may take some time).",
