@@ -17,7 +17,7 @@ use std::process::Command;
 use std::io::Write;
 use std::io::stdout;
 
-use clap::{Arg, App};
+use clap::{Arg, App, SubCommand};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
 use git2::ObjectType;
@@ -87,7 +87,7 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
     let mut sign = "+";
     if size_diff < 0 {
         sign = "-";
-        size_diff *=-1;
+        size_diff *= -1;
     }
     let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
     println!("{} ({}{})", SA_human_readable, sign, SD_human_readable);
@@ -254,6 +254,10 @@ fn main() {
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
             "Recompress git repositories (may take some time).",
         ))
+        .subcommand(
+            // this is needed so "cargo cache" works
+            SubCommand::with_name("cache")
+        )
         .get_matches();
 
     // get the cargo home dir path from cargo
@@ -369,7 +373,7 @@ fn main() {
         let mut sign = "+";
         if size_diff < 0 {
             sign = "-";
-            size_diff *=-1;
+            size_diff *= -1;
         }
         let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
 
