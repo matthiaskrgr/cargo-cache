@@ -10,6 +10,7 @@ extern crate cargo; // obtain CARGO_DIR
 use std::fs;
 use std::path::Path;
 use std::io;
+use std::process;
 
 use clap::{Arg, App};
 use humansize::{FileSize, file_size_opts as options};
@@ -46,7 +47,7 @@ struct DirSizesCollector {
 }
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
-    let dir_path = std::path::Path::new(dir);
+    let dir_path = Path::new(dir);
     if !dir_path.is_dir() {
         return DirInfoObj {
             dir_size: 0,
@@ -107,7 +108,7 @@ fn rm_dir(cache: &CacheDirCollector) {
             "bin-dir" => println!("Please use 'cargo uninstall'."),
             "abort" => {
                 println!("Terminating...");
-                std::process::exit(0);
+                process::exit(0);
             }
             _ => {
                 println!("Invalid input.");
@@ -212,7 +213,7 @@ fn main() {
     // make sure we actually have a cargo dir
     if !cargo_home_path.is_dir() {
         println!("Error, no '{} dir found", &cargo_home_str);
-        std::process::exit(1);
+        process::exit(1);
     }
 
     if !cargo_show_cfg.is_present("print-dirs") {
