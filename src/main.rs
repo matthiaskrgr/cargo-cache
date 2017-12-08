@@ -52,7 +52,7 @@ struct DirSizesCollector {
     total_git_chk_size: u64, // git checkout size
 }
 
-fn gc_repo(pathstr: &str) {
+fn gc_repo(pathstr: &str) -> (u64, u64) {
     print!("Recompressing {} : ", pathstr);
     let path = Path::new(pathstr);
     if !path.is_dir() {
@@ -84,7 +84,7 @@ fn gc_repo(pathstr: &str) {
     let size_after = cumulative_dir_size(&pathstr).dir_size;
     let SA_human_readable = size_after.file_size(options::DECIMAL).unwrap();
     println!("{}", SA_human_readable);
-
+    (size_before, size_after)
 }
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
@@ -326,13 +326,18 @@ fn main() {
 
     // gc cloned git repos of crates or whatever
     if cargo_show_cfg.is_present("gc-repos") {
+        let mut total_size_before: u64 = 0;
+        let mut total_size_after: u64 = 0;
+
         println!("Recompressing repositories. Please be patient...");
         // gc git repos of crates
         for entry in fs::read_dir(&git_db).unwrap() {
             let entry = entry.unwrap();
             let repo = entry.path();
             let repostr = repo.into_os_string().into_string().unwrap();
-            gc_repo(&repostr);
+            let (before, after) = gc_repo(&repostr);
+            total_size_before += before;
+            total_size_after += after;
         }
 
         // gc registries
@@ -349,7 +354,17 @@ fn main() {
         for repo in fs::read_dir(&registry_repos_path).unwrap() {
             let repo = repo.unwrap().path().join(".git/");
             let repo_str = repo.into_os_string().into_string().unwrap();
-            gc_repo(&repo_str);
+            let (before, after) = gc_repo(&repo_str);
+            total_size_before += before;
+            total_size_after += after;
+
         } // iterate over registries and gc
+        let diff = total_size_after - total_size_before;
+        println!(
+            "Compressed {} to {}, {}",
+            total_size_before.file_size(options::DECIMAL).unwrap(),
+            total_size_after.file_size(options::DECIMAL).unwrap(),
+            diff.file_size(options::DECIMAL).unwrap()
+        );
     } // gc
 }
