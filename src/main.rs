@@ -83,8 +83,14 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
     }
     let size_after = cumulative_dir_size(&pathstr).dir_size;
     let SA_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    let size_diff = (size_after - size_before).file_size(options::DECIMAL).unwrap();
-    println!("{} ({})", SA_human_readable, size_diff);
+    let mut size_diff = ((size_after - size_before) as i64);
+    let mut sign = "+";
+    if size_diff < 0 {
+        sign = "-";
+        size_diff *=-1;
+    }
+    let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+    println!("{} ({}{})", SA_human_readable, sign, SD_human_readable);
     (size_before, size_after)
 }
 
@@ -358,14 +364,21 @@ fn main() {
             let (before, after) = gc_repo(&repo_str);
             total_size_before += before;
             total_size_after += after;
-
         } // iterate over registries and gc
-        let diff = total_size_after - total_size_before;
+        let mut size_diff = (total_size_after - total_size_before) as i64;
+        let mut sign = "+";
+        if size_diff < 0 {
+            sign = "-";
+            size_diff *=-1;
+        }
+        let SD_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+
         println!(
-            "Compressed {} to {}, {}",
+            "Compressed {} to {}, ({}{})",
             total_size_before.file_size(options::DECIMAL).unwrap(),
             total_size_after.file_size(options::DECIMAL).unwrap(),
-            diff.file_size(options::DECIMAL).unwrap()
+            sign,
+            SD_human_readable
         );
     } // gc
 }
