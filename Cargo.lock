@@ -121,7 +121,7 @@ name = "cargo-cache"
 version = "0.1.0"
 dependencies = [
  "cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "humansize 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "walkdir 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -139,7 +139,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "clap"
-version = "2.28.0"
+version = "2.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1001,7 +1001,7 @@ dependencies = [
 "checksum cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6e901b12ae1f05f21a53fc511000d66cdfa453af3e4746d881cb6913bc97e2e6"
 "checksum cc 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "a9b13a57efd6b30ecd6598ebdb302cca617930b5470647570468a65d12ef9719"
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
-"checksum clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)" = "dc34bf7d5d66268b466b9852bca925ec1d2650654dab4da081e63fd230145c2e"
+"checksum clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)" = "110d43e343eb29f4f51c1db31beb879d546db27998577e5715270a54bcf41d3f"
 "checksum cmake 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)" = "e14cd15a7cbc2c6a905677e54b831ee91af2ff43b352010f6133236463b65cac"
 "checksum commoncrypto 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d056a8586ba25a1e4d61cb090900e495952c7886786fc55f909ab2f819b69007"
 "checksum commoncrypto-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1fed34f46747aa73dfaa578069fd8279d2818ade2b55f38f22a9401c7f4083e2"
