@@ -83,7 +83,8 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
     }
     let size_after = cumulative_dir_size(&pathstr).dir_size;
     let SA_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    println!("{}", SA_human_readable);
+    let size_diff = (size_after - size_before).file_size(options::DECIMAL).unwrap();
+    println!("{} ({})", SA_human_readable, size_diff);
     (size_before, size_after)
 }
 
