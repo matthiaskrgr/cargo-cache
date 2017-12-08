@@ -122,6 +122,7 @@ version = "0.1.0"
 dependencies = [
  "cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "git2 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "humansize 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "walkdir 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

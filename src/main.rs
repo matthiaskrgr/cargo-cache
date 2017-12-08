@@ -6,15 +6,21 @@ extern crate walkdir; // walk CARGO_DIR recursively
 extern crate clap; // cmdline arg parsing
 // https://github.com/rust-lang/cargo
 extern crate cargo; // obtain CARGO_DIR
+// https://github.com/alexcrichton/git2-rs
+extern crate git2; // compress git repos
 
 use std::fs;
 use std::path::Path;
 use std::io;
 use std::process;
+use std::process::Command;
+use std::io::Write;
+use std::io::stdout;
 
 use clap::{Arg, App};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
+use git2::ObjectType;
 
 struct CacheDir<'a> {
     path: &'a std::path::Path, // path object of the dir
@@ -44,6 +50,41 @@ struct DirSizesCollector {
     total_reg_size: u64, // registry size
     total_git_db_size: u64, // git db size
     total_git_chk_size: u64, // git checkout size
+}
+
+fn gc_repo(pathstr: &str) {
+    print!("Recompressing {} : ", pathstr);
+    let path = Path::new(pathstr);
+    if !path.is_dir() {
+        panic!("WARNING: git gc path is not directory: {}", &pathstr);
+    }
+
+    // get size before
+    let size_before = cumulative_dir_size(&pathstr).dir_size;
+    let SB_human_readable = size_before.file_size(options::DECIMAL).unwrap();
+    print!("{} => ", SB_human_readable);
+    // we need to flush stdout manually for incremental print();
+    stdout().flush();
+    let repo = git2::Repository::open(path).unwrap();
+    match Command::new("git")
+        .arg("gc")
+        .arg("--aggressive")
+        .arg("--prune=now")
+        .current_dir(repo.path())
+        .output() {
+        Ok(out) => {
+            /*
+        println!("git gc error\nstatus: {}", out.status);
+            println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
+            println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
+            //if out.status.success() {} */
+        }
+        Err(e) => println!("git-gc failed {}", e),
+    }
+    let size_after = cumulative_dir_size(&pathstr).dir_size;
+    let SA_human_readable = size_after.file_size(options::DECIMAL).unwrap();
+    println!("{}", SA_human_readable);
+
 }
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
@@ -203,6 +244,9 @@ fn main() {
                 .long("remove")
                 .help("Remove directories in the cache."),
         )
+        .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
+            "Recompress git repositories (may take some time).",
+        ))
         .get_matches();
 
     // get the cargo home dir path from cargo
@@ -217,7 +261,7 @@ fn main() {
     }
 
     if !cargo_show_cfg.is_present("print-dirs") {
-        println!("Found CARGO_HOME: {}", cargo_home_str);
+        println!("Found CARGO_HOME: {}\n", cargo_home_str);
     }
 
     let bin_dir = (cargo_home_path.clone()).join("bin/");
@@ -275,11 +319,37 @@ fn main() {
         },
     };
 
-
     if cargo_show_cfg.is_present("remove-dirs") {
         print_dir_sizes(&dir_sizes);
         rm_dir(&cargo_cache);
     }
 
-    print_dir_sizes(&dir_sizes);
+    // gc cloned git repos of crates or whatever
+    if cargo_show_cfg.is_present("gc-repos") {
+        println!("Recompressing repositories. Please be patient...");
+        // gc git repos of crates
+        for entry in fs::read_dir(&git_db).unwrap() {
+            let entry = entry.unwrap();
+            let repo = entry.path();
+            let repostr = repo.into_os_string().into_string().unwrap();
+            gc_repo(&repostr);
+        }
+
+        // gc registries
+        let registry_repos_str = format!(
+            "{}",
+            cargo::util::config::Config::default()
+                .unwrap()
+                .home()
+                .display()
+        );
+        let registry_repos_path = Path::new(&registry_repos_str).join("registry/").join(
+            "index/",
+        );
+        for repo in fs::read_dir(&registry_repos_path).unwrap() {
+            let repo = repo.unwrap().path().join(".git/");
+            let repo_str = repo.into_os_string().into_string().unwrap();
+            gc_repo(&repo_str);
+        } // iterate over registries and gc
+    } // gc
 }
