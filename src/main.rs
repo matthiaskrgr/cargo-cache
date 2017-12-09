@@ -137,7 +137,9 @@ fn rm_dir(cache: &CacheDirCollector) {
 
     let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
-    println!("Possile directories to delete: 'git-checkouts', 'git', 'registry', 'registry-source-checkouts', 'registry-crate-archives'.");
+    println!(
+        "Possile directories to delete: 'git-checkouts', 'git', 'registry', 'registry-source-checkouts', 'registry-crate-archives'."
+    );
     println!("'abort' to abort.");
 
     'inputStrLoop: loop {
@@ -177,7 +179,9 @@ fn rm_dir(cache: &CacheDirCollector) {
             }
             _ => {
                 println!("Invalid input.");
-                println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'registry-source-checkouts', 'registry-crate-archives'.");
+                println!(
+                    "Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'registry-source-checkouts', 'registry-crate-archives'."
+                );
                 continue 'inputStrLoop;
             } // _
         } // match input
@@ -381,7 +385,7 @@ fn main() {
         bin_dir: &CacheDir {
             path: &bin_dir,
             string: &bin_dir_str,
-        }
+        },
     };
 
 
@@ -390,7 +394,7 @@ fn main() {
 
     if cargo_show_cfg.is_present("remove-dirs") {
         rm_dir(&cargo_cache);
-    } else  if cargo_show_cfg.is_present("list-dirs")  {
+    } else if cargo_show_cfg.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
 
     }
