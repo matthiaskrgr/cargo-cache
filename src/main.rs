@@ -238,10 +238,10 @@ fn main() {
         .about("Manage cargo cache")
         .author("matthiaskrgr")
         .arg(
-            Arg::with_name("print-dirs")
-                .short("p")
-                .long("print-dirs")
-                .help("Print found directory paths."),
+            Arg::with_name("list-dirs")
+                .short("l")
+                .long("list-dirs")
+                .help("List found directory paths."),
         )
         .arg(
             Arg::with_name("remove-dirs")
@@ -269,7 +269,7 @@ fn main() {
         process::exit(1);
     }
 
-    if !cargo_show_cfg.is_present("print-dirs") {
+    if !cargo_show_cfg.is_present("list-dirs") {
         println!("Found CARGO_HOME: {}\n", cargo_home_str);
     }
 
@@ -303,7 +303,7 @@ fn main() {
     };
 
 
-    if cargo_show_cfg.is_present("print-dirs") {
+    if cargo_show_cfg.is_present("list-dirs") {
         println!("cargo home: {}", cargo_home_str);
         println!("bin dir: {}", bin_dir_str);
         println!("registry dir: {}", registry_dir_str);
