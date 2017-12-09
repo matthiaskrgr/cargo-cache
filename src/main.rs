@@ -283,6 +283,17 @@ fn main() {
         .into_string()
         .unwrap();
 
+    let registry_cache = (registry_dir.clone()).join("cache/");
+    let registry_cache_str = (registry_cache.clone())
+        .into_os_string()
+        .into_string()
+        .unwrap();
+    let registry_sources = (registry_dir.clone()).join("src/");
+    let registry_sources_str = (registry_sources.clone())
+        .into_os_string()
+        .into_string()
+        .unwrap();
+
     let git_db = (cargo_home_path.clone()).join("git/db/");
     let git_db_str = git_db.clone().into_os_string().into_string().unwrap();
 
@@ -307,6 +318,8 @@ fn main() {
         println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
         println!("binaries directory:           {}", bin_dir_str);
         println!("registry directory:           {}", registry_dir_str);
+        println!("registry crate source cache:  {}", registry_cache_str);
+        println!("registry unpacked sources:    {}", registry_sources_str);
         println!("git db directory:             {}", git_db_str);
         println!("git checkouts dir:            {}", git_checkouts_str);
     }
