@@ -32,6 +32,8 @@ struct CacheDirCollector<'a> {
     git_checkouts: &'a CacheDir<'a>,
     git_db: &'a CacheDir<'a>,
     registry: &'a CacheDir<'a>,
+    registry_cache: &'a CacheDir<'a>,
+    registry_src: &'a CacheDir<'a>,
     //bin_dir: &'a CacheDir<'a>,
 }
 
@@ -49,6 +51,8 @@ struct DirSizesCollector {
     total_reg_size: u64, // registry size
     total_git_db_size: u64, // git db size
     total_git_chk_size: u64, // git checkout size
+    total_reg_cache_size: u64, // registry cache size
+    total_reg_src_size: u64, // registry sources size
 }
 
 fn gc_repo(pathstr: &str) -> (u64, u64) {
@@ -207,24 +211,32 @@ fn print_dir_sizes(sizes: &DirSizesCollector) {
     let s = sizes;
     println!("\nCargo cache:\n");
     println!(
-        "Total size: {} ",
+        "Total size:                        {} ",
         s.total_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of {} installed binaries {} ",
+        "Size of {} installed binaries:     {} ",
         s.numb_bins,
         s.total_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of registry {} ",
+        "Size of registry:                  {} ",
         s.total_reg_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of git db  {} ",
+        "Size of registry crate cache:      {} ",
+        s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of registry source checkouts: {} ",
+        s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "Size of git db:                    {} ",
         s.total_git_db_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of git repo checkouts {} ",
+        "Size of git repo checkouts:        {} ",
         s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
     );
 }
@@ -311,6 +323,8 @@ fn main() {
         total_reg_size: cumulative_dir_size(&registry_dir_str).dir_size,
         total_git_db_size: cumulative_dir_size(&git_db_str).dir_size,
         total_git_chk_size: cumulative_dir_size(&git_checkouts_str).dir_size,
+        total_reg_cache_size: cumulative_dir_size(&registry_cache_str).dir_size,
+        total_reg_src_size:  cumulative_dir_size(&registry_sources_str).dir_size,
     };
 
 
@@ -338,6 +352,14 @@ fn main() {
         registry: &CacheDir {
             path: &registry_dir,
             string: &registry_dir_str,
+        },
+        registry_cache: &CacheDir {
+            path: &registry_cache,
+            string: &registry_cache_str,
+        },
+        registry_src: &CacheDir {
+            path: &registry_sources,
+            string: &registry_sources_str,
         },
     };
     print_dir_sizes(&dir_sizes);
