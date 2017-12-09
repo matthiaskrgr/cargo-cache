@@ -1,11 +1,15 @@
 // https://github.com/LeopoldArkham/humansize
 extern crate humansize; // convert bytes to whatever
+
 // https://github.com/BurntSushi/walkdir
 extern crate walkdir; // walk CARGO_DIR recursively
+
 // https://github.com/kbknapp/clap-rs
 extern crate clap; // cmdline arg parsing
+
 // https://github.com/rust-lang/cargo
 extern crate cargo; // obtain CARGO_DIR
+
 // https://github.com/alexcrichton/git2-rs
 extern crate git2; // compress git repos
 
@@ -207,8 +211,7 @@ fn rm_dir(cache: &CacheDirCollector) {
     } // loop
 } // fn rm_dir
 
-fn print_dir_sizes(sizes: &DirSizesCollector) {
-    let s = sizes;
+fn print_dir_sizes(s: &DirSizesCollector) {
     println!("\nCargo cache:\n");
     println!(
         "Total size:                        {} ",
@@ -324,7 +327,7 @@ fn main() {
         total_git_db_size: cumulative_dir_size(&git_db_str).dir_size,
         total_git_chk_size: cumulative_dir_size(&git_checkouts_str).dir_size,
         total_reg_cache_size: cumulative_dir_size(&registry_cache_str).dir_size,
-        total_reg_src_size:  cumulative_dir_size(&registry_sources_str).dir_size,
+        total_reg_src_size: cumulative_dir_size(&registry_sources_str).dir_size,
     };
 
 
