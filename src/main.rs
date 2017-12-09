@@ -130,7 +130,11 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
 
-    // @TODO print the paths and sizes to give user some context
+    //print the paths and sizes to give user some context
+    println!();
+    print_dir_paths(cache);
+    println!();
+
     let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
     println!("Possile directories to delete: 'git-checkouts', 'git', 'registry', 'registry-source-checkouts', 'registry-crate-archives'.");
@@ -234,11 +238,11 @@ fn print_dir_sizes(s: &DirSizesCollector) {
         s.total_reg_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of registry crate cache:      {} ",
+        "Size of registry crate cache:           {} ",
         s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
-        "Size of registry source checkouts: {} ",
+        "Size of registry source checkouts:      {} ",
         s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
@@ -380,14 +384,15 @@ fn main() {
         }
     };
 
-    if cargo_show_cfg.is_present("list-dirs") {
-        print_dir_paths(&cargo_cache);
-    }
+
 
     print_dir_sizes(&dir_sizes);
 
     if cargo_show_cfg.is_present("remove-dirs") {
         rm_dir(&cargo_cache);
+    } else  if cargo_show_cfg.is_present("list-dirs")  {
+        print_dir_paths(&cargo_cache);
+
     }
 
     // gc cloned git repos of crates or whatever
