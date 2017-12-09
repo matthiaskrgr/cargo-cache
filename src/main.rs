@@ -35,7 +35,7 @@ struct CacheDirCollector<'a> {
     registry: &'a CacheDir<'a>,
     registry_cache: &'a CacheDir<'a>,
     registry_src: &'a CacheDir<'a>,
-    //bin_dir: &'a CacheDir<'a>,
+    bin_dir: &'a CacheDir<'a>,
 }
 
 struct DirInfoObj {
@@ -251,6 +251,17 @@ fn print_dir_sizes(s: &DirSizesCollector) {
     );
 }
 
+fn print_dir_paths(c: &CacheDirCollector) {
+    //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
+    println!("binaries directory:           {}", c.bin_dir.string);
+    println!("registry directory:           {}", c.registry.string);
+    println!("registry crate source cache:  {}", c.registry_cache.string);
+    println!("registry unpacked sources:    {}", c.registry_src.string);
+    println!("git db directory:             {}", c.git_db.string);
+    println!("git checkouts dir:            {}", c.git_checkouts.string);
+}
+
+
 
 fn main() {
 
@@ -338,15 +349,7 @@ fn main() {
     };
 
 
-    if cargo_show_cfg.is_present("list-dirs") {
-        println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
-        println!("binaries directory:           {}", bin_dir_str);
-        println!("registry directory:           {}", registry_dir_str);
-        println!("registry crate source cache:  {}", registry_cache_str);
-        println!("registry unpacked sources:    {}", registry_sources_str);
-        println!("git db directory:             {}", git_db_str);
-        println!("git checkouts dir:            {}", git_checkouts_str);
-    }
+
 
 
     // link everything into the CacheDirCollector which we can easily pass around to functions
@@ -371,7 +374,16 @@ fn main() {
             path: &registry_sources,
             string: &registry_sources_str,
         },
+        bin_dir: &CacheDir {
+            path: &bin_dir,
+            string: &bin_dir_str,
+        }
     };
+
+    if cargo_show_cfg.is_present("list-dirs") {
+        print_dir_paths(&cargo_cache);
+    }
+
     print_dir_sizes(&dir_sizes);
 
     if cargo_show_cfg.is_present("remove-dirs") {
