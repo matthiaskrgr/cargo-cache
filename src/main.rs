@@ -129,9 +129,11 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
 
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
+
+    // @TODO print the paths and sizes to give user some context
     let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
-    println!("Possile directories to delete: 'git-checkouts', 'git', 'registry'.");
+    println!("Possile directories to delete: 'git-checkouts', 'git', 'registry', 'registry-source-checkouts', 'registry-crate-archives'.");
     println!("'abort' to abort.");
 
     'inputStrLoop: loop {
@@ -156,6 +158,14 @@ fn rm_dir(cache: &CacheDirCollector) {
                 dirs_to_delete.push(cache.registry);
                 break;
             }
+            "registry-source-checkouts" => {
+                dirs_to_delete.push(cache.registry_src);
+                break;
+            }
+            "registry-crate-archives" => {
+                dirs_to_delete.push(cache.registry_cache);
+                break;
+            }
             "bin-dir" => println!("Please use 'cargo uninstall'."),
             "abort" => {
                 println!("Terminating...");
@@ -163,7 +173,7 @@ fn rm_dir(cache: &CacheDirCollector) {
             }
             _ => {
                 println!("Invalid input.");
-                println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry'.");
+                println!("Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'registry-source-checkouts', 'registry-crate-archives'.");
                 continue 'inputStrLoop;
             } // _
         } // match input
