@@ -13,15 +13,12 @@ extern crate cargo; // obtain CARGO_DIR
 // https://github.com/alexcrichton/git2-rs
 extern crate git2; // compress git repos
 
-use std::fs;
+use std::{fs, io, process};
+use std::io::{stdout, Write};
 use std::path::Path;
-use std::io;
-use std::process;
 use std::process::Command;
-use std::io::Write;
-use std::io::stdout;
 
-use clap::{Arg, App, SubCommand};
+use clap::{App, Arg, SubCommand};
 use humansize::{FileSize, file_size_opts as options};
 use walkdir::WalkDir;
 
