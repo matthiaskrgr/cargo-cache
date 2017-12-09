@@ -304,11 +304,11 @@ fn main() {
 
 
     if cargo_show_cfg.is_present("list-dirs") {
-        println!("cargo home: {}", cargo_home_str);
-        println!("bin dir: {}", bin_dir_str);
-        println!("registry dir: {}", registry_dir_str);
-        println!("git db dir: {}", git_db_str);
-        println!("checkouts dir: {}", git_checkouts_str);
+        println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
+        println!("binaries directory:           {}", bin_dir_str);
+        println!("registry directory:           {}", registry_dir_str);
+        println!("git db directory:             {}", git_db_str);
+        println!("git checkouts dir:            {}", git_checkouts_str);
     }
 
 
