@@ -274,28 +274,30 @@ fn print_dir_paths(c: &CacheDirCollector) {
 fn main() {
 
     // parse args
-    let cargo_show_cfg = App::new("cargo-show")
+    // dummy subcommand:
+    // https://github.com/kbknapp/clap-rs/issues/937
+    let cargo_show_cfg = App::new("cargo show")
         .version("0.1")
+        .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .arg(
-            Arg::with_name("list-dirs")
-                .short("l")
-                .long("list-dirs")
-                .help("List found directory paths."),
-        )
-        .arg(
-            Arg::with_name("remove-dirs")
-                .short("r")
-                .long("remove")
-                .help("Select directories in the cache to be removed."),
-        )
-        .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
-            "Recompress git repositories (may take some time).",
-        ))
         .subcommand(
-            // this is needed so "cargo cache" works
-            SubCommand::with_name("cache"),
+            SubCommand::with_name("cache")
+                .arg(
+                    Arg::with_name("list-dirs")
+                        .short("l")
+                        .long("list-dirs")
+                        .help("List found directory paths."),
+                )
+                .arg(
+                    Arg::with_name("remove-dirs")
+                        .short("r")
+                        .long("remove")
+                        .help("Select directories in the cache to be removed."),
+                )
+                .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
+                    "Recompress git repositories (may take some time).",
+                )),
         )
         .get_matches();
 
