@@ -130,6 +130,13 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
 
+    fn print_dirs_to_delete() {
+        println!("Possile directories to delete:");
+        println!("'git-checkouts', 'git', 'registry'");
+        println!("'registry-source-checkouts', 'registry-crate-archives'.");
+        println!("'abort' to abort.");
+    }
+
     //print the paths and sizes to give user some context
     println!();
     print_dir_paths(cache);
@@ -137,10 +144,7 @@ fn rm_dir(cache: &CacheDirCollector) {
 
     let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
 
-    println!(
-        "Possile directories to delete: 'git-checkouts', 'git', 'registry', 'registry-source-checkouts', 'registry-crate-archives'."
-    );
-    println!("'abort' to abort.");
+    print_dirs_to_delete();
 
     'inputStrLoop: loop {
         let mut input = String::new();
@@ -179,9 +183,9 @@ fn rm_dir(cache: &CacheDirCollector) {
             }
             _ => {
                 println!("Invalid input.");
-                println!(
-                    "Possile directories to delete: 'git-checkouts', 'git-db', 'registry', 'registry-source-checkouts', 'registry-crate-archives'."
-                );
+                print_dirs_to_delete();
+
+
                 continue 'inputStrLoop;
             } // _
         } // match input
@@ -276,7 +280,7 @@ fn main() {
     // parse args
     // dummy subcommand:
     // https://github.com/kbknapp/clap-rs/issues/937
-    let cargo_show_cfg = App::new("cargo show")
+    let cargo_show_cfg = App::new("cargo cache")
         .version("0.1")
         .bin_name("cargo")
         .about("Manage cargo cache")
