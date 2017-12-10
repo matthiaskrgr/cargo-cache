@@ -337,7 +337,7 @@ fn main() {
     // parse args
     // dummy subcommand:
     // https://github.com/kbknapp/clap-rs/issues/937
-    let cargo_show_cfg = App::new("cargo cache")
+    let cargo_cache_cfg = App::new("cargo-cache")
         .version("0.1")
         .bin_name("cargo")
         .about("Manage cargo cache")
@@ -368,7 +368,44 @@ fn main() {
                 ),
         )
         .get_matches();
-    let cargo_show_cfg = cargo_show_cfg.subcommand_matches("cache").unwrap();
+
+//@TODO fix this mess
+
+        let cargo_cache_cfg2 = App::new("cargo-cache")
+            .version("0.1")
+            .bin_name("cargo-cache")
+            .about("Manage cargo cache")
+            .author("matthiaskrgr")
+                    .arg(
+                        Arg::with_name("list-dirs")
+                            .short("l")
+                            .long("list-dirs")
+                            .help("List found directory paths."),
+                    )
+                    .arg(
+                        Arg::with_name("remove-dirs")
+                            .short("r")
+                            .long("remove")
+                            .help("Select directories in the cache to be removed."),
+                    )
+                    .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
+                        "Recompress git repositories (may take some time).",
+                    ))
+                    .arg(
+                        Arg::with_name("info")
+                            .short("i")
+                            .long("info")
+                            .conflicts_with("list-dirs")
+                            .help("give information on directories"),
+                    )
+
+            .get_matches();
+
+
+
+
+    // we need this in case we call "cargo-cache" directly
+    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(&cargo_cache_cfg2);
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
@@ -380,7 +417,7 @@ fn main() {
         process::exit(1);
     }
 
-    if !cargo_show_cfg.is_present("list-dirs") {
+    if !cargo_cache_cfg.is_present("list-dirs") {
         println!("Found CARGO_HOME: {}\n", cargo_home_str);
     }
 
@@ -459,7 +496,7 @@ fn main() {
         },
     };
 
-    if cargo_show_cfg.is_present("info") {
+    if cargo_cache_cfg.is_present("info") {
         print_info(&cargo_cache, &dir_sizes);
         process::exit(0);
     }
@@ -467,15 +504,15 @@ fn main() {
 
     print_dir_sizes(&dir_sizes);
 
-    if cargo_show_cfg.is_present("remove-dirs") {
+    if cargo_cache_cfg.is_present("remove-dirs") {
         rm_dir(&cargo_cache);
-    } else if cargo_show_cfg.is_present("list-dirs") {
+    } else if cargo_cache_cfg.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
 
     }
 
     // gc cloned git repos of crates or whatever
-    if cargo_show_cfg.is_present("gc-repos") {
+    if cargo_cache_cfg.is_present("gc-repos") {
         let mut total_size_before: u64 = 0;
         let mut total_size_after: u64 = 0;
 
