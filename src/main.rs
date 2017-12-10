@@ -304,7 +304,7 @@ fn main() {
                 )),
         )
         .get_matches();
-
+    let cargo_show_cfg = cargo_show_cfg.subcommand_matches("cache").unwrap();
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
