@@ -30,6 +30,7 @@ struct CacheDir<'a> {
 struct CacheDirCollector<'a> {
     // an object containing all the relevant cache dirs
     // for easy pasing around to functions
+    cargo_home: &'a CacheDir<'a>,
     git_checkouts: &'a CacheDir<'a>,
     git_db: &'a CacheDir<'a>,
     registry: &'a CacheDir<'a>,
@@ -273,6 +274,62 @@ fn print_dir_paths(c: &CacheDirCollector) {
     println!("git checkouts dir:            {}", c.git_checkouts.string);
 }
 
+fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
+    println!("Found CARGO_HOME / cargo cache base dir");
+    println!(
+        "\t\t\t'{}' of size: {}",
+        c.cargo_home.string,
+        s.total_size.file_size(options::DECIMAL).unwrap()
+    );
+
+    println!("Found {} binaries installed in", s.numb_bins);
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.bin_dir.string,
+        s.total_bin_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.");
+
+    println!("Found registry base dir:");
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.registry.string,
+        s.total_reg_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!("Found registry crate source cache:");
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.registry_cache.string,
+        s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
+    println!("Found registry unpacked sources");
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.registry_src.string,
+        s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed)."
+    );
+
+    println!("Found git repo database:");
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.git_db.string,
+        s.total_git_db_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
+    println!("Found git repo checkouts:");
+    println!(
+        "\t\t\t'{}', size: {}",
+        c.git_checkouts.string,
+        s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
+    );
+    println!(
+        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if neccessary (no net access needed, if repos are up-to-date)."
+    );
+}
 
 
 fn main() {
@@ -301,7 +358,14 @@ fn main() {
                 )
                 .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
                     "Recompress git repositories (may take some time).",
-                )),
+                ))
+                .arg(
+                    Arg::with_name("info")
+                        .short("i")
+                        .long("info")
+                        .conflicts_with("list-dirs")
+                        .help("give information on directories"),
+                ),
         )
         .get_matches();
     let cargo_show_cfg = cargo_show_cfg.subcommand_matches("cache").unwrap();
@@ -363,11 +427,12 @@ fn main() {
     };
 
 
-
-
-
     // link everything into the CacheDirCollector which we can easily pass around to functions
     let cargo_cache = CacheDirCollector {
+        cargo_home: &CacheDir {
+            path: &cargo_home_path,
+            string: &cargo_home_str,
+        },
         git_checkouts: &CacheDir {
             path: &git_checkouts,
             string: &git_checkouts_str,
@@ -394,6 +459,10 @@ fn main() {
         },
     };
 
+    if cargo_show_cfg.is_present("info") {
+        print_info(&cargo_cache, &dir_sizes);
+        process::exit(0);
+    }
 
 
     print_dir_sizes(&dir_sizes);
