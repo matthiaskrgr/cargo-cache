@@ -17,3 +17,11 @@ script:
   - cargo test --verbose --all
   - cargo build --verbose --all --release
   - cargo test --verbose --all --release
+  - cargo run
+  - cargo install --git https://github.com/matthiaskrgr/cargo-cache
+  - cargo-cache
+  - cargo cache
+  - cargo cache --help
+  - cargo cache --gc
+  - cargo cache --info
+  - cargo cache --list-dirs
