@@ -234,7 +234,7 @@ fn rm_dir(cache: &CacheDirCollector) {
 fn print_dir_sizes(s: &DirSizesCollector) {
     println!("\nCargo cache:\n");
     println!(
-        "Total size:                        {} ",
+        "Total size:                   {} ",
         s.total_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
