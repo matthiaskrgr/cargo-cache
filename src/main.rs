@@ -366,46 +366,36 @@ fn main() {
                         .conflicts_with("list-dirs")
                         .help("give information on directories"),
                 ),
+        ) /*subcmd*/
+        .arg(
+            Arg::with_name("list-dirs")
+                .short("l")
+                .long("list-dirs")
+                .help("List found directory paths."),
+        )
+        .arg(
+            Arg::with_name("remove-dirs")
+                .short("r")
+                .long("remove")
+                .help("Select directories in the cache to be removed."),
+        )
+        .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
+            "Recompress git repositories (may take some time).",
+        ))
+        .arg(
+            Arg::with_name("info")
+                .short("i")
+                .long("info")
+                .conflicts_with("list-dirs")
+                .help("give information on directories"),
         )
         .get_matches();
-
-//@TODO fix this mess
-
-        let cargo_cache_cfg2 = App::new("cargo-cache")
-            .version("0.1")
-            .bin_name("cargo-cache")
-            .about("Manage cargo cache")
-            .author("matthiaskrgr")
-                    .arg(
-                        Arg::with_name("list-dirs")
-                            .short("l")
-                            .long("list-dirs")
-                            .help("List found directory paths."),
-                    )
-                    .arg(
-                        Arg::with_name("remove-dirs")
-                            .short("r")
-                            .long("remove")
-                            .help("Select directories in the cache to be removed."),
-                    )
-                    .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
-                        "Recompress git repositories (may take some time).",
-                    ))
-                    .arg(
-                        Arg::with_name("info")
-                            .short("i")
-                            .long("info")
-                            .conflicts_with("list-dirs")
-                            .help("give information on directories"),
-                    )
-
-            .get_matches();
 
 
 
 
     // we need this in case we call "cargo-cache" directly
-    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(&cargo_cache_cfg2);
+    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(&cargo_cache_cfg);
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
