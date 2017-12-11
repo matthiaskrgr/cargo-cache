@@ -395,7 +395,9 @@ fn main() {
 
 
     // we need this in case we call "cargo-cache" directly
-    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(&cargo_cache_cfg);
+    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(
+        &cargo_cache_cfg,
+    );
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
@@ -502,7 +504,7 @@ fn main() {
     }
 
     // gc cloned git repos of crates or whatever
-    if cargo_cache_cfg.is_present("gc-repos") {
+    if cargo_cache_cfg.is_present("gc-repos") && git_db.is_dir() {
         let mut total_size_before: u64 = 0;
         let mut total_size_after: u64 = 0;
 
