@@ -1,0 +1,19 @@
+language: rust
+dist: trusty
+sudo: false
+
+#cache deps
+cache: cargo
+
+rust:
+  - stable
+  - beta
+  - nightly
+#matrix:
+#  allow_failures:
+#    - rust: nightly
+script:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
+  - cargo build --verbose --all --release
+  - cargo test --verbose --all --release
