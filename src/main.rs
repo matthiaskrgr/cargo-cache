@@ -36,7 +36,6 @@ impl<'a> CacheDir<'a> {
     }
 }
 
-
 struct CacheDirCollector<'a> {
     // an object containing all the relevant cache dirs
     // for easy pasing around to functions
@@ -137,7 +136,6 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-
 fn rm_dir(cache: &CacheDirCollector) {
     // remove a directory from cargo cache
 
@@ -201,7 +199,6 @@ fn rm_dir(cache: &CacheDirCollector) {
             } // _
         } // match input
     } // 'inputStrLoop
-
 
 
     println!(
@@ -346,13 +343,11 @@ fn str_from_pb(path: &std::path::PathBuf) -> std::string::String {
 }
 
 
-
 fn main() {
-
     // parse args
     // dummy subcommand:
     // https://github.com/kbknapp/clap-rs/issues/937
-    let cargo_cache_cfg = App::new("cargo-cache")
+    let config = App::new("cargo-cache")
         .version("0.1")
         .bin_name("cargo")
         .about("Manage cargo cache")
@@ -406,13 +401,10 @@ fn main() {
         )
         .get_matches();
 
-
-
-
     // we need this in case we call "cargo-cache" directly
-    let cargo_cache_cfg = cargo_cache_cfg.subcommand_matches("cache").unwrap_or(
-        &cargo_cache_cfg,
-    );
+    let config = config.subcommand_matches("cache").unwrap_or(&config);
+
+
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
@@ -423,17 +415,15 @@ fn main() {
         panic!("Error, no '{} dir found", &cargo_home_str);
     }
 
-    if !cargo_cache_cfg.is_present("list-dirs") {
+    if !config.is_present("list-dirs") {
         println!("Found CARGO_HOME: {}\n", cargo_home_str);
     }
 
     let bin_dir = cargo_home_path.join("bin/");
     let bin_dir_str = str_from_pb(&bin_dir);
 
-
     let registry_dir = cargo_home_path.join("registry/");
     let registry_dir_str = str_from_pb(&registry_dir);
-
 
     let registry_cache = registry_dir.join("cache/");
     let registry_cache_str = str_from_pb(&registry_cache);
@@ -444,11 +434,11 @@ fn main() {
     let git_db = cargo_home_path.join("git/db/");
     let git_db_str = str_from_pb(&git_db);
 
-
     let git_checkouts = cargo_home_path.join("git/checkouts/");
     let git_checkouts_str = str_from_pb(&git_checkouts);
 
     let bindir_files = cumulative_dir_size(&bin_dir_str);
+
     let dir_sizes = DirSizesCollector {
         total_size: cumulative_dir_size(&cargo_home_str).dir_size,
         numb_bins: bindir_files.file_number,
@@ -472,7 +462,7 @@ fn main() {
         bin_dir: &CacheDir::new(&bin_dir, &bin_dir_str),
     };
 
-    if cargo_cache_cfg.is_present("info") {
+    if config.is_present("info") {
         print_info(&cargo_cache, &dir_sizes);
         process::exit(0);
     }
@@ -480,15 +470,14 @@ fn main() {
 
     print_dir_sizes(&dir_sizes);
 
-    if cargo_cache_cfg.is_present("remove-dirs") {
+    if config.is_present("remove-dirs") {
         rm_dir(&cargo_cache);
-    } else if cargo_cache_cfg.is_present("list-dirs") {
+    } else if config.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
-
     }
 
     // gc cloned git repos of crates or whatever
-    if cargo_cache_cfg.is_present("gc-repos") && git_db.is_dir() {
+    if config.is_present("gc-repos") && git_db.is_dir() {
         let mut total_size_before: u64 = 0;
         let mut total_size_after: u64 = 0;
 
