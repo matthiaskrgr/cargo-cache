@@ -27,6 +27,15 @@ struct CacheDir<'a> {
     string: &'a str, // string that represents the dir path
 }
 
+impl<'a> CacheDir<'a> {
+    fn new(path: &'a std::path::Path, string: &'a str) -> CacheDir<'a> {
+        CacheDir {
+            path: &path,
+            string: &string,
+        }
+    }
+}
+
 struct CacheDirCollector<'a> {
     // an object containing all the relevant cache dirs
     // for easy pasing around to functions
@@ -332,6 +341,8 @@ fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
 }
 
 
+
+
 fn main() {
 
     // parse args
@@ -366,7 +377,7 @@ fn main() {
                         .conflicts_with("list-dirs")
                         .help("give information on directories"),
                 ),
-        ) /*subcmd*/
+        ) // subcmd
         .arg(
             Arg::with_name("list-dirs")
                 .short("l")
@@ -458,34 +469,13 @@ fn main() {
 
     // link everything into the CacheDirCollector which we can easily pass around to functions
     let cargo_cache = CacheDirCollector {
-        cargo_home: &CacheDir {
-            path: &cargo_home_path,
-            string: &cargo_home_str,
-        },
-        git_checkouts: &CacheDir {
-            path: &git_checkouts,
-            string: &git_checkouts_str,
-        },
-        git_db: &CacheDir {
-            path: &git_db,
-            string: &git_db_str,
-        },
-        registry: &CacheDir {
-            path: &registry_dir,
-            string: &registry_dir_str,
-        },
-        registry_cache: &CacheDir {
-            path: &registry_cache,
-            string: &registry_cache_str,
-        },
-        registry_src: &CacheDir {
-            path: &registry_sources,
-            string: &registry_sources_str,
-        },
-        bin_dir: &CacheDir {
-            path: &bin_dir,
-            string: &bin_dir_str,
-        },
+        cargo_home: &CacheDir::new(&cargo_home_path, &cargo_home_str),
+        git_checkouts: &CacheDir::new(&git_checkouts, &git_checkouts_str),
+        git_db: &CacheDir::new(&git_db, &git_db_str),
+        registry: &CacheDir::new(&registry_dir, &registry_dir_str),
+        registry_cache: &CacheDir::new(&registry_cache, &registry_cache_str),
+        registry_src: &CacheDir::new(&registry_sources, &registry_sources_str),
+        bin_dir: &CacheDir::new(&bin_dir, &bin_dir_str),
     };
 
     if cargo_cache_cfg.is_present("info") {
