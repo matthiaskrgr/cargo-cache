@@ -5,6 +5,7 @@ extern crate humansize; // convert bytes to whatever
 extern crate walkdir; // walk CARGO_DIR recursively
 
 // https://github.com/kbknapp/clap-rs
+#[macro_use]
 extern crate clap; // cmdline arg parsing
 
 // https://github.com/rust-lang/cargo
@@ -276,6 +277,84 @@ fn print_dir_sizes(s: &DirSizesCollector) {
     );
 }
 
+fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
+    //@TODO can we import parts of cargo to simplify this?
+    println!("DEBUG; amount to keep: {}", amount_to_keep);
+
+    println!();
+
+    let registry_str = format!(
+        "{}",
+        cargo::util::config::Config::default()
+            .unwrap()
+            .home()
+            .display()
+    );
+
+    // @TODO use struct and  sort by key:
+    //  https://doc.rust-lang.org/std/primitive.slice.html#method.sort_by_key
+
+    // remove crate sources from cache
+    // src can be completely nuked since we can always rebuilt it from cache
+    let registry_src_path = Path::new(&registry_str).join("registry/").join("cache/");
+
+    // path().into_os_string().into_string().unwrap()
+    let mut removed_size = 0;
+
+    for repo in fs::read_dir(&registry_src_path).unwrap() {
+        let mut crate_list = Vec::new();
+
+        let repo = repo.unwrap();
+        let path = repo.path();
+        let string = path.into_os_string().into_string().unwrap();
+        for cratesrc in fs::read_dir(&string).unwrap() {
+            let cratestr = cratesrc
+                .unwrap()
+                .path()
+                .into_os_string()
+                .into_string()
+                .unwrap();
+            crate_list.push(cratestr.clone());
+        }
+        crate_list.sort();
+        crate_list.reverse();
+
+        let mut versions_of_this_package = 0;
+        let mut last_pkgname = String::from("");
+
+        for pkgpath in &crate_list {
+            let string = pkgpath.split('/').last().unwrap();
+            let mut vec = string.split('-').collect::<Vec<&str>>();
+            let pkgver = vec.pop().unwrap();
+            let pkgname = vec.join("-");
+
+            //println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
+            if last_pkgname == pkgname {
+                versions_of_this_package += 1;
+                if versions_of_this_package + 1 > amount_to_keep {
+                    // we have seen this package too many times, queue for deletion
+                    println!("deleting: {} {} at  {}", pkgname, pkgver, pkgpath);
+                    removed_size += fs::metadata(pkgpath).unwrap().len();
+                    if config.is_present("dry-run") {
+                        println!("dry run; nothing deleted");
+                    } else {
+                        fs::remove_file(pkgpath).unwrap();
+                    }
+
+                }
+            } else {
+                // new package in list
+                versions_of_this_package = 0;
+                last_pkgname = pkgname;
+            }
+        }
+    }
+    println!(
+        "Removed {} in compressed crate sources.",
+        removed_size.file_size(options::DECIMAL).unwrap()
+    );
+}
+
 fn print_dir_paths(c: &CacheDirCollector) {
     //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
     println!("binaries directory:           {}", c.bin_dir.string);
@@ -379,6 +458,10 @@ fn main() {
                         .conflicts_with("list-dirs")
                         .help("give information on directories"),
                 )
+                .arg(Arg::with_name("remove-old-crates").short("c").long("remove-crates")
+                .help("removes oldest versions of cached crate sources if there are more than N")
+                .takes_value(true).value_name("N"),
+            )
                 .arg(
                     Arg::with_name("dry-run")
                     .short("d").long("dry-run").help("don't remove anything, just pretend"),
@@ -406,6 +489,10 @@ fn main() {
                 .conflicts_with("list-dirs")
                 .help("give information on directories"),
         )
+        .arg(Arg::with_name("remove-old-crates").short("c").long("remove-crates")
+        .help("removes oldest versions of cached crate sources if there are more than N")
+        .takes_value(true).value_name("N"),)
+
         .arg(
             Arg::with_name("dry-run")
             .short("d").long("dry-run").help("don't remove anything, just pretend"),
@@ -536,5 +623,9 @@ fn main() {
             sign,
             sd_human_readable
         );
-    } // gc
+    } // gc?
+    if config.is_present("remove-old-crates") {
+        let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
+        rm_old_crates(val, config);
+    }
 }
