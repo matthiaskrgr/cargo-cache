@@ -136,7 +136,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-fn rm_dir(cache: &CacheDirCollector) {
+fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
     // remove a directory from cargo cache
 
     fn print_dirs_to_delete() {
@@ -222,7 +222,12 @@ fn rm_dir(cache: &CacheDirCollector) {
                     println!("ERROR: {} is not a directory but a file??", dir.string);
                     println!("Doing nothing.");
                 } else if dir.path.is_dir() {
-                    fs::remove_dir_all(dir.string).unwrap();
+                    if config.is_present("dry-run") {
+                        // don't actually delete
+                        println!("dry run: would remove directory: {}", dir.string);
+                    } else {
+                        fs::remove_dir_all(dir.string).unwrap();
+                    }
                 } else {
                     println!("Directory {} does not exist, skipping", dir.string);
                 }
@@ -316,9 +321,7 @@ fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
         c.registry_src.string,
         s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
     );
-    println!(
-        "\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed)."
-    );
+    println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
 
     println!("Found git repo database:");
     println!(
@@ -375,6 +378,10 @@ fn main() {
                         .long("info")
                         .conflicts_with("list-dirs")
                         .help("give information on directories"),
+                )
+                .arg(
+                    Arg::with_name("dry-run")
+                    .short("d").long("dry-run").help("don't remove anything, just pretend"),
                 ),
         ) // subcmd
         .arg(
@@ -398,6 +405,10 @@ fn main() {
                 .long("info")
                 .conflicts_with("list-dirs")
                 .help("give information on directories"),
+        )
+        .arg(
+            Arg::with_name("dry-run")
+            .short("d").long("dry-run").help("don't remove anything, just pretend"),
         )
         .get_matches();
 
@@ -471,7 +482,7 @@ fn main() {
     print_dir_sizes(&dir_sizes);
 
     if config.is_present("remove-dirs") {
-        rm_dir(&cargo_cache);
+        rm_dir(&cargo_cache, config);
     } else if config.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
     }
