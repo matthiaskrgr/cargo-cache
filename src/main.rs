@@ -342,7 +342,7 @@ fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
 }
 
 fn str_from_pb(path: &std::path::PathBuf) -> std::string::String {
-    (path.clone()).into_os_string().into_string().unwrap()
+    path.clone().into_os_string().into_string().unwrap()
 }
 
 
@@ -427,25 +427,25 @@ fn main() {
         println!("Found CARGO_HOME: {}\n", cargo_home_str);
     }
 
-    let bin_dir = (cargo_home_path.clone()).join("bin/");
+    let bin_dir = cargo_home_path.join("bin/");
     let bin_dir_str = str_from_pb(&bin_dir);
 
 
-    let registry_dir = (cargo_home_path.clone()).join("registry/");
+    let registry_dir = cargo_home_path.join("registry/");
     let registry_dir_str = str_from_pb(&registry_dir);
 
 
-    let registry_cache = (registry_dir.clone()).join("cache/");
+    let registry_cache = registry_dir.join("cache/");
     let registry_cache_str = str_from_pb(&registry_cache);
 
-    let registry_sources = (registry_dir.clone()).join("src/");
+    let registry_sources = registry_dir.join("src/");
     let registry_sources_str = str_from_pb(&registry_sources);
 
-    let git_db = (cargo_home_path.clone()).join("git/db/");
+    let git_db = cargo_home_path.join("git/db/");
     let git_db_str = str_from_pb(&git_db);
 
 
-    let git_checkouts = (cargo_home_path.clone()).join("git/checkouts/");
+    let git_checkouts = cargo_home_path.join("git/checkouts/");
     let git_checkouts_str = str_from_pb(&git_checkouts);
 
     let bindir = cumulative_dir_size(&bin_dir_str);
