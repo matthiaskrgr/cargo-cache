@@ -416,8 +416,7 @@ fn main() {
 
     // make sure we actually have a cargo dir
     if !cargo_home_path.is_dir() {
-        println!("Error, no '{} dir found", &cargo_home_str);
-        process::exit(1);
+        panic!("Error, no '{} dir found", &cargo_home_str);
     }
 
     if !cargo_cache_cfg.is_present("list-dirs") {
