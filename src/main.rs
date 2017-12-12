@@ -30,8 +30,8 @@ struct CacheDir<'a> {
 impl<'a> CacheDir<'a> {
     fn new(path: &'a std::path::Path, string: &'a str) -> CacheDir<'a> {
         CacheDir {
-            path: &path,
-            string: &string,
+            path: path,
+            string: string,
         }
     }
 }
@@ -448,11 +448,11 @@ fn main() {
     let git_checkouts = cargo_home_path.join("git/checkouts/");
     let git_checkouts_str = str_from_pb(&git_checkouts);
 
-    let bindir = cumulative_dir_size(&bin_dir_str);
+    let bindir_files = cumulative_dir_size(&bin_dir_str);
     let dir_sizes = DirSizesCollector {
         total_size: cumulative_dir_size(&cargo_home_str).dir_size,
-        numb_bins: bindir.file_number,
-        total_bin_size: bindir.dir_size,
+        numb_bins: bindir_files.file_number,
+        total_bin_size: bindir_files.dir_size,
         total_reg_size: cumulative_dir_size(&registry_dir_str).dir_size,
         total_git_db_size: cumulative_dir_size(&git_db_str).dir_size,
         total_git_chk_size: cumulative_dir_size(&git_checkouts_str).dir_size,
@@ -463,7 +463,7 @@ fn main() {
 
     // link everything into the CacheDirCollector which we can easily pass around to functions
     let cargo_cache = CacheDirCollector {
-        cargo_home: &CacheDir::new(&cargo_home_path, &cargo_home_str),
+        cargo_home: &CacheDir::new(cargo_home_path, &cargo_home_str),
         git_checkouts: &CacheDir::new(&git_checkouts, &git_checkouts_str),
         git_db: &CacheDir::new(&git_db, &git_db_str),
         registry: &CacheDir::new(&registry_dir, &registry_dir_str),
