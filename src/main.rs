@@ -68,7 +68,9 @@ struct DirSizesCollector {
 }
 
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
-    print!("Recompressing {} : ", pathstr);
+    let mut vec = pathstr.split('/').collect::<Vec<&str>>();
+    let reponame = vec.last().unwrap();
+    print!("Recompressing {} : ", reponame);
     let path = Path::new(pathstr);
     if !path.is_dir() {
         panic!("WARNING: git gc path is not directory: {}", &pathstr);
@@ -103,7 +105,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
         }
         let size_after = cumulative_dir_size(pathstr).dir_size;
         let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-        let mut size_diff: i64 = (size_after - size_before) as i64;
+        let mut size_diff: i64 = ((size_after as i64) - (size_before as i64)) as i64;
         let mut sign = "+";
         if size_diff < 0 {
             sign = "-";
