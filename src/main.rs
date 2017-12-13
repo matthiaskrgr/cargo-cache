@@ -58,6 +58,7 @@ impl DirSizesCollector {
     }
 }
 
+#[derive(Clone)]
 struct DirCache {
     path: std::path::PathBuf,
     string: std::string::String,
@@ -73,6 +74,7 @@ impl DirCache {
     }
 }
 
+#[derive(Clone)]
 struct CargoCacheDirs {
     cargo_home: DirCache,
     bin_dir: DirCache,
@@ -498,6 +500,63 @@ fn str_from_pb(path: &std::path::PathBuf) -> std::string::String {
     path.clone().into_os_string().into_string().unwrap()
 }
 
+fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches)  {
+    let git_db = &cargo_cache.git_db.path;
+    // gc cloned git repos of crates or whatever
+    if !(config.is_present("gc-repos") && git_db.is_dir()) {
+        return
+    }
+        let mut total_size_before: u64 = 0;
+        let mut total_size_after: u64 = 0;
+
+        println!("Recompressing repositories. Please be patient...");
+        // gc git repos of crates
+        for entry in fs::read_dir(&git_db).unwrap() {
+            let entry = entry.unwrap();
+            let repo = entry.path();
+            let repostr = repo.into_os_string().into_string().unwrap();
+            let (before, after) = gc_repo(&repostr, config);
+            total_size_before += before;
+            total_size_after += after;
+        }
+
+        // gc registries
+        let registry_repos_str = format!(
+            "{}",
+            cargo::util::config::Config::default()
+                .unwrap()
+                .home()
+                .display()
+        );
+        let registry_repos_path = Path::new(&registry_repos_str)
+            .join("registry/")
+            .join("index/");
+        println!("Recompressing registries.");
+        for repo in fs::read_dir(&registry_repos_path).unwrap() {
+            let repo = repo.unwrap().path();
+            let repo_str = repo.into_os_string().into_string().unwrap();
+            let (before, after) = gc_repo(&repo_str, config);
+            total_size_before += before;
+            total_size_after += after;
+        } // iterate over registries and gc
+        let mut size_diff = (total_size_after - total_size_before) as i64;
+        let mut sign = "+";
+        if size_diff < 0 {
+            sign = "-";
+            size_diff *= -1;
+        }
+        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+
+        println!(
+            "Compressed {} to {}, ({}{})",
+            total_size_before.file_size(options::DECIMAL).unwrap(),
+            total_size_after.file_size(options::DECIMAL).unwrap(),
+            sign,
+            sd_human_readable
+        );
+
+}
+
 fn main() {
     // parse args
     // dummy subcommand:
@@ -587,63 +646,15 @@ fn main() {
 
     print_dir_sizes(&dir_sizes);
 
+
     if config.is_present("remove-dirs") {
-        rm_dir(cargo_cache, config);
+        rm_dir(cargo_cache.clone(), config);
     } else if config.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
     }
 
-    // gc cloned git repos of crates or whatever
-    if config.is_present("gc-repos") && git_db.is_dir() {
-        let mut total_size_before: u64 = 0;
-        let mut total_size_after: u64 = 0;
+    run_gc(&cargo_cache, config);
 
-        println!("Recompressing repositories. Please be patient...");
-        // gc git repos of crates
-        for entry in fs::read_dir(&git_db).unwrap() {
-            let entry = entry.unwrap();
-            let repo = entry.path();
-            let repostr = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repostr, config);
-            total_size_before += before;
-            total_size_after += after;
-        }
-
-        // gc registries
-        let registry_repos_str = format!(
-            "{}",
-            cargo::util::config::Config::default()
-                .unwrap()
-                .home()
-                .display()
-        );
-        let registry_repos_path = Path::new(&registry_repos_str)
-            .join("registry/")
-            .join("index/");
-        println!("Recompressing registries.");
-        for repo in fs::read_dir(&registry_repos_path).unwrap() {
-            let repo = repo.unwrap().path();
-            let repo_str = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repo_str, config);
-            total_size_before += before;
-            total_size_after += after;
-        } // iterate over registries and gc
-        let mut size_diff = (total_size_after - total_size_before) as i64;
-        let mut sign = "+";
-        if size_diff < 0 {
-            sign = "-";
-            size_diff *= -1;
-        }
-        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
-
-        println!(
-            "Compressed {} to {}, ({}{})",
-            total_size_before.file_size(options::DECIMAL).unwrap(),
-            total_size_after.file_size(options::DECIMAL).unwrap(),
-            sign,
-            sd_human_readable
-        );
-    } // gc?
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
         rm_old_crates(val, config);
