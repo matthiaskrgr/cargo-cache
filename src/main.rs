@@ -607,8 +607,9 @@ fn main() {
         let registry_repos_path = Path::new(&registry_repos_str)
             .join("registry/")
             .join("index/");
+        println!("Recompressing registries.");
         for repo in fs::read_dir(&registry_repos_path).unwrap() {
-            let repo = repo.unwrap().path().join(".git/");
+            let repo = repo.unwrap().path();
             let repo_str = repo.into_os_string().into_string().unwrap();
             let (before, after) = gc_repo(&repo_str, config);
             total_size_before += before;
