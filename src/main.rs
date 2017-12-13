@@ -67,7 +67,7 @@ struct DirSizesCollector {
     total_reg_src_size: u64, // registry sources size
 }
 
-fn gc_repo(pathstr: &str) -> (u64, u64) {
+fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     print!("Recompressing {} : ", pathstr);
     let path = Path::new(pathstr);
     if !path.is_dir() {
@@ -80,32 +80,40 @@ fn gc_repo(pathstr: &str) -> (u64, u64) {
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
     stdout().flush().unwrap();
-    let repo = git2::Repository::open(path).unwrap();
-    match Command::new("git")
-        .arg("gc")
-        .arg("--aggressive")
-        .arg("--prune=now")
-        .current_dir(repo.path())
-        .output() {
-        Ok(_out) => {}
-        /* println!("git gc error\nstatus: {}", out.status);
+    if config.is_present("dry-run") {
+        println!("{} ({}{})", sb_human_readable, "+", 0);
+        (0, 0)
+    } else {
+
+
+        let repo = git2::Repository::open(path).unwrap();
+        match Command::new("git")
+            .arg("gc")
+            .arg("--aggressive")
+            .arg("--prune=now")
+            .current_dir(repo.path())
+            .output() {
+            Ok(_out) => {}
+            /* println!("git gc error\nstatus: {}", out.status);
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
             //if out.status.success() {}
         } */
-        Err(e) => println!("git-gc failed {}", e),
+            Err(e) => println!("git-gc failed {}", e),
+        }
+        let size_after = cumulative_dir_size(pathstr).dir_size;
+        let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
+        let mut size_diff = (size_after - size_before) as i64;
+        let mut sign = "+";
+        if size_diff < 0 {
+            sign = "-";
+            size_diff *= -1;
+        }
+        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+        println!("{} ({}{})", sa_human_readable, sign, sd_human_readable);
+
+        (size_before, size_after)
     }
-    let size_after = cumulative_dir_size(pathstr).dir_size;
-    let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    let mut size_diff = (size_after - size_before) as i64;
-    let mut sign = "+";
-    if size_diff < 0 {
-        sign = "-";
-        size_diff *= -1;
-    }
-    let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
-    println!("{} ({}{})", sa_human_readable, sign, sd_human_readable);
-    (size_before, size_after)
 }
 
 fn cumulative_dir_size(dir: &str) -> DirInfoObj {
@@ -585,7 +593,7 @@ fn main() {
             let entry = entry.unwrap();
             let repo = entry.path();
             let repostr = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repostr);
+            let (before, after) = gc_repo(&repostr, config);
             total_size_before += before;
             total_size_after += after;
         }
@@ -604,7 +612,7 @@ fn main() {
         for repo in fs::read_dir(&registry_repos_path).unwrap() {
             let repo = repo.unwrap().path().join(".git/");
             let repo_str = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repo_str);
+            let (before, after) = gc_repo(&repo_str, config);
             total_size_before += before;
             total_size_after += after;
         } // iterate over registries and gc
