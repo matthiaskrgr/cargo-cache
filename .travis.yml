@@ -22,6 +22,9 @@ script:
   - cargo-cache
   - cargo cache
   - cargo cache --help
-  - cargo cache --gc
+  - cargo cache --gc --dry-run
+  - cargo cache --gc --dry-run
   - cargo cache --info
   - cargo cache --list-dirs
+  - cargo cache --remove-crates 0 --dry-run
+  - cargo cache -c 0
