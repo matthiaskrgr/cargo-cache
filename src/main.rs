@@ -20,12 +20,12 @@ use std::path::Path;
 use std::process::Command;
 
 use clap::{App, Arg, SubCommand};
-use humansize::{FileSize, file_size_opts as options};
+use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
 
 struct CacheDir<'a> {
     path: &'a std::path::Path, // path object of the dir
-    string: &'a str, // string that represents the dir path
+    string: &'a str,           // string that represents the dir path
 }
 
 impl<'a> CacheDir<'a> {
@@ -57,16 +57,15 @@ struct DirInfoObj {
 }
 
 struct DirSizesCollector {
-    total_size: u64, // total size of cargo root dir
-    numb_bins: u64, // number of binaries found
-    total_bin_size: u64, // total size of binaries found
-    total_reg_size: u64, // registry size
-    total_git_db_size: u64, // git db size
-    total_git_chk_size: u64, // git checkout size
+    total_size: u64,           // total size of cargo root dir
+    numb_bins: u64,            // number of binaries found
+    total_bin_size: u64,       // total size of binaries found
+    total_reg_size: u64,       // registry size
+    total_git_db_size: u64,    // git db size
+    total_git_chk_size: u64,   // git checkout size
     total_reg_cache_size: u64, // registry cache size
-    total_reg_src_size: u64, // registry sources size
+    total_reg_src_size: u64,   // registry sources size
 }
-
 
 impl DirSizesCollector {
     fn new(d: &CacheDirCollector) -> DirSizesCollector {
@@ -104,15 +103,14 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
         println!("{} ({}{})", sb_human_readable, "+", 0);
         (0, 0)
     } else {
-
-
         let repo = git2::Repository::open(path).unwrap();
         match Command::new("git")
             .arg("gc")
             .arg("--aggressive")
             .arg("--prune=now")
             .current_dir(repo.path())
-            .output() {
+            .output()
+        {
             Ok(_out) => {}
             /* println!("git gc error\nstatus: {}", out.status);
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
@@ -186,9 +184,9 @@ fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
 
     'inputStrLoop: loop {
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect(
-            "Couldn't read input",
-        );
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Couldn't read input");
 
         // check what dir we are supposed to delete now
         match input.trim() {
@@ -223,12 +221,10 @@ fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
                 println!("Invalid input.");
                 print_dirs_to_delete();
 
-
                 continue 'inputStrLoop;
             } // _
         } // match input
     } // 'inputStrLoop
-
 
     println!(
         "Trying to delete {}",
@@ -241,9 +237,9 @@ fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
 
     loop {
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect(
-            "Couldn't read line",
-        );
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Couldn't read line");
         if input.trim() == "yes" {
             println!("deleting {}", dirs_to_delete.first().unwrap().string);
             for dir in dirs_to_delete {
@@ -368,7 +364,6 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
                     } else {
                         fs::remove_file(pkgpath).unwrap();
                     }
-
                 }
             } else {
                 // new package in list
@@ -452,7 +447,6 @@ fn str_from_pb(path: &std::path::PathBuf) -> std::string::String {
     path.clone().into_os_string().into_string().unwrap()
 }
 
-
 fn main() {
     // parse args
     // dummy subcommand:
@@ -530,7 +524,6 @@ fn main() {
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
 
-
     // get the cargo home dir path from cargo
     let cargo_cfg = cargo::util::config::Config::default().unwrap();
     let cargo_home_str = format!("{}", cargo_cfg.home().display());
@@ -581,7 +574,6 @@ fn main() {
         process::exit(0);
     }
 
-
     print_dir_sizes(&dir_sizes);
 
     if config.is_present("remove-dirs") {
@@ -614,9 +606,9 @@ fn main() {
                 .home()
                 .display()
         );
-        let registry_repos_path = Path::new(&registry_repos_str).join("registry/").join(
-            "index/",
-        );
+        let registry_repos_path = Path::new(&registry_repos_str)
+            .join("registry/")
+            .join("index/");
         for repo in fs::read_dir(&registry_repos_path).unwrap() {
             let repo = repo.unwrap().path().join(".git/");
             let repo_str = repo.into_os_string().into_string().unwrap();
