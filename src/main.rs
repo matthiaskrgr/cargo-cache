@@ -303,8 +303,6 @@ fn print_dir_sizes(s: &DirSizesCollector) {
 
 fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
     //@TODO can we import parts of cargo to simplify this?
-    println!("DEBUG; amount to keep: {}", amount_to_keep);
-
     println!();
 
     let registry_str = format!(
