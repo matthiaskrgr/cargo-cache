@@ -116,7 +116,7 @@ impl CargoCacheDirs {
         let registry_sources_str = str_from_pb(&registry_sources);
         let reg_src = DirCache::new(registry_sources_str);
         // git
-        let git_db_path = registry.path.join("git/db/");
+        let git_db_path = cargo_home.path.join("git/db/");
         let git_db_str = str_from_pb(&git_db_path);
         let git_db = DirCache::new(git_db_str);
 
@@ -500,61 +500,61 @@ fn str_from_pb(path: &std::path::PathBuf) -> std::string::String {
     path.clone().into_os_string().into_string().unwrap()
 }
 
-fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches)  {
+fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     let git_db = &cargo_cache.git_db.path;
     // gc cloned git repos of crates or whatever
-    if !(config.is_present("gc-repos") && git_db.is_dir()) {
-        return
+    if !git_db.is_dir() {
+        println!("WARNING:   {} is not a dir", str_from_pb(git_db));
+        return;
     }
-        let mut total_size_before: u64 = 0;
-        let mut total_size_after: u64 = 0;
+    let mut total_size_before: u64 = 0;
+    let mut total_size_after: u64 = 0;
 
-        println!("Recompressing repositories. Please be patient...");
-        // gc git repos of crates
-        for entry in fs::read_dir(&git_db).unwrap() {
-            let entry = entry.unwrap();
-            let repo = entry.path();
-            let repostr = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repostr, config);
-            total_size_before += before;
-            total_size_after += after;
-        }
+    println!("Recompressing repositories. Please be patient...");
+    // gc git repos of crates
+    for entry in fs::read_dir(&git_db).unwrap() {
+        let entry = entry.unwrap();
+        let repo = entry.path();
+        let repostr = repo.into_os_string().into_string().unwrap();
+        let (before, after) = gc_repo(&repostr, config);
+        total_size_before += before;
+        total_size_after += after;
+    }
 
-        // gc registries
-        let registry_repos_str = format!(
-            "{}",
-            cargo::util::config::Config::default()
-                .unwrap()
-                .home()
-                .display()
-        );
-        let registry_repos_path = Path::new(&registry_repos_str)
-            .join("registry/")
-            .join("index/");
-        println!("Recompressing registries.");
-        for repo in fs::read_dir(&registry_repos_path).unwrap() {
-            let repo = repo.unwrap().path();
-            let repo_str = repo.into_os_string().into_string().unwrap();
-            let (before, after) = gc_repo(&repo_str, config);
-            total_size_before += before;
-            total_size_after += after;
-        } // iterate over registries and gc
-        let mut size_diff = (total_size_after - total_size_before) as i64;
-        let mut sign = "+";
-        if size_diff < 0 {
-            sign = "-";
-            size_diff *= -1;
-        }
-        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+    // gc registries
+    let registry_repos_str = format!(
+        "{}",
+        cargo::util::config::Config::default()
+            .unwrap()
+            .home()
+            .display()
+    );
+    let registry_repos_path = Path::new(&registry_repos_str)
+        .join("registry/")
+        .join("index/");
+    println!("Recompressing registries.");
+    for repo in fs::read_dir(&registry_repos_path).unwrap() {
+        let repo = repo.unwrap().path();
+        let repo_str = repo.into_os_string().into_string().unwrap();
+        let (before, after) = gc_repo(&repo_str, config);
+        total_size_before += before;
+        total_size_after += after;
+    } // iterate over registries and gc
+    let mut size_diff = (total_size_after - total_size_before) as i64;
+    let mut sign = "+";
+    if size_diff < 0 {
+        sign = "-";
+        size_diff *= -1;
+    }
+    let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
 
-        println!(
-            "Compressed {} to {}, ({}{})",
-            total_size_before.file_size(options::DECIMAL).unwrap(),
-            total_size_after.file_size(options::DECIMAL).unwrap(),
-            sign,
-            sd_human_readable
-        );
-
+    println!(
+        "Compressed {} to {}, ({}{})",
+        total_size_before.file_size(options::DECIMAL).unwrap(),
+        total_size_after.file_size(options::DECIMAL).unwrap(),
+        sign,
+        sd_human_readable
+    );
 }
 
 fn main() {
@@ -597,6 +597,14 @@ fn main() {
                 .arg(
                     Arg::with_name("dry-run")
                     .short("d").long("dry-run").help("don't remove anything, just pretend"),
+                )
+                .arg(
+                    Arg::with_name("autoclean")
+                    .short("a").long("autoclean").help("Removes registry src checkouts and git repo checkouts"),
+                )
+                .arg(
+                    Arg::with_name("autoclean-expensive")
+                    .short("e").long("autoclean-expensive").help("Removes registry src checkouts, git repo checkouts and gcs repos"),
                 ),
         ) // subcmd
         .arg(
@@ -629,14 +637,19 @@ fn main() {
             Arg::with_name("dry-run")
             .short("d").long("dry-run").help("don't remove anything, just pretend"),
         )
+        .arg(
+            Arg::with_name("autoclean")
+            .short("a").long("autoclean").help("Removes registry src checkouts and git repo checkouts"),
+        )
+        .arg(
+            Arg::with_name("autoclean-expensive")
+            .short("e").long("autoclean-expensive").help("Removes registry src checkouts, git repo checkouts and gcs repos"),
+        )
         .get_matches();
 
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
-
     let cargo_cache = CargoCacheDirs::new(config);
-    let git_db = cargo_cache.git_db.path.clone();
-
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
     if config.is_present("info") {
@@ -646,14 +659,30 @@ fn main() {
 
     print_dir_sizes(&dir_sizes);
 
-
     if config.is_present("remove-dirs") {
         rm_dir(cargo_cache.clone(), config);
     } else if config.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
     }
+    if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
+        run_gc(&cargo_cache, config);
+    }
 
-    run_gc(&cargo_cache, config);
+    if config.is_present("autoclean") || config.is_present("autoclean-expensive") {
+        let reg_srcs = cargo_cache.registry_sources;
+        let git_checkouts = cargo_cache.git_checkouts;
+        for dir in &[reg_srcs, git_checkouts] {
+            if dir.path.is_dir() {
+                if config.is_present("dry-run") {
+                    println!("would remove directory '{}'", dir.string);
+                } else {
+                    fs::remove_dir(&dir.path).unwrap();
+                }
+            } else {
+                println!("WARNING '{}' is not a directory", dir.string);
+            }
+        }
+    }
 
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
