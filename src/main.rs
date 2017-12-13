@@ -23,6 +23,7 @@ use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
 
+#[derive(Clone)]
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
@@ -30,6 +31,7 @@ struct DirInfoObj {
     file_number: u64,
 }
 
+#[derive(Clone)]
 struct DirSizesCollector {
     total_size: u64,           // total size of cargo root dir
     numb_bins: u64,            // number of binaries found
@@ -669,14 +671,14 @@ fn main() {
     }
 
     if config.is_present("autoclean") || config.is_present("autoclean-expensive") {
-        let reg_srcs = cargo_cache.registry_sources;
-        let git_checkouts = cargo_cache.git_checkouts;
+        let reg_srcs = &cargo_cache.registry_sources;
+        let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
             if dir.path.is_dir() {
                 if config.is_present("dry-run") {
                     println!("would remove directory '{}'", dir.string);
                 } else {
-                    fs::remove_dir(&dir.path).unwrap();
+                    fs::remove_dir_all(&dir.path).unwrap();
                 }
             } else {
                 println!("WARNING '{}' is not a directory", dir.string);
@@ -687,5 +689,16 @@ fn main() {
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
         rm_old_crates(val, config);
+    }
+    if !config.is_present("dry-run") {
+        let cache_size_old = dir_sizes.total_size.file_size(options::DECIMAL).unwrap();
+        let cache_size_new = DirSizesCollector::new(&cargo_cache)
+            .total_size
+            .file_size(options::DECIMAL)
+            .unwrap();
+        println!(
+            "\nSize changed from {} to {}",
+            cache_size_old, cache_size_new
+        );
     }
 }
