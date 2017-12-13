@@ -68,7 +68,7 @@ struct DirSizesCollector {
 }
 
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
-    let mut vec = pathstr.split('/').collect::<Vec<&str>>();
+    let vec = pathstr.split('/').collect::<Vec<&str>>();
     let reponame = vec.last().unwrap();
     print!("Recompressing {} : ", reponame);
     let path = Path::new(pathstr);
