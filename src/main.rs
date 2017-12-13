@@ -67,6 +67,24 @@ struct DirSizesCollector {
     total_reg_src_size: u64, // registry sources size
 }
 
+
+impl DirSizesCollector {
+    fn new(d: &CacheDirCollector) -> DirSizesCollector {
+        let bindir_files = cumulative_dir_size(d.bin_dir.string);
+
+        DirSizesCollector {
+            total_size: cumulative_dir_size(d.cargo_home.string).dir_size,
+            numb_bins: bindir_files.file_number,
+            total_bin_size: bindir_files.dir_size,
+            total_reg_size: cumulative_dir_size(d.registry.string).dir_size,
+            total_git_db_size: cumulative_dir_size(d.git_db.string).dir_size,
+            total_git_chk_size: cumulative_dir_size(d.git_checkouts.string).dir_size,
+            total_reg_cache_size: cumulative_dir_size(d.registry_cache.string).dir_size,
+            total_reg_src_size: cumulative_dir_size(d.registry_src.string).dir_size,
+        }
+    }
+}
+
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     let vec = pathstr.split('/').collect::<Vec<&str>>();
     let reponame = vec.last().unwrap();
@@ -545,20 +563,6 @@ fn main() {
     let git_checkouts = cargo_home_path.join("git/checkouts/");
     let git_checkouts_str = str_from_pb(&git_checkouts);
 
-    let bindir_files = cumulative_dir_size(&bin_dir_str);
-
-    let dir_sizes = DirSizesCollector {
-        total_size: cumulative_dir_size(&cargo_home_str).dir_size,
-        numb_bins: bindir_files.file_number,
-        total_bin_size: bindir_files.dir_size,
-        total_reg_size: cumulative_dir_size(&registry_dir_str).dir_size,
-        total_git_db_size: cumulative_dir_size(&git_db_str).dir_size,
-        total_git_chk_size: cumulative_dir_size(&git_checkouts_str).dir_size,
-        total_reg_cache_size: cumulative_dir_size(&registry_cache_str).dir_size,
-        total_reg_src_size: cumulative_dir_size(&registry_sources_str).dir_size,
-    };
-
-
     // link everything into the CacheDirCollector which we can easily pass around to functions
     let cargo_cache = CacheDirCollector {
         cargo_home: &CacheDir::new(cargo_home_path, &cargo_home_str),
@@ -569,6 +573,8 @@ fn main() {
         registry_src: &CacheDir::new(&registry_sources, &registry_sources_str),
         bin_dir: &CacheDir::new(&bin_dir, &bin_dir_str),
     };
+
+    let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
     if config.is_present("info") {
         print_info(&cargo_cache, &dir_sizes);
