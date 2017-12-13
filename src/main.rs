@@ -69,12 +69,12 @@ struct DirSizesCollector {
 
 impl DirSizesCollector {
     fn new(d: &CacheDirCollector) -> DirSizesCollector {
-        let bindir_files = cumulative_dir_size(d.bin_dir.string);
+        let bindir = cumulative_dir_size(d.bin_dir.string);
 
         DirSizesCollector {
             total_size: cumulative_dir_size(d.cargo_home.string).dir_size,
-            numb_bins: bindir_files.file_number,
-            total_bin_size: bindir_files.dir_size,
+            numb_bins: bindir.file_number,
+            total_bin_size: bindir.dir_size,
             total_reg_size: cumulative_dir_size(d.registry.string).dir_size,
             total_git_db_size: cumulative_dir_size(d.git_db.string).dir_size,
             total_git_chk_size: cumulative_dir_size(d.git_checkouts.string).dir_size,
