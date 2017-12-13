@@ -16,38 +16,12 @@ extern crate git2; // compress git repos
 
 use std::{fs, io, process};
 use std::io::{stdout, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
-
-struct CacheDir<'a> {
-    path: &'a std::path::Path, // path object of the dir
-    string: &'a str,           // string that represents the dir path
-}
-
-impl<'a> CacheDir<'a> {
-    fn new(path: &'a std::path::Path, string: &'a str) -> CacheDir<'a> {
-        CacheDir {
-            path: path,
-            string: string,
-        }
-    }
-}
-
-struct CacheDirCollector<'a> {
-    // an object containing all the relevant cache dirs
-    // for easy pasing around to functions
-    cargo_home: &'a CacheDir<'a>,
-    git_checkouts: &'a CacheDir<'a>,
-    git_db: &'a CacheDir<'a>,
-    registry: &'a CacheDir<'a>,
-    registry_cache: &'a CacheDir<'a>,
-    registry_src: &'a CacheDir<'a>,
-    bin_dir: &'a CacheDir<'a>,
-}
 
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -68,18 +42,94 @@ struct DirSizesCollector {
 }
 
 impl DirSizesCollector {
-    fn new(d: &CacheDirCollector) -> DirSizesCollector {
-        let bindir = cumulative_dir_size(d.bin_dir.string);
+    fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
+        let bindir = cumulative_dir_size(&ccd.bin_dir.string);
 
         DirSizesCollector {
-            total_size: cumulative_dir_size(d.cargo_home.string).dir_size,
+            total_size: cumulative_dir_size(&ccd.cargo_home.string).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
-            total_reg_size: cumulative_dir_size(d.registry.string).dir_size,
-            total_git_db_size: cumulative_dir_size(d.git_db.string).dir_size,
-            total_git_chk_size: cumulative_dir_size(d.git_checkouts.string).dir_size,
-            total_reg_cache_size: cumulative_dir_size(d.registry_cache.string).dir_size,
-            total_reg_src_size: cumulative_dir_size(d.registry_src.string).dir_size,
+            total_reg_size: cumulative_dir_size(&ccd.registry.string).dir_size,
+            total_git_db_size: cumulative_dir_size(&ccd.git_db.string).dir_size,
+            total_git_chk_size: cumulative_dir_size(&ccd.git_checkouts.string).dir_size,
+            total_reg_cache_size: cumulative_dir_size(&ccd.registry_cache.string).dir_size,
+            total_reg_src_size: cumulative_dir_size(&ccd.registry_sources.string).dir_size,
+        }
+    }
+}
+
+struct DirCache {
+    path: std::path::PathBuf,
+    string: std::string::String,
+}
+
+impl DirCache {
+    fn new(string: std::string::String) -> DirCache {
+        let pathbuf = PathBuf::from(&string);
+        DirCache {
+            path: pathbuf,
+            string: string,
+        }
+    }
+}
+
+struct CargoCacheDirs {
+    cargo_home: DirCache,
+    bin_dir: DirCache,
+    registry: DirCache,
+    registry_cache: DirCache,
+    registry_sources: DirCache,
+    git_db: DirCache,
+    git_checkouts: DirCache,
+}
+
+impl CargoCacheDirs {
+    fn new(config: &clap::ArgMatches) -> CargoCacheDirs {
+        let cargo_cfg = cargo::util::config::Config::default().unwrap();
+        let cargo_home_str = format!("{}", cargo_cfg.home().display());
+        let cargo_home_path = PathBuf::from(&cargo_home_str);
+
+        if !cargo_home_path.is_dir() {
+            panic!("Error, no '{} dir found", &cargo_home_str);
+        }
+
+        if !config.is_present("list-dirs") {
+            println!("Found CARGO_HOME: {}\n", cargo_home_str);
+        }
+        let cargo_home = DirCache::new(cargo_home_str);
+        // bin
+        let bin_path = cargo_home.path.join("bin/");
+        let bin_str = str_from_pb(&bin_path);
+        let bin = DirCache::new(bin_str);
+        // registry
+        let registry_dir_path = cargo_home.path.join("registry/");
+        let registry_dir_str = str_from_pb(&registry_dir_path);
+        let registry = DirCache::new(registry_dir_str);
+
+        let registry_cache = registry.path.join("cache/");
+        let registry_cache_str = str_from_pb(&registry_cache);
+        let reg_cache = DirCache::new(registry_cache_str);
+
+        let registry_sources = registry.path.join("src/");
+        let registry_sources_str = str_from_pb(&registry_sources);
+        let reg_src = DirCache::new(registry_sources_str);
+        // git
+        let git_db_path = registry.path.join("git/db/");
+        let git_db_str = str_from_pb(&git_db_path);
+        let git_db = DirCache::new(git_db_str);
+
+        let git_checkouts_path = cargo_home_path.join("git/checkouts/");
+        let git_checkouts_str = str_from_pb(&git_checkouts_path);
+        let git_checkouts = DirCache::new(git_checkouts_str);
+
+        CargoCacheDirs {
+            cargo_home: cargo_home,
+            bin_dir: bin,
+            registry: registry,
+            registry_cache: reg_cache,
+            registry_sources: reg_src,
+            git_db: git_db,
+            git_checkouts: git_checkouts,
         }
     }
 }
@@ -163,7 +213,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
+fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
     // remove a directory from cargo cache
 
     fn print_dirs_to_delete() {
@@ -175,10 +225,10 @@ fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
 
     //print the paths and sizes to give user some context
     println!();
-    print_dir_paths(cache);
+    print_dir_paths(&cache);
     println!();
 
-    let mut dirs_to_delete: Vec<&CacheDir> = Vec::new();
+    let mut dirs_to_delete: Vec<DirCache> = Vec::new();
 
     print_dirs_to_delete();
 
@@ -205,7 +255,7 @@ fn rm_dir(cache: &CacheDirCollector, config: &clap::ArgMatches) {
                 break;
             }
             "registry-source-checkouts" => {
-                dirs_to_delete.push(cache.registry_src);
+                dirs_to_delete.push(cache.registry_sources);
                 break;
             }
             "registry-crate-archives" => {
@@ -376,17 +426,20 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
     );
 }
 
-fn print_dir_paths(c: &CacheDirCollector) {
+fn print_dir_paths(c: &CargoCacheDirs) {
     //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
     println!("binaries directory:           {}", c.bin_dir.string);
     println!("registry directory:           {}", c.registry.string);
     println!("registry crate source cache:  {}", c.registry_cache.string);
-    println!("registry unpacked sources:    {}", c.registry_src.string);
+    println!(
+        "registry unpacked sources:    {}",
+        c.registry_sources.string
+    );
     println!("git db directory:             {}", c.git_db.string);
     println!("git checkouts dir:            {}", c.git_checkouts.string);
 }
 
-fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
+fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",
@@ -418,7 +471,7 @@ fn print_info(c: &CacheDirCollector, s: &DirSizesCollector) {
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
-        c.registry_src.string,
+        c.registry_sources.string,
         s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
@@ -522,48 +575,8 @@ fn main() {
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
 
-    // get the cargo home dir path from cargo
-    let cargo_cfg = cargo::util::config::Config::default().unwrap();
-    let cargo_home_str = format!("{}", cargo_cfg.home().display());
-    let cargo_home_path = Path::new(&cargo_home_str);
-
-    // make sure we actually have a cargo dir
-    if !cargo_home_path.is_dir() {
-        panic!("Error, no '{} dir found", &cargo_home_str);
-    }
-
-    if !config.is_present("list-dirs") {
-        println!("Found CARGO_HOME: {}\n", cargo_home_str);
-    }
-
-    let bin_dir = cargo_home_path.join("bin/");
-    let bin_dir_str = str_from_pb(&bin_dir);
-
-    let registry_dir = cargo_home_path.join("registry/");
-    let registry_dir_str = str_from_pb(&registry_dir);
-
-    let registry_cache = registry_dir.join("cache/");
-    let registry_cache_str = str_from_pb(&registry_cache);
-
-    let registry_sources = registry_dir.join("src/");
-    let registry_sources_str = str_from_pb(&registry_sources);
-
-    let git_db = cargo_home_path.join("git/db/");
-    let git_db_str = str_from_pb(&git_db);
-
-    let git_checkouts = cargo_home_path.join("git/checkouts/");
-    let git_checkouts_str = str_from_pb(&git_checkouts);
-
-    // link everything into the CacheDirCollector which we can easily pass around to functions
-    let cargo_cache = CacheDirCollector {
-        cargo_home: &CacheDir::new(cargo_home_path, &cargo_home_str),
-        git_checkouts: &CacheDir::new(&git_checkouts, &git_checkouts_str),
-        git_db: &CacheDir::new(&git_db, &git_db_str),
-        registry: &CacheDir::new(&registry_dir, &registry_dir_str),
-        registry_cache: &CacheDir::new(&registry_cache, &registry_cache_str),
-        registry_src: &CacheDir::new(&registry_sources, &registry_sources_str),
-        bin_dir: &CacheDir::new(&bin_dir, &bin_dir_str),
-    };
+    let cargo_cache = CargoCacheDirs::new(config);
+    let git_db = cargo_cache.git_db.path.clone();
 
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
@@ -575,7 +588,7 @@ fn main() {
     print_dir_sizes(&dir_sizes);
 
     if config.is_present("remove-dirs") {
-        rm_dir(&cargo_cache, config);
+        rm_dir(cargo_cache, config);
     } else if config.is_present("list-dirs") {
         print_dir_paths(&cargo_cache);
     }
