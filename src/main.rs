@@ -218,7 +218,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
 
     fn print_dirs_to_delete() {
         println!("Possile directories to delete:");
-        println!("'git-checkouts', 'git', 'registry'");
+        println!("'git-checkouts', 'git' (removes checkouts and cloned repos), 'registry'");
         println!("'registry-source-checkouts', 'registry-crate-archives'.");
         println!("'abort' to abort.");
     }
@@ -245,7 +245,6 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
                 break;
             }
             "git" => {
-                // @TODO make sure we print that we are rming bare repos AND checkouts
                 dirs_to_delete.push(cache.git_db);
                 dirs_to_delete.push(cache.git_checkouts);
                 break;
