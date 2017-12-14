@@ -2,7 +2,10 @@
 name = "cargo-cache"
 version = "0.1.0"
 authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
-description = "Manage cargo cache"
+description = "Manage cargo cache, show sizes and delete directories."
+homepage = "https://github.com/matthiaskrgr/cargo-cache"
+repository = "https://github.com/matthiaskrgr/cargo-cache"
+keywords = ["cargo", "cache", "delete", "manage","size"]
 
 [dependencies]
 clap = "2.29"
@@ -10,6 +13,9 @@ walkdir = "2.0"
 humansize = "1.0"
 cargo = "0.23"
 git2 = "0.6"
+
+[badges]
+travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
 [profile.release]
 lto = true
