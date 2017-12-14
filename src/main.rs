@@ -352,9 +352,8 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
 
     // remove crate sources from cache
     // src can be completely nuked since we can always rebuilt it from cache
-    let registry_src_path = Path::new(&registry_str).join("registry/").join("cache/");
+    let registry_src_path = Path::new(&registry_str);
 
-    // path().into_os_string().into_string().unwrap()
     let mut removed_size = 0;
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
