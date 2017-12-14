@@ -347,16 +347,9 @@ fn print_dir_sizes(s: &DirSizesCollector) {
     );
 }
 
-fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
+fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str) {
     println!();
-    // @TODO: don't recalc this
-    let registry_str = format!(
-        "{}",
-        cargo::util::config::Config::default()
-            .unwrap()
-            .home()
-            .display()
-    );
+
     // remove crate sources from cache
     // src can be completely nuked since we can always rebuilt it from cache
     let registry_src_path = Path::new(&registry_str).join("registry/").join("cache/");
@@ -509,20 +502,9 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
         total_size_after += after;
     }
 
-    // gc registries
-    // @TODO we already calced this
-    let registry_repos_str = format!(
-        "{}",
-        cargo::util::config::Config::default()
-            .unwrap()
-            .home()
-            .display()
-    );
-    let registry_repos_path = Path::new(&registry_repos_str)
-        .join("registry/")
-        .join("index/");
+    //
     println!("Recompressing registries.");
-    for repo in fs::read_dir(&registry_repos_path).unwrap() {
+    for repo in fs::read_dir(&cargo_cache.registry_cache.string).unwrap() {
         let repo_str = str_from_pb(&repo.unwrap().path());
         let (before, after) = gc_repo(&repo_str, config);
         total_size_before += before;
@@ -671,7 +653,7 @@ fn main() {
 
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
-        rm_old_crates(val, config);
+        rm_old_crates(val, config, &cargo_cache.registry_cache.string);
     }
     if !config.is_present("dry-run") {
         let cache_size_old = dir_sizes.total_size.file_size(options::DECIMAL).unwrap();
