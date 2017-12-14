@@ -94,7 +94,7 @@ impl CargoCacheDirs {
         let cargo_home_path = PathBuf::from(&cargo_home_str);
 
         if !cargo_home_path.is_dir() {
-            panic!("Error, no '{} dir found", &cargo_home_str);
+            panic!("Error, no '{}' dir found", &cargo_home_str);
         }
 
         if !config.is_present("list-dirs") {
@@ -141,15 +141,15 @@ impl CargoCacheDirs {
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     let vec = pathstr.split('/').collect::<Vec<&str>>();
     let reponame = vec.last().unwrap();
-    print!("Recompressing {} : ", reponame);
+    print!("Recompressing '{}': ", reponame);
     let path = Path::new(pathstr);
     if !path.is_dir() {
         panic!("WARNING: git gc path is not directory: {}", &pathstr);
     }
 
     // get size before
-    let size_before = cumulative_dir_size(pathstr).dir_size;
-    let sb_human_readable = size_before.file_size(options::DECIMAL).unwrap();
+    let repo_size_before = cumulative_dir_size(pathstr).dir_size;
+    let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
     stdout().flush().unwrap();
@@ -170,21 +170,19 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
             //if out.status.success() {}
-        } */
+            } */
             Err(e) => println!("git-gc failed {}", e),
         }
-        let size_after = cumulative_dir_size(pathstr).dir_size;
-        let sa_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-        let mut size_diff: i64 = ((size_after as i64) - (size_before as i64)) as i64;
-        let mut sign = "+";
-        if size_diff < 0 {
-            sign = "-";
-            size_diff *= -1;
-        }
-        let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+        let repo_size_after = cumulative_dir_size(pathstr).dir_size;
+        let sa_human_readable = repo_size_after.file_size(options::DECIMAL).unwrap();
+        let repo_size_diff: i64 = (repo_size_after as i64) - (repo_size_before as i64);
+        let sign = if repo_size_diff < 0 { "-" } else { "+" };
+
+        // humansize file_size()  expects  u64 so we need to use abs()
+        let sd_human_readable = repo_size_diff.abs().file_size(options::DECIMAL).unwrap();
         println!("{} ({}{})", sa_human_readable, sign, sd_human_readable);
 
-        (size_before, size_after)
+        (repo_size_before, repo_size_after)
     }
 }
 
@@ -196,15 +194,13 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
             file_number: 0,
         };
     }
-    //@TODO add some clever caching
+    //@TODO add some clever caching?
     let mut cumulative_size = 0;
     let mut number_of_files = 0;
     // traverse recursively and sum filesizes
     for entry in WalkDir::new(dir) {
         let entry = entry.unwrap();
         let path = entry.path();
-        //println!("{}", path.display());
-
         if path.is_file() {
             cumulative_size += fs::metadata(path).unwrap().len();
             number_of_files += 1;
@@ -281,11 +277,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
     } // 'inputStrLoop
 
     println!(
-        "Trying to delete {}",
-        dirs_to_delete.first().unwrap().string
-    );
-    println!(
-        "Really delete dir {} ? (yes/no)",
+        "Really delete '{}'? (yes/no)",
         dirs_to_delete.first().unwrap().string
     );
 
@@ -293,7 +285,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
         let mut input = String::new();
         io::stdin()
             .read_line(&mut input)
-            .expect("Couldn't read line");
+            .expect("Failed to read input");
         if input.trim() == "yes" {
             println!("deleting {}", dirs_to_delete.first().unwrap().string);
             for dir in dirs_to_delete {
@@ -302,22 +294,23 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
                     println!("Doing nothing.");
                 } else if dir.path.is_dir() {
                     if config.is_present("dry-run") {
-                        // don't actually delete
-                        println!("dry run: would remove directory: {}", dir.string);
+                        println!("dry run: would remove directory: '{}'", dir.string);
                     } else {
                         fs::remove_dir_all(dir.string).unwrap();
                     }
                 } else {
-                    println!("Directory {} does not exist, skipping", dir.string);
+                    println!("Directory '{}' does not exist, skipping", dir.string);
                 }
             }
             break;
         } else if input == "no" {
-            println!("keeping {}", dirs_to_delete.first().unwrap().string);
+            println!(
+                "Keeping '{}' as requested.",
+                dirs_to_delete.first().unwrap().string
+            );
             break;
         } else {
-            println!("Invalid input: {}", input);
-            println!("please use 'yes' or 'no'");
+            println!("Invalid input: {}, please use 'yes' or 'no'.", input);
         }
     } // loop
 } // fn rm_dir
@@ -356,9 +349,8 @@ fn print_dir_sizes(s: &DirSizesCollector) {
 }
 
 fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
-    //@TODO can we import parts of cargo to simplify this?
     println!();
-
+    // @TODO: don't recalc this
     let registry_str = format!(
         "{}",
         cargo::util::config::Config::default()
@@ -366,23 +358,16 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
             .home()
             .display()
     );
-
-    // @TODO use struct and  sort by key:
-    //  https://doc.rust-lang.org/std/primitive.slice.html#method.sort_by_key
-
     // remove crate sources from cache
     // src can be completely nuked since we can always rebuilt it from cache
     let registry_src_path = Path::new(&registry_str).join("registry/").join("cache/");
 
     // path().into_os_string().into_string().unwrap()
     let mut removed_size = 0;
-
+    // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
         let mut crate_list = Vec::new();
-
-        let repo = repo.unwrap();
-        let path = repo.path();
-        let string = path.into_os_string().into_string().unwrap();
+        let string = repo.unwrap().path().into_os_string().into_string().unwrap();
         for cratesrc in fs::read_dir(&string).unwrap() {
             let cratestr = cratesrc
                 .unwrap()
@@ -397,7 +382,7 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
 
         let mut versions_of_this_package = 0;
         let mut last_pkgname = String::from("");
-
+        // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
             let string = pkgpath.split('/').last().unwrap();
             let mut vec = string.split('-').collect::<Vec<&str>>();
@@ -407,25 +392,28 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches) {
             //println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
             if last_pkgname == pkgname {
                 versions_of_this_package += 1;
-                if versions_of_this_package + 1 > amount_to_keep {
+                if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
-                    println!("deleting: {} {} at  {}", pkgname, pkgver, pkgpath);
                     removed_size += fs::metadata(pkgpath).unwrap().len();
                     if config.is_present("dry-run") {
-                        println!("dry run; nothing deleted");
+                        println!(
+                            "dry run: not actually deleting {} {} at {}",
+                            pkgname, pkgver, pkgpath
+                        );
                     } else {
+                        println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
                         fs::remove_file(pkgpath).unwrap();
                     }
                 }
             } else {
-                // new package in list
+                // last_pkgname != pkgname, we got to a new package, reset counter
                 versions_of_this_package = 0;
                 last_pkgname = pkgname;
-            }
-        }
+            } // if last_pkgname == pkgname
+        } // for pkgpath in &crate_list
     }
     println!(
-        "Removed {} in compressed crate sources.",
+        "Removed {} of compressed crate sources.",
         removed_size.file_size(options::DECIMAL).unwrap()
     );
 }
@@ -515,15 +503,15 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     println!("Recompressing repositories. Please be patient...");
     // gc git repos of crates
     for entry in fs::read_dir(&git_db).unwrap() {
-        let entry = entry.unwrap();
-        let repo = entry.path();
-        let repostr = repo.into_os_string().into_string().unwrap();
-        let (before, after) = gc_repo(&repostr, config);
+        let repo = entry.unwrap().path();
+        let repostr = str_from_pb(&repo);
+        let (before, after) = gc_repo(&repostr, config); // run gc
         total_size_before += before;
         total_size_after += after;
     }
 
     // gc registries
+    // @TODO we already calced this
     let registry_repos_str = format!(
         "{}",
         cargo::util::config::Config::default()
@@ -536,19 +524,14 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
         .join("index/");
     println!("Recompressing registries.");
     for repo in fs::read_dir(&registry_repos_path).unwrap() {
-        let repo = repo.unwrap().path();
-        let repo_str = repo.into_os_string().into_string().unwrap();
+        let repo_str = str_from_pb(&repo.unwrap().path());
         let (before, after) = gc_repo(&repo_str, config);
         total_size_before += before;
         total_size_after += after;
     } // iterate over registries and gc
-    let mut size_diff = (total_size_after - total_size_before) as i64;
-    let mut sign = "+";
-    if size_diff < 0 {
-        sign = "-";
-        size_diff *= -1;
-    }
-    let sd_human_readable = size_diff.file_size(options::DECIMAL).unwrap();
+    let repo_size_diff: i64 = total_size_after as i64 - total_size_before as i64;
+    let sign = if repo_size_diff < 0 { "-" } else { "+" };
+    let sd_human_readable = repo_size_diff.abs().file_size(options::DECIMAL).unwrap();
 
     println!(
         "Compressed {} to {}, ({}{})",
@@ -651,6 +634,7 @@ fn main() {
 
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
+
     let cargo_cache = CargoCacheDirs::new(config);
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
