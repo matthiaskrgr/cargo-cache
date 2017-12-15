@@ -266,7 +266,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
+fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     // remove a directory from cargo cache
 
     fn print_dirs_to_delete() {
@@ -281,7 +281,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
     cache.print_dir_paths();
     println!();
 
-    let mut dirs_to_delete: Vec<DirCache> = Vec::new();
+    let mut dirs_to_delete: Vec<&DirCache> = Vec::new();
 
     print_dirs_to_delete();
 
@@ -294,24 +294,24 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
         // check what dir we are supposed to delete now
         match input.trim() {
             "git-checkouts" => {
-                dirs_to_delete.push(cache.git_checkouts);
+                dirs_to_delete.push(&cache.git_checkouts);
                 break;
             }
             "git" => {
-                dirs_to_delete.push(cache.git_db);
-                dirs_to_delete.push(cache.git_checkouts);
+                dirs_to_delete.push(&cache.git_db);
+                dirs_to_delete.push(&cache.git_checkouts);
                 break;
             }
             "registry" => {
-                dirs_to_delete.push(cache.registry);
+                dirs_to_delete.push(&cache.registry);
                 break;
             }
             "registry-source-checkouts" => {
-                dirs_to_delete.push(cache.registry_sources);
+                dirs_to_delete.push(&cache.registry_sources);
                 break;
             }
             "registry-crate-archives" => {
-                dirs_to_delete.push(cache.registry_cache);
+                dirs_to_delete.push(&cache.registry_cache);
                 break;
             }
             "bin-dir" => println!("Please use 'cargo uninstall'."),
@@ -348,7 +348,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
                     if config.is_present("dry-run") {
                         println!("dry run: would remove directory: '{}'", dir.string);
                     } else {
-                        fs::remove_dir_all(dir.string).unwrap();
+                        fs::remove_dir_all(&dir.string).unwrap();
                     }
                 } else {
                     println!("Directory '{}' does not exist, skipping", dir.string);
@@ -637,7 +637,7 @@ fn main() {
     dir_sizes.print_pretty();
 
     if config.is_present("remove-dirs") {
-        rm_dir(cargo_cache.clone(), config);
+        rm_dir(&cargo_cache, config);
     } else if config.is_present("list-dirs") {
         cargo_cache.print_dir_paths();
     }
