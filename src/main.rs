@@ -527,12 +527,16 @@ fn main() {
     // dummy subcommand:
     // https://github.com/kbknapp/clap-rs/issues/937
     let config = App::new("cargo-cache")
-        .version("0.1")
+        .version(crate_version!())
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
         .subcommand(
             SubCommand::with_name("cache")
+            .version(crate_version!())
+            .bin_name("cargo-cache")
+            .about("Manage cargo cache")
+            .author("matthiaskrgr")
                 .arg(
                     Arg::with_name("list-dirs")
                         .short("l")
