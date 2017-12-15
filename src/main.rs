@@ -23,7 +23,6 @@ use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
 
-#[derive(Clone)]
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
@@ -31,7 +30,6 @@ struct DirInfoObj {
     file_number: u64,
 }
 
-#[derive(Clone)]
 struct DirSizesCollector {
     total_size: u64,           // total size of cargo root dir
     numb_bins: u64,            // number of binaries foundq
@@ -94,7 +92,6 @@ impl DirSizesCollector {
     }
 }
 
-#[derive(Clone)]
 struct DirCache {
     path: std::path::PathBuf,
     string: std::string::String,
@@ -110,7 +107,6 @@ impl DirCache {
     }
 }
 
-#[derive(Clone)]
 struct CargoCacheDirs {
     cargo_home: DirCache,
     bin_dir: DirCache,
