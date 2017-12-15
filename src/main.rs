@@ -75,7 +75,9 @@ impl DirSizesCollector {
         );
         println!(
             "Size of registry crate cache:           {} ",
-            self.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
+            self.total_reg_cache_size
+                .file_size(options::DECIMAL)
+                .unwrap()
         );
         println!(
             "Size of registry source checkouts:      {} ",
@@ -168,6 +170,25 @@ impl CargoCacheDirs {
             git_checkouts: git_checkouts,
         }
     }
+
+    fn print_dir_paths(&self) {
+        //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
+        println!("binaries directory:           {}", self.bin_dir.string);
+        println!("registry directory:           {}", self.registry.string);
+        println!(
+            "registry crate source cache:  {}",
+            self.registry_cache.string
+        );
+        println!(
+            "registry unpacked sources:    {}",
+            self.registry_sources.string
+        );
+        println!("git db directory:             {}", self.git_db.string);
+        println!(
+            "git checkouts dir:            {}",
+            self.git_checkouts.string
+        );
+    }
 }
 
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
@@ -257,7 +278,7 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
 
     //print the paths and sizes to give user some context
     println!();
-    print_dir_paths(&cache);
+    cache.print_dir_paths();
     println!();
 
     let mut dirs_to_delete: Vec<DirCache> = Vec::new();
@@ -406,19 +427,6 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
         "Removed {} of compressed crate sources.",
         removed_size.file_size(options::DECIMAL).unwrap()
     );
-}
-
-fn print_dir_paths(c: &CargoCacheDirs) {
-    //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
-    println!("binaries directory:           {}", c.bin_dir.string);
-    println!("registry directory:           {}", c.registry.string);
-    println!("registry crate source cache:  {}", c.registry_cache.string);
-    println!(
-        "registry unpacked sources:    {}",
-        c.registry_sources.string
-    );
-    println!("git db directory:             {}", c.git_db.string);
-    println!("git checkouts dir:            {}", c.git_checkouts.string);
 }
 
 fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
@@ -631,7 +639,7 @@ fn main() {
     if config.is_present("remove-dirs") {
         rm_dir(cargo_cache.clone(), config);
     } else if config.is_present("list-dirs") {
-        print_dir_paths(&cargo_cache);
+        cargo_cache.print_dir_paths();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         run_gc(&cargo_cache, config);
