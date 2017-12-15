@@ -262,7 +262,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches) {
+fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches, size_changed: &mut bool) {
     // remove a directory from cargo cache
 
     fn print_dirs_to_delete() {
@@ -345,6 +345,7 @@ fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                         println!("dry run: would remove directory: '{}'", dir.string);
                     } else {
                         fs::remove_dir_all(&dir.string).unwrap();
+                        *size_changed = true;
                     }
                 } else {
                     println!("Directory '{}' does not exist, skipping", dir.string);
@@ -363,7 +364,7 @@ fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     } // loop
 } // fn rm_dir
 
-fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str) {
+fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str, size_changed: &mut bool) {
     println!();
 
     // remove crate sources from cache
@@ -410,6 +411,7 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
                         fs::remove_file(pkgpath).unwrap();
+                        *size_changed = true;
                     }
                 }
             } else {
@@ -621,6 +623,8 @@ fn main() {
 
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
+    // indicates if size changed and wether we should print a before/after size diff
+    let mut size_changed: bool = false;
 
     let cargo_cache = CargoCacheDirs::new(config);
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
@@ -633,12 +637,13 @@ fn main() {
     dir_sizes.print_pretty();
 
     if config.is_present("remove-dirs") {
-        rm_dir(&cargo_cache, config);
+        rm_dir(&cargo_cache, config, &mut size_changed);
     } else if config.is_present("list-dirs") {
         cargo_cache.print_dir_paths();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         run_gc(&cargo_cache, config);
+        size_changed = true;
     }
 
     if config.is_present("autoclean") || config.is_present("autoclean-expensive") {
@@ -650,6 +655,7 @@ fn main() {
                     println!("would remove directory '{}'", dir.string);
                 } else {
                     fs::remove_dir_all(&dir.path).unwrap();
+                    size_changed = true;
                 }
             } else {
                 println!("WARNING '{}' is not a directory", dir.string);
@@ -659,9 +665,9 @@ fn main() {
 
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
-        rm_old_crates(val, config, &cargo_cache.registry_cache.string);
+        rm_old_crates(val, config, &cargo_cache.registry_cache.string, &mut size_changed);
     }
-    if !config.is_present("dry-run") {
+    if size_changed && !config.is_present("dry-run")  {
         let cache_size_old = dir_sizes.total_size.file_size(options::DECIMAL).unwrap();
         let cache_size_new = DirSizesCollector::new(&cargo_cache)
             .total_size
