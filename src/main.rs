@@ -34,7 +34,7 @@ struct DirInfoObj {
 #[derive(Clone)]
 struct DirSizesCollector {
     total_size: u64,           // total size of cargo root dir
-    numb_bins: u64,            // number of binaries found
+    numb_bins: u64,            // number of binaries foundq
     total_bin_size: u64,       // total size of binaries found
     total_reg_size: u64,       // registry size
     total_git_db_size: u64,    // git db size
@@ -57,6 +57,38 @@ impl DirSizesCollector {
             total_reg_cache_size: cumulative_dir_size(&ccd.registry_cache.string).dir_size,
             total_reg_src_size: cumulative_dir_size(&ccd.registry_sources.string).dir_size,
         }
+    }
+    fn print_pretty(&self) {
+        println!("\nCargo cache:\n");
+        println!(
+            "Total size:                   {} ",
+            self.total_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of {} installed binaries:     {} ",
+            self.numb_bins,
+            self.total_bin_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of registry:                  {} ",
+            self.total_reg_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of registry crate cache:           {} ",
+            self.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of registry source checkouts:      {} ",
+            self.total_reg_src_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of git db:                    {} ",
+            self.total_git_db_size.file_size(options::DECIMAL).unwrap()
+        );
+        println!(
+            "Size of git repo checkouts:        {} ",
+            self.total_git_chk_size.file_size(options::DECIMAL).unwrap()
+        );
     }
 }
 
@@ -313,39 +345,6 @@ fn rm_dir(cache: CargoCacheDirs, config: &clap::ArgMatches) {
         }
     } // loop
 } // fn rm_dir
-
-fn print_dir_sizes(s: &DirSizesCollector) {
-    println!("\nCargo cache:\n");
-    println!(
-        "Total size:                   {} ",
-        s.total_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of {} installed binaries:     {} ",
-        s.numb_bins,
-        s.total_bin_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of registry:                  {} ",
-        s.total_reg_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of registry crate cache:           {} ",
-        s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of registry source checkouts:      {} ",
-        s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of git db:                    {} ",
-        s.total_git_db_size.file_size(options::DECIMAL).unwrap()
-    );
-    println!(
-        "Size of git repo checkouts:        {} ",
-        s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
-    );
-}
 
 fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str) {
     println!();
@@ -627,7 +626,7 @@ fn main() {
         process::exit(0);
     }
 
-    print_dir_sizes(&dir_sizes);
+    dir_sizes.print_pretty();
 
     if config.is_present("remove-dirs") {
         rm_dir(cargo_cache.clone(), config);
