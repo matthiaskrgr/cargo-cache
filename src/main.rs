@@ -673,8 +673,6 @@ fn main() {
                     fs::remove_dir_all(&dir.path).unwrap();
                     size_changed = true;
                 }
-            } else {
-                println!("WARNING '{}' is not a directory", dir.string);
             }
         }
     }
