@@ -165,7 +165,7 @@ impl CargoCacheDirs {
     }
 
     fn print_dir_paths(&self) {
-        //println!("cargo base path (CARGO_HOME): {}", cargo_home_str);
+        println!();
         println!("binaries directory:           {}", self.bin_dir.string);
         println!("registry directory:           {}", self.registry.string);
         println!(
