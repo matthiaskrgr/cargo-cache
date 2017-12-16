@@ -394,9 +394,25 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
             let pkgver = vec.pop().unwrap();
             let pkgname = vec.join("-");
 
+            if amount_to_keep == 0 {
+                removed_size += fs::metadata(pkgpath).unwrap().len();
+                if config.is_present("dry-run") {
+                    println!(
+                        "dry run: not actually deleting {} {} at {}",
+                        pkgname, pkgver, pkgpath
+                    );
+                } else {
+                    println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
+                    fs::remove_file(pkgpath).unwrap();
+                    *size_changed = true;
+                }
+                continue;
+            }
             //println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
+
             if last_pkgname == pkgname {
-                if versions_of_this_package >  amount_to_keep {
+                versions_of_this_package += 1;
+                if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath).unwrap().len();
                     if config.is_present("dry-run") {
@@ -410,7 +426,6 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
                         *size_changed = true;
                     }
                 }
-                versions_of_this_package += 1;
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
                 versions_of_this_package = 0;
