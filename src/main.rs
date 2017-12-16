@@ -56,8 +56,8 @@ impl DirSizesCollector {
             total_reg_src_size: cumulative_dir_size(&ccd.registry_sources.string).dir_size,
         }
     }
-    fn print_pretty(&self) {
-        println!("\nCargo cache:\n");
+    fn print_pretty(&self, ccd: &CargoCacheDirs) {
+        println!("Cargo cache '{}':\n", ccd.cargo_home.string);
         println!(
             "Total size:                   {} ",
             self.total_size.file_size(options::DECIMAL).unwrap()
@@ -118,7 +118,7 @@ struct CargoCacheDirs {
 }
 
 impl CargoCacheDirs {
-    fn new(config: &clap::ArgMatches) -> CargoCacheDirs {
+    fn new() -> CargoCacheDirs {
         let cargo_cfg = cargo::util::config::Config::default().unwrap();
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
@@ -127,9 +127,6 @@ impl CargoCacheDirs {
             panic!("Error, no '{}' dir found", &cargo_home_str);
         }
 
-        if !config.is_present("list-dirs") {
-            println!("Found CARGO_HOME: {}\n", cargo_home_str);
-        }
         let cargo_home = DirCache::new(cargo_home_str);
         // bin
         let bin_path = cargo_home.path.join("bin/");
@@ -672,7 +669,7 @@ fn main() {
     // indicates if size changed and wether we should print a before/after size diff
     let mut size_changed: bool = false;
 
-    let cargo_cache = CargoCacheDirs::new(config);
+    let cargo_cache = CargoCacheDirs::new();
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
     if config.is_present("info") {
@@ -680,7 +677,7 @@ fn main() {
         process::exit(0);
     }
 
-    dir_sizes.print_pretty();
+    dir_sizes.print_pretty(&cargo_cache);
 
     if config.is_present("remove-dirs") {
         rm_dir(&cargo_cache, config, &mut size_changed);
