@@ -223,13 +223,10 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
             Err(e) => println!("git-gc failed {}", e),
         }
         let repo_size_after = cumulative_dir_size(pathstr).dir_size;
-        let sa_human_readable = repo_size_after.file_size(options::DECIMAL).unwrap();
-        let repo_size_diff: i64 = (repo_size_after as i64) - (repo_size_before as i64);
-        let sign = if repo_size_diff < 0 { "-" } else { "+" };
-
-        // humansize file_size()  expects  u64 so we need to use abs()
-        let sd_human_readable = repo_size_diff.abs().file_size(options::DECIMAL).unwrap();
-        println!("{} ({}{})", sa_human_readable, sign, sd_human_readable);
+        println!(
+            "{}",
+            size_diff_format(repo_size_before, repo_size_before, false)
+        );
 
         (repo_size_before, repo_size_after)
     }
@@ -515,17 +512,35 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
         total_size_before += before;
         total_size_after += after;
     } // iterate over registries and gc
-    let repo_size_diff: i64 = total_size_after as i64 - total_size_before as i64;
-    let sign = if repo_size_diff < 0 { "-" } else { "+" };
-    let sd_human_readable = repo_size_diff.abs().file_size(options::DECIMAL).unwrap();
 
     println!(
-        "Compressed {} to {}, ({}{})",
+        "Compressed {} to {}",
         total_size_before.file_size(options::DECIMAL).unwrap(),
-        total_size_after.file_size(options::DECIMAL).unwrap(),
-        sign,
-        sd_human_readable
+        size_diff_format(total_size_before, total_size_after, false)
     );
+}
+
+fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> std::string::String {
+    let size_after = size_after as i64;
+    let size_before = size_before as i64;
+    let size_diff: i64 = size_after - size_before;
+    let sign = if size_diff < 0 { "-" } else { "+" };
+
+    let size_after_human_readable = size_after.file_size(options::DECIMAL).unwrap();
+    let size_diff_human_readable = size_diff.abs().file_size(options::DECIMAL).unwrap();
+
+    if dspl_sze_before {
+        let size_before_human_readabel = size_before.file_size(options::DECIMAL).unwrap();
+        format!(
+            "{} => {} ({}{})",
+            size_before_human_readabel, size_after_human_readable, sign, size_diff_human_readable
+        )
+    } else {
+        format!(
+            "{} ({}{})",
+            size_after_human_readable, sign, size_diff_human_readable
+        )
+    }
 }
 
 fn main() {
@@ -666,23 +681,22 @@ fn main() {
 
     if config.is_present("remove-old-crates") {
         let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
-        rm_old_crates(val, config, &cargo_cache.registry_cache.string, &mut size_changed);
+        rm_old_crates(
+            val,
+            config,
+            &cargo_cache.registry_cache.string,
+            &mut size_changed,
+        );
     }
-    if size_changed && !config.is_present("dry-run")  {
+    if size_changed && !config.is_present("dry-run") {
         let cache_size_old = dir_sizes.total_size;
-        let cache_size_new = DirSizesCollector::new(&cargo_cache)
-            .total_size;
+        let cache_size_new = DirSizesCollector::new(&cargo_cache).total_size;
 
         let size_old_human_readable = cache_size_old.file_size(options::DECIMAL).unwrap();
-        let size_new_human_readable = cache_size_new.file_size(options::DECIMAL).unwrap();
-
-        let size_diff: i64 = cache_size_new as i64 - cache_size_old as i64;
-        let sign = if size_diff < 0 { "-" } else { "+" };
-        let size_diff_human_readable = size_diff.abs().file_size(options::DECIMAL).unwrap();
-
         println!(
-            "\nSize changed from {} to {} ({}{})",
-            size_old_human_readable, size_new_human_readable, sign, size_diff_human_readable
+            "\nSize changed from {} to {}",
+            size_old_human_readable,
+            size_diff_format(cache_size_old, cache_size_new, false)
         );
     }
 }
