@@ -496,7 +496,7 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     let mut total_size_before: u64 = 0;
     let mut total_size_after: u64 = 0;
 
-    println!("Recompressing repositories. Please be patient...");
+    println!("\nRecompressing repositories. Please be patient...");
     // gc git repos of crates
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
@@ -669,14 +669,20 @@ fn main() {
         rm_old_crates(val, config, &cargo_cache.registry_cache.string, &mut size_changed);
     }
     if size_changed && !config.is_present("dry-run")  {
-        let cache_size_old = dir_sizes.total_size.file_size(options::DECIMAL).unwrap();
+        let cache_size_old = dir_sizes.total_size;
         let cache_size_new = DirSizesCollector::new(&cargo_cache)
-            .total_size
-            .file_size(options::DECIMAL)
-            .unwrap();
+            .total_size;
+
+        let size_old_human_readable = cache_size_old.file_size(options::DECIMAL).unwrap();
+        let size_new_human_readable = cache_size_new.file_size(options::DECIMAL).unwrap();
+
+        let size_diff: i64 = cache_size_new as i64 - cache_size_old as i64;
+        let sign = if size_diff < 0 { "-" } else { "+" };
+        let size_diff_human_readable = size_diff.abs().file_size(options::DECIMAL).unwrap();
+
         println!(
-            "\nSize changed from {} to {}",
-            cache_size_old, cache_size_new
+            "\nSize changed from {} to {} ({}{})",
+            size_old_human_readable, size_new_human_readable, sign, size_diff_human_readable
         );
     }
 }
