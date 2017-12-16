@@ -1,3 +1,18 @@
+// enable additional clippy warnings
+#![cfg_attr(feature = "cargo-clippy", warn(int_plus_one))]
+#![cfg_attr(feature = "cargo-clippy", warn(shadow_reuse))]
+#![cfg_attr(feature = "cargo-clippy", warn(shadow_same))]
+#![cfg_attr(feature = "cargo-clippy", warn(shadow_unrelated))]
+#![cfg_attr(feature = "cargo-clippy", warn(mut_mut))]
+#![cfg_attr(feature = "cargo-clippy", warn(nonminimal_bool))]
+#![cfg_attr(feature = "cargo-clippy", warn(pub_enum_variant_names))]
+#![cfg_attr(feature = "cargo-clippy", warn(range_plus_one))]
+#![cfg_attr(feature = "cargo-clippy", warn(string_add))]
+#![cfg_attr(feature = "cargo-clippy", warn(string_add_assign))]
+#![cfg_attr(feature = "cargo-clippy", warn(stutter))]
+//#![cfg_attr(feature = "cargo-clippy", warn(result_unwrap_used))]
+
+
 // https://github.com/LeopoldArkham/humansize
 extern crate humansize; // convert bytes to whatever
 
@@ -22,6 +37,7 @@ use std::process::Command;
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
+
 
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -533,9 +549,9 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
 }
 
 fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> std::string::String {
-    let size_after = size_after as i64;
-    let size_before = size_before as i64;
-    let size_diff: i64 = size_after - size_before;
+    let size_after_signed = size_after as i64;
+    let size_before_signed = size_before as i64;
+    let size_diff: i64 = size_after_signed - size_before_signed;
 
     // humansize does not work with negative numbers currently so we have to work around
     let sign = if size_diff < 0 { "-" } else { "+" };
