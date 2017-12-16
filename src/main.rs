@@ -610,8 +610,8 @@ fn main() {
                         .conflicts_with("list-dirs")
                         .help("give information on directories"),
                 )
-                .arg(Arg::with_name("remove-old-crates").short("c").long("remove-crates")
-                .help("removes oldest versions of cached crate sources if there are more than N")
+                .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
+                .help("remove all but N versions of duplicate crates in the source cache")
                 .takes_value(true).value_name("N"),
             )
                 .arg(
@@ -649,8 +649,8 @@ fn main() {
                 .conflicts_with("list-dirs")
                 .help("give information on directories"),
         )
-        .arg(Arg::with_name("remove-old-crates").short("c").long("remove-crates")
-        .help("removes oldest versions of cached crate sources if there are more than N")
+        .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
+        .help("remove all but N versions of duplicate crates in the source cache")
         .takes_value(true).value_name("N"),)
 
         .arg(
@@ -707,8 +707,8 @@ fn main() {
         }
     }
 
-    if config.is_present("remove-old-crates") {
-        let val = value_t!(config.value_of("remove-old-crates"), u64).unwrap_or(10 /* default*/);
+    if config.is_present("keep-duplicate-crates") {
+        let val = value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
         rm_old_crates(
             val,
             config,
