@@ -505,10 +505,11 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
         total_size_before += before;
         total_size_after += after;
     }
-
-    //
-    println!("Recompressing registries.");
-    for repo in fs::read_dir(&cargo_cache.registry_cache.string).unwrap() {
+    println!("Recompressing registries....");
+    let mut repo_index = (&cargo_cache.registry_cache.path).clone();
+    repo_index.pop();
+    repo_index.push("index/");
+    for repo in fs::read_dir(repo_index).unwrap() {
         let repo_str = str_from_pb(&repo.unwrap().path());
         let (before, after) = gc_repo(&repo_str, config);
         total_size_before += before;
