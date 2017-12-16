@@ -26,5 +26,11 @@ script:
   - cargo cache --gc --dry-run
   - cargo cache --info
   - cargo cache --list-dirs
-  - cargo cache --remove-crates 0 --dry-run
+  - cargo cache --keep-duplicate-crates 10 --dry-run
+  - cargo cache --keep-duplicate-crates 1 --dry-run
+  - cargo cache --keep-duplicate-crates 0 --dry-run
+  - cargo cache --keep-duplicate-crates 10
+  - cargo cache --keep-duplicate-crates 1
+  - cargo cache --keep-duplicate-crates 0
+
   - cargo cache -c 0
