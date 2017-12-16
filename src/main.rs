@@ -396,8 +396,7 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
 
             //println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
             if last_pkgname == pkgname {
-                versions_of_this_package += 1;
-                if versions_of_this_package == amount_to_keep {
+                if versions_of_this_package >  amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath).unwrap().len();
                     if config.is_present("dry-run") {
@@ -411,6 +410,7 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
                         *size_changed = true;
                     }
                 }
+                versions_of_this_package += 1;
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
                 versions_of_this_package = 0;
