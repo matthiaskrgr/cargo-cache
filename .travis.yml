@@ -32,5 +32,4 @@ script:
   - cargo cache --keep-duplicate-crates 10
   - cargo cache --keep-duplicate-crates 1
   - cargo cache --keep-duplicate-crates 0
-
-  - cargo cache -c 0
+  - cargo cache -k 0
