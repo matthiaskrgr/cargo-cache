@@ -253,7 +253,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
             file_number: 0,
         };
     }
-    //@TODO add some clever caching?
+    // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     let mut cumulative_size = 0;
     let mut number_of_files = 0;
     // traverse recursively and sum filesizes
