@@ -12,7 +12,6 @@
 #![cfg_attr(feature = "cargo-clippy", warn(stutter))]
 //#![cfg_attr(feature = "cargo-clippy", warn(result_unwrap_used))]
 
-
 // https://github.com/LeopoldArkham/humansize
 extern crate humansize; // convert bytes to whatever
 
@@ -37,7 +36,6 @@ use std::process::Command;
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
-
 
 struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -238,7 +236,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
         let repo_size_after = cumulative_dir_size(pathstr).dir_size;
         println!(
             "{}",
-            size_diff_format(repo_size_before, repo_size_before, false)
+            size_diff_format(repo_size_before, repo_size_after, false)
         );
 
         (repo_size_before, repo_size_after)
