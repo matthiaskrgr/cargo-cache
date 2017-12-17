@@ -133,7 +133,7 @@ struct CargoCacheDirs {
 
 impl CargoCacheDirs {
     fn new() -> CargoCacheDirs {
-        let cargo_cfg = cargo::util::config::Config::default().unwrap();
+        let cargo_cfg = cargo::util::config::Config::default().expect("Failed to get cargo config");
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
 
@@ -200,7 +200,7 @@ impl CargoCacheDirs {
 
 fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     let vec = pathstr.split('/').collect::<Vec<&str>>();
-    let reponame = vec.last().unwrap();
+    let reponame = vec.last().expect("ERROR: malformed package name/version?");
     print!("Recompressing '{}': ", reponame);
     let path = Path::new(pathstr);
     if !path.is_dir() {
@@ -212,12 +212,12 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
-    stdout().flush().unwrap();
+    stdout().flush().expect("failed to flush stdout");
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
         (0, 0)
     } else {
-        let repo = git2::Repository::open(path).unwrap();
+        let repo = git2::Repository::open(path).expect("failed to determine git repo");
         match Command::new("git")
             .arg("gc")
             .arg("--aggressive")
@@ -259,7 +259,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_file() {
-            cumulative_size += fs::metadata(path).unwrap().len();
+            cumulative_size += fs::metadata(path).expect("failed to get metadata of file").len();
             number_of_files += 1;
         }
     } // walkdir
@@ -352,7 +352,7 @@ fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches, size_changed: &mut 
                     if config.is_present("dry-run") {
                         println!("dry run: would remove directory: '{}'", dir.string);
                     } else {
-                        fs::remove_dir_all(&dir.string).unwrap();
+                        fs::remove_dir_all(&dir.string).expect("failed to remove directory");
                         *size_changed = true;
                     }
                 } else {
@@ -386,11 +386,11 @@ fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &
         let string = repo.unwrap().path().into_os_string().into_string().unwrap();
         for cratesrc in fs::read_dir(&string).unwrap() {
             let cratestr = cratesrc
-                .unwrap()
+                .expect("failed to read directory")
                 .path()
                 .into_os_string()
                 .into_string()
-                .unwrap();
+                .expect("failed to convert path to string");
             crate_list.push(cratestr.clone());
         }
         crate_list.sort();
