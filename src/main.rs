@@ -272,7 +272,12 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     }
 }
 
-fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str, size_changed: &mut bool) {
+fn rm_old_crates(
+    amount_to_keep: u64,
+    config: &clap::ArgMatches,
+    registry_str: &str,
+    size_changed: &mut bool,
+) {
     println!();
 
     // remove crate sources from cache
@@ -446,7 +451,11 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     );
 }
 
-fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> std::string::String {
+fn size_diff_format(
+    size_before: u64,
+    size_after: u64,
+    dspl_sze_before: bool,
+) -> std::string::String {
     let size_after_signed = size_after as i64;
     let size_before_signed = size_before as i64;
     let size_diff: i64 = size_after_signed - size_before_signed;
@@ -458,7 +467,8 @@ fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) ->
     let size_diff_human_readable = size_diff.abs().file_size(options::DECIMAL).unwrap();
     let size_before_human_readabel = size_before.file_size(options::DECIMAL).unwrap();
     // percentage
-    let percentage: f64 = ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
+    let percentage: f64 =
+        ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
     // format
     let percentage = format!("{:.*}", 2, percentage);
 
@@ -474,7 +484,11 @@ fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) ->
     } else if dspl_sze_before {
         format!(
             "{} => {} ({}{}, {}%)",
-            size_before_human_readabel, size_after_human_readable, sign, size_diff_human_readable, percentage
+            size_before_human_readabel,
+            size_after_human_readable,
+            sign,
+            size_diff_human_readable,
+            percentage
         )
     } else {
         format!(
@@ -484,7 +498,11 @@ fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) ->
     }
 }
 
-fn remove_dir_via_cmdline(config: &clap::ArgMatches, ccd: &CargoCacheDirs, size_changed: &mut bool) {
+fn remove_dir_via_cmdline(
+    config: &clap::ArgMatches,
+    ccd: &CargoCacheDirs,
+    size_changed: &mut bool,
+) {
     if !config.is_present("remove-dir") {
         return;
     }
@@ -655,11 +673,11 @@ fn main() {
         )
 
 
-        .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
+            .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
 
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
             "Recompress git repositories (may take some time).",
-        ))
+    ))
         .arg(
             Arg::with_name("info")
                 .short("i")
@@ -728,7 +746,8 @@ fn main() {
     }
 
     if config.is_present("keep-duplicate-crates") {
-        let val = value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
+        let val =
+            value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
         rm_old_crates(
             val,
             config,
