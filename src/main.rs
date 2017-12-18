@@ -28,7 +28,7 @@ extern crate cargo; // obtain CARGO_DIR
 // https://github.com/alexcrichton/git2-rs
 extern crate git2; // compress git repos
 
-use std::{fs, io, process};
+use std::{fs, process};
 use std::io::{stdout, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -259,7 +259,9 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_file() {
-            cumulative_size += fs::metadata(path).expect("failed to get metadata of file").len();
+            cumulative_size += fs::metadata(path)
+                .expect("failed to get metadata of file")
+                .len();
             number_of_files += 1;
         }
     } // walkdir
@@ -269,108 +271,6 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         file_number: number_of_files,
     }
 }
-
-fn rm_dir(cache: &CargoCacheDirs, config: &clap::ArgMatches, size_changed: &mut bool) {
-    // remove a directory from cargo cache
-
-    fn print_dirs_to_delete() {
-        println!("Possile directories to delete:");
-        println!("'git-checkouts', 'git' (removes checkouts and cloned repos), 'registry'");
-        println!("'registry-source-checkouts', 'registry-crate-archives'.");
-        println!("'abort' to abort.");
-    }
-
-    //print the paths and sizes to give user some context
-    println!();
-    cache.print_dir_paths();
-    println!();
-
-    let mut dirs_to_delete: Vec<&DirCache> = Vec::new();
-
-    print_dirs_to_delete();
-
-    'inputStrLoop: loop {
-        let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Couldn't read input");
-
-        // check what dir we are supposed to delete now
-        match input.trim() {
-            "git-checkouts" => {
-                dirs_to_delete.push(&cache.git_checkouts);
-                break;
-            }
-            "git" => {
-                dirs_to_delete.push(&cache.git_db);
-                dirs_to_delete.push(&cache.git_checkouts);
-                break;
-            }
-            "registry" => {
-                dirs_to_delete.push(&cache.registry);
-                break;
-            }
-            "registry-source-checkouts" => {
-                dirs_to_delete.push(&cache.registry_sources);
-                break;
-            }
-            "registry-crate-archives" => {
-                dirs_to_delete.push(&cache.registry_cache);
-                break;
-            }
-            "bin-dir" => println!("Please use 'cargo uninstall'."),
-            "abort" => {
-                println!("Terminating...");
-                process::exit(0);
-            }
-            _ => {
-                println!("Invalid input.");
-                print_dirs_to_delete();
-
-                continue 'inputStrLoop;
-            } // _
-        } // match input
-    } // 'inputStrLoop
-
-    println!(
-        "Really delete '{}'? (yes/no)",
-        dirs_to_delete.first().unwrap().string
-    );
-
-    loop {
-        let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read input");
-        if input.trim() == "yes" {
-            println!("deleting {}", dirs_to_delete.first().unwrap().string);
-            for dir in dirs_to_delete {
-                if dir.path.is_file() {
-                    println!("ERROR: {} is not a directory but a file??", dir.string);
-                    println!("Doing nothing.");
-                } else if dir.path.is_dir() {
-                    if config.is_present("dry-run") {
-                        println!("dry run: would remove directory: '{}'", dir.string);
-                    } else {
-                        fs::remove_dir_all(&dir.string).expect("failed to remove directory");
-                        *size_changed = true;
-                    }
-                } else {
-                    println!("Directory '{}' does not exist, skipping", dir.string);
-                }
-            }
-            break;
-        } else if input == "no" {
-            println!(
-                "Keeping '{}' as requested.",
-                dirs_to_delete.first().unwrap().string
-            );
-            break;
-        } else {
-            println!("Invalid input: {}, please use 'yes' or 'no'.", input);
-        }
-    } // loop
-} // fn rm_dir
 
 fn rm_old_crates(amount_to_keep: u64, config: &clap::ArgMatches, registry_str: &str, size_changed: &mut bool) {
     println!();
@@ -584,6 +484,118 @@ fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) ->
     }
 }
 
+fn remove_dir_via_cmdline(config: &clap::ArgMatches, ccd: &CargoCacheDirs, size_changed: &mut bool) {
+    if !config.is_present("remove-dir") {
+        return;
+    }
+
+    let input = match config.value_of("remove-dir") {
+        Some(value) => value,
+        None => {
+            println!("No argument assigned to --remove-dir, example: 'git-repos,registry-sources'");
+            process::exit(2)
+        }
+    };
+
+    let inputs = input.split(',').collect::<Vec<&str>>();
+    let valid_dirs = vec![
+        "git-db",
+        "git-repos",
+        "registry-sources",
+        "registry-crate-cache",
+        "registry",
+        "all",
+    ];
+    // make sure input is valid
+    for word in &inputs {
+        if !valid_dirs.contains(word) {
+            println!("Warning: invalid deletable dir: {}", word);
+            process::exit(5);
+        }
+    }
+
+    #[derive(Clone, Debug, PartialEq)]
+    enum DelDir {
+        GitRepos,
+        GitCheckouts,
+        RegistrySources,
+        RegistryCrateCache,
+    }
+
+    // all inputs are valid
+    let mut dirs_to_delete = Vec::new();
+    for deletable_dir in inputs {
+        match deletable_dir {
+            "all" => {
+                dirs_to_delete.push(DelDir::GitRepos);
+                dirs_to_delete.push(DelDir::GitCheckouts);
+                dirs_to_delete.push(DelDir::RegistrySources);
+                dirs_to_delete.push(DelDir::RegistryCrateCache);
+            }
+            "registry" | "registry-crate-cache" => {
+                dirs_to_delete.push(DelDir::RegistrySources);
+                dirs_to_delete.push(DelDir::RegistryCrateCache);
+            }
+            "registry-sources" => {
+                dirs_to_delete.push(DelDir::RegistrySources);
+            }
+            "git-repos" => {
+                dirs_to_delete.push(DelDir::GitCheckouts);
+            }
+            "git-db" => {
+                dirs_to_delete.push(DelDir::GitRepos);
+                dirs_to_delete.push(DelDir::GitCheckouts);
+            }
+            _ => {
+                panic!("'deletable dir' unhandled in match");
+            }
+        }
+    }
+    // remove duplicates
+    let mut deduped_dirs = Vec::new();
+    for elm in dirs_to_delete {
+        if !deduped_dirs.contains(&elm) {
+            deduped_dirs.push(elm);
+        }
+    }
+    // translate enum to actual paths to be deleted
+    let mut dirs = Vec::new();
+    for dir in deduped_dirs {
+        match dir {
+            DelDir::GitCheckouts => {
+                dirs.push(&ccd.git_db);
+            }
+            DelDir::GitRepos => {
+                dirs.push(&ccd.git_checkouts);
+            }
+            DelDir::RegistrySources => {
+                dirs.push(&ccd.registry_sources);
+            }
+            DelDir::RegistryCrateCache => {
+                dirs.push(&ccd.registry_cache);
+            }
+        }
+    }
+    // finally delete
+    for dir in dirs {
+        if config.is_present("dry-run") {
+            println!("dry-run: would delete: '{}'", dir.string);
+        } else if dir.path.is_dir() {
+            println!("removing: '{}'", dir.string);
+            fs::remove_dir_all(&dir.path).expect(&format!(
+                "failed to remove dir '{}' as part of --remove-dir",
+                dir.string
+            ));
+            *size_changed = true;
+        } else {
+            println!(
+                "dir not existing or already removed; skipping: '{}'",
+                dir.string
+            );
+        }
+    }
+}
+
 fn main() {
     // parse args
     // dummy subcommand:
@@ -605,12 +617,9 @@ fn main() {
                         .long("list-dirs")
                         .help("List found directory paths."),
                 )
-                .arg(
-                    Arg::with_name("remove-dirs")
-                        .short("r")
-                        .long("remove")
-                        .help("Select directories in the cache to be removed."),
-                )
+
+
+                .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
                 .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
                     "Recompress git repositories (may take some time).",
                 ))
@@ -624,7 +633,7 @@ fn main() {
                 .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
                 .help("remove all but N versions of duplicate crates in the source cache")
                 .takes_value(true).value_name("N"),
-            )
+                )
                 .arg(
                     Arg::with_name("dry-run")
                     .short("d").long("dry-run").help("don't remove anything, just pretend"),
@@ -644,12 +653,10 @@ fn main() {
                 .long("list-dirs")
                 .help("List found directory paths."),
         )
-        .arg(
-            Arg::with_name("remove-dirs")
-                .short("r")
-                .long("remove")
-                .help("Select directories in the cache to be removed."),
-        )
+
+
+        .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
+
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
             "Recompress git repositories (may take some time).",
         ))
@@ -693,9 +700,11 @@ fn main() {
 
     dir_sizes.print_pretty(&cargo_cache);
 
-    if config.is_present("remove-dirs") {
-        rm_dir(&cargo_cache, config, &mut size_changed);
-    } else if config.is_present("list-dirs") {
+    if config.is_present("remove-dir") {
+        remove_dir_via_cmdline(config, &cargo_cache, &mut size_changed);
+    }
+
+    if config.is_present("list-dirs") {
         cargo_cache.print_dir_paths();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
