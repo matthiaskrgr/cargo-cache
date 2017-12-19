@@ -132,6 +132,7 @@ struct CargoCacheDirs {
 }
 
 enum ErrorKind {
+    GitRepoNotOpened,
     GitRepoDirNotFound,
     GitGCFailed,
 }
@@ -231,7 +232,10 @@ fn gc_repo(
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
     } else {
-        let repo = git2::Repository::open(path).expect("failed to determine git repo");
+        let repo = match git2::Repository::open(path) {
+            Ok(repo) => repo,
+            Err(e) => { return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))) }
+        };
         match Command::new("git")
             .arg("gc")
             .arg("--aggressive")
@@ -453,7 +457,11 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                     continue;
                 }
                 ErrorKind::GitRepoDirNotFound => {
-                    println!("Git repo not found: {}", msg);
+                    println!("Git repo not found: '{}'", msg);
+                    continue;
+                }
+                ErrorKind::GitRepoNotOpened => {
+                    println!("Failed to parse git repo: '{}'", msg);
                     continue;
                 }
                 _ => unreachable!()
@@ -479,6 +487,10 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                 }
                 ErrorKind::GitRepoDirNotFound => {
                     println!("Git repo not found: {}", msg);
+                    continue;
+                }
+                ErrorKind::GitRepoNotOpened => {
+                    println!("Failed to parse git repo: '{}'", msg);
                     continue;
                 }
                 _ => unreachable!()
