@@ -223,7 +223,10 @@ fn gc_repo(
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
-    stdout().flush().expect("failed to flush stdout");
+    match stdout().flush() {
+        Ok(_ok) => {},
+        Err(_e) => {} // ignore errors
+    }
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
