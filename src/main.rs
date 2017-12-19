@@ -343,7 +343,7 @@ fn rm_old_crates(
                     );
                 } else {
                     println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
-                    fs::remove_file(pkgpath).unwrap();
+                    fs::remove_file(pkgpath).expect(&format!("Failed to remove file '{}'", pkgpath));
                     *size_changed = true;
                 }
                 continue;
@@ -364,7 +364,7 @@ fn rm_old_crates(
                         );
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
-                        fs::remove_file(pkgpath).unwrap();
+                        fs::remove_file(pkgpath).expect(&format!("Failed to remove file '{}'", pkgpath));
                         *size_changed = true;
                     }
                 }
@@ -569,6 +569,7 @@ fn remove_dir_via_cmdline(
     size_changed: &mut bool,
 ) {
     if !config.is_present("remove-dir") {
+        // do nothing if arg not used
         return;
     }
 
