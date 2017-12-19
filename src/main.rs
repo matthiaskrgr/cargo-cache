@@ -131,6 +131,11 @@ struct CargoCacheDirs {
     git_checkouts: DirCache,
 }
 
+enum ErrorKind {
+    GitRepoDirNotFound,
+    GitGCFailed,
+}
+
 impl CargoCacheDirs {
     fn new() -> CargoCacheDirs {
         let cargo_cfg = cargo::util::config::Config::default().expect("Failed to get cargo config");
@@ -198,13 +203,16 @@ impl CargoCacheDirs {
     }
 }
 
-fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
+fn gc_repo(
+    pathstr: &str,
+    config: &clap::ArgMatches,
+) -> Result<(u64, u64), (ErrorKind, std::string::String)> {
     let vec = pathstr.split('/').collect::<Vec<&str>>();
     let reponame = vec.last().expect("ERROR: malformed package name/version?");
     print!("Recompressing '{}': ", reponame);
     let path = Path::new(pathstr);
     if !path.is_dir() {
-        panic!("WARNING: git gc path is not directory: {}", &pathstr);
+        return Err((ErrorKind::GitRepoDirNotFound, pathstr.to_string()));
     }
 
     // get size before
@@ -215,7 +223,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
     stdout().flush().expect("failed to flush stdout");
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
-        (0, 0)
+        Ok((0, 0))
     } else {
         let repo = git2::Repository::open(path).expect("failed to determine git repo");
         match Command::new("git")
@@ -231,7 +239,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
             //if out.status.success() {}
             } */
-            Err(e) => println!("git-gc failed {}", e),
+            Err(e) => return Err((ErrorKind::GitGCFailed, format!("{:?}", e))),
         }
         let repo_size_after = cumulative_dir_size(pathstr).dir_size;
         println!(
@@ -239,7 +247,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> (u64, u64) {
             size_diff_format(repo_size_before, repo_size_after, false)
         );
 
-        (repo_size_before, repo_size_after)
+        Ok((repo_size_before, repo_size_after))
     }
 }
 
@@ -429,7 +437,21 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = str_from_pb(&repo);
-        let (before, after) = gc_repo(&repostr, config); // run gc
+        let (before, after) = match gc_repo(&repostr, config) {
+            // run gc
+            Ok((before, after)) => (before, after),
+            Err((errorkind, msg)) => match errorkind {
+                ErrorKind::GitGCFailed => {
+                    println!("Warning, git gc failed, skipping '{}'", repostr);
+                    println!("git error: '{}'", msg);
+                    continue;
+                }
+                ErrorKind::GitRepoDirNotFound => {
+                    println!("Git repo not found: {}", msg);
+                    continue;
+                }
+            },
+        };
         total_size_before += before;
         total_size_after += after;
     }
@@ -439,7 +461,22 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     repo_index.push("index/");
     for repo in fs::read_dir(repo_index).unwrap() {
         let repo_str = str_from_pb(&repo.unwrap().path());
-        let (before, after) = gc_repo(&repo_str, config);
+        let (before, after) = match gc_repo(&repo_str, config) {
+            // run gc
+            Ok((before, after)) => (before, after),
+            Err((errorkind, msg)) => match errorkind {
+                ErrorKind::GitGCFailed => {
+                    println!("Warning, git gc failed, skipping '{}'", repo_str);
+                    println!("git error: '{}'", msg);
+                    continue;
+                }
+                ErrorKind::GitRepoDirNotFound => {
+                    println!("Git repo not found: {}", msg);
+                    continue;
+                }
+            },
+        };
+
         total_size_before += before;
         total_size_after += after;
     } // iterate over registries and gc
