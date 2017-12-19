@@ -278,7 +278,7 @@ fn cumulative_dir_size(dir: &str) -> DirInfoObj {
         let path = entry.path();
         if path.is_file() {
             cumulative_size += fs::metadata(path)
-                .expect("failed to get metadata of file")
+                .expect(&format!("Failed to get metadata of file '{}'", &dir))
                 .len();
             number_of_files += 1;
         }
@@ -329,7 +329,7 @@ fn rm_old_crates(
             let pkgname = vec.join("-");
 
             if amount_to_keep == 0 {
-                removed_size += fs::metadata(pkgpath).unwrap().len();
+                removed_size += fs::metadata(pkgpath).expect(&format!("Failed to get metadata of file '{}'", &pkgpath)).len();
                 if config.is_present("dry-run") {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
@@ -348,7 +348,7 @@ fn rm_old_crates(
                 versions_of_this_package += 1;
                 if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
-                    removed_size += fs::metadata(pkgpath).unwrap().len();
+                    removed_size += fs::metadata(pkgpath).expect(&format!("Failed to get metadata of file '{}'", &pkgpath)).len();
                     if config.is_present("dry-run") {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
