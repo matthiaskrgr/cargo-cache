@@ -139,12 +139,16 @@ enum ErrorKind {
 
 impl CargoCacheDirs {
     fn new() -> CargoCacheDirs {
-        let cargo_cfg = cargo::util::config::Config::default().expect("Failed to get cargo config/CARGO_HOME from cargo!");
+        let cargo_cfg = cargo::util::config::Config::default()
+            .expect("Failed to get cargo config/CARGO_HOME from cargo!");
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
 
         if !cargo_home_path.is_dir() {
-            panic!("Error, no cargo home path directory '{}' found.", &cargo_home_str);
+            panic!(
+                "Error, no cargo home path directory '{}' found.",
+                &cargo_home_str
+            );
         }
 
         let cargo_home = DirCache::new(cargo_home_str);
@@ -211,7 +215,7 @@ fn gc_repo(
     let vec = pathstr.split('/').collect::<Vec<&str>>();
     let reponame = match vec.last() {
         Some(reponame) => reponame,
-        None => "<unknown>"
+        None => "<unknown>",
     };
     print!("Recompressing '{}': ", reponame);
     let path = Path::new(pathstr);
@@ -225,7 +229,7 @@ fn gc_repo(
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
     match stdout().flush() {
-        Ok(_ok) => {},
+        Ok(_ok) => {}
         Err(_e) => {} // ignore errors
     }
     if config.is_present("dry-run") {
@@ -234,7 +238,7 @@ fn gc_repo(
     } else {
         let repo = match git2::Repository::open(path) {
             Ok(repo) => repo,
-            Err(e) => { return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))) }
+            Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
         };
         match Command::new("git")
             .arg("gc")
@@ -329,7 +333,9 @@ fn rm_old_crates(
             let pkgname = vec.join("-");
 
             if amount_to_keep == 0 {
-                removed_size += fs::metadata(pkgpath).expect(&format!("Failed to get metadata of file '{}'", &pkgpath)).len();
+                removed_size += fs::metadata(pkgpath)
+                    .expect(&format!("Failed to get metadata of file '{}'", &pkgpath))
+                    .len();
                 if config.is_present("dry-run") {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
@@ -348,7 +354,9 @@ fn rm_old_crates(
                 versions_of_this_package += 1;
                 if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
-                    removed_size += fs::metadata(pkgpath).expect(&format!("Failed to get metadata of file '{}'", &pkgpath)).len();
+                    removed_size += fs::metadata(pkgpath)
+                        .expect(&format!("Failed to get metadata of file '{}'", &pkgpath))
+                        .len();
                     if config.is_present("dry-run") {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
@@ -464,7 +472,7 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                     println!("Failed to parse git repo: '{}'", msg);
                     continue;
                 }
-                _ => unreachable!()
+                _ => unreachable!(),
             },
         };
         total_size_before += before;
@@ -493,7 +501,7 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                     println!("Failed to parse git repo: '{}'", msg);
                     continue;
                 }
-                _ => unreachable!()
+                _ => unreachable!(),
             },
         };
 
