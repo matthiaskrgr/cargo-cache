@@ -138,12 +138,12 @@ enum ErrorKind {
 
 impl CargoCacheDirs {
     fn new() -> CargoCacheDirs {
-        let cargo_cfg = cargo::util::config::Config::default().expect("Failed to get cargo config");
+        let cargo_cfg = cargo::util::config::Config::default().expect("Failed to get cargo config/CARGO_HOME from cargo!");
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
 
         if !cargo_home_path.is_dir() {
-            panic!("Error, no '{}' dir found", &cargo_home_str);
+            panic!("Error, no cargo home path directory '{}' found.", &cargo_home_str);
         }
 
         let cargo_home = DirCache::new(cargo_home_str);
@@ -453,6 +453,7 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                     println!("Git repo not found: {}", msg);
                     continue;
                 }
+                _ => unreachable!()
             },
         };
         total_size_before += before;
@@ -477,6 +478,7 @@ fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
                     println!("Git repo not found: {}", msg);
                     continue;
                 }
+                _ => unreachable!()
             },
         };
 
