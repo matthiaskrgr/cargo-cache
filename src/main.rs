@@ -208,7 +208,10 @@ fn gc_repo(
     config: &clap::ArgMatches,
 ) -> Result<(u64, u64), (ErrorKind, std::string::String)> {
     let vec = pathstr.split('/').collect::<Vec<&str>>();
-    let reponame = vec.last().expect("ERROR: malformed package name/version?");
+    let reponame = match vec.last() {
+        Some(reponame) => reponame,
+        None => "<unknown>"
+    };
     print!("Recompressing '{}': ", reponame);
     let path = Path::new(pathstr);
     if !path.is_dir() {
