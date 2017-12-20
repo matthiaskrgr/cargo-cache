@@ -602,16 +602,6 @@ fn remove_dir_via_cmdline(
         "all",
     ];
     // validate input
-    let mut terminate: bool = false;
-    for word in &inputs {
-        if !valid_dirs.contains(word) {
-            println!("Error: invalid deletable dir: '{}'.", word);
-            terminate = true;
-        }
-    }
-    if terminate {
-        process::exit(5);
-    }
 
     #[derive(Clone, Debug, PartialEq)]
     enum DelDir {
@@ -621,35 +611,42 @@ fn remove_dir_via_cmdline(
         RegistryCrateCache,
     }
 
-    // all inputs are valid
     let mut dirs_to_delete = Vec::new();
-    for deletable_dir in inputs {
-        match deletable_dir {
-            "all" => {
-                dirs_to_delete.push(DelDir::GitRepos);
-                dirs_to_delete.push(DelDir::GitCheckouts);
-                dirs_to_delete.push(DelDir::RegistrySources);
-                dirs_to_delete.push(DelDir::RegistryCrateCache);
-            }
-            "registry" | "registry-crate-cache" => {
-                dirs_to_delete.push(DelDir::RegistrySources);
-                dirs_to_delete.push(DelDir::RegistryCrateCache);
-            }
-            "registry-sources" => {
-                dirs_to_delete.push(DelDir::RegistrySources);
-            }
-            "git-repos" => {
-                dirs_to_delete.push(DelDir::GitCheckouts);
-            }
-            "git-db" => {
-                dirs_to_delete.push(DelDir::GitRepos);
-                dirs_to_delete.push(DelDir::GitCheckouts);
-            }
-            _ => {
-                panic!("'deletable dir' unhandled in match");
+    let mut terminate: bool = false;
+    for word in &inputs {
+        if !valid_dirs.contains(word) {
+            println!("Error: invalid deletable dir: '{}'.", word);
+            terminate = true;
+        } else  { // dir is recognized, translate into enum
+            match *word {
+                "all" => {
+                    dirs_to_delete.push(DelDir::GitRepos);
+                    dirs_to_delete.push(DelDir::GitCheckouts);
+                    dirs_to_delete.push(DelDir::RegistrySources);
+                    dirs_to_delete.push(DelDir::RegistryCrateCache);
+                }
+                "registry" | "registry-crate-cache" => {
+                    dirs_to_delete.push(DelDir::RegistrySources);
+                    dirs_to_delete.push(DelDir::RegistryCrateCache);
+                }
+                "registry-sources" => {
+                    dirs_to_delete.push(DelDir::RegistrySources);
+                }
+                "git-repos" => {
+                    dirs_to_delete.push(DelDir::GitCheckouts);
+                }
+                "git-db" => {
+                    dirs_to_delete.push(DelDir::GitRepos);
+                    dirs_to_delete.push(DelDir::GitCheckouts);
+                }
+                _ =>  unreachable!()
             }
         }
     }
+    if terminate { // invalid deletable dir given
+        process::exit(5);
+    }
+
     // remove duplicates
     let mut deduped_dirs = Vec::new();
     for elm in dirs_to_delete {
@@ -657,15 +654,16 @@ fn remove_dir_via_cmdline(
             deduped_dirs.push(elm);
         }
     }
+
     // translate enum to actual paths to be deleted
     let mut dirs = Vec::new();
     for dir in deduped_dirs {
         match dir {
             DelDir::GitCheckouts => {
-                dirs.push(&ccd.git_db);
+                dirs.push(&ccd.git_checkouts);
             }
             DelDir::GitRepos => {
-                dirs.push(&ccd.git_checkouts);
+                dirs.push(&ccd.git_db);
             }
             DelDir::RegistrySources => {
                 dirs.push(&ccd.registry_sources);
