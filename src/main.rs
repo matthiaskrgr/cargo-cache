@@ -143,6 +143,7 @@ impl CargoCacheDirs {
             .expect("Failed to get cargo config/CARGO_HOME from cargo!");
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
+        let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
             panic!(
@@ -173,8 +174,7 @@ impl CargoCacheDirs {
         let git_db_str = str_from_pb(&git_db_path);
         let git_db = DirCache::new(git_db_str, git_db_path);
 
-        let git_checkouts_path =
-            PathBuf::from(format!("{}", cargo_cfg.home().display())).join("git/checkouts/");
+        let git_checkouts_path = cargo_home_path_clone.join("git/checkouts/");
         let git_checkouts_str = str_from_pb(&git_checkouts_path);
         let git_checkouts = DirCache::new(git_checkouts_str, git_checkouts_path);
 
