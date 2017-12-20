@@ -617,7 +617,8 @@ fn remove_dir_via_cmdline(
         if !valid_dirs.contains(word) {
             println!("Error: invalid deletable dir: '{}'.", word);
             terminate = true;
-        } else  { // dir is recognized, translate into enum
+        } else {
+            // dir is recognized, translate into enum
             match *word {
                 "all" => {
                     dirs_to_delete.push(DelDir::GitRepos);
@@ -639,11 +640,12 @@ fn remove_dir_via_cmdline(
                     dirs_to_delete.push(DelDir::GitRepos);
                     dirs_to_delete.push(DelDir::GitCheckouts);
                 }
-                _ =>  unreachable!()
+                _ => unreachable!(),
             }
         }
     }
-    if terminate { // invalid deletable dir given
+    if terminate {
+        // invalid deletable dir given
         process::exit(5);
     }
 
