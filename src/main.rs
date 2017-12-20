@@ -135,6 +135,7 @@ enum ErrorKind {
     GitRepoNotOpened,
     GitRepoDirNotFound,
     GitGCFailed,
+    MalformedPackageName,
 }
 
 impl CargoCacheDirs {
@@ -299,7 +300,7 @@ fn rm_old_crates(
     config: &clap::ArgMatches,
     registry_str: &str,
     size_changed: &mut bool,
-) {
+) -> Result<bool, (ErrorKind, std::string::String)> {
     println!();
 
     // remove crate sources from cache
@@ -327,9 +328,16 @@ fn rm_old_crates(
         let mut last_pkgname = String::from("");
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
-            let string = pkgpath.split('/').last().unwrap();
+            let string = match pkgpath.split('/').last() {
+                Some(string) => string,
+                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
+            };
+
             let mut vec = string.split('-').collect::<Vec<&str>>();
-            let pkgver = vec.pop().unwrap();
+            let pkgver = match vec.pop() {
+                Some(pkgver) => pkgver,
+                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
+            };
             let pkgname = vec.join("-");
 
             if amount_to_keep == 0 {
@@ -343,7 +351,8 @@ fn rm_old_crates(
                     );
                 } else {
                     println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
-                    fs::remove_file(pkgpath).expect(&format!("Failed to remove file '{}'", pkgpath));
+                    fs::remove_file(pkgpath)
+                        .expect(&format!("Failed to remove file '{}'", pkgpath));
                     *size_changed = true;
                 }
                 continue;
@@ -364,7 +373,8 @@ fn rm_old_crates(
                         );
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
-                        fs::remove_file(pkgpath).expect(&format!("Failed to remove file '{}'", pkgpath));
+                        fs::remove_file(pkgpath)
+                            .expect(&format!("Failed to remove file '{}'", pkgpath));
                         *size_changed = true;
                     }
                 }
@@ -379,6 +389,7 @@ fn rm_old_crates(
         "Removed {} of compressed crate sources.",
         removed_size.file_size(options::DECIMAL).unwrap()
     );
+    Ok(true)
 }
 
 fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
@@ -814,12 +825,22 @@ fn main() {
     if config.is_present("keep-duplicate-crates") {
         let val =
             value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
-        rm_old_crates(
+        match rm_old_crates(
             val,
             config,
             &cargo_cache.registry_cache.string,
             &mut size_changed,
-        );
+        ) {
+            Ok(_bool) => {} // can we have Result with void fn?
+            Err((error_kind, string)) => {
+                match error_kind {
+                    ErrorKind::MalformedPackageName => {
+                        panic!(format!("Error: can't parse package string: '{}'", &string));
+                    }
+                    _ => unreachable!(),
+                };
+            }
+        }
     }
     if size_changed && !config.is_present("dry-run") {
         let cache_size_old = dir_sizes.total_size;
