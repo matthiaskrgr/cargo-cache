@@ -601,12 +601,16 @@ fn remove_dir_via_cmdline(
         "registry",
         "all",
     ];
-    // make sure input is valid
+    // validate input
+    let mut terminate: bool = false;
     for word in &inputs {
         if !valid_dirs.contains(word) {
-            println!("Warning: invalid deletable dir: {}", word);
-            process::exit(5);
+            println!("Error: invalid deletable dir: '{}'.", word);
+            terminate = true;
         }
+    }
+    if terminate {
+        process::exit(5);
     }
 
     #[derive(Clone, Debug, PartialEq)]
