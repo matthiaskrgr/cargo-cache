@@ -712,9 +712,10 @@ fn main() {
                         .long("list-dirs")
                         .help("List found directory paths."),
                 )
-
-
-                .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
+                .arg(Arg::with_name("remove-dir").short("r").long("remove-dir")
+                    .help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
+                    .takes_value(true).value_name("dir1,dir2,dir3"),
+                )
                 .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
                     "Recompress git repositories (may take some time).",
                 ))
@@ -748,13 +749,13 @@ fn main() {
                 .long("list-dirs")
                 .help("List found directory paths."),
         )
-
-
-            .arg(Arg::with_name("remove-dir").short("r").long("remove-dir").help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all").takes_value(true).value_name("dir1,dir2,dir3"),)
-
+        .arg(Arg::with_name("remove-dir").short("r").long("remove-dir")
+            .help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
+            .takes_value(true).value_name("dir1,dir2,dir3")
+            ,)
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
             "Recompress git repositories (may take some time).",
-    ))
+         ))
         .arg(
             Arg::with_name("info")
                 .short("i")
@@ -763,8 +764,9 @@ fn main() {
                 .help("give information on directories"),
         )
         .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
-        .help("remove all but N versions of duplicate crates in the source cache")
-        .takes_value(true).value_name("N"),)
+            .help("remove all but N versions of duplicate crates in the source cache")
+            .takes_value(true).value_name("N"),
+        )
 
         .arg(
             Arg::with_name("dry-run")
