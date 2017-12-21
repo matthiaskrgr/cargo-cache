@@ -23,13 +23,14 @@ extern crate walkdir; // walk CARGO_DIR recursively
 extern crate clap; // cmdline arg parsing
 
 mod lib;
-
+mod git;
 use std::{fs, process};
 
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts as options, FileSize};
 
 use lib::*;
+use git::*;
 
 fn main() {
     // parse args
