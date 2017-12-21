@@ -12,15 +12,10 @@
 #![cfg_attr(feature = "cargo-clippy", warn(stutter))]
 //#![cfg_attr(feature = "cargo-clippy", warn(result_unwrap_used))]
 
-// https://github.com/LeopoldArkham/humansize
-extern crate humansize; // convert bytes to whatever
-
-// https://github.com/BurntSushi/walkdir
-extern crate walkdir; // walk CARGO_DIR recursively
-
-// https://github.com/kbknapp/clap-rs
 #[macro_use]
-extern crate clap; // cmdline arg parsing
+extern crate clap;
+extern crate humansize;
+extern crate walkdir;
 
 mod lib;
 mod git;

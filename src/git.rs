@@ -1,8 +1,6 @@
-// https://github.com/kbknapp/clap-rs
-extern crate clap; // cmdline arg parsing
-
-// https://github.com/alexcrichton/git2-rs
-extern crate git2; // compress git repos
+extern crate clap;
+extern crate git2;
+extern crate humansize;
 
 use std::fs;
 use std::io::{stdout, Write};

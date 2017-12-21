@@ -8,11 +8,16 @@ repository = "https://github.com/matthiaskrgr/cargo-cache"
 keywords = ["cargo", "cache", "delete", "manage","size"]
 
 [dependencies]
-clap = "2.29"
-walkdir = "2.0"
-humansize = "1.0"
-cargo = "0.23"
-git2 = "0.6"
+# https://github.com/kbknapp/clap-rs
+clap = "2.29" # cmdline arg parsing
+# https://github.com/BurntSushi/walkdir
+walkdir = "2.0" # walk content of directory/CARGO_HOME recursively
+# https://github.com/LeopoldArkham/humansize
+humansize = "1.0" # convert digits of bytes to human readable size
+# https://github.com/rust/cargo
+cargo = "0.23" # get CARGO_HOME
+# https://github.com/alexcrichton/git2-rs
+git2 = "0.6" # check if repo is git repo
 
 [[bin]]
 path = "src/main.rs"

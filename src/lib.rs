@@ -12,20 +12,11 @@
 #![cfg_attr(feature = "cargo-clippy", warn(stutter))]
 //#![cfg_attr(feature = "cargo-clippy", warn(result_unwrap_used))]
 
-// https://github.com/LeopoldArkham/humansize
-extern crate humansize; // convert bytes to whatever
-
-// https://github.com/BurntSushi/walkdir
-extern crate walkdir; // walk CARGO_DIR recursively
-
-// https://github.com/kbknapp/clap-rs
-extern crate clap; // cmdline arg parsing
-
-// https://github.com/rust-lang/cargo
-extern crate cargo; // obtain CARGO_DIR
-
-// https://github.com/alexcrichton/git2-rs
-extern crate git2; // compress git repos
+extern crate cargo;
+extern crate clap;
+extern crate git2;
+extern crate humansize;
+extern crate walkdir;
 
 use std::{fs, process};
 use std::path::{Path, PathBuf};
