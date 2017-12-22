@@ -245,15 +245,10 @@ pub fn rm_old_crates(
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
         let mut crate_list = Vec::new();
-        let string = repo.unwrap().path().into_os_string().into_string().unwrap();
-        for cratesrc in fs::read_dir(&string).unwrap() {
-            let cratestr = cratesrc
-                .expect("failed to read directory")
-                .path()
-                .into_os_string()
-                .into_string()
-                .expect("failed to convert path to string");
-            crate_list.push(cratestr.clone());
+        let string = str_from_pb(&repo.unwrap().path());
+        for cratepath in fs::read_dir(&string).unwrap() {
+            let cratestr = str_from_pb(&cratepath.expect("failed to read directory").path());
+            crate_list.push(cratestr);
         }
         crate_list.sort();
         crate_list.reverse();
