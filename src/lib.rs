@@ -132,8 +132,14 @@ impl Default for CargoCacheDirs {
 
 impl CargoCacheDirs {
     pub fn new() -> CargoCacheDirs {
-        let cargo_cfg = cargo::util::config::Config::default()
-            .expect("Failed to get cargo config/CARGO_HOME from cargo!");
+        let cargo_cfg = match cargo::util::config::Config::default() {
+            Ok(cargo_cfg) => cargo_cfg,
+            Err(_e) => {
+                println!("Error: failed to get cargo config!");
+                process::exit(1)
+            }
+        };
+
         let cargo_home_str = format!("{}", cargo_cfg.home().display());
         let cargo_home_path = PathBuf::from(&cargo_home_str);
         let cargo_home_path_clone = cargo_home_path.clone();
