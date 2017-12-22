@@ -234,15 +234,13 @@ pub fn cumulative_dir_size(dir: &str) -> DirInfoObj {
 pub fn rm_old_crates(
     amount_to_keep: u64,
     config: &clap::ArgMatches,
-    registry_str: &str,
+    registry_src_path: &PathBuf,
     size_changed: &mut bool,
 ) -> Result<bool, (ErrorKind, String)> {
     println!();
 
     // remove crate sources from cache
     // src can be completely nuked since we can always rebuilt it from cache
-    let registry_src_path = Path::new(&registry_str);
-
     let mut removed_size = 0;
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {

@@ -166,7 +166,7 @@ fn main() {
         match rm_old_crates(
             val,
             config,
-            &cargo_cache.registry_cache.string,
+            &cargo_cache.registry_cache.path,
             &mut size_changed,
         ) {
             Ok(_bool) => {} // can we have Result with void fn?
