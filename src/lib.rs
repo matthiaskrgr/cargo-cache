@@ -148,28 +148,22 @@ impl CargoCacheDirs {
         let cargo_home = DirCache::new(cargo_home_str, cargo_home_path);
         // bin
         let bin_path = cargo_home.path.join("bin/");
-        let bin_str = str_from_pb(&bin_path);
-        let bin = DirCache::new(bin_str, bin_path);
+        let bin = DirCache::new(str_from_pb(&bin_path), bin_path);
         // registry
         let registry_dir_path = cargo_home.path.join("registry/");
-        let registry_dir_str = str_from_pb(&registry_dir_path);
-        let registry = DirCache::new(registry_dir_str, registry_dir_path);
+        let registry = DirCache::new(str_from_pb(&registry_dir_path), registry_dir_path);
 
         let registry_cache = registry.path.join("cache/");
-        let registry_cache_str = str_from_pb(&registry_cache);
-        let reg_cache = DirCache::new(registry_cache_str, registry_cache);
+        let reg_cache = DirCache::new(str_from_pb(&registry_cache), registry_cache);
 
         let registry_sources = registry.path.join("src/");
-        let registry_sources_str = str_from_pb(&registry_sources);
-        let reg_src = DirCache::new(registry_sources_str, registry_sources);
+        let reg_src = DirCache::new(str_from_pb(&registry_sources), registry_sources);
         // git
         let git_db_path = cargo_home.path.join("git/db/");
-        let git_db_str = str_from_pb(&git_db_path);
-        let git_db = DirCache::new(git_db_str, git_db_path);
+        let git_db = DirCache::new(str_from_pb(&git_db_path), git_db_path);
 
         let git_checkouts_path = cargo_home_path_clone.join("git/checkouts/");
-        let git_checkouts_str = str_from_pb(&git_checkouts_path);
-        let git_checkouts = DirCache::new(git_checkouts_str, git_checkouts_path);
+        let git_checkouts = DirCache::new(str_from_pb(&git_checkouts_path), git_checkouts_path);
 
         CargoCacheDirs {
             cargo_home: cargo_home,
