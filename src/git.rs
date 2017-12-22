@@ -29,8 +29,9 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
     match stdout().flush() {
+        // ignore errors
         Ok(_ok) => {}
-        Err(_e) => {} // ignore errors
+        Err(_e) => {}
     }
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
@@ -40,6 +41,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             Ok(repo) => repo,
             Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
         };
+        // recompress the repo from scratch and ignore all dangling objects
         match Command::new("git")
             .arg("gc")
             .arg("--aggressive")
@@ -105,6 +107,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     }
     println!("Recompressing registries....");
     let mut repo_index = (&cargo_cache.registry_cache.path).clone();
+    // cd "../index"
     repo_index.pop();
     repo_index.push("index/");
     for repo in fs::read_dir(repo_index).unwrap() {
