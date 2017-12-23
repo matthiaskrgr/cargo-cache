@@ -122,7 +122,7 @@ dependencies = [
  "cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.6.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "humansize 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "walkdir 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -419,7 +419,7 @@ dependencies = [
 
 [[package]]
 name = "humansize"
-version = "1.0.2"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -1055,7 +1055,7 @@ dependencies = [
 "checksum globset 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "464627f948c3190ae3d04b1bc6d7dca2f785bda0ac01278e6db129ad383dbeb6"
 "checksum hex 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d6a22814455d41612f41161581c2883c0c6a1c41852729b17d5ed88f01e153aa"
 "checksum home 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "9f25ae61099d8f3fee8b483df0bd4ecccf4b2731897aad40d50eca1b641fe6db"
-"checksum humansize 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d99804bdb0790b0c312a5a1115f83804b821f1a96d80759fbb57ce796d1f3778"
+"checksum humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b6cab2627acfc432780848602f3f558f7e9dd427352224b0d9324025796d2a5e"
 "checksum idna 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "014b298351066f1512874135335d62a789ffe78a9974f94b43ed5621951eaf7d"
 "checksum ignore 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "b3fcaf2365eb14b28ec7603c98c06cc531f19de9eb283d89a3dff8417c8c99f5"
 "checksum itoa 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "8324a32baf01e2ae060e9de58ed0bc2320c9a2833491ee36cd3b4c414de4db8c"
