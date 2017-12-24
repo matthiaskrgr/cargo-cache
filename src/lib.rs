@@ -381,7 +381,7 @@ pub fn str_from_pb(path: &PathBuf) -> String {
 }
 
 pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-    let size_diff: i64 = size_before as i64 - size_after as i64;
+    let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(options::DECIMAL).unwrap();
     let humansize_opts = options::FileSizeOpts {
