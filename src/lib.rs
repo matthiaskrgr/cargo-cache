@@ -542,3 +542,18 @@ pub fn remove_dir_via_cmdline(
         }
     }
 }
+
+
+#[test]
+fn test_dir_cache() {
+    let pathbuf =  PathBuf::from("/tmp/test/foo");
+    let pathstring = String::from("/tmp/test/foo");
+    let dir_cache = DirCache::new(pathstring, pathbuf);
+
+    let str_from_path = (dir_cache.path.clone()).into_os_string().into_string().unwrap();
+
+    assert_eq!(dir_cache.string, str_from_path);
+    assert_eq!(dir_cache.string, String::from("/tmp/test/foo"));
+    assert_eq!(dir_cache.path, PathBuf::from("/tmp/test/foo"));
+
+}
