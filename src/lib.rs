@@ -381,15 +381,11 @@ pub fn str_from_pb(path: &PathBuf) -> String {
 }
 
 pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-    let size_after_signed = size_after as i64;
-    let size_before_signed = size_before as i64;
-    let size_diff: i64 = size_after_signed - size_before_signed;
-
-    // humansize does not work with negative numbers currently so we have to work around
-    let sign = if size_diff < 0 { "-" } else { "+" };
-
+    let size_diff: i64 = size_before as i64 - size_after as i64;
+    let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    let size_diff_human_readable = size_diff.abs().file_size(options::DECIMAL).unwrap();
+    let humansize_opts = options::FileSizeOpts {allow_negative: true, ..options::DECIMAL};
+    let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
     let size_before_human_readabel = size_before.file_size(options::DECIMAL).unwrap();
     // percentage
     let percentage: f64 =
