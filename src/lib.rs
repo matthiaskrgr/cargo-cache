@@ -543,17 +543,27 @@ pub fn remove_dir_via_cmdline(
     }
 }
 
-
 #[test]
 fn test_dir_cache() {
-    let pathbuf =  PathBuf::from("/tmp/test/foo");
+    let pathbuf = PathBuf::from("/tmp/test/foo");
     let pathstring = String::from("/tmp/test/foo");
     let dir_cache = DirCache::new(pathstring, pathbuf);
 
-    let str_from_path = (dir_cache.path.clone()).into_os_string().into_string().unwrap();
+    let str_from_path = (dir_cache.path.clone())
+        .into_os_string()
+        .into_string()
+        .unwrap();
 
     assert_eq!(dir_cache.string, str_from_path);
     assert_eq!(dir_cache.string, String::from("/tmp/test/foo"));
     assert_eq!(dir_cache.path, PathBuf::from("/tmp/test/foo"));
+}
 
+#[test]
+fn test_str_from_pb() {
+    let string = String::from("/home/one/two/three");
+    let path = PathBuf::from(&string);
+
+    assert_eq!(str_from_pb(&path), string);
+    assert_eq!(str_from_pb(&path), "/home/one/two/three");
 }
