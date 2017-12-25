@@ -41,6 +41,32 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             Ok(repo) => repo,
             Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
         };
+
+        // delete all history of all checkouts and so on.
+        // this will enable us to remove *all* dangling commits
+        match Command::new("git")
+            .arg("reflog")
+            .arg("expire")
+            .arg("--expire=1.minute")
+            .arg("--all")
+            .current_dir(repo.path())
+            .output()
+        {
+            Ok(_out) => {}
+            Err(e) => return Err((ErrorKind::GitReflogFailed, format!("{:?}", e))),
+        }
+        // pack refs of branches/tags etc
+        match Command::new("git")
+            .arg("pack-refs")
+            .arg("--all")
+            .arg("--prune")
+            .current_dir(repo.path())
+            .output()
+        {
+            Ok(_out) => {}
+            Err(e) => return Err((ErrorKind::GitPackRefsFailed, format!("{:?}", e))),
+        }
+
         // recompress the repo from scratch and ignore all dangling objects
         match Command::new("git")
             .arg("gc")

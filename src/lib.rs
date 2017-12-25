@@ -121,6 +121,8 @@ pub enum ErrorKind {
     GitRepoNotOpened,
     GitRepoDirNotFound,
     GitGCFailed,
+    GitPackRefsFailed,
+    GitReflogFailed,
     MalformedPackageName,
 }
 
