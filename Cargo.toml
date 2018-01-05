@@ -15,7 +15,7 @@ walkdir = "2.0" # walk content of directory/CARGO_HOME recursively
 # https://github.com/LeopoldArkham/humansize
 humansize = "1.0" # convert digits of bytes to human readable size
 # https://github.com/rust/cargo
-cargo = "0.23" # get CARGO_HOME
+cargo = "0.24" # get CARGO_HOME
 # https://github.com/alexcrichton/git2-rs
 git2 = "0.6" # check if repo is git repo
 
