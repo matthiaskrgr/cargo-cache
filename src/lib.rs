@@ -33,7 +33,7 @@ pub struct DirInfoObj {
 
 pub struct DirSizesCollector {
     pub total_size: u64,       // total size of cargo root dir
-    numb_bins: u64,            // number of binaries foundq
+    numb_bins: u64,            // number of binaries found
     total_bin_size: u64,       // total size of binaries found
     total_reg_size: u64,       // registry size
     total_git_db_size: u64,    // git db size
