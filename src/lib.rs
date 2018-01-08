@@ -259,12 +259,14 @@ pub fn rm_old_crates(
         let mut last_pkgname = String::from("");
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
-            let string = match pkgpath.split('/').last() {
-                Some(string) => string,
+            //@TODO redundant conversion: path -> str -> path
+            let path = PathBuf::from(pkgpath.clone());
+            let path_end = match path.into_iter().last() {
+                Some(path_end) => path_end,
                 None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
             };
 
-            let mut vec = string.split('-').collect::<Vec<&str>>();
+            let mut vec = path_end.to_str().unwrap().split('-').collect::<Vec<&str>>();
             let pkgver = match vec.pop() {
                 Some(pkgver) => pkgver,
                 None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
