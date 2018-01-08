@@ -136,7 +136,7 @@ impl CargoCacheDirs {
     pub fn new() -> CargoCacheDirs {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
-            Err(_e) => {
+            Err(_) => {
                 println!("Error: failed to get cargo config!");
                 process::exit(1)
             }

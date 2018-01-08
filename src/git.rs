@@ -30,8 +30,8 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
     // we need to flush stdout manually for incremental print();
     match stdout().flush() {
         // ignore errors
-        Ok(_ok) => {}
-        Err(_e) => {}
+        Ok(_) => {}
+        Err(_) => {}
     }
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
@@ -52,7 +52,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             .current_dir(repo.path())
             .output()
         {
-            Ok(_out) => {}
+            Ok(_) => {}
             Err(e) => return Err((ErrorKind::GitReflogFailed, format!("{:?}", e))),
         }
         // pack refs of branches/tags etc
@@ -63,7 +63,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             .current_dir(repo.path())
             .output()
         {
-            Ok(_out) => {}
+            Ok(_) => {}
             Err(e) => return Err((ErrorKind::GitPackRefsFailed, format!("{:?}", e))),
         }
 
@@ -75,7 +75,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             .current_dir(repo.path())
             .output()
         {
-            Ok(_out) => {}
+            Ok(_) => {}
             /* println!("git gc error\nstatus: {}", out.status);
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
