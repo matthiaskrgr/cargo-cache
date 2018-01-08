@@ -238,7 +238,7 @@ pub fn rm_old_crates(
     config: &clap::ArgMatches,
     registry_src_path: &PathBuf,
     size_changed: &mut bool,
-) -> Result<bool, (ErrorKind, String)> {
+) -> Result<(), (ErrorKind, String)> {
     println!();
 
     // remove crate sources from cache
@@ -320,7 +320,7 @@ pub fn rm_old_crates(
         "Removed {} of compressed crate sources.",
         removed_size.file_size(options::DECIMAL).unwrap()
     );
-    Ok(true)
+    Ok(())
 }
 
 pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {

@@ -169,7 +169,7 @@ fn main() {
             &cargo_cache.registry_cache.path,
             &mut size_changed,
         ) {
-            Ok(_bool) => {} // can we have Result with void fn?
+            Ok(()) => {}
             Err((error_kind, string)) => {
                 match error_kind {
                     ErrorKind::MalformedPackageName => {
