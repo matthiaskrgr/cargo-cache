@@ -28,11 +28,9 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
-    match stdout().flush() {
-        // ignore errors
-        Ok(_) => {}
-        Err(_) => {}
-    }
+
+    if stdout().flush().is_ok() {} // ignore errors
+
     if config.is_present("dry-run") {
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
