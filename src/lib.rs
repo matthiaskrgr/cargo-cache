@@ -515,7 +515,7 @@ pub fn remove_dir_via_cmdline(
     }
     // finally delete
     for dir in dirs {
-        let dirstr = str_from_pb(dir);
+        let dirstr = dir.display();
         if config.is_present("dry-run") {
             println!("dry-run: would delete: '{}'", dirstr);
         } else if dir.is_dir() {
