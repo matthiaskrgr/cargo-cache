@@ -44,21 +44,21 @@ pub struct DirSizesCollector {
 
 impl DirSizesCollector {
     pub fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
-        let bindir = cumulative_dir_size(&ccd.bin_dir.string);
+        let bindir = cumulative_dir_size(&str_from_pb(&ccd.bin_dir));
 
         DirSizesCollector {
-            total_size: cumulative_dir_size(&ccd.cargo_home.string).dir_size,
+            total_size: cumulative_dir_size(&str_from_pb(&ccd.cargo_home)).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
-            total_reg_size: cumulative_dir_size(&ccd.registry.string).dir_size,
-            total_git_db_size: cumulative_dir_size(&ccd.git_db.string).dir_size,
-            total_git_chk_size: cumulative_dir_size(&ccd.git_checkouts.string).dir_size,
-            total_reg_cache_size: cumulative_dir_size(&ccd.registry_cache.string).dir_size,
-            total_reg_src_size: cumulative_dir_size(&ccd.registry_sources.string).dir_size,
+            total_reg_size: cumulative_dir_size(&str_from_pb(&ccd.registry)).dir_size,
+            total_git_db_size: cumulative_dir_size(&str_from_pb(&ccd.git_db)).dir_size,
+            total_git_chk_size: cumulative_dir_size(&str_from_pb(&ccd.git_checkouts)).dir_size,
+            total_reg_cache_size: cumulative_dir_size(&str_from_pb(&ccd.registry_cache)).dir_size,
+            total_reg_src_size: cumulative_dir_size(&str_from_pb(&ccd.registry_sources)).dir_size,
         }
     }
     pub fn print_pretty(&self, ccd: &CargoCacheDirs) {
-        println!("Cargo cache '{}':\n", ccd.cargo_home.string);
+        println!("Cargo cache '{}':\n", str_from_pb(&ccd.cargo_home));
         println!(
             "Total size:                   {} ",
             self.total_size.file_size(options::DECIMAL).unwrap()
@@ -93,28 +93,15 @@ impl DirSizesCollector {
     }
 }
 
-pub struct DirCache {
-    pub path: PathBuf,
-    pub string: String,
-}
-
-impl DirCache {
-    fn new(string: String, pathbuf: PathBuf) -> DirCache {
-        DirCache {
-            path: pathbuf,
-            string: string,
-        }
-    }
-}
 
 pub struct CargoCacheDirs {
-    pub cargo_home: DirCache,
-    pub bin_dir: DirCache,
-    pub registry: DirCache,
-    pub registry_cache: DirCache,
-    pub registry_sources: DirCache,
-    pub git_db: DirCache,
-    pub git_checkouts: DirCache,
+    pub cargo_home: PathBuf,
+    pub bin_dir: PathBuf,
+    pub registry: PathBuf,
+    pub registry_cache: PathBuf,
+    pub registry_sources: PathBuf,
+    pub git_db: PathBuf,
+    pub git_checkouts: PathBuf,
 }
 
 pub enum ErrorKind {
@@ -153,25 +140,25 @@ impl CargoCacheDirs {
             );
         }
 
-        let cargo_home = DirCache::new(cargo_home_str, cargo_home_path);
+        let cargo_home = cargo_home_path;
         // bin
-        let bin_path = cargo_home.path.join("bin/");
-        let bin = DirCache::new(str_from_pb(&bin_path), bin_path);
+        let bin_path = cargo_home.join("bin/");
+        let bin = bin_path;
         // registry
-        let registry_dir_path = cargo_home.path.join("registry/");
-        let registry = DirCache::new(str_from_pb(&registry_dir_path), registry_dir_path);
+        let registry_dir_path = cargo_home.join("registry/");
+        let registry = registry_dir_path;
 
-        let registry_cache = registry.path.join("cache/");
-        let reg_cache = DirCache::new(str_from_pb(&registry_cache), registry_cache);
+        let registry_cache = registry.join("cache/");
+        let reg_cache = registry_cache;
 
-        let registry_sources = registry.path.join("src/");
-        let reg_src = DirCache::new(str_from_pb(&registry_sources), registry_sources);
+        let registry_sources = registry.join("src/");
+        let reg_src = registry_sources;
         // git
-        let git_db_path = cargo_home.path.join("git/db/");
-        let git_db = DirCache::new(str_from_pb(&git_db_path), git_db_path);
+        let git_db_path = cargo_home.join("git/db/");
+        let git_db = git_db_path;
 
         let git_checkouts_path = cargo_home_path_clone.join("git/checkouts/");
-        let git_checkouts = DirCache::new(str_from_pb(&git_checkouts_path), git_checkouts_path);
+        let git_checkouts = git_checkouts_path;
 
         CargoCacheDirs {
             cargo_home: cargo_home,
@@ -186,20 +173,20 @@ impl CargoCacheDirs {
 
     pub fn print_dir_paths(&self) {
         println!();
-        println!("binaries directory:           {}", self.bin_dir.string);
-        println!("registry directory:           {}", self.registry.string);
+        println!("binaries directory:           {}", str_from_pb(&self.bin_dir));
+        println!("registry directory:           {}",  str_from_pb(&self.registry));
         println!(
             "registry crate source cache:  {}",
-            self.registry_cache.string
+             str_from_pb(&self.registry_cache)
         );
         println!(
             "registry unpacked sources:    {}",
-            self.registry_sources.string
+             str_from_pb(&self.registry_sources)
         );
-        println!("git db directory:             {}", self.git_db.string);
+        println!("git db directory:             {}",  str_from_pb(&self.git_db));
         println!(
             "git checkouts dir:            {}",
-            self.git_checkouts.string
+             str_from_pb(&self.git_checkouts)
         );
     }
 }
@@ -329,14 +316,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",
-        c.cargo_home.string,
+        str_from_pb(&c.cargo_home),
         s.total_size.file_size(options::DECIMAL).unwrap()
     );
 
     println!("Found {} binaries installed in", s.numb_bins);
     println!(
         "\t\t\t'{}', size: {}",
-        c.bin_dir.string,
+        str_from_pb(&c.bin_dir),
         s.total_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.");
@@ -344,20 +331,20 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found registry base dir:");
     println!(
         "\t\t\t'{}', size: {}",
-        c.registry.string,
+        str_from_pb(&c.registry),
         s.total_reg_size.file_size(options::DECIMAL).unwrap()
     );
     println!("Found registry crate source cache:");
     println!(
         "\t\t\t'{}', size: {}",
-        c.registry_cache.string,
+        str_from_pb(&c.registry_cache),
         s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
-        c.registry_sources.string,
+        str_from_pb(&c.registry_sources),
         s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
@@ -365,14 +352,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found git repo database:");
     println!(
         "\t\t\t'{}', size: {}",
-        c.git_db.string,
+        str_from_pb(&c.git_db),
         s.total_git_db_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
     println!("Found git repo checkouts:");
     println!(
         "\t\t\t'{}', size: {}",
-        c.git_checkouts.string,
+        str_from_pb(&c.git_checkouts),
         s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
@@ -529,19 +516,20 @@ pub fn remove_dir_via_cmdline(
     }
     // finally delete
     for dir in dirs {
+        let dirstr = str_from_pb(dir);
         if config.is_present("dry-run") {
-            println!("dry-run: would delete: '{}'", dir.string);
-        } else if dir.path.is_dir() {
-            println!("removing: '{}'", dir.string);
-            fs::remove_dir_all(&dir.path).expect(&format!(
+            println!("dry-run: would delete: '{}'", dirstr);
+        } else if dir.is_dir() {
+            println!("removing: '{}'", dirstr);
+            fs::remove_dir_all(&dir).expect(&format!(
                 "failed to remove dir '{}' as part of --remove-dir",
-                dir.string
+                dirstr
             ));
             *size_changed = true;
         } else {
             println!(
                 "dir not existing or already removed; skipping: '{}'",
-                dir.string
+                dirstr
             );
         }
     }

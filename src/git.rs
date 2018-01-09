@@ -92,7 +92,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
 }
 
 pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
-    let git_db = &cargo_cache.git_db.path;
+    let git_db = &cargo_cache.git_db;
     // gc cloned git repos of crates or whatever
     if !git_db.is_dir() {
         println!("WARNING:   {} is not a dir", str_from_pb(git_db));
@@ -130,7 +130,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
         total_size_after += after;
     }
     println!("Recompressing registries....");
-    let mut repo_index = (&cargo_cache.registry_cache.path).clone();
+    let mut repo_index = (&cargo_cache.registry_cache).clone();
     // cd "../index"
     repo_index.pop();
     repo_index.push("index/");

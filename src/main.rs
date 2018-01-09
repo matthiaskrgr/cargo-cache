@@ -149,11 +149,11 @@ fn main() {
         let reg_srcs = &cargo_cache.registry_sources;
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
-            if dir.path.is_dir() {
+            if dir.is_dir() {
                 if config.is_present("dry-run") {
-                    println!("would remove directory '{}'", dir.string);
+                    println!("would remove directory '{}'", str_from_pb(dir));
                 } else {
-                    fs::remove_dir_all(&dir.path).unwrap();
+                    fs::remove_dir_all(&dir).unwrap();
                     size_changed = true;
                 }
             }
@@ -166,7 +166,7 @@ fn main() {
         match rm_old_crates(
             val,
             config,
-            &cargo_cache.registry_cache.path,
+            &cargo_cache.registry_cache,
             &mut size_changed,
         ) {
             Ok(()) => {}
