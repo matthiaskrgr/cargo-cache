@@ -44,17 +44,17 @@ pub struct DirSizesCollector {
 
 impl DirSizesCollector {
     pub fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
-        let bindir = cumulative_dir_size(&str_from_pb(&ccd.bin_dir));
+        let bindir = cumulative_dir_size(&ccd.bin_dir);
 
         DirSizesCollector {
-            total_size: cumulative_dir_size(&str_from_pb(&ccd.cargo_home)).dir_size,
+            total_size: cumulative_dir_size(&ccd.cargo_home).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
-            total_reg_size: cumulative_dir_size(&str_from_pb(&ccd.registry)).dir_size,
-            total_git_db_size: cumulative_dir_size(&str_from_pb(&ccd.git_db)).dir_size,
-            total_git_chk_size: cumulative_dir_size(&str_from_pb(&ccd.git_checkouts)).dir_size,
-            total_reg_cache_size: cumulative_dir_size(&str_from_pb(&ccd.registry_cache)).dir_size,
-            total_reg_src_size: cumulative_dir_size(&str_from_pb(&ccd.registry_sources)).dir_size,
+            total_reg_size: cumulative_dir_size(&ccd.registry).dir_size,
+            total_git_db_size: cumulative_dir_size(&ccd.git_db).dir_size,
+            total_git_chk_size: cumulative_dir_size(&ccd.git_checkouts).dir_size,
+            total_reg_cache_size: cumulative_dir_size(&ccd.registry_cache).dir_size,
+            total_reg_src_size: cumulative_dir_size(&ccd.registry_sources).dir_size,
         }
     }
     pub fn print_pretty(&self, ccd: &CargoCacheDirs) {
@@ -191,9 +191,8 @@ impl CargoCacheDirs {
     }
 }
 
-pub fn cumulative_dir_size(dir: &str) -> DirInfoObj {
-    let dir_path = Path::new(dir);
-    if !dir_path.is_dir() {
+pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
+    if !dir.is_dir() {
         return DirInfoObj {
             dir_size: 0,
             file_number: 0,
@@ -203,12 +202,12 @@ pub fn cumulative_dir_size(dir: &str) -> DirInfoObj {
     let mut cumulative_size = 0;
     let mut number_of_files = 0;
     // traverse recursively and sum filesizes
-    for entry in WalkDir::new(dir) {
+    for entry in WalkDir::new(str_from_pb(dir)) {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_file() {
             cumulative_size += fs::metadata(path)
-                .expect(&format!("Failed to get metadata of file '{}'", &dir))
+                .expect(&format!("Failed to get metadata of file '{}'", &dir.display()))
                 .len();
             number_of_files += 1;
         }

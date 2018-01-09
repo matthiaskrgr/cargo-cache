@@ -4,7 +4,7 @@ extern crate humansize;
 
 use std::fs;
 use std::io::{stdout, Write};
-use std::path::Path;
+use std::path::PathBuf;
 use std::process::Command;
 
 use humansize::{file_size_opts as options, FileSize};
@@ -18,13 +18,13 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
         None => "<unknown>",
     };
     print!("Recompressing '{}': ", reponame);
-    let path = Path::new(pathstr);
+    let path = PathBuf::from(pathstr);
     if !path.is_dir() {
         return Err((ErrorKind::GitRepoDirNotFound, pathstr.to_string()));
     }
 
     // get size before
-    let repo_size_before = cumulative_dir_size(pathstr).dir_size;
+    let repo_size_before = cumulative_dir_size(&path).dir_size;
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
@@ -35,7 +35,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
     } else {
-        let repo = match git2::Repository::open(path) {
+        let repo = match git2::Repository::open(&path) {
             Ok(repo) => repo,
             Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
         };
@@ -81,7 +81,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             } */
             Err(e) => return Err((ErrorKind::GitGCFailed, format!("{:?}", e))),
         }
-        let repo_size_after = cumulative_dir_size(pathstr).dir_size;
+        let repo_size_after = cumulative_dir_size(&path).dir_size;
         println!(
             "{}",
             size_diff_format(repo_size_before, repo_size_after, false)
