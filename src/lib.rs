@@ -19,7 +19,7 @@ extern crate humansize;
 extern crate walkdir;
 
 use std::{fs, process};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use humansize::{file_size_opts as options, FileSize};
 use walkdir::WalkDir;
