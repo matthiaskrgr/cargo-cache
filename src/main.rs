@@ -151,7 +151,7 @@ fn main() {
         for dir in &[reg_srcs, git_checkouts] {
             if dir.is_dir() {
                 if config.is_present("dry-run") {
-                    println!("would remove directory '{}'", str_from_pb(dir));
+                    println!("would remove directory '{}'", dir.display());
                 } else {
                     fs::remove_dir_all(&dir).unwrap();
                     size_changed = true;

@@ -58,7 +58,7 @@ impl DirSizesCollector {
         }
     }
     pub fn print_pretty(&self, ccd: &CargoCacheDirs) {
-        println!("Cargo cache '{}':\n", str_from_pb(&ccd.cargo_home));
+        println!("Cargo cache '{}':\n", &ccd.cargo_home.display());
         println!(
             "Total size:                   {} ",
             self.total_size.file_size(options::DECIMAL).unwrap()
@@ -173,20 +173,20 @@ impl CargoCacheDirs {
 
     pub fn print_dir_paths(&self) {
         println!();
-        println!("binaries directory:           {}", str_from_pb(&self.bin_dir));
-        println!("registry directory:           {}",  str_from_pb(&self.registry));
+        println!("binaries directory:           {}", &self.bin_dir.display());
+        println!("registry directory:           {}", &self.registry.display());
         println!(
             "registry crate source cache:  {}",
-             str_from_pb(&self.registry_cache)
+             &self.registry_cache.display()
         );
         println!(
             "registry unpacked sources:    {}",
-             str_from_pb(&self.registry_sources)
+             &self.registry_sources.display()
         );
-        println!("git db directory:             {}",  str_from_pb(&self.git_db));
+        println!("git db directory:             {}",  &self.git_db.display());
         println!(
             "git checkouts dir:            {}",
-             str_from_pb(&self.git_checkouts)
+             &self.git_checkouts.display()
         );
     }
 }
@@ -316,14 +316,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",
-        str_from_pb(&c.cargo_home),
+        &c.cargo_home.display(),
         s.total_size.file_size(options::DECIMAL).unwrap()
     );
 
     println!("Found {} binaries installed in", s.numb_bins);
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.bin_dir),
+        &c.bin_dir.display(),
         s.total_bin_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.");
@@ -331,20 +331,20 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found registry base dir:");
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.registry),
+        &c.registry.display(),
         s.total_reg_size.file_size(options::DECIMAL).unwrap()
     );
     println!("Found registry crate source cache:");
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.registry_cache),
+        &c.registry_cache.display(),
         s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.registry_sources),
+        &c.registry_sources.display(),
         s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
@@ -352,14 +352,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found git repo database:");
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.git_db),
+        &c.git_db.display(),
         s.total_git_db_size.file_size(options::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
     println!("Found git repo checkouts:");
     println!(
         "\t\t\t'{}', size: {}",
-        str_from_pb(&c.git_checkouts),
+        &c.git_checkouts.display(),
         s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
     );
     println!(
@@ -543,4 +543,5 @@ fn test_str_from_pb() {
 
     assert_eq!(str_from_pb(&path), string);
     assert_eq!(str_from_pb(&path), "/home/one/two/three");
+
 }

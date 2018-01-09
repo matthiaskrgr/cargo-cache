@@ -95,7 +95,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     let git_db = &cargo_cache.git_db;
     // gc cloned git repos of crates or whatever
     if !git_db.is_dir() {
-        println!("WARNING:   {} is not a dir", str_from_pb(git_db));
+        println!("WARNING:   {} is not a dir", git_db.display());
         return;
     }
     let mut total_size_before: u64 = 0;
