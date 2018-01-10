@@ -93,7 +93,6 @@ impl DirSizesCollector {
     }
 }
 
-
 pub struct CargoCacheDirs {
     pub cargo_home: PathBuf,
     pub bin_dir: PathBuf,
@@ -177,16 +176,16 @@ impl CargoCacheDirs {
         println!("registry directory:           {}", &self.registry.display());
         println!(
             "registry crate source cache:  {}",
-             &self.registry_cache.display()
+            &self.registry_cache.display()
         );
         println!(
             "registry unpacked sources:    {}",
-             &self.registry_sources.display()
+            &self.registry_sources.display()
         );
-        println!("git db directory:             {}",  &self.git_db.display());
+        println!("git db directory:             {}", &self.git_db.display());
         println!(
             "git checkouts dir:            {}",
-             &self.git_checkouts.display()
+            &self.git_checkouts.display()
         );
     }
 }
@@ -207,7 +206,10 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         let path = entry.path();
         if path.is_file() {
             cumulative_size += fs::metadata(path)
-                .expect(&format!("Failed to get metadata of file '{}'", &dir.display()))
+                .expect(&format!(
+                    "Failed to get metadata of file '{}'",
+                    &dir.display()
+                ))
                 .len();
             number_of_files += 1;
         }
@@ -259,12 +261,17 @@ pub fn rm_old_crates(
 
             if amount_to_keep == 0 {
                 removed_size += fs::metadata(pkgpath)
-                    .expect(&format!("Failed to get metadata of file '{}'", &pkgpath.display()))
+                    .expect(&format!(
+                        "Failed to get metadata of file '{}'",
+                        &pkgpath.display()
+                    ))
                     .len();
                 if config.is_present("dry-run") {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
-                        pkgname, pkgver, pkgpath.display()
+                        pkgname,
+                        pkgver,
+                        pkgpath.display()
                     );
                 } else {
                     println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
@@ -281,12 +288,17 @@ pub fn rm_old_crates(
                 if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath)
-                        .expect(&format!("Failed to get metadata of file '{}'", &pkgpath.display()))
+                        .expect(&format!(
+                            "Failed to get metadata of file '{}'",
+                            &pkgpath.display()
+                        ))
                         .len();
                     if config.is_present("dry-run") {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
-                            pkgname, pkgver, pkgpath.display()
+                            pkgname,
+                            pkgver,
+                            pkgpath.display()
                         );
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
@@ -531,7 +543,6 @@ pub fn remove_dir_via_cmdline(
     }
 }
 
-
 #[test]
 fn test_str_from_pb() {
     let string = String::from("/home/one/two/three");
@@ -539,5 +550,4 @@ fn test_str_from_pb() {
 
     assert_eq!(str_from_pb(&path), string);
     assert_eq!(str_from_pb(&path), "/home/one/two/three");
-
 }

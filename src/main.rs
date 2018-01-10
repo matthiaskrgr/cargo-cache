@@ -163,17 +163,15 @@ fn main() {
     if config.is_present("keep-duplicate-crates") {
         let val =
             value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
-        match rm_old_crates(
-            val,
-            config,
-            &cargo_cache.registry_cache,
-            &mut size_changed,
-        ) {
+        match rm_old_crates(val, config, &cargo_cache.registry_cache, &mut size_changed) {
             Ok(()) => {}
             Err((error_kind, path)) => {
                 match error_kind {
                     ErrorKind::MalformedPackageName => {
-                        panic!(format!("Error: can't parse package string: '{}'", &path.display()));
+                        panic!(format!(
+                            "Error: can't parse package string: '{}'",
+                            &path.display()
+                        ));
                     }
                     _ => unreachable!(),
                 };
