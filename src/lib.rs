@@ -224,7 +224,7 @@ pub fn rm_old_crates(
     config: &clap::ArgMatches,
     registry_src_path: &PathBuf,
     size_changed: &mut bool,
-) -> Result<(), (ErrorKind, String)> {
+) -> Result<(), (ErrorKind, PathBuf)> {
     println!();
 
     // remove crate sources from cache
@@ -235,8 +235,7 @@ pub fn rm_old_crates(
         let mut crate_list = Vec::new();
         let string = str_from_pb(&repo.unwrap().path());
         for cratepath in fs::read_dir(&string).unwrap() {
-            let cratestr = str_from_pb(&cratepath.expect("failed to read directory").path());
-            crate_list.push(cratestr);
+            crate_list.push(cratepath.expect("failed to read directory").path());
         }
         crate_list.sort();
         crate_list.reverse();
@@ -246,8 +245,7 @@ pub fn rm_old_crates(
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
             //@TODO redundant conversion: path -> str -> path
-            let path = PathBuf::from(pkgpath.clone());
-            let path_end = match path.into_iter().last() {
+            let path_end = match pkgpath.into_iter().last() {
                 Some(path_end) => path_end,
                 None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
             };
@@ -261,17 +259,17 @@ pub fn rm_old_crates(
 
             if amount_to_keep == 0 {
                 removed_size += fs::metadata(pkgpath)
-                    .expect(&format!("Failed to get metadata of file '{}'", &pkgpath))
+                    .expect(&format!("Failed to get metadata of file '{}'", &pkgpath.display()))
                     .len();
                 if config.is_present("dry-run") {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
-                        pkgname, pkgver, pkgpath
+                        pkgname, pkgver, pkgpath.display()
                     );
                 } else {
-                    println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
+                    println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
                     fs::remove_file(pkgpath)
-                        .expect(&format!("Failed to remove file '{}'", pkgpath));
+                        .expect(&format!("Failed to remove file '{}'", pkgpath.display()));
                     *size_changed = true;
                 }
                 continue;
@@ -283,17 +281,17 @@ pub fn rm_old_crates(
                 if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath)
-                        .expect(&format!("Failed to get metadata of file '{}'", &pkgpath))
+                        .expect(&format!("Failed to get metadata of file '{}'", &pkgpath.display()))
                         .len();
                     if config.is_present("dry-run") {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
-                            pkgname, pkgver, pkgpath
+                            pkgname, pkgver, pkgpath.display()
                         );
                     } else {
-                        println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath);
+                        println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
                         fs::remove_file(pkgpath)
-                            .expect(&format!("Failed to remove file '{}'", pkgpath));
+                            .expect(&format!("Failed to remove file '{}'", pkgpath.display()));
                         *size_changed = true;
                     }
                 }

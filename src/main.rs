@@ -170,10 +170,10 @@ fn main() {
             &mut size_changed,
         ) {
             Ok(()) => {}
-            Err((error_kind, string)) => {
+            Err((error_kind, path)) => {
                 match error_kind {
                     ErrorKind::MalformedPackageName => {
-                        panic!(format!("Error: can't parse package string: '{}'", &string));
+                        panic!(format!("Error: can't parse package string: '{}'", &path.display()));
                     }
                     _ => unreachable!(),
                 };
