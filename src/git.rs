@@ -11,20 +11,19 @@ use humansize::{file_size_opts as options, FileSize};
 
 use lib::*;
 
-fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (ErrorKind, String)> {
-    let vec = pathstr.split('/').collect::<Vec<&str>>();
-    let reponame = match vec.last() {
-        Some(reponame) => reponame,
-        None => "<unknown>",
+fn gc_repo(path: &PathBuf, config: &clap::ArgMatches) -> Result<(u64, u64), (ErrorKind, String)> {
+    let reponame = match path.iter().last() {
+        Some(name) => name.to_os_string().into_string().unwrap(),
+        None => String::from("<unknown>"),
     };
+
     print!("Recompressing '{}': ", reponame);
-    let path = PathBuf::from(pathstr);
     if !path.is_dir() {
-        return Err((ErrorKind::GitRepoDirNotFound, pathstr.to_string()));
+        return Err((ErrorKind::GitRepoDirNotFound, str_from_pb(path)));
     }
 
     // get size before
-    let repo_size_before = cumulative_dir_size(&path).dir_size;
+    let repo_size_before = cumulative_dir_size(path).dir_size;
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
     // we need to flush stdout manually for incremental print();
@@ -81,7 +80,7 @@ fn gc_repo(pathstr: &str, config: &clap::ArgMatches) -> Result<(u64, u64), (Erro
             } */
             Err(e) => return Err((ErrorKind::GitGCFailed, format!("{:?}", e))),
         }
-        let repo_size_after = cumulative_dir_size(&path).dir_size;
+        let repo_size_after = cumulative_dir_size(path).dir_size;
         println!(
             "{}",
             size_diff_format(repo_size_before, repo_size_after, false)
@@ -106,7 +105,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = str_from_pb(&repo);
-        let (before, after) = match gc_repo(&repostr, config) {
+        let (before, after) = match gc_repo(&repo, config) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
@@ -135,13 +134,13 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     repo_index.pop();
     repo_index.push("index/");
     for repo in fs::read_dir(repo_index).unwrap() {
-        let repo_str = str_from_pb(&repo.unwrap().path());
-        let (before, after) = match gc_repo(&repo_str, config) {
+        let repopath = repo.unwrap().path();
+        let (before, after) = match gc_repo(&repopath, config) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
                 ErrorKind::GitGCFailed => {
-                    println!("Warning, git gc failed, skipping '{}'", repo_str);
+                    println!("Warning, git gc failed, skipping '{}'", repopath.display());
                     println!("git error: '{}'", msg);
                     continue;
                 }
