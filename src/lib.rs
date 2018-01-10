@@ -448,7 +448,6 @@ pub fn remove_dir_via_cmdline(
         RegistrySources,
         RegistryCrateCache,
     }
-
     let mut dirs_to_delete = Vec::new();
     let mut terminate: bool = false;
     for word in &inputs {
@@ -488,7 +487,7 @@ pub fn remove_dir_via_cmdline(
     }
 
     // remove duplicates
-    let mut deduped_dirs = Vec::new();
+    let mut deduped_dirs = Vec::with_capacity(dirs_to_delete.len());
     for elm in dirs_to_delete {
         if !deduped_dirs.contains(&elm) {
             deduped_dirs.push(elm);
@@ -496,7 +495,7 @@ pub fn remove_dir_via_cmdline(
     }
 
     // translate enum to actual paths to be deleted
-    let mut dirs = Vec::new();
+    let mut dirs = Vec::with_capacity(deduped_dirs.len());
     for dir in deduped_dirs {
         match dir {
             DelDir::GitCheckouts => {
