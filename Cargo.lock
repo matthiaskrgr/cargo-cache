@@ -113,7 +113,7 @@ name = "cargo-cache"
 version = "0.1.0"
 dependencies = [
  "cargo 0.24.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.6.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "walkdir 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -131,7 +131,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "clap"
-version = "2.29.0"
+version = "2.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1046,7 +1046,7 @@ dependencies = [
 "checksum cargo 0.24.0 (registry+https://github.com/rust-lang/crates.io-index)" = "11bae52b8d1073f11a8b4f532ff09e6521d9e7d8908aacd3410542a2953ccd00"
 "checksum cc 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "deaf9ec656256bb25b404c51ef50097207b9cbb29c933d31f92cae5a8a0ffee0"
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
-"checksum clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)" = "110d43e343eb29f4f51c1db31beb879d546db27998577e5715270a54bcf41d3f"
+"checksum clap 2.29.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8f4a2b3bb7ef3c672d7c13d15613211d5a6976b6892c598b0fcb5d40765f19c2"
 "checksum cmake 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)" = "56d741ea7a69e577f6d06b36b7dff4738f680593dc27a701ffa8506b73ce28bb"
 "checksum commoncrypto 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d056a8586ba25a1e4d61cb090900e495952c7886786fc55f909ab2f819b69007"
 "checksum commoncrypto-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1fed34f46747aa73dfaa578069fd8279d2818ade2b55f38f22a9401c7f4083e2"
