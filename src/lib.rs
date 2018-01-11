@@ -138,26 +138,14 @@ impl CargoCacheDirs {
                 &cargo_home_str
             );
         }
-
+        // get the paths to the relevant directories
         let cargo_home = cargo_home_path;
-        // bin
-        let bin_path = cargo_home.join("bin/");
-        let bin = bin_path;
-        // registry
-        let registry_dir_path = cargo_home.join("registry/");
-        let registry = registry_dir_path;
-
-        let registry_cache = registry.join("cache/");
-        let reg_cache = registry_cache;
-
-        let registry_sources = registry.join("src/");
-        let reg_src = registry_sources;
-        // git
-        let git_db_path = cargo_home.join("git/db/");
-        let git_db = git_db_path;
-
-        let git_checkouts_path = cargo_home_path_clone.join("git/checkouts/");
-        let git_checkouts = git_checkouts_path;
+        let bin = cargo_home.join("bin/");
+        let registry = cargo_home.join("registry/");
+        let reg_cache = registry.join("cache/");
+        let reg_src = registry.join("src/");
+        let git_db = cargo_home.join("git/db/");
+        let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
         CargoCacheDirs {
             cargo_home: cargo_home,
