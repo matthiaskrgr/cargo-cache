@@ -90,7 +90,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     }
 }
 
-pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
+pub fn run_gc(cargo_cache: &CargoCacheDirs, dry_run: bool) {
     let git_db = &cargo_cache.git_db;
     // gc cloned git repos of crates or whatever
     if !git_db.is_dir() {
@@ -105,7 +105,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = str_from_pb(&repo);
-        let (before, after) = match gc_repo(&repo, config.is_present("dry-run")) {
+        let (before, after) = match gc_repo(&repo, dry_run) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
@@ -135,7 +135,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     repo_index.push("index/");
     for repo in fs::read_dir(repo_index).unwrap() {
         let repopath = repo.unwrap().path();
-        let (before, after) = match gc_repo(&repopath, config.is_present("dry-run")) {
+        let (before, after) = match gc_repo(&repopath, dry_run) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
