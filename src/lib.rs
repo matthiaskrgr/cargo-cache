@@ -414,11 +414,6 @@ pub fn remove_dir_via_cmdline(
     ccd: &CargoCacheDirs,
     size_changed: &mut bool,
 ) {
-    if !config.is_present("remove-dir") {
-        // do nothing if arg not used
-        return;
-    }
-
     let input = match config.value_of("remove-dir") {
         Some(value) => value,
         None => {
