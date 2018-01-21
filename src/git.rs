@@ -1,4 +1,3 @@
-extern crate clap;
 extern crate git2;
 extern crate humansize;
 

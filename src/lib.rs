@@ -211,7 +211,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
 
 pub fn rm_old_crates(
     amount_to_keep: u64,
-    config: &clap::ArgMatches,
+    dry_run: bool,
     registry_src_path: &PathBuf,
     size_changed: &mut bool,
 ) -> Result<(), (ErrorKind, PathBuf)> {
@@ -253,7 +253,7 @@ pub fn rm_old_crates(
                         &pkgpath.display()
                     ))
                     .len();
-                if config.is_present("dry-run") {
+                if dry_run {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
                         pkgname,
@@ -280,7 +280,7 @@ pub fn rm_old_crates(
                             &pkgpath.display()
                         ))
                         .len();
-                    if config.is_present("dry-run") {
+                    if dry_run {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
                             pkgname,
