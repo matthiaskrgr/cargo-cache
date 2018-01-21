@@ -13,7 +13,6 @@
 //#![cfg_attr(feature = "cargo-clippy", warn(result_unwrap_used))]
 
 extern crate cargo;
-extern crate clap;
 extern crate git2;
 extern crate humansize;
 extern crate walkdir;
