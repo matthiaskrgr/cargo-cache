@@ -410,11 +410,12 @@ pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool
 }
 
 pub fn remove_dir_via_cmdline(
-    config: &clap::ArgMatches,
+    directory: Option<&str>,
+    dry_run: bool,
     ccd: &CargoCacheDirs,
     size_changed: &mut bool,
 ) {
-    let input = match config.value_of("remove-dir") {
+    let input = match directory {
         Some(value) => value,
         None => {
             println!("No argument assigned to --remove-dir, example: 'git-repos,registry-sources'");
@@ -507,7 +508,7 @@ pub fn remove_dir_via_cmdline(
     // finally delete
     for dir in dirs {
         let dirstr = dir.display();
-        if config.is_present("dry-run") {
+        if dry_run {
             println!("dry-run: would delete: '{}'", dirstr);
         } else if dir.is_dir() {
             println!("removing: '{}'", dirstr);
