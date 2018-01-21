@@ -11,7 +11,7 @@ use humansize::{file_size_opts as options, FileSize};
 
 use lib::*;
 
-fn gc_repo(path: &PathBuf, config: &clap::ArgMatches) -> Result<(u64, u64), (ErrorKind, String)> {
+fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
     let reponame = match path.iter().last() {
         Some(name) => name.to_os_string().into_string().unwrap(),
         None => String::from("<unknown>"),
@@ -30,7 +30,7 @@ fn gc_repo(path: &PathBuf, config: &clap::ArgMatches) -> Result<(u64, u64), (Err
 
     if stdout().flush().is_ok() {} // ignore errors
 
-    if config.is_present("dry-run") {
+    if dry_run {
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
     } else {
@@ -105,7 +105,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = str_from_pb(&repo);
-        let (before, after) = match gc_repo(&repo, config) {
+        let (before, after) = match gc_repo(&repo, config.is_present("dry-run")) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
@@ -135,7 +135,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, config: &clap::ArgMatches) {
     repo_index.push("index/");
     for repo in fs::read_dir(repo_index).unwrap() {
         let repopath = repo.unwrap().path();
-        let (before, after) = match gc_repo(&repopath, config) {
+        let (before, after) = match gc_repo(&repopath, config.is_present("dry-run")) {
             // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
