@@ -11,12 +11,12 @@ use humansize::{file_size_opts as options, FileSize};
 use lib::*;
 
 fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
-    let reponame = match path.iter().last() {
+    let repo_name = match path.iter().last() {
         Some(name) => name.to_os_string().into_string().unwrap(),
         None => String::from("<unknown>"),
     };
 
-    print!("Recompressing '{}': ", reponame);
+    print!("Recompressing '{}': ", repo_name);
     if !path.is_dir() {
         return Err((ErrorKind::GitRepoDirNotFound, str_from_pb(path)));
     }
