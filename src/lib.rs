@@ -17,7 +17,7 @@ extern crate git2;
 extern crate humansize;
 extern crate walkdir;
 
-use std::{fs, process};
+use std::fs;
 use std::path::PathBuf;
 
 use humansize::{file_size_opts as options, FileSize};
