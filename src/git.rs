@@ -25,9 +25,9 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     let repo_size_before = cumulative_dir_size(path).dir_size;
     let sb_human_readable = repo_size_before.file_size(options::DECIMAL).unwrap();
     print!("{} => ", sb_human_readable);
-    // we need to flush stdout manually for incremental print();
 
-    if stdout().flush().is_ok() {} // ignore errors
+    // we need to flush stdout manually for incremental print();
+    let _ = stdout().flush();  // ignore errors
 
     if dry_run {
         println!("{} ({}{})", sb_human_readable, "+", 0);
