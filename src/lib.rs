@@ -111,6 +111,9 @@ pub enum ErrorKind {
     MalformedPackageName,
     CargoFailedGetConfig,
     CargoHomeNotDirectory,
+    InvalidDeletableDir,
+    #[allow(non_camel_case_types)]
+    rmFailed,
 }
 
 impl CargoCacheDirs {
@@ -406,22 +409,24 @@ pub fn remove_dir_via_cmdline(
     dry_run: bool,
     ccd: &CargoCacheDirs,
     size_changed: &mut bool,
-) {
-    fn rm(dir: &PathBuf, dry_run: bool, size_changed: &mut bool) {
+) -> Result<(),(ErrorKind, String)> {
+
+    fn rm(dir: &PathBuf, dry_run: bool, size_changed: &mut bool) -> Result<(), (ErrorKind, String)> {
         // remove a specified subdirectory from cargo cache
         if !dir.is_dir() {
-            return;
         } else if dry_run {
             println!("dry-run: would delete: '{}'", dir.display());
-            return;
         } else {
             println!("removing: '{}'", dir.display());
-            fs::remove_dir_all(&dir).expect(&format!(
-                "failed to remove dir '{}' as part of --remove-dir",
-                dir.display()
-            ));
+            match fs::remove_dir_all(&dir) {
+                Ok(_) => {},
+                Err(_) => {
+                        return Err((ErrorKind::rmFailed, format!("failed to remove directory {}", dir.display())))
+                },
+            }
             *size_changed = true;
         }
+        Ok(())
     }
 
     let input = match directory {
@@ -458,11 +463,11 @@ pub fn remove_dir_via_cmdline(
         registry_crate_cache: false,
     };
 
+    let mut invalid_dirs = "".to_string();
     for word in &inputs {
         if !valid_dirs.contains(word) {
-            // @TODO return result/error here
-            println!("Error: invalid deletable dir: '{}'.", word);
-            // don't terminate right away, we might have more than one invalid dir
+            // collect all invalid dirs and print all of them as merged string later
+            invalid_dirs = format!("{} {}", invalid_dirs.to_string(), word.to_string()).to_string();
             terminate = true;
         } else {
             // dir is recognized
@@ -491,26 +496,38 @@ pub fn remove_dir_via_cmdline(
                     del_dirs.git_checkouts = true;
                 }
                 _ => unreachable!(),
-            }
+            } // match *word
         }
-    }
+    } // for word in &inputs
     if terminate {
-        // invalid deletable dir given
-        process::exit(5);
+        return Err((ErrorKind::InvalidDeletableDir, format!("Invalid deletable dirs: {}", invalid_dirs)))
     }
     // finally delete
     if del_dirs.git_checkouts {
-        rm(&ccd.git_checkouts, dry_run, size_changed);
+        match rm(&ccd.git_checkouts, dry_run, size_changed) {
+            Ok(_) => {},
+            Err(e) => return Err(e),
+        }
     }
     if del_dirs.git_repos {
-        rm(&ccd.git_db, dry_run, size_changed);
+        match rm(&ccd.git_db, dry_run, size_changed) {
+            Ok(_) => {},
+            Err(e) => return Err(e),
+        }
     }
     if del_dirs.registry_sources {
-        rm(&ccd.registry_sources, dry_run, size_changed);
+        match rm(&ccd.registry_sources, dry_run, size_changed) {
+            Ok(_) => {},
+            Err(e) => return Err(e),
+        }
     }
     if del_dirs.registry_crate_cache {
-        rm(&ccd.registry_cache, dry_run, size_changed);
+        match rm(&ccd.registry_cache, dry_run, size_changed) {
+            Ok(_) => {},
+            Err(e) => return Err(e),
+        }
     }
+    Ok(())
 }
 
 #[test]

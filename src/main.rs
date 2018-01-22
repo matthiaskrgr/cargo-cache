@@ -141,12 +141,18 @@ fn main() {
     dir_sizes.print_pretty(&cargo_cache);
 
     if config.is_present("remove-dir") {
-        remove_dir_via_cmdline(
+        match remove_dir_via_cmdline(
             config.value_of("remove-dir"),
             config.is_present("dry-run"),
             &cargo_cache,
             &mut size_changed,
-        );
+        ) {
+            Ok(_) => {},
+            Err((_, msg)) => {
+                println!("{}", msg);
+                process::exit(1);
+            }
+        }
     }
 
     if config.is_present("list-dirs") {
