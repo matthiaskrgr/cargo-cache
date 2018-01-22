@@ -114,6 +114,8 @@ pub enum ErrorKind {
     InvalidDeletableDir,
     #[allow(non_camel_case_types)]
     rmFailed,
+    #[allow(non_camel_case_types)]
+    rmDirNoArg,
 }
 
 impl CargoCacheDirs {
@@ -432,8 +434,7 @@ pub fn remove_dir_via_cmdline(
     let input = match directory {
         Some(value) => value,
         None => {
-            println!("No argument assigned to --remove-dir, example: 'git-repos,registry-sources'");
-            process::exit(2)
+            return Err((ErrorKind::rmDirNoArg, "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'".to_string()))
         }
     };
 
