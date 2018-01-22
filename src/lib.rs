@@ -109,21 +109,16 @@ pub enum ErrorKind {
     GitPackRefsFailed,
     GitReflogFailed,
     MalformedPackageName,
-}
-
-impl Default for CargoCacheDirs {
-    fn default() -> Self {
-        Self::new()
-    }
+    CargoFailedGetConfig,
+    CargoHomeNotDirectory,
 }
 
 impl CargoCacheDirs {
-    pub fn new() -> CargoCacheDirs {
+    pub fn new() -> Result<CargoCacheDirs, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
             Err(_) => {
-                println!("Error: failed to get cargo config!");
-                process::exit(1)
+                return Err((ErrorKind::CargoFailedGetConfig, "Failed to get cargo config!".to_string()))
             }
         };
 
@@ -132,10 +127,8 @@ impl CargoCacheDirs {
         let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
-            panic!(
-                "Error, no cargo home path directory '{}' found.",
-                &cargo_home_str
-            );
+            let msg = format!("Error, no cargo home path directory '{}' found.", &cargo_home_str);
+            return Err((ErrorKind::CargoHomeNotDirectory, msg));
         }
         // get the paths to the relevant directories
         let cargo_home = cargo_home_path;
@@ -146,7 +139,7 @@ impl CargoCacheDirs {
         let git_db = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
-        CargoCacheDirs {
+        Ok(CargoCacheDirs {
             cargo_home: cargo_home,
             bin_dir: bin,
             registry: registry,
@@ -154,7 +147,7 @@ impl CargoCacheDirs {
             registry_sources: reg_src,
             git_db: git_db,
             git_checkouts: git_checkouts,
-        }
+        })
     }
 
     pub fn print_dir_paths(&self) {

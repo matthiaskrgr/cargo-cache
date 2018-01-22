@@ -123,7 +123,14 @@ fn main() {
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 
-    let cargo_cache = CargoCacheDirs::new();
+    let cargo_cache = match CargoCacheDirs::new() {
+        Ok(cargo_cache) => cargo_cache,
+        Err((_, msg)) => {
+            println!("{}", msg);
+            process::exit(1);
+         },
+    };
+
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
     if config.is_present("info") {
