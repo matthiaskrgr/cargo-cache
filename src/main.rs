@@ -134,7 +134,12 @@ fn main() {
     dir_sizes.print_pretty(&cargo_cache);
 
     if config.is_present("remove-dir") {
-        remove_dir_via_cmdline(config.value_of("remove-dir"), config.is_present("dry-run"), &cargo_cache, &mut size_changed);
+        remove_dir_via_cmdline(
+            config.value_of("remove-dir"),
+            config.is_present("dry-run"),
+            &cargo_cache,
+            &mut size_changed,
+        );
     }
 
     if config.is_present("list-dirs") {
@@ -163,7 +168,12 @@ fn main() {
     if config.is_present("keep-duplicate-crates") {
         let val =
             value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
-        match rm_old_crates(val, config.is_present("dry-run"), &cargo_cache.registry_cache, &mut size_changed) {
+        match rm_old_crates(
+            val,
+            config.is_present("dry-run"),
+            &cargo_cache.registry_cache,
+            &mut size_changed,
+        ) {
             Ok(()) => {}
             Err((error_kind, path)) => {
                 match error_kind {
