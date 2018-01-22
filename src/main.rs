@@ -126,7 +126,7 @@ fn main() {
     let cargo_cache = match CargoCacheDirs::new() {
         Ok(cargo_cache) => cargo_cache,
         Err((_, msg)) => {
-            println!("{}", msg);
+            eprintln!("{}", msg);
             process::exit(1);
          },
     };
@@ -149,7 +149,7 @@ fn main() {
         ) {
             Ok(_) => {},
             Err((_, msg)) => {
-                println!("{}", msg);
+                eprintln!("{}", msg);
                 process::exit(1);
             }
         }
