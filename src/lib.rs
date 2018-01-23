@@ -186,7 +186,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     let mut cumulative_size = 0;
     let mut number_of_files = 0;
     // traverse recursively and sum filesizes
-    for entry in WalkDir::new(str_from_pb(dir)) {
+    for entry in WalkDir::new(format!("{}", dir.display())) {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_file() {
@@ -220,7 +220,7 @@ pub fn rm_old_crates(
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
         let mut crate_list = Vec::new();
-        let string = str_from_pb(&repo.unwrap().path());
+        let string = format!("{}", &repo.unwrap().path().display());
         for cratepath in fs::read_dir(&string).unwrap() {
             crate_list.push(cratepath.expect("failed to read directory").path());
         }
@@ -358,10 +358,6 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if neccessary (no net access needed, if repos are up-to-date)."
     );
-}
-
-pub fn str_from_pb(path: &PathBuf) -> String {
-    path.clone().into_os_string().into_string().unwrap()
 }
 
 pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
@@ -529,13 +525,4 @@ pub fn remove_dir_via_cmdline(
         }
     }
     Ok(())
-}
-
-#[test]
-fn test_str_from_pb() {
-    let string = String::from("/home/one/two/three");
-    let path = PathBuf::from(&string);
-
-    assert_eq!(str_from_pb(&path), string);
-    assert_eq!(str_from_pb(&path), "/home/one/two/three");
 }

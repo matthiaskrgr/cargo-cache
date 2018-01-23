@@ -18,7 +18,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 
     print!("Recompressing '{}': ", repo_name);
     if !path.is_dir() {
-        return Err((ErrorKind::GitRepoDirNotFound, str_from_pb(path)));
+        return Err((ErrorKind::GitRepoDirNotFound, format!("{}", path.display())));
     }
 
     // get size before
@@ -103,7 +103,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, dry_run: bool) {
     // gc git repos of crates
     for entry in fs::read_dir(&git_db).unwrap() {
         let repo = entry.unwrap().path();
-        let repostr = str_from_pb(&repo);
+        let repostr = format!("{}", repo.display());
         let (before, after) = match gc_repo(&repo, dry_run) {
             // run gc
             Ok((before, after)) => (before, after),
