@@ -127,8 +127,8 @@ impl CargoCacheDirs {
             }
         };
 
-        let cargo_home_str = format!("{}", cargo_cfg.home().display());
-        let cargo_home_path = PathBuf::from(&cargo_home_str);
+        let cargo_home_path = cargo_cfg.home().clone().into_path_unlocked();
+        let cargo_home_str = format!("{}", cargo_home_path.display());
         let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
