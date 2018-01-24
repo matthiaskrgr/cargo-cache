@@ -224,9 +224,9 @@ pub fn rm_old_crates(
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
         let mut crate_list = Vec::new();
-        let string = format!("{}", &repo.unwrap().path().display());
-        for cratepath in fs::read_dir(&string).unwrap() {
-            crate_list.push(cratepath.expect("failed to read directory").path());
+        for cratepath in fs::read_dir(&repo.unwrap().path()).unwrap() {
+            let path = cratepath.unwrap().path();
+            crate_list.push(path);
         }
         crate_list.sort();
         crate_list.reverse();
