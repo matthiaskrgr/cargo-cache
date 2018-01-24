@@ -128,7 +128,7 @@ fn main() {
         Err((_, msg)) => {
             eprintln!("{}", msg);
             process::exit(1);
-         },
+        }
     };
 
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
@@ -147,7 +147,7 @@ fn main() {
             &cargo_cache,
             &mut size_changed,
         ) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err((_, msg)) => {
                 eprintln!("{}", msg);
                 process::exit(1);

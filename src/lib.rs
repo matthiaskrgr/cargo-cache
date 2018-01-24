@@ -112,10 +112,8 @@ pub enum ErrorKind {
     CargoFailedGetConfig,
     CargoHomeNotDirectory,
     InvalidDeletableDir,
-    #[allow(non_camel_case_types)]
-    rmFailed,
-    #[allow(non_camel_case_types)]
-    rmDirNoArg,
+    #[allow(non_camel_case_types)] rmFailed,
+    #[allow(non_camel_case_types)] rmDirNoArg,
 }
 
 impl CargoCacheDirs {
@@ -123,7 +121,10 @@ impl CargoCacheDirs {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
             Err(_) => {
-                return Err((ErrorKind::CargoFailedGetConfig, "Failed to get cargo config!".to_string()))
+                return Err((
+                    ErrorKind::CargoFailedGetConfig,
+                    "Failed to get cargo config!".to_string(),
+                ))
             }
         };
 
@@ -132,7 +133,10 @@ impl CargoCacheDirs {
         let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
-            let msg = format!("Error, no cargo home path directory '{}' found.", &cargo_home_str);
+            let msg = format!(
+                "Error, no cargo home path directory '{}' found.",
+                &cargo_home_str
+            );
             return Err((ErrorKind::CargoHomeNotDirectory, msg));
         }
         // get the paths to the relevant directories
@@ -407,9 +411,12 @@ pub fn remove_dir_via_cmdline(
     dry_run: bool,
     ccd: &CargoCacheDirs,
     size_changed: &mut bool,
-) -> Result<(),(ErrorKind, String)> {
-
-    fn rm(dir: &PathBuf, dry_run: bool, size_changed: &mut bool) -> Result<(), (ErrorKind, String)> {
+) -> Result<(), (ErrorKind, String)> {
+    fn rm(
+        dir: &PathBuf,
+        dry_run: bool,
+        size_changed: &mut bool,
+    ) -> Result<(), (ErrorKind, String)> {
         // remove a specified subdirectory from cargo cache
         if !dir.is_dir() {
         } else if dry_run {
@@ -417,10 +424,13 @@ pub fn remove_dir_via_cmdline(
         } else {
             println!("removing: '{}'", dir.display());
             match fs::remove_dir_all(&dir) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(_) => {
-                        return Err((ErrorKind::rmFailed, format!("failed to remove directory {}", dir.display())))
-                },
+                    return Err((
+                        ErrorKind::rmFailed,
+                        format!("failed to remove directory {}", dir.display()),
+                    ))
+                }
             }
             *size_changed = true;
         }
@@ -430,7 +440,11 @@ pub fn remove_dir_via_cmdline(
     let input = match directory {
         Some(value) => value,
         None => {
-            return Err((ErrorKind::rmDirNoArg, "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'".to_string()))
+            return Err((
+                ErrorKind::rmDirNoArg,
+                "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
+                    .to_string(),
+            ))
         }
     };
 
@@ -497,30 +511,33 @@ pub fn remove_dir_via_cmdline(
         }
     } // for word in &inputs
     if terminate {
-        return Err((ErrorKind::InvalidDeletableDir, format!("Invalid deletable dirs: {}", invalid_dirs)))
+        return Err((
+            ErrorKind::InvalidDeletableDir,
+            format!("Invalid deletable dirs: {}", invalid_dirs),
+        ));
     }
     // finally delete
     if del_dirs.git_checkouts {
         match rm(&ccd.git_checkouts, dry_run, size_changed) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
     if del_dirs.git_repos {
         match rm(&ccd.git_db, dry_run, size_changed) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
     if del_dirs.registry_sources {
         match rm(&ccd.registry_sources, dry_run, size_changed) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
     if del_dirs.registry_crate_cache {
         match rm(&ccd.registry_cache, dry_run, size_changed) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
