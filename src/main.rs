@@ -22,7 +22,7 @@ mod git;
 use std::{fs, process};
 
 use clap::{App, Arg, SubCommand};
-use humansize::{file_size_opts as options, FileSize};
+use humansize::{file_size_opts, FileSize};
 
 use lib::*;
 use git::*;
@@ -206,7 +206,7 @@ fn main() {
         // recalculate file sizes by constructing a new DSC object
         let cache_size_new = DirSizesCollector::new(&cargo_cache).total_size;
 
-        let size_old_human_readable = cache_size_old.file_size(options::DECIMAL).unwrap();
+        let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(
             "\nSize changed from {} to {}",
             size_old_human_readable,

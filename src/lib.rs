@@ -20,7 +20,7 @@ extern crate walkdir;
 use std::fs;
 use std::path::PathBuf;
 
-use humansize::{file_size_opts as options, FileSize};
+use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 pub struct DirInfoObj {
@@ -60,34 +60,34 @@ impl DirSizesCollector {
         println!("Cargo cache '{}':\n", &ccd.cargo_home.display());
         println!(
             "Total size:                   {} ",
-            self.total_size.file_size(options::DECIMAL).unwrap()
+            self.total_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
             "Size of {} installed binaries:     {} ",
             self.numb_bins,
-            self.total_bin_size.file_size(options::DECIMAL).unwrap()
+            self.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
             "Size of registry:                  {} ",
-            self.total_reg_size.file_size(options::DECIMAL).unwrap()
+            self.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
             "Size of registry crate cache:           {} ",
             self.total_reg_cache_size
-                .file_size(options::DECIMAL)
+                .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
             "Size of registry source checkouts:      {} ",
-            self.total_reg_src_size.file_size(options::DECIMAL).unwrap()
+            self.total_reg_src_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
             "Size of git db:                    {} ",
-            self.total_git_db_size.file_size(options::DECIMAL).unwrap()
+            self.total_git_db_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
             "Size of git repo checkouts:        {} ",
-            self.total_git_chk_size.file_size(options::DECIMAL).unwrap()
+            self.total_git_chk_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
     }
 }
@@ -304,7 +304,7 @@ pub fn rm_old_crates(
     }
     println!(
         "Removed {} of compressed crate sources.",
-        removed_size.file_size(options::DECIMAL).unwrap()
+        removed_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     Ok(())
 }
@@ -314,14 +314,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\t'{}' of size: {}",
         &c.cargo_home.display(),
-        s.total_size.file_size(options::DECIMAL).unwrap()
+        s.total_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
 
     println!("Found {} binaries installed in", s.numb_bins);
     println!(
         "\t\t\t'{}', size: {}",
         &c.bin_dir.display(),
-        s.total_bin_size.file_size(options::DECIMAL).unwrap()
+        s.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.");
 
@@ -329,20 +329,20 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\t'{}', size: {}",
         &c.registry.display(),
-        s.total_reg_size.file_size(options::DECIMAL).unwrap()
+        s.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!("Found registry crate source cache:");
     println!(
         "\t\t\t'{}', size: {}",
         &c.registry_cache.display(),
-        s.total_reg_cache_size.file_size(options::DECIMAL).unwrap()
+        s.total_reg_cache_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
         &c.registry_sources.display(),
-        s.total_reg_src_size.file_size(options::DECIMAL).unwrap()
+        s.total_reg_src_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
 
@@ -350,14 +350,14 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\t'{}', size: {}",
         &c.git_db.display(),
-        s.total_git_db_size.file_size(options::DECIMAL).unwrap()
+        s.total_git_db_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
     println!("Found git repo checkouts:");
     println!(
         "\t\t\t'{}', size: {}",
         &c.git_checkouts.display(),
-        s.total_git_chk_size.file_size(options::DECIMAL).unwrap()
+        s.total_git_chk_size.file_size(file_size_opts::DECIMAL).unwrap()
     );
     println!(
         "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if neccessary (no net access needed, if repos are up-to-date)."
@@ -367,13 +367,13 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
 pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
-    let size_after_human_readable = size_after.file_size(options::DECIMAL).unwrap();
-    let humansize_opts = options::FileSizeOpts {
+    let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
+    let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
-        ..options::DECIMAL
+        ..file_size_opts::DECIMAL
     };
     let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
-    let size_before_human_readabel = size_before.file_size(options::DECIMAL).unwrap();
+    let size_before_human_readabel = size_before.file_size(file_size_opts::DECIMAL).unwrap();
     // percentage
     let percentage: f64 =
         ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
