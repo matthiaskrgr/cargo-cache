@@ -65,11 +65,15 @@ impl DirSizesCollector {
         println!(
             "Size of {} installed binaries:     {} ",
             self.numb_bins,
-            self.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
+            self.total_bin_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
         );
         println!(
             "Size of registry:                  {} ",
-            self.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
+            self.total_reg_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
         );
         println!(
             "Size of registry crate cache:           {} ",
@@ -79,15 +83,21 @@ impl DirSizesCollector {
         );
         println!(
             "Size of registry source checkouts:      {} ",
-            self.total_reg_src_size.file_size(file_size_opts::DECIMAL).unwrap()
+            self.total_reg_src_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
         );
         println!(
             "Size of git db:                    {} ",
-            self.total_git_db_size.file_size(file_size_opts::DECIMAL).unwrap()
+            self.total_git_db_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
         );
         println!(
             "Size of git repo checkouts:        {} ",
-            self.total_git_chk_size.file_size(file_size_opts::DECIMAL).unwrap()
+            self.total_git_chk_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
         );
     }
 }
@@ -335,14 +345,18 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\t'{}', size: {}",
         &c.registry_cache.display(),
-        s.total_reg_cache_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_reg_cache_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     );
     println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
         &c.registry_sources.display(),
-        s.total_reg_src_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_reg_src_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     );
     println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
 
@@ -350,14 +364,18 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!(
         "\t\t\t'{}', size: {}",
         &c.git_db.display(),
-        s.total_git_db_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_git_db_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     );
     println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
     println!("Found git repo checkouts:");
     println!(
         "\t\t\t'{}', size: {}",
         &c.git_checkouts.display(),
-        s.total_git_chk_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_git_chk_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     );
     println!(
         "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if neccessary (no net access needed, if repos are up-to-date)."
