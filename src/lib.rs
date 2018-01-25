@@ -193,13 +193,13 @@ impl CargoCacheDirs {
 }
 
 pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
+    // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
         return DirInfoObj {
             dir_size: 0,
             file_number: 0,
         };
     }
-    // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     // traverse recursively and sum filesizes
     let mut files = Vec::new();
     for entry in WalkDir::new(format!("{}", dir.display())) {
@@ -207,7 +207,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         let path = entry.path();
         files.push(path.to_owned());
     }
-    let size = files
+    let sizes_sum = files
         .par_iter()
         .map(|f| {
             fs::metadata(f)
@@ -220,7 +220,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         .sum();
 
     DirInfoObj {
-        dir_size: size,
+        dir_size: sizes_sum,
         file_number: files.len() as u64,
     }
 }
@@ -238,11 +238,10 @@ pub fn rm_old_crates(
     let mut removed_size = 0;
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
-        let mut crate_list = Vec::new();
-        for cratepath in fs::read_dir(&repo.unwrap().path()).unwrap() {
-            let path = cratepath.unwrap().path();
-            crate_list.push(path);
-        }
+        let mut crate_list: Vec<PathBuf> = fs::read_dir(&repo.unwrap().path())
+            .unwrap()
+            .map(|cratepath| cratepath.unwrap().path())
+            .collect();
         crate_list.sort();
         crate_list.reverse();
 
