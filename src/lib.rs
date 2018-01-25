@@ -15,6 +15,7 @@
 extern crate cargo;
 extern crate git2;
 extern crate humansize;
+extern crate rayon;
 extern crate walkdir;
 
 use std::fs;
@@ -22,6 +23,7 @@ use std::path::PathBuf;
 
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
+use self::rayon::prelude::*;
 
 pub struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -197,26 +199,28 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         };
     }
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
-    let mut cumulative_size = 0;
-    let mut number_of_files = 0;
     // traverse recursively and sum filesizes
+    let mut files = Vec::new();
     for entry in WalkDir::new(format!("{}", dir.display())) {
         let entry = entry.unwrap();
         let path = entry.path();
-        if path.is_file() {
-            cumulative_size += fs::metadata(path)
+        files.push(path.to_owned());
+    }
+    let size = files
+        .par_iter()
+        .map(|f| {
+            fs::metadata(f)
                 .expect(&format!(
                     "Failed to get metadata of file '{}'",
                     &dir.display()
                 ))
-                .len();
-            number_of_files += 1;
-        }
-    } // walkdir
+                .len()
+        })
+        .sum();
 
     DirInfoObj {
-        dir_size: cumulative_size,
-        file_number: number_of_files,
+        dir_size: size,
+        file_number: files.len() as u64,
     }
 }
 

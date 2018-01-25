@@ -18,6 +18,8 @@ humansize = "1.0" # convert digits of bytes to human readable size
 cargo = "0.24" # get CARGO_HOME
 # https://github.com/alexcrichton/git2-rs
 git2 = "0.6" # check if repo is git repo
+# https://github.com/rayon-rs/rayon
+rayon = "0.9" # parallel for loops 
 
 [[bin]]
 path = "src/main.rs"
