@@ -207,6 +207,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         let path = entry.path();
         files.push(path.to_owned());
     }
+    // parallelize using rayon
     let sizes_sum = files
         .par_iter()
         .map(|f| {
@@ -479,24 +480,17 @@ pub fn remove_dir_via_cmdline(
         "registry",
         "all",
     ];
+
+    // keep track of what we want to remove
+    let mut rm_git_repos = false;
+    let mut rm_git_checkouts = false;
+    let mut rm_registry_sources = false;
+    let mut rm_registry_crate_cache = false;
+
     // validate input
-
-    #[derive(Clone, Debug, PartialEq)]
-    struct DelDirs {
-        git_repos: bool,
-        git_checkouts: bool,
-        registry_sources: bool,
-        registry_crate_cache: bool,
-    }
-    let mut terminate: bool = false;
-    let mut del_dirs = DelDirs {
-        git_repos: false,
-        git_checkouts: false,
-        registry_sources: false,
-        registry_crate_cache: false,
-    };
-
     let mut invalid_dirs = "".to_string();
+    let mut terminate: bool = false;
+
     for word in &inputs {
         if !valid_dirs.contains(word) {
             // collect all invalid dirs and print all of them as merged string later
@@ -507,26 +501,26 @@ pub fn remove_dir_via_cmdline(
             // dedupe
             match *word {
                 "all" => {
-                    del_dirs.git_repos = true;
-                    del_dirs.git_checkouts = true;
-                    del_dirs.registry_sources = true;
-                    del_dirs.registry_crate_cache = true;
+                    rm_git_repos = true;
+                    rm_git_checkouts = true;
+                    rm_registry_sources = true;
+                    rm_registry_crate_cache = true;
                     // we rm everything, no need to look further, break out of loop
                     break; // for word in &inputs
                 }
                 "registry" | "registry-crate-cache" => {
-                    del_dirs.registry_sources = true;
-                    del_dirs.registry_crate_cache = true;
+                    rm_registry_sources = true;
+                    rm_registry_crate_cache = true;
                 }
                 "registry-sources" => {
-                    del_dirs.registry_sources = true;
+                    rm_registry_sources = true;
                 }
                 "git-repos" => {
-                    del_dirs.git_checkouts = true;
+                    rm_git_checkouts = true;
                 }
                 "git-db" => {
-                    del_dirs.git_repos = true;
-                    del_dirs.git_checkouts = true;
+                    rm_git_repos = true;
+                    rm_git_checkouts = true;
                 }
                 _ => unreachable!(),
             } // match *word
@@ -539,25 +533,25 @@ pub fn remove_dir_via_cmdline(
         ));
     }
     // finally delete
-    if del_dirs.git_checkouts {
+    if rm_git_checkouts {
         match rm(&ccd.git_checkouts, dry_run, size_changed) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
-    if del_dirs.git_repos {
+    if rm_git_repos {
         match rm(&ccd.git_db, dry_run, size_changed) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
-    if del_dirs.registry_sources {
+    if rm_registry_sources {
         match rm(&ccd.registry_sources, dry_run, size_changed) {
             Ok(_) => {}
             Err(e) => return Err(e),
         }
     }
-    if del_dirs.registry_crate_cache {
+    if rm_registry_crate_cache {
         match rm(&ccd.registry_cache, dry_run, size_changed) {
             Ok(_) => {}
             Err(e) => return Err(e),
