@@ -488,13 +488,13 @@ pub fn remove_dir_via_cmdline(
     let mut rm_registry_crate_cache = false;
 
     // validate input
-    let mut invalid_dirs = "".to_string();
+    let mut invalid_dirs = String::from("");
     let mut terminate: bool = false;
 
     for word in &inputs {
         if !valid_dirs.contains(word) {
             // collect all invalid dirs and print all of them as merged string later
-            invalid_dirs = format!("{} {}", invalid_dirs.to_string(), word.to_string()).to_string();
+            invalid_dirs.push_str(&format!("{} ", &word));
             terminate = true;
         } else {
             // dir is recognized
@@ -527,6 +527,8 @@ pub fn remove_dir_via_cmdline(
         }
     } // for word in &inputs
     if terminate {
+        // remove the last character which is a trailing whitespace
+        invalid_dirs.pop();
         return Err((
             ErrorKind::InvalidDeletableDir,
             format!("Invalid deletable dirs: {}", invalid_dirs),
