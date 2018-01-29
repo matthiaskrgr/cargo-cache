@@ -125,8 +125,8 @@ pub enum ErrorKind {
     CargoFailedGetConfig,
     CargoHomeNotDirectory,
     InvalidDeletableDir,
-    #[allow(non_camel_case_types)] rmFailed,
-    #[allow(non_camel_case_types)] rmDirNoArg,
+    RemoveFailed,
+    RemoveDirNoArg,
 }
 
 impl CargoCacheDirs {
@@ -450,7 +450,7 @@ pub fn remove_dir_via_cmdline(
                 Ok(_) => {}
                 Err(_) => {
                     return Err((
-                        ErrorKind::rmFailed,
+                        ErrorKind::RemoveFailed,
                         format!("failed to remove directory {}", dir.display()),
                     ))
                 }
@@ -464,7 +464,7 @@ pub fn remove_dir_via_cmdline(
         Some(value) => value,
         None => {
             return Err((
-                ErrorKind::rmDirNoArg,
+                ErrorKind::RemoveDirNoArg,
                 "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
                     .to_string(),
             ))
