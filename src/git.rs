@@ -11,12 +11,14 @@ use humansize::{file_size_opts, FileSize};
 use lib::*;
 
 fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
+    // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_os_string().into_string().unwrap(),
         None => String::from("<unknown>"),
     };
 
     print!("Recompressing '{}': ", repo_name);
+    // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
         return Err((ErrorKind::GitRepoDirNotFound, format!("{}", path.display())));
     }
@@ -30,14 +32,16 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     let _ = stdout().flush(); // ignore errors
 
     if dry_run {
+        // don't do anything on dry run
         println!("{} ({}{})", sb_human_readable, "+", 0);
         Ok((0, 0))
     } else {
+        // validate that the directory is a git repo
         let repo = match git2::Repository::open(&path) {
             Ok(repo) => repo,
             Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
         };
-
+        let repo_path = repo.path();
         // delete all history of all checkouts and so on.
         // this will enable us to remove *all* dangling commits
         match Command::new("git")
@@ -45,18 +49,18 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .arg("expire")
             .arg("--expire=1.minute")
             .arg("--all")
-            .current_dir(repo.path())
+            .current_dir(repo_path)
             .output()
         {
             Ok(_) => {}
             Err(e) => return Err((ErrorKind::GitReflogFailed, format!("{:?}", e))),
         }
-        // pack refs of branches/tags etc
+        // pack refs of branches/tags etc into one file
         match Command::new("git")
             .arg("pack-refs")
             .arg("--all")
             .arg("--prune")
-            .current_dir(repo.path())
+            .current_dir(repo_path)
             .output()
         {
             Ok(_) => {}
@@ -68,11 +72,12 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .arg("gc")
             .arg("--aggressive")
             .arg("--prune=now")
-            .current_dir(repo.path())
+            .current_dir(repo_path)
             .output()
         {
             Ok(_) => {}
-            /* println!("git gc error\nstatus: {}", out.status);
+            /* debug:
+            println!("git gc error\nstatus: {}", out.status);
             println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
             println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
             //if out.status.success() {}
@@ -104,6 +109,7 @@ pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry
     for entry in fs::read_dir(&git_db_dir).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = format!("{}", repo.display());
+        // compress
         let (size_before, size_after) = match gc_repo(&repo, dry_run) {
             // run gc
             Ok((before, after)) => (before, after),
@@ -132,10 +138,11 @@ pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry
     // cd "../index"
     repo_index.pop();
     repo_index.push("index");
+
     for repo in fs::read_dir(repo_index).unwrap() {
         let repopath = repo.unwrap().path();
+        // run gc
         let (before, after) = match gc_repo(&repopath, dry_run) {
-            // run gc
             Ok((before, after)) => (before, after),
             Err((errorkind, msg)) => match errorkind {
                 ErrorKind::GitGCFailed => {
