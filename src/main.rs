@@ -159,7 +159,7 @@ fn main() {
         cargo_cache.print_dir_paths();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
-        run_gc(&cargo_cache, config.is_present("dry-run"));
+        git_gc_everything(&cargo_cache.git_db, &cargo_cache.registry_cache, config.is_present("dry-run"));
         size_changed = true;
     }
 

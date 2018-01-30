@@ -89,11 +89,10 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     }
 }
 
-pub fn run_gc(cargo_cache: &CargoCacheDirs, dry_run: bool) {
-    let git_db = &cargo_cache.git_db;
+pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry_run: bool) {
     // gc cloned git repos of crates or whatever
-    if !git_db.is_dir() {
-        println!("WARNING:   {} is not a directory", git_db.display());
+    if !git_db_dir.is_dir() {
+        println!("WARNING:   {} is not a directory", git_db_dir.display());
         return;
     }
     let mut total_size_before: u64 = 0;
@@ -101,7 +100,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, dry_run: bool) {
 
     println!("\nRecompressing repositories. Please be patient...");
     // gc git repos of crates
-    for entry in fs::read_dir(&git_db).unwrap() {
+    for entry in fs::read_dir(&git_db_dir).unwrap() {
         let repo = entry.unwrap().path();
         let repostr = format!("{}", repo.display());
         let (size_before, size_after) = match gc_repo(&repo, dry_run) {
@@ -128,7 +127,7 @@ pub fn run_gc(cargo_cache: &CargoCacheDirs, dry_run: bool) {
         total_size_after += size_after;
     }
     println!("Recompressing registries....");
-    let mut repo_index = (&cargo_cache.registry_cache).clone();
+    let mut repo_index = registry_cache_dir.clone();
     // cd "../index"
     repo_index.pop();
     repo_index.push("index");
