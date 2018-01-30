@@ -96,6 +96,43 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 
 #[cfg_attr(feature = "cargo-clippy", allow(stutter))]
 pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry_run: bool) {
+    // gc repos and registries inside cargo cache
+
+    fn gc_subdirs(path: &PathBuf, dry_run: bool) -> (u64, u64) {
+        // takes directory, finds all subdirectories and tries to gc those
+        let mut size_sum_before: u64 = 0;
+        let mut size_sum_after: u64 = 0;
+
+        for entry in fs::read_dir(&path).unwrap() {
+            let repo = entry.unwrap().path();
+            let repostr = format!("{}", repo.display());
+            // compress
+            let (size_before, size_after) = match gc_repo(&repo, dry_run) {
+                // run gc
+                Ok((before, after)) => (before, after),
+                Err((errorkind, msg)) => match errorkind {
+                    ErrorKind::GitGCFailed => {
+                        println!("Warning, git gc failed, skipping '{}'", repostr);
+                        println!("git error: '{}'", msg);
+                        continue;
+                    }
+                    ErrorKind::GitRepoDirNotFound => {
+                        println!("Git repo not found: '{}'", msg);
+                        continue;
+                    }
+                    ErrorKind::GitRepoNotOpened => {
+                        println!("Failed to parse git repo: '{}'", msg);
+                        continue;
+                    }
+                    _ => unreachable!(),
+                },
+            };
+            size_sum_before += size_before;
+            size_sum_after += size_after;
+        }
+        (size_sum_before, size_sum_after)
+    } // fn
+
     // gc cloned git repos of crates or whatever
     if !git_db_dir.is_dir() {
         println!("WARNING:   {} is not a directory", git_db_dir.display());
@@ -106,65 +143,19 @@ pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry
 
     println!("\nRecompressing repositories. Please be patient...");
     // gc git repos of crates
-    for entry in fs::read_dir(&git_db_dir).unwrap() {
-        let repo = entry.unwrap().path();
-        let repostr = format!("{}", repo.display());
-        // compress
-        let (size_before, size_after) = match gc_repo(&repo, dry_run) {
-            // run gc
-            Ok((before, after)) => (before, after),
-            Err((errorkind, msg)) => match errorkind {
-                ErrorKind::GitGCFailed => {
-                    println!("Warning, git gc failed, skipping '{}'", repostr);
-                    println!("git error: '{}'", msg);
-                    continue;
-                }
-                ErrorKind::GitRepoDirNotFound => {
-                    println!("Git repo not found: '{}'", msg);
-                    continue;
-                }
-                ErrorKind::GitRepoNotOpened => {
-                    println!("Failed to parse git repo: '{}'", msg);
-                    continue;
-                }
-                _ => unreachable!(),
-            },
-        };
-        total_size_before += size_before;
-        total_size_after += size_after;
-    }
+    let (repos_before, repos_after) = gc_subdirs(git_db_dir, dry_run);
+    total_size_before += repos_before;
+    total_size_after += repos_after;
+
     println!("Recompressing registries....");
     let mut repo_index = registry_cache_dir.clone();
     // cd "../index"
     repo_index.pop();
     repo_index.push("index");
-
-    for repo in fs::read_dir(repo_index).unwrap() {
-        let repopath = repo.unwrap().path();
-        // run gc
-        let (before, after) = match gc_repo(&repopath, dry_run) {
-            Ok((before, after)) => (before, after),
-            Err((errorkind, msg)) => match errorkind {
-                ErrorKind::GitGCFailed => {
-                    println!("Warning, git gc failed, skipping '{}'", repopath.display());
-                    println!("git error: '{}'", msg);
-                    continue;
-                }
-                ErrorKind::GitRepoDirNotFound => {
-                    println!("Git repo not found: {}", msg);
-                    continue;
-                }
-                ErrorKind::GitRepoNotOpened => {
-                    println!("Failed to parse git repo: '{}'", msg);
-                    continue;
-                }
-                _ => unreachable!(),
-            },
-        };
-
-        total_size_before += before;
-        total_size_after += after;
-    } // iterate over registries and gc them
+    // gc registries
+    let (regs_before, regs_after) = gc_subdirs(&repo_index, dry_run);
+    total_size_before += regs_before;
+    total_size_after += regs_after;
 
     println!(
         "Compressed {} to {}",
