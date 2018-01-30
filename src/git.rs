@@ -89,6 +89,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     }
 }
 
+#[cfg_attr(feature = "cargo-clippy", allow(stutter))]
 pub fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry_run: bool) {
     // gc cloned git repos of crates or whatever
     if !git_db_dir.is_dir() {
