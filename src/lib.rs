@@ -245,7 +245,7 @@ pub fn rm_old_crates(
         crate_list.reverse();
 
         let mut versions_of_this_package = 0;
-        let mut last_pkgname = String::from("");
+        let mut last_pkgname = String::new();
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
             let path_end = match pkgpath.into_iter().last() {
@@ -486,7 +486,7 @@ pub fn remove_dir_via_cmdline(
     let mut rm_registry_crate_cache = false;
 
     // validate input
-    let mut invalid_dirs = String::from("");
+let mut invalid_dirs = String::new();
     let mut terminate: bool = false;
 
     for word in &inputs {
