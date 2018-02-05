@@ -352,7 +352,7 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     );
-    println!("\t\t\tNote: removed crate sources will be redownloaded if neccessary");
+    println!("\t\t\tNote: removed crate sources will be redownloaded if necessary");
     println!("Found registry unpacked sources");
     println!(
         "\t\t\t'{}', size: {}",
@@ -371,7 +371,7 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     );
-    println!("\t\t\tNote: removed git repositories will be recloned if neccessary");
+    println!("\t\t\tNote: removed git repositories will be recloned if necessary");
     println!("Found git repo checkouts:");
     println!(
         "\t\t\t'{}', size: {}",
@@ -381,7 +381,7 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
             .unwrap()
     );
     println!(
-        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if neccessary (no net access needed, if repos are up-to-date)."
+        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if necessary (no net access needed, if repos are up-to-date)."
     );
 }
 
@@ -486,7 +486,7 @@ pub fn remove_dir_via_cmdline(
     let mut rm_registry_crate_cache = false;
 
     // validate input
-let mut invalid_dirs = String::new();
+    let mut invalid_dirs = String::new();
     let mut terminate: bool = false;
 
     for word in &inputs {
