@@ -9,9 +9,9 @@ keywords = ["cargo", "cache", "delete", "manage","size"]
 
 [dependencies]
 # https://github.com/kbknapp/clap-rs
-clap = "2.29" # cmdline arg parsing
+clap = "2.30" # cmdline arg parsing
 # https://github.com/BurntSushi/walkdir
-walkdir = "2.0" # walk content of directory/CARGO_HOME recursively
+walkdir = "2.1" # walk content of directory/CARGO_HOME recursively
 # https://github.com/LeopoldArkham/humansize
 humansize = "1.0" # convert digits of bytes to human readable size
 # https://github.com/rust/cargo
@@ -19,7 +19,7 @@ cargo = "0.24" # get CARGO_HOME
 # https://github.com/alexcrichton/git2-rs
 git2 = "0.6" # check if repo is git repo
 # https://github.com/rayon-rs/rayon
-rayon = "0.9" # parallel for loops 
+rayon = "1.0" # parallel for loops
 
 [[bin]]
 path = "src/main.rs"
