@@ -160,13 +160,13 @@ impl CargoCacheDirs {
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
         Ok(CargoCacheDirs {
-            cargo_home: cargo_home,
+            cargo_home,
             bin_dir: bin,
-            registry: registry,
+            registry,
             registry_cache: reg_cache,
             registry_sources: reg_src,
-            git_db: git_db,
-            git_checkouts: git_checkouts,
+            git_db,
+            git_checkouts,
         })
     }
 
