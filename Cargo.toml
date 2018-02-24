@@ -30,3 +30,4 @@ travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
 [profile.release]
 lto = true
+codegen-units=1
