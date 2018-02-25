@@ -534,28 +534,16 @@ pub fn remove_dir_via_cmdline(
     }
     // finally delete
     if rm_git_checkouts {
-        match rm(&ccd.git_checkouts, dry_run, size_changed) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+        rm(&ccd.git_checkouts, dry_run, size_changed)?
     }
     if rm_git_repos {
-        match rm(&ccd.git_db, dry_run, size_changed) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+        rm(&ccd.git_db, dry_run, size_changed)?
     }
     if rm_registry_sources {
-        match rm(&ccd.registry_sources, dry_run, size_changed) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+        rm(&ccd.registry_sources, dry_run, size_changed)?
     }
     if rm_registry_crate_cache {
-        match rm(&ccd.registry_cache, dry_run, size_changed) {
-            Ok(_) => {}
-            Err(e) => return Err(e),
-        }
+       rm(&ccd.registry_cache, dry_run, size_changed)?
     }
     Ok(())
 }
