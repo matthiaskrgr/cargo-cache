@@ -543,7 +543,7 @@ pub fn remove_dir_via_cmdline(
         rm(&ccd.registry_sources, dry_run, size_changed)?
     }
     if rm_registry_crate_cache {
-       rm(&ccd.registry_cache, dry_run, size_changed)?
+        rm(&ccd.registry_cache, dry_run, size_changed)?
     }
     Ok(())
 }
