@@ -14,7 +14,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_os_string().into_string().unwrap(),
-        None => String::from("<unknown>"),
+        None => "<unknown>".to_string(),
     };
 
     print!("Recompressing '{}': ", repo_name);
@@ -33,7 +33,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 
     if dry_run {
         // don't do anything on dry run
-        println!("{} ({}{})", sb_human_readable, "+", 0);
+        println!("{} (+{})", sb_human_readable, 0);
         Ok((0, 0))
     } else {
         // validate that the directory is a git repo
