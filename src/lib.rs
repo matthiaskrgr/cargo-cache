@@ -205,6 +205,10 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         let path = entry.path();
         files.push(path.to_owned());
     }
+	
+	let file2 = WalkDir::new(format!("{}", dir.display()));
+    
+    
     // parallelize using rayon
     let sizes_sum = files
         .par_iter()
