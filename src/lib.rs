@@ -201,10 +201,11 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // traverse recursively and sum filesizes
     let mut files = Vec::new();
     for entry in WalkDir::new(format!("{}", dir.display())) {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        files.push(path.to_owned());
+        files.push(entry.unwrap().path().to_owned());
     }
+    // would like to get rid of the vector here but not sure how to convert
+    // WalkDir iterator into rayon par_iter
+
     // parallelize using rayon
     let sizes_sum = files
         .par_iter()
