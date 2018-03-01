@@ -1,5 +1,4 @@
 
-extern crate cargo;
 extern crate walkdir;
 
 use std::fs;
