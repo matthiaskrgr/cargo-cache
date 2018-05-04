@@ -33,7 +33,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 
     if dry_run {
         // don't do anything on dry run
-        println!("{} ({}{})", sb_human_readable, "+", 0);
+        println!("{} (+0)", sb_human_readable);
         Ok((0, 0))
     } else {
         // validate that the directory is a git repo

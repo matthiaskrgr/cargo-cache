@@ -160,13 +160,13 @@ impl CargoCacheDirs {
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
         Ok(CargoCacheDirs {
-            cargo_home: cargo_home,
+            cargo_home,
             bin_dir: bin,
-            registry: registry,
+            registry,
             registry_cache: reg_cache,
             registry_sources: reg_src,
-            git_db: git_db,
-            git_checkouts: git_checkouts,
+            git_db,
+            git_checkouts,
         })
     }
 
@@ -408,7 +408,7 @@ pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool
                 size_before_human_readabel, size_after_human_readable
             )
         } else {
-            format!("{}", size_after_human_readable)
+            size_after_human_readable
         }
     } else if dspl_sze_before {
         format!(
@@ -469,6 +469,7 @@ pub fn remove_dir_via_cmdline(
         }
     };
 
+    //@TODO remove vec
     let inputs = input.split(',').collect::<Vec<&str>>();
     let valid_dirs = vec![
         "git-db",
