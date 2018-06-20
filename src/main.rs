@@ -16,15 +16,15 @@ extern crate clap;
 extern crate humansize;
 extern crate walkdir;
 
-mod lib;
 mod git;
+mod lib;
 use std::{fs, process};
 
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts, FileSize};
 
-use lib::*;
 use git::*;
+use lib::*;
 
 fn main() {
     // parse args
