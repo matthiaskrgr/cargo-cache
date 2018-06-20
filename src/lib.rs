@@ -211,10 +211,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
         .par_iter()
         .map(|f| {
             fs::metadata(f)
-                .expect(&format!(
-                    "Failed to get metadata of file '{}'",
-                    &dir.display()
-                ))
+                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &dir.display()))
                 .len()
         })
         .sum();
@@ -263,10 +260,9 @@ pub fn rm_old_crates(
 
             if amount_to_keep == 0 {
                 removed_size += fs::metadata(pkgpath)
-                    .expect(&format!(
-                        "Failed to get metadata of file '{}'",
-                        &pkgpath.display()
-                    ))
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to get metadata of file '{}'", &pkgpath.display())
+                    })
                     .len();
                 if dry_run {
                     println!(
@@ -277,8 +273,9 @@ pub fn rm_old_crates(
                     );
                 } else {
                     println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                    fs::remove_file(pkgpath)
-                        .expect(&format!("Failed to remove file '{}'", pkgpath.display()));
+                    fs::remove_file(pkgpath).unwrap_or_else(|_| {
+                        panic!("Failed to remove file '{}'", pkgpath.display())
+                    });
                     *size_changed = true;
                 }
                 continue;
@@ -290,10 +287,9 @@ pub fn rm_old_crates(
                 if versions_of_this_package == amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath)
-                        .expect(&format!(
-                            "Failed to get metadata of file '{}'",
-                            &pkgpath.display()
-                        ))
+                        .unwrap_or_else(|_| {
+                            panic!("Failed to get metadata of file '{}'", &pkgpath.display())
+                        })
                         .len();
                     if dry_run {
                         println!(
@@ -304,8 +300,9 @@ pub fn rm_old_crates(
                         );
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                        fs::remove_file(pkgpath)
-                            .expect(&format!("Failed to remove file '{}'", pkgpath.display()));
+                        fs::remove_file(pkgpath).unwrap_or_else(|_| {
+                            panic!("Failed to remove file '{}'", pkgpath.display())
+                        });
                         *size_changed = true;
                     }
                 }
