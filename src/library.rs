@@ -369,6 +369,7 @@ pub(crate) fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
+#[cfg_attr(feature = "cargo-clippy", allow(cast_possible_wrap))]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
@@ -379,7 +380,9 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
     let size_before_human_readabel = size_before.file_size(file_size_opts::DECIMAL).unwrap();
     // percentage
+    #[cfg_attr(feature = "cargo-clippy", allow(cast_precision_loss))]
     let percentage: f64 =
+
         ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
     // format
     let percentage = format!("{:.*}", 2, percentage);
