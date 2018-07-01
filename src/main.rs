@@ -22,14 +22,14 @@ extern crate humansize;
 extern crate walkdir;
 
 mod git;
-mod lib;
+mod library;
 use std::{fs, process};
 
 use clap::{App, Arg, SubCommand};
 use humansize::{file_size_opts, FileSize};
 
 use git::*;
-use lib::*;
+use library::*;
 
 fn main() {
     // parse args

@@ -8,7 +8,7 @@ use std::process::Command;
 
 use humansize::{file_size_opts, FileSize};
 
-use lib::*;
+use library::*;
 
 fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
     // get name of the repo (last item of path)
