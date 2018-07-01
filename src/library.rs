@@ -474,11 +474,7 @@ pub(crate) fn remove_dir_via_cmdline(
     let mut terminate: bool = false;
 
     for word in &inputs {
-        if !valid_dirs.contains(word) {
-            // collect all invalid dirs and print all of them as merged string later
-            invalid_dirs.push_str(&format!("{} ", &word));
-            terminate = true;
-        } else {
+        if valid_dirs.contains(word) {
             // dir is recognized
             // dedupe
             match *word {
@@ -506,6 +502,10 @@ pub(crate) fn remove_dir_via_cmdline(
                 }
                 _ => unreachable!(),
             } // match *word
+        } else  {
+            // collect all invalid dirs and print all of them as merged string later
+            invalid_dirs.push_str(&format!("{} ", &word));
+            terminate = true;
         }
     } // for word in &inputs
     if terminate {
