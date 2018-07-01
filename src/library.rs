@@ -28,10 +28,10 @@ pub(crate) struct DirSizesCollector {
 }
 
 impl DirSizesCollector {
-    pub(crate) fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
+    pub(crate) fn new(ccd: &CargoCacheDirs) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
 
-        DirSizesCollector {
+        Self {
             total_size: cumulative_dir_size(&ccd.cargo_home).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
@@ -113,7 +113,7 @@ pub(crate) enum ErrorKind {
 }
 
 impl CargoCacheDirs {
-    pub(crate) fn new() -> Result<CargoCacheDirs, (ErrorKind, String)> {
+    pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
             Err(_) => {
@@ -144,7 +144,7 @@ impl CargoCacheDirs {
         let git_db = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
-        Ok(CargoCacheDirs {
+        Ok(Self {
             cargo_home,
             bin_dir: bin,
             registry,
