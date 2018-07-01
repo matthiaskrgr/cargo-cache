@@ -6,7 +6,6 @@ use std::path::PathBuf;
 
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
-// why self:: ??
 use self::rayon::prelude::*;
 
 pub(crate) struct DirInfoObj {
