@@ -18,7 +18,6 @@
 #![cfg_attr(feature = "cargo-clippy", warn(string_add, string_add_assign))]
 #![cfg_attr(feature = "cargo-clippy", warn(needless_borrow))]
 
-
 #[macro_use]
 extern crate clap;
 extern crate humansize;

@@ -17,14 +17,14 @@ pub(crate) struct DirInfoObj {
 }
 
 pub(crate) struct DirSizesCollector {
-    pub(crate) total_size: u64,       // total size of cargo root dir
-    numb_bins: u64,            // number of binaries found
-    total_bin_size: u64,       // total size of binaries found
-    total_reg_size: u64,       // registry size
-    total_git_db_size: u64,    // git db size
-    total_git_chk_size: u64,   // git checkout size
-    total_reg_cache_size: u64, // registry cache size
-    total_reg_src_size: u64,   // registry sources size
+    pub(crate) total_size: u64, // total size of cargo root dir
+    numb_bins: u64,             // number of binaries found
+    total_bin_size: u64,        // total size of binaries found
+    total_reg_size: u64,        // registry size
+    total_git_db_size: u64,     // git db size
+    total_git_chk_size: u64,    // git checkout size
+    total_reg_cache_size: u64,  // registry cache size
+    total_reg_src_size: u64,    // registry sources size
 }
 
 impl DirSizesCollector {
@@ -369,7 +369,7 @@ pub(crate) fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-#[cfg_attr(feature = "cargo-clippy", allow(cast_possible_wrap))]
+    #[cfg_attr(feature = "cargo-clippy", allow(cast_possible_wrap))]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
@@ -382,7 +382,6 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     // percentage
     #[cfg_attr(feature = "cargo-clippy", allow(cast_precision_loss))]
     let percentage: f64 =
-
         ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
     // format
     let percentage = format!("{:.*}", 2, percentage);
@@ -505,7 +504,7 @@ pub(crate) fn remove_dir_via_cmdline(
                 }
                 _ => unreachable!(),
             } // match *word
-        } else  {
+        } else {
             // collect all invalid dirs and print all of them as merged string later
             invalid_dirs.push_str(&format!("{} ", &word));
             terminate = true;
