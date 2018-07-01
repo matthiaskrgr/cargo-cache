@@ -1,7 +1,5 @@
 extern crate cargo;
-extern crate humansize;
 extern crate rayon;
-extern crate walkdir;
 
 use std::fs;
 use std::path::PathBuf;
@@ -11,15 +9,15 @@ use walkdir::WalkDir;
 // why self:: ??
 use self::rayon::prelude::*;
 
-pub struct DirInfoObj {
+pub(crate) struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
-    pub dir_size: u64,
-    pub file_number: u64,
+    pub(crate) dir_size: u64,
+    pub(crate) file_number: u64,
 }
 
-pub struct DirSizesCollector {
-    pub total_size: u64,       // total size of cargo root dir
+pub(crate) struct DirSizesCollector {
+    pub(crate) total_size: u64,       // total size of cargo root dir
     numb_bins: u64,            // number of binaries found
     total_bin_size: u64,       // total size of binaries found
     total_reg_size: u64,       // registry size
@@ -30,7 +28,7 @@ pub struct DirSizesCollector {
 }
 
 impl DirSizesCollector {
-    pub fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
+    pub(crate) fn new(ccd: &CargoCacheDirs) -> DirSizesCollector {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
 
         DirSizesCollector {
@@ -44,7 +42,7 @@ impl DirSizesCollector {
             total_reg_src_size: cumulative_dir_size(&ccd.registry_sources).dir_size,
         }
     }
-    pub fn print_pretty(&self, ccd: &CargoCacheDirs) {
+    pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
         println!("Cargo cache '{}':\n", &ccd.cargo_home.display());
         println!(
             "Total size:                   {} ",
@@ -90,17 +88,17 @@ impl DirSizesCollector {
     }
 }
 
-pub struct CargoCacheDirs {
-    pub cargo_home: PathBuf,
-    pub bin_dir: PathBuf,
-    pub registry: PathBuf,
-    pub registry_cache: PathBuf,
-    pub registry_sources: PathBuf,
-    pub git_db: PathBuf,
-    pub git_checkouts: PathBuf,
+pub(crate) struct CargoCacheDirs {
+    pub(crate) cargo_home: PathBuf,
+    pub(crate) bin_dir: PathBuf,
+    pub(crate) registry: PathBuf,
+    pub(crate) registry_cache: PathBuf,
+    pub(crate) registry_sources: PathBuf,
+    pub(crate) git_db: PathBuf,
+    pub(crate) git_checkouts: PathBuf,
 }
 
-pub enum ErrorKind {
+pub(crate) enum ErrorKind {
     GitRepoNotOpened,
     GitRepoDirNotFound,
     GitGCFailed,
@@ -115,7 +113,7 @@ pub enum ErrorKind {
 }
 
 impl CargoCacheDirs {
-    pub fn new() -> Result<CargoCacheDirs, (ErrorKind, String)> {
+    pub(crate) fn new() -> Result<CargoCacheDirs, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
             Err(_) => {
@@ -157,7 +155,7 @@ impl CargoCacheDirs {
         })
     }
 
-    pub fn print_dir_paths(&self) {
+    pub(crate) fn print_dir_paths(&self) {
         println!();
         println!("binaries directory:           {}", &self.bin_dir.display());
         println!("registry directory:           {}", &self.registry.display());
@@ -177,7 +175,7 @@ impl CargoCacheDirs {
     }
 }
 
-pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
+pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
         return DirInfoObj {
@@ -209,7 +207,7 @@ pub fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     }
 }
 
-pub fn rm_old_crates(
+pub(crate) fn rm_old_crates(
     amount_to_keep: u64,
     dry_run: bool,
     registry_src_path: &PathBuf,
@@ -307,7 +305,7 @@ pub fn rm_old_crates(
     Ok(())
 }
 
-pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
+pub(crate) fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",
@@ -370,7 +368,7 @@ pub fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     );
 }
 
-pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
+pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
@@ -412,7 +410,7 @@ pub fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool
     }
 }
 
-pub fn remove_dir_via_cmdline(
+pub(crate) fn remove_dir_via_cmdline(
     directory: Option<&str>,
     dry_run: bool,
     ccd: &CargoCacheDirs,
