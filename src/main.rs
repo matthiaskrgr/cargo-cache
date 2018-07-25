@@ -1,21 +1,37 @@
 // these [allow()] by default, make them warn:
 #![warn(
-    ellipsis_inclusive_range_patterns, single_use_lifetimes, trivial_casts, trivial_numeric_casts,
-    unreachable_pub, unsafe_code, unused
+    ellipsis_inclusive_range_patterns,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unsafe_code,
+    unused
 )]
 // enable additional clippy warnings
 #![cfg_attr(
     feature = "cargo-clippy",
     warn(
-        clippy, clippy_correctness, clippy_perf, clippy_complexity, clippy_style, clippy_pedantic,
+        clippy,
+        clippy_correctness,
+        clippy_perf,
+        clippy_complexity,
+        clippy_style,
+        clippy_pedantic,
         clippy_nursery
     )
 )]
 //#![cfg_attr(feature = "cargo-clippy", warn(clippy_cargo))]
 // additional warnings from "cippy_restriction" group
-#![cfg_attr(feature = "cargo-clippy", warn(shadow_reuse, shadow_same, shadow_unrelated))]
+#![cfg_attr(
+    feature = "cargo-clippy",
+    warn(shadow_reuse, shadow_same, shadow_unrelated)
+)]
 #![cfg_attr(feature = "cargo-clippy", warn(pub_enum_variant_names))]
-#![cfg_attr(feature = "cargo-clippy", warn(string_add, string_add_assign))]
+#![cfg_attr(
+    feature = "cargo-clippy",
+    warn(string_add, string_add_assign)
+)]
 #![cfg_attr(feature = "cargo-clippy", warn(needless_borrow))]
 
 #[macro_use]

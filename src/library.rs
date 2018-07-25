@@ -4,9 +4,9 @@ extern crate rayon;
 use std::fs;
 use std::path::PathBuf;
 
+use self::rayon::prelude::*;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
-use self::rayon::prelude::*;
 
 pub(crate) struct DirInfoObj {
     // make sure we do not accidentally confuse dir_size and file_number
