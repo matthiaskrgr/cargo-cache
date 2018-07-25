@@ -1,3 +1,5 @@
+cargo-features = ["edition"]
+
 [package]
 name = "cargo-cache"
 version = "0.1.0"
@@ -6,6 +8,7 @@ description = "Manage cargo cache, show sizes and delete directories."
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
 repository = "https://github.com/matthiaskrgr/cargo-cache"
 keywords = ["cargo", "cache", "delete", "manage","size"]
+edition = "2018"
 
 [dependencies]
 # https://github.com/kbknapp/clap-rs

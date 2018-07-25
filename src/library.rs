@@ -1,11 +1,8 @@
-extern crate cargo;
-extern crate rayon;
-
 use std::fs;
 use std::path::PathBuf;
 
-use self::rayon::prelude::*;
 use humansize::{file_size_opts, FileSize};
+use rayon::iter::*;
 use walkdir::WalkDir;
 
 pub(crate) struct DirInfoObj {

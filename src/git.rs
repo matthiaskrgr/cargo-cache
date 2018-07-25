@@ -1,5 +1,3 @@
-extern crate git2;
-
 use std::fs;
 use std::io::{stdout, Write};
 use std::path::PathBuf;
@@ -7,7 +5,7 @@ use std::process::Command;
 
 use humansize::{file_size_opts, FileSize};
 
-use library::*;
+use crate::library::*;
 
 fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
     // get name of the repo (last item of path)

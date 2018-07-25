@@ -6,7 +6,8 @@
     trivial_numeric_casts,
     unreachable_pub,
     unsafe_code,
-    unused
+    unused,
+    rust_2018_idioms
 )]
 // enable additional clippy warnings
 #![cfg_attr(
@@ -34,20 +35,15 @@
 )]
 #![cfg_attr(feature = "cargo-clippy", warn(needless_borrow))]
 
-#[macro_use]
-extern crate clap;
-extern crate humansize;
-extern crate walkdir;
-
 mod git;
 mod library;
 use std::{fs, process};
 
-use clap::{App, Arg, SubCommand};
+use clap::{crate_version, value_t, App, Arg, SubCommand};
 use humansize::{file_size_opts, FileSize};
 
-use git::*;
-use library::*;
+use crate::git::*;
+use crate::library::*;
 
 fn main() {
     // parse args
