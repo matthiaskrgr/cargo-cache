@@ -1,5 +1,7 @@
 Requires rust 1.29 (due to rust 2018 edition usage).
 
+DISCLAIMER: I only tested this on linux.
+
 Sample output:
 ````
 Cargo cache '/home/matthias/.cargo':
