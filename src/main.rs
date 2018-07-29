@@ -67,7 +67,7 @@ fn main() {
                         .help("List found directory paths."),
                 )
                 .arg(Arg::with_name("remove-dir").short("r").long("remove-dir")
-                    .help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
+                    .help("Remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
                     .takes_value(true).value_name("dir1,dir2,dir3"),
                 )
                 .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
@@ -78,15 +78,15 @@ fn main() {
                         .short("i")
                         .long("info")
                         .conflicts_with("list-dirs")
-                        .help("give information on directories"),
+                        .help("Give information on directories"),
                 )
                 .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
-                .help("remove all but N versions of duplicate crates in the source cache")
+                .help("Remove all but N versions of duplicate crates in the source cache")
                 .takes_value(true).value_name("N"),
                 )
                 .arg(
                     Arg::with_name("dry-run")
-                    .short("d").long("dry-run").help("don't remove anything, just pretend"),
+                    .short("d").long("dry-run").help("Don't remove anything, just pretend"),
                 )
                 .arg(
                     Arg::with_name("autoclean")
@@ -104,7 +104,7 @@ fn main() {
                 .help("List found directory paths."),
         )
         .arg(Arg::with_name("remove-dir").short("r").long("remove-dir")
-            .help("remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
+            .help("Remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
             .takes_value(true).value_name("dir1,dir2,dir3")
             ,)
         .arg(Arg::with_name("gc-repos").short("g").long("gc").help(
@@ -115,16 +115,16 @@ fn main() {
                 .short("i")
                 .long("info")
                 .conflicts_with("list-dirs")
-                .help("give information on directories"),
+                .help("Give information on directories"),
         )
         .arg(Arg::with_name("keep-duplicate-crates").short("k").long("keep-duplicate-crates")
-            .help("remove all but N versions of duplicate crates in the source cache")
+            .help("Remove all but N versions of duplicate crates in the source cache")
             .takes_value(true).value_name("N"),
         )
 
         .arg(
             Arg::with_name("dry-run")
-            .short("d").long("dry-run").help("don't remove anything, just pretend"),
+            .short("d").long("dry-run").help("Don't remove anything, just pretend"),
         )
         .arg(
             Arg::with_name("autoclean")
