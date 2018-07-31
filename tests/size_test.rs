@@ -55,5 +55,31 @@ mod sizetests {
             "libc-0.2.42.crate",
             libc.unwrap().unwrap().path().file_name().unwrap()
         );
+        // make sure cargo cache is built
+        let cargo_build = Command::new("cargo").arg("build").output();
+        assert!(cargo_build.is_ok(), "could not build cargo cache");
+        // run it on the fake cargo cache dir
+        let cargo_cache = Command::new("target/debug/cargo-cache")
+            .env("CARGO_HOME", &fchp)
+            .output();
+        assert!(cargo_cache.is_ok(), "cargo cache failed to run");
+        let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
+        // we need to get the actual path to fake cargo home dir and make it an absolute path
+        let absolute_fchp = PathBuf::from(&fchp).canonicalize().unwrap();
+        let mut desired_output = format!("Cargo cache '{}':\n\n", absolute_fchp.display());
+
+        desired_output.push_str(
+            "Total size:                   66.57 MB
+Size of 0 installed binaries:     0 B
+Size of registry:                  66.57 MB
+Size of registry crate cache:           407.94 KB
+Size of registry source checkouts:      2.04 MB
+Size of git db:                    0 B
+Size of git repo checkouts:        0 B\n",
+        );
+
+        assert_eq!(desired_output, cc_output);
+
+        //    panic!();
     }
 }

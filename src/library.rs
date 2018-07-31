@@ -41,42 +41,42 @@ impl DirSizesCollector {
     pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
         println!("Cargo cache '{}':\n", &ccd.cargo_home.display());
         println!(
-            "Total size:                   {} ",
+            "Total size:                   {}",
             self.total_size.file_size(file_size_opts::DECIMAL).unwrap()
         );
         println!(
-            "Size of {} installed binaries:     {} ",
+            "Size of {} installed binaries:     {}",
             self.numb_bins,
             self.total_bin_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of registry:                  {} ",
+            "Size of registry:                  {}",
             self.total_reg_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of registry crate cache:           {} ",
+            "Size of registry crate cache:           {}",
             self.total_reg_cache_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of registry source checkouts:      {} ",
+            "Size of registry source checkouts:      {}",
             self.total_reg_src_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of git db:                    {} ",
+            "Size of git db:                    {}",
             self.total_git_db_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of git repo checkouts:        {} ",
+            "Size of git repo checkouts:        {}",
             self.total_git_chk_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
