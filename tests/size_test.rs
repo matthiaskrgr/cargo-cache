@@ -9,13 +9,19 @@ mod sizetests {
 
     #[test]
     fn build_and_check_size_test() {
-        // move into the directory of our dummy cra
+        // move into the directory of our dummy crate
+        // set a fake CARGO_HOME and build the dummy crate there
         let crate_path = PathBuf::from("tests/size_test/");
         let status = Command::new("cargo")
             .arg("check")
             .current_dir(&crate_path)
             .env("CARGO_HOME", "fake_cargo_home")
             .output();
-        assert!(status.is_ok());
+        // make sure the build succeeded
+        assert!(status.is_ok(), "build of dummy crate did not succeed");
+        assert!(
+            PathBuf::from("tests/size_test/fake_cargo_home").is_dir(),
+            "fake cargo home was not created!"
+        );
     }
 }
