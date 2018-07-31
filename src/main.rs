@@ -7,6 +7,7 @@
     unreachable_pub,
     unsafe_code,
     unused,
+    rust_2018_compatibility,
     rust_2018_idioms
 )]
 // enable additional clippy warnings
@@ -19,21 +20,16 @@
         clippy_complexity,
         clippy_style,
         clippy_pedantic,
-        clippy_nursery
+        clippy_nursery,
+        shadow_reuse,
+        shadow_same,
+        shadow_unrelated,
+        pub_enum_variant_names,
+        string_add,
+        string_add_assign,
+        needless_borrow
     )
 )]
-//#![cfg_attr(feature = "cargo-clippy", warn(clippy_cargo))]
-// additional warnings from "cippy_restriction" group
-#![cfg_attr(
-    feature = "cargo-clippy",
-    warn(shadow_reuse, shadow_same, shadow_unrelated)
-)]
-#![cfg_attr(feature = "cargo-clippy", warn(pub_enum_variant_names))]
-#![cfg_attr(
-    feature = "cargo-clippy",
-    warn(string_add, string_add_assign)
-)]
-#![cfg_attr(feature = "cargo-clippy", warn(needless_borrow))]
 
 mod git;
 mod library;
