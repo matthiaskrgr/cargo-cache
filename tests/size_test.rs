@@ -77,9 +77,7 @@ Size of registry source checkouts:      2.04 MB
 Size of git db:                    0 B
 Size of git repo checkouts:        0 B\n",
         );
-
+        // make sure the sizes match
         assert_eq!(desired_output, cc_output);
-
-        //    panic!();
     }
 }
