@@ -194,8 +194,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
             fs::metadata(f)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &dir.display()))
                 .len()
-        })
-        .sum();
+        }).sum();
 
     DirInfoObj {
         dir_size: sizes_sum,
@@ -243,8 +242,7 @@ pub(crate) fn rm_old_crates(
                 removed_size += fs::metadata(pkgpath)
                     .unwrap_or_else(|_| {
                         panic!("Failed to get metadata of file '{}'", &pkgpath.display())
-                    })
-                    .len();
+                    }).len();
                 if dry_run {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
@@ -270,8 +268,7 @@ pub(crate) fn rm_old_crates(
                     removed_size += fs::metadata(pkgpath)
                         .unwrap_or_else(|_| {
                             panic!("Failed to get metadata of file '{}'", &pkgpath.display())
-                        })
-                        .len();
+                        }).len();
                     if dry_run {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
