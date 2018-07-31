@@ -30,31 +30,27 @@ mod sizetests {
         registry_cache_path.push("registry");
         registry_cache_path.push("cache");
         assert!(registry_cache_path.is_dir(), "no registry cache found");
-        let mut dirs = WalkDir::new(registry_cache_path).min_depth(2).into_iter();
-        // make sure we have all the items, unroll the iterator
-        let pkg_cfg = dirs.next();
-        let cc = dirs.next();
-        let unicode = dirs.next();
-        let libc = dirs.next();
-        let empty = dirs.next(); // should be None
-        assert!(empty.is_none(), "did not find exactly 4 downloaded crates!");
+
+        let mut filenames = WalkDir::new(registry_cache_path)
+            .min_depth(2)
+            .into_iter()
+            .map(|dir| dir.unwrap().path().file_name().unwrap().to_owned())
+            .collect::<Vec<_>>();
+        filenames.sort();
+
         // make sure the filenames all match
+        assert!(filenames.len() == 4);
+
         assert_eq!(
-            "pkg-config-0.3.12.crate",
-            pkg_cfg.unwrap().unwrap().path().file_name().unwrap()
+            filenames,
+            [
+                "cc-1.0.18.crate",
+                "libc-0.2.42.crate",
+                "pkg-config-0.3.12.crate",
+                "unicode-xid-0.0.4.crate"
+            ]
         );
-        assert_eq!(
-            "cc-1.0.18.crate",
-            cc.unwrap().unwrap().path().file_name().unwrap()
-        );
-        assert_eq!(
-            "unicode-xid-0.0.4.crate",
-            unicode.unwrap().unwrap().path().file_name().unwrap()
-        );
-        assert_eq!(
-            "libc-0.2.42.crate",
-            libc.unwrap().unwrap().path().file_name().unwrap()
-        );
+
         // make sure cargo cache is built
         let cargo_build = Command::new("cargo").arg("build").output();
         assert!(cargo_build.is_ok(), "could not build cargo cache");
