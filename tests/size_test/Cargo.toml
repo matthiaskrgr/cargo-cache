@@ -1,0 +1,11 @@
+[package]
+name = "size_test"
+version = "0.1.0"
+authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
+
+[dependencies]
+# some packages that don't have any dependencies so we can know their exact sizes
+cc = "1.0.18"
+pkg-config = "0.3.12"
+libc = "0.2.42"
+unicode-xid = "0.0.4"
