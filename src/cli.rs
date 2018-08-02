@@ -14,6 +14,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .short("g")
         .long("gc")
         .help("Recompress git repositories (may take some time).");
+
     let info = Arg::with_name("info")
         .short("i")
         .long("info")
