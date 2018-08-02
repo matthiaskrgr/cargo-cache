@@ -67,9 +67,9 @@ mod sizetests {
         //@TODO this won't work because git repo is constantly growing
 
         desired_output.push_str(
-            "Total size:                   66.57 MB
+            "Total size:                   120.39 MB
 Size of 0 installed binaries:     0 B
-Size of registry:                  66.57 MB
+Size of registry:                  120.39 MB
 Size of registry crate cache:           407.94 KB
 Size of registry source checkouts:      2.04 MB
 Size of git db:                    0 B
