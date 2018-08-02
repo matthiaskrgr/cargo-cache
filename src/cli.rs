@@ -1,4 +1,4 @@
-use clap::{crate_version, App, Arg, ArgMatches, SubCommand};
+use clap::{crate_version, App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let list_dirs = Arg::with_name("list-dirs")
@@ -61,6 +61,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
                 .arg(&dry_run)
                 .arg(&autoclean)
                 .arg(&autoclean_expensive)
+                .setting(AppSettings::Hidden)
         ) // subcommand
         .arg(&list_dirs)
         .arg(&remove_dir)
@@ -93,7 +94,7 @@ mod clitests {
 matthiaskrgr
 Manage cargo cache\n
 USAGE:
-    cargo [FLAGS] [OPTIONS] [SUBCOMMAND]\n
+    cargo [FLAGS] [OPTIONS]\n
 FLAGS:
     -a, --autoclean              Removes registry src checkouts and git repo checkouts
     -e, --autoclean-expensive    Removes registry src checkouts, git repo checkouts and gcs repos
@@ -106,11 +107,7 @@ FLAGS:
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of duplicate crates in the source cache
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
-                                         sources,registry-crate-cache,registry,all\n
-SUBCOMMANDS:
-    cache    Manage cargo cache
-    help     Prints this message or the help of the given subcommand(s)
-";
+                                         sources,registry-crate-cache,registry,all\n";
 
         assert_eq!(help_desired, help_real);
     }
