@@ -42,7 +42,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .long("autoclean-expensive")
         .help("Removes registry src checkouts, git repo checkouts and gcs repos");
 
-     App::new("cargo-cache")
+    App::new("cargo-cache")
         .version(crate_version!())
         .bin_name("cargo")
         .about("Manage cargo cache")
@@ -71,4 +71,47 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .get_matches()
+}
+
+#[cfg(test)]
+mod clitests {
+    use super::*;
+    use std::process::Command;
+
+    #[test]
+    fn run_help() {
+        // build
+        let status = Command::new("cargo").arg("build").output();
+        // make sure the build succeeded
+        assert!(status.is_ok(), "cargo build did not succeed");
+        let cc_help = Command::new("target/debug/cargo-cache")
+            .arg("--help")
+            .output();
+        assert!(cc_help.is_ok(), "cargo-cache --help failed");
+        let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
+        let help_desired = "cargo-cache 0.1.0
+matthiaskrgr
+Manage cargo cache\n
+USAGE:
+    cargo [FLAGS] [OPTIONS] [SUBCOMMAND]\n
+FLAGS:
+    -a, --autoclean              Removes registry src checkouts and git repo checkouts
+    -e, --autoclean-expensive    Removes registry src checkouts, git repo checkouts and gcs repos
+    -d, --dry-run                Don't remove anything, just pretend
+    -g, --gc                     Recompress git repositories (may take some time).
+    -h, --help                   Prints help information
+    -i, --info                   Give information on directories
+    -l, --list-dirs              List found directory paths.
+    -V, --version                Prints version information\n
+OPTIONS:
+    -k, --keep-duplicate-crates <N>      Remove all but N versions of duplicate crates in the source cache
+    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
+                                         sources,registry-crate-cache,registry,all\n
+SUBCOMMANDS:
+    cache    Manage cargo cache
+    help     Prints this message or the help of the given subcommand(s)
+";
+
+        assert_eq!(help_desired, help_real);
     }
+}

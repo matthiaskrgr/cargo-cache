@@ -31,13 +31,13 @@
     )
 )]
 
+mod cli;
 mod git;
 mod library;
-mod cli;
 
 use std::{fs, process};
 
-use clap::{value_t};
+use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
 use crate::git::*;

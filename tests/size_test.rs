@@ -64,6 +64,8 @@ mod sizetests {
         let absolute_fchp = PathBuf::from(&fchp).canonicalize().unwrap();
         let mut desired_output = format!("Cargo cache '{}':\n\n", absolute_fchp.display());
 
+        //@TODO this won't work because git repo is constantly growing
+
         desired_output.push_str(
             "Total size:                   66.57 MB
 Size of 0 installed binaries:     0 B
