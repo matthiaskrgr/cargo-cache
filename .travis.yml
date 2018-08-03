@@ -12,11 +12,15 @@ rust:
 #matrix:
 #  allow_failures:
 #    - rust: nightly
+
+env:
+  matrix:
+    - RELEASE="--release"
+    - RELEASE=""
+
 script:
-  - cargo build --verbose --all
-  - cargo test --verbose --all
-  - cargo build --verbose --all --release
-  - cargo test --verbose --all --release
+  - cargo build --verbose --all ${RELEASE}
+  - cargo test --verbose --all ${RELEASE}
   - cargo run
   - cargo install --force --path .
   - cargo-cache
