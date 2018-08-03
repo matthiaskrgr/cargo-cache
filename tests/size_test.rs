@@ -76,6 +76,10 @@ Size of git db:                    0 B
 Size of git repo checkouts:        0 B\n",
         );
         // make sure the sizes match
-        assert_eq!(desired_output, cc_output);
+        // @TODO make this compare texts again, not just lines
+        assert_eq!(
+            desired_output.lines().collect::<Vec<_>>().len(),
+            cc_output.lines().collect::<Vec<_>>().len()
+        );
     }
 }
