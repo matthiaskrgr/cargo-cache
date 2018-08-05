@@ -30,6 +30,7 @@
         needless_borrow
     )
 )]
+#![feature(test)]
 
 mod cli;
 mod git;

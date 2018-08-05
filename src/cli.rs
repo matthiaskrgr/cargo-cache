@@ -78,6 +78,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 #[cfg(test)]
 mod clitests {
     use std::process::Command;
+    use test::Bencher;
 
     #[test]
     fn run_help() {
@@ -143,6 +144,31 @@ OPTIONS:
                                          sources,registry-crate-cache,registry,all\n";
 
         assert_eq!(help_desired, help_real);
+    }
+
+    fn build_release() {
+        let _ = Command::new("cargo").arg("build").arg("--release").output();
+    }
+
+    #[bench]
+    fn bench_clap_help(b: &mut Bencher) {
+        build_release();
+        b.iter(|| {
+            Command::new("target/debug/cargo-cache")
+                .arg("--help")
+                .output()
+        })
+    }
+
+    #[bench]
+    fn bench_clap_help_submodule(b: &mut Bencher) {
+        build_release();
+        b.iter(|| {
+            Command::new("target/debug/cargo-cache")
+                .arg("cache")
+                .arg("--help")
+                .output()
+        })
     }
 
 }
