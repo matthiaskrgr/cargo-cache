@@ -1,6 +1,4 @@
 
 /target/
 **/*.rs.bk
-# TODO: move this to /target/
-tests/size_test/fake_cargo_home/
-tests/size_test/target
+

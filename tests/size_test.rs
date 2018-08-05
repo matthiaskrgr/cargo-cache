@@ -13,11 +13,13 @@ mod sizetests {
         // move into the directory of our dummy crate
         // set a fake CARGO_HOME and build the dummy crate there
         let crate_path = PathBuf::from("tests/size_test/");
-        let fchp = "tests/size_test/fake_cargo_home"; // cake cargo_home path
+        let fchp = "target/fake_cargo_home"; // cake cargo_home path
         let status = Command::new("cargo")
             .arg("check")
+            .arg("--target-dir")
+            .arg("../../target/size_test/")
             .current_dir(&crate_path)
-            .env("CARGO_HOME", "fake_cargo_home")
+            .env("CARGO_HOME", "../../target/fake_cargo_home")
             .output();
         // make sure the build succeeded
         assert!(status.is_ok(), "build of dummy crate did not succeed");
