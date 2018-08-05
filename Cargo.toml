@@ -24,6 +24,10 @@ git2 = "0.7" # check if repo is git repo
 # https://github.com/rayon-rs/rayon
 rayon = "1.0" # parallel for loops
 
+[dev-dependencies]
+# https://github.com/bluss/bencher/
+bencher = "0.1" # benchmarks
+
 [[bin]]
 path = "src/main.rs"
 name = "cargo-cache"
