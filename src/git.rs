@@ -163,6 +163,7 @@ pub(crate) fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathB
     );
 }
 
+/*
 #[cfg(test)]
 mod gittest {
     use super::*;
@@ -205,3 +206,4 @@ mod gittest {
     }
 
 }
+*/
