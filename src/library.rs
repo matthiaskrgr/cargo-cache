@@ -13,29 +13,45 @@ pub(crate) struct DirInfoObj {
 }
 
 pub(crate) struct DirSizesCollector {
-    pub(crate) total_size: u64, // total size of cargo root dir
-    numb_bins: u64,             // number of binaries found
-    total_bin_size: u64,        // total size of binaries found
-    total_reg_size: u64,        // registry size
-    total_git_db_size: u64,     // git db size
-    total_git_chk_size: u64,    // git checkout size
-    total_reg_cache_size: u64,  // registry cache size
-    total_reg_src_size: u64,    // registry sources size
+    pub(crate) total_size: u64,  // total size of cargo root dir
+    numb_bins: u64,              // number of binaries found
+    total_bin_size: u64,         // total size of binaries found
+    total_reg_size: u64,         // registry size
+    total_git_db_size: u64,      // git db size
+    numb_git_db_repos: u64,      // number of cloned repos
+    numb_git_checkouts: u64,     // number of checked out repos
+    total_git_chk_size: u64,     // git checkout size
+    total_reg_cache_size: u64,   // registry cache size
+    total_reg_src_size: u64,     // registry sources size
+    numb_reg_cache_entries: u64, // number of source archives
+    numb_reg_src_checkouts: u64, // number of source checkouts
 }
 
 impl DirSizesCollector {
     pub(crate) fn new(ccd: &CargoCacheDirs) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
+        let git_db = cumulative_dir_size(&ccd.git_db);
+        let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
+        let reg_cache = cumulative_dir_size(&ccd.registry_cache);
+        let reg_src = cumulative_dir_size(&ccd.registry_sources);
 
         Self {
             total_size: cumulative_dir_size(&ccd.cargo_home).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
             total_reg_size: cumulative_dir_size(&ccd.registry).dir_size,
-            total_git_db_size: cumulative_dir_size(&ccd.git_db).dir_size,
-            total_git_chk_size: cumulative_dir_size(&ccd.git_checkouts).dir_size,
-            total_reg_cache_size: cumulative_dir_size(&ccd.registry_cache).dir_size,
-            total_reg_src_size: cumulative_dir_size(&ccd.registry_sources).dir_size,
+
+            total_git_db_size: git_db.dir_size,
+            numb_git_db_repos: git_db.file_number,
+
+            total_git_chk_size: git_checkouts.dir_size,
+            numb_git_checkouts: git_checkouts.file_number,
+
+            total_reg_cache_size: reg_cache.dir_size,
+            numb_reg_cache_entries: reg_cache.file_number,
+
+            total_reg_src_size: reg_src.dir_size,
+            numb_reg_src_checkouts: reg_src.file_number,
         }
     }
     pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
@@ -58,25 +74,29 @@ impl DirSizesCollector {
                 .unwrap()
         );
         println!(
-            "Size of registry crate cache:           {}",
+            "Size of {} registry crate cache:           {}",
+            self.numb_reg_cache_entries,
             self.total_reg_cache_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of registry source checkouts:      {}",
+            "Size of {} registry source checkouts:      {}",
+            self.numb_reg_src_checkouts,
             self.total_reg_src_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of git db:                    {}",
+            "Size of {} git repos:                    {}",
+            self.numb_git_db_repos,
             self.total_git_db_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of git repo checkouts:        {}",
+            "Size of {} git repo checkouts:        {}",
+            self.numb_git_checkouts,
             self.total_git_chk_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
@@ -196,9 +216,25 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
                 .len()
         }).sum();
 
+    // for the file number, we don't want the actual number of files but only the number of
+    // files in the current directory.
+    let mut numb_files = 0_u64;
+    if dir.display().to_string().contains("registry") {
+        for _ in WalkDir::new(format!("{}", dir.display()))
+            .max_depth(2)
+            .min_depth(2)
+        {
+            numb_files += 1;
+        }
+    } else {
+        for _ in WalkDir::new(format!("{}", dir.display())).max_depth(1) {
+            numb_files += 1;
+        }
+    }
+
     DirInfoObj {
         dir_size: sizes_sum,
-        file_number: files.len() as u64,
+        file_number: numb_files,
     }
 }
 
