@@ -162,3 +162,46 @@ pub(crate) fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathB
         size_diff_format(total_size_before, total_size_after, false)
     );
 }
+
+#[cfg(test)]
+mod gittest {
+    use super::*;
+    use std::fs::File;
+    use std::io::prelude::*;
+    use std::path::PathBuf;
+    use std::process::Command;
+    use test::Bencher;
+
+    #[test]
+    fn test_gc_repo() {
+        // create a fake git repo in the target dir
+        let git_init = Command::new("git")
+            .arg("init")
+            .arg("gitrepo")
+            .current_dir("target")
+            .output();
+        assert!(git_init.is_ok());
+        let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
+        file.write_all(b"Hello hello hello this is a test \n hello \n hello")
+            .unwrap();
+        let git_add = Command::new("git")
+            .arg("add")
+            .arg("testfile.txt")
+            .current_dir("target/gitrepo/")
+            .output();
+        assert!(git_add.is_ok());
+        let git_commit = Command::new("git")
+            .arg("commit")
+            .arg("-m")
+            .arg("commit msg")
+            .current_dir("target/gitrepo/")
+            .output();
+        assert!(git_commit.is_ok());
+        let gc = match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
+            Err(_) => (0, 0),
+            Ok((x, y)) => (x, y),
+        };
+        println!("{:?}", gc);
+    }
+
+}
