@@ -74,21 +74,21 @@ impl DirSizesCollector {
                 .unwrap()
         );
         println!(
-            "Size of {} registry crate cache:           {}",
+            "Size of {} crate archives:           {}",
             self.numb_reg_cache_entries,
             self.total_reg_cache_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of {} registry source checkouts:      {}",
+            "Size of {} crate source checkouts:   {}",
             self.numb_reg_src_checkouts,
             self.total_reg_src_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         );
         println!(
-            "Size of {} git repos:                    {}",
+            "Size of {} git repos:                {}",
             self.numb_git_db_repos,
             self.total_git_db_size
                 .file_size(file_size_opts::DECIMAL)
