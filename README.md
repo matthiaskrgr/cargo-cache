@@ -5,13 +5,15 @@ DISCLAIMER: I only tested this on linux.
 Sample output:
 ````
 Cargo cache '/home/matthias/.cargo':
-Total size:                   2.52 GB
-Size of 62 installed binaries:     726.57 MB
-Size of registry:                  1.25 GB
-Size of registry crate cache:           418.04 MB
-Size of registry source checkouts:      770.58 MB
-Size of git db:                    276.01 MB
-Size of git repo checkouts:        266.36 MB
+
+Total size:                             2.06 GB
+Size of 62 installed binaries:            722.49 MB
+Size of registry:                         950.39 MB
+Size of 3022 crate archives:                440.57 MB
+Size of 621 crate source checkouts:         445.13 MB
+Size of git db:                           387.48 MB
+Size of 95 bare git repos:                  377.87 MB
+Size of 4 git repo checkouts:               9.61 MB
 ````
 
 Usage:
