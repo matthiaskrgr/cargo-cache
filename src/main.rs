@@ -53,6 +53,7 @@ fn main() {
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
     // indicates if size changed and whether we should print a before/after size diff
+
     let mut size_changed: bool = false;
 
     let cargo_cache = match CargoCacheDirs::new() {
@@ -62,6 +63,12 @@ fn main() {
             process::exit(1);
         }
     };
+
+    if config.is_present("list-dirs") {
+        // only print the directories and exit, don't calculate anything else
+        cargo_cache.print_dir_paths();
+        process::exit(0);
+    }
 
     let dir_sizes = DirSizesCollector::new(&cargo_cache);
 
@@ -87,9 +94,6 @@ fn main() {
         }
     }
 
-    if config.is_present("list-dirs") {
-        cargo_cache.print_dir_paths();
-    }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         git_gc_everything(
             &cargo_cache.git_db,
