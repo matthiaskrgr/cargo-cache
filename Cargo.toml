@@ -22,7 +22,7 @@ cargo = "0.29" # get CARGO_HOME
 # https://github.com/alexcrichton/git2-rs
 git2 = "0.7" # check if repo is git repo
 # https://github.com/rayon-rs/rayon
-rayon = "1.0" # parallel for loops
+rayon = "1.0" # parallel for iterators
 
 [dev-dependencies]
 # https://github.com/bluss/bencher/
