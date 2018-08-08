@@ -55,6 +55,9 @@ impl DirSizesCollector {
         }
     }
     pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
+        // create a string and concatenate all the things we want to print with it
+        // and only print it in the end, this should save a few syscalls and be faster than
+        // printing every line one by one
         let mut s = String::new();
 
         s.push_str(&format!("Cargo cache '{}':\n\n", &ccd.cargo_home.display()));
@@ -64,6 +67,8 @@ impl DirSizesCollector {
             self.total_size.file_size(file_size_opts::DECIMAL).unwrap()
         ));
 
+        // the nested format!()s are a hack to get nice alignment of the numbers
+        // any ideas on how to not uses nested format here is appreciate...
         s.push_str(&format!(
             "{: <41} {}\n",
             &format!("Size of {} installed binaries:", self.numb_bins,),
