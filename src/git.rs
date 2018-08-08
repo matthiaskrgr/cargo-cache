@@ -92,7 +92,11 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 }
 
 #[cfg_attr(feature = "cargo-clippy", allow(stutter))]
-pub(crate) fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathBuf, dry_run: bool) {
+pub(crate) fn git_gc_everything(
+    git_repos_bare_dir: &PathBuf,
+    registry_cache_dir: &PathBuf,
+    dry_run: bool,
+) {
     // gc repos and registries inside cargo cache
 
     fn gc_subdirs(path: &PathBuf, dry_run: bool) -> (u64, u64) {
@@ -131,8 +135,11 @@ pub(crate) fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathB
     } // fn
 
     // gc cloned git repos of crates or whatever
-    if !git_db_dir.is_dir() {
-        println!("WARNING:   {} is not a directory", git_db_dir.display());
+    if !git_repos_bare_dir.is_dir() {
+        println!(
+            "WARNING:   {} is not a directory",
+            git_repos_bare_dir.display()
+        );
         return;
     }
     let mut total_size_before: u64 = 0;
@@ -140,7 +147,7 @@ pub(crate) fn git_gc_everything(git_db_dir: &PathBuf, registry_cache_dir: &PathB
 
     println!("\nRecompressing repositories. Please be patient...");
     // gc git repos of crates
-    let (repos_before, repos_after) = gc_subdirs(git_db_dir, dry_run);
+    let (repos_before, repos_after) = gc_subdirs(git_repos_bare_dir, dry_run);
     total_size_before += repos_before;
     total_size_after += repos_after;
 

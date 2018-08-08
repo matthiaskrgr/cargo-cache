@@ -96,7 +96,7 @@ fn main() {
 
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         git_gc_everything(
-            &cargo_cache.git_db,
+            &cargo_cache.git_repos_bare,
             &cargo_cache.registry_cache,
             config.is_present("dry-run"),
         );

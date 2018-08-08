@@ -13,24 +13,24 @@ pub(crate) struct DirInfoObj {
 }
 
 pub(crate) struct DirSizesCollector {
-    pub(crate) total_size: u64,  // total size of cargo root dir
-    numb_bins: u64,              // number of binaries found
-    total_bin_size: u64,         // total size of binaries found
-    total_reg_size: u64,         // registry size
-    total_git_db_size: u64,      // git db size
-    numb_git_db_repos: u64,      // number of cloned repos
-    numb_git_checkouts: u64,     // number of checked out repos
-    total_git_chk_size: u64,     // git checkout size
-    total_reg_cache_size: u64,   // registry cache size
-    total_reg_src_size: u64,     // registry sources size
-    numb_reg_cache_entries: u64, // number of source archives
-    numb_reg_src_checkouts: u64, // number of source checkouts
+    pub(crate) total_size: u64,     // total size of cargo root dir
+    numb_bins: u64,                 // number of binaries found
+    total_bin_size: u64,            // total size of binaries found
+    total_reg_size: u64,            // registry size
+    total_git_repos_bare_size: u64, // git db size
+    numb_git_repos_bare_repos: u64, // number of cloned repos
+    numb_git_checkouts: u64,        // number of checked out repos
+    total_git_chk_size: u64,        // git checkout size
+    total_reg_cache_size: u64,      // registry cache size
+    total_reg_src_size: u64,        // registry sources size
+    numb_reg_cache_entries: u64,    // number of source archives
+    numb_reg_src_checkouts: u64,    // number of source checkouts
 }
 
 impl DirSizesCollector {
     pub(crate) fn new(ccd: &CargoCacheDirs) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
-        let git_db = cumulative_dir_size(&ccd.git_db);
+        let git_repos_bare = cumulative_dir_size(&ccd.git_repos_bare);
         let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
         let reg_cache = cumulative_dir_size(&ccd.registry_cache);
         let reg_src = cumulative_dir_size(&ccd.registry_sources);
@@ -41,8 +41,8 @@ impl DirSizesCollector {
             total_bin_size: bindir.dir_size,
             total_reg_size: cumulative_dir_size(&ccd.registry).dir_size,
 
-            total_git_db_size: git_db.dir_size,
-            numb_git_db_repos: git_db.file_number,
+            total_git_repos_bare_size: git_repos_bare.dir_size,
+            numb_git_repos_bare_repos: git_repos_bare.file_number,
 
             total_git_chk_size: git_checkouts.dir_size,
             numb_git_checkouts: git_checkouts.file_number,
@@ -100,8 +100,8 @@ impl DirSizesCollector {
 
         s.push_str(&format!(
             "{: <41} {}\n",
-            &format!("Size of {} git repos:", self.numb_git_db_repos),
-            self.total_git_db_size
+            &format!("Size of {} git repos:", self.numb_git_repos_bare_repos),
+            self.total_git_repos_bare_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
@@ -123,7 +123,7 @@ pub(crate) struct CargoCacheDirs {
     pub(crate) registry: PathBuf,
     pub(crate) registry_cache: PathBuf,
     pub(crate) registry_sources: PathBuf,
-    pub(crate) git_db: PathBuf,
+    pub(crate) git_repos_bare: PathBuf,
     pub(crate) git_checkouts: PathBuf,
 }
 
@@ -170,7 +170,7 @@ impl CargoCacheDirs {
         let registry = cargo_home.join("registry/");
         let reg_cache = registry.join("cache/");
         let reg_src = registry.join("src/");
-        let git_db = cargo_home.join("git/db/");
+        let git_repos_bare = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
         Ok(Self {
@@ -179,7 +179,7 @@ impl CargoCacheDirs {
             registry,
             registry_cache: reg_cache,
             registry_sources: reg_src,
-            git_db,
+            git_repos_bare,
             git_checkouts,
         })
     }
@@ -196,7 +196,10 @@ impl CargoCacheDirs {
             "registry unpacked sources:    {}",
             &self.registry_sources.display()
         );
-        println!("git db directory:             {}", &self.git_db.display());
+        println!(
+            "git db directory:             {}",
+            &self.git_repos_bare.display()
+        );
         println!(
             "git checkouts dir:            {}",
             &self.git_checkouts.display()
@@ -391,8 +394,8 @@ pub(crate) fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
     println!("Found git repo database:");
     println!(
         "\t\t\t'{}', size: {}",
-        &c.git_db.display(),
-        s.total_git_db_size
+        &c.git_repos_bare.display(),
+        s.total_git_repos_bare_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     );
@@ -566,7 +569,7 @@ pub(crate) fn remove_dir_via_cmdline(
         rm(&ccd.git_checkouts, dry_run, size_changed)?
     }
     if rm_git_repos {
-        rm(&ccd.git_db, dry_run, size_changed)?
+        rm(&ccd.git_repos_bare, dry_run, size_changed)?
     }
     if rm_registry_sources {
         rm(&ccd.registry_sources, dry_run, size_changed)?
