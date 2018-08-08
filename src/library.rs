@@ -114,14 +114,14 @@ impl DirSizesCollector {
 
         s.push_str(&format!(
             "{: <43} {}\n",
-            &format!("Size of {} git bare repos:", self.numb_git_repos_bare_repos),
+            &format!("Size of {} bare git repos:", self.numb_git_repos_bare_repos),
             self.total_git_repos_bare_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
 
         s.push_str(&format!(
-            "{: <43} {}\n",
+            "{: <43} {}", /* final println already introduces \n */
             &format!("Size of {} git repo checkouts:", self.numb_git_checkouts),
             self.total_git_chk_size
                 .file_size(file_size_opts::DECIMAL)
