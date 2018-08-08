@@ -141,7 +141,7 @@ impl CargoCacheDirs {
         };
 
         let cargo_home_path = cargo_cfg.home().clone().into_path_unlocked();
-        let cargo_home_str = format!("{}", cargo_home_path.display());
+        let cargo_home_str = cargo_home_path.display();
         let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
@@ -201,7 +201,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     }
     // traverse recursively and sum filesizes
     let mut files = Vec::new();
-    for entry in WalkDir::new(format!("{}", dir.display())) {
+    for entry in WalkDir::new(dir.display().to_string()) {
         files.push(entry.unwrap().path().to_owned());
     }
     // would like to get rid of the vector here but not sure how to convert
@@ -220,14 +220,14 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // files in the current directory.
     let mut numb_files = 0_u64;
     if dir.display().to_string().contains("registry") {
-        for _ in WalkDir::new(format!("{}", dir.display()))
+        for _ in WalkDir::new(dir.display().to_string())
             .max_depth(2)
             .min_depth(2)
         {
             numb_files += 1;
         }
     } else {
-        for _ in WalkDir::new(format!("{}", dir.display())).max_depth(1) {
+        for _ in WalkDir::new(dir.display().to_string()).max_depth(1) {
             numb_files += 1;
         }
     }
@@ -535,7 +535,8 @@ pub(crate) fn remove_dir_via_cmdline(
             } // match *word
         } else {
             // collect all invalid dirs and print all of them as merged string later
-            invalid_dirs.push_str(&format!("{} ", &word));
+            invalid_dirs.push_str(&word);
+            invalid_dirs.push_str(" ");
             terminate = true;
         }
     } // for word in &inputs
