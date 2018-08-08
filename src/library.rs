@@ -551,7 +551,7 @@ pub(crate) fn remove_dir_via_cmdline(
             } // match *word
         } else {
             // collect all invalid dirs and print all of them as merged string later
-            invalid_dirs.push_str(&word);
+            invalid_dirs.push_str(word);
             invalid_dirs.push_str(" ");
             terminate = true;
         }
