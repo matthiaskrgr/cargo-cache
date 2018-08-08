@@ -17,6 +17,7 @@ pub(crate) struct DirSizesCollector {
     numb_bins: u64,                 // number of binaries found
     total_bin_size: u64,            // total size of binaries found
     total_reg_size: u64,            // registry size
+    total_git_db_size: u64,         // size of bare repos and checkouts combined
     total_git_repos_bare_size: u64, // git db size
     numb_git_repos_bare_repos: u64, // number of cloned repos
     numb_git_checkouts: u64,        // number of checked out repos
@@ -41,6 +42,7 @@ impl DirSizesCollector {
             total_bin_size: bindir.dir_size,
             total_reg_size: cumulative_dir_size(&ccd.registry).dir_size,
 
+            total_git_db_size: cumulative_dir_size(&ccd.git_repo_db).dir_size,
             total_git_repos_bare_size: git_repos_bare.dir_size,
             numb_git_repos_bare_repos: git_repos_bare.file_number,
 
@@ -104,15 +106,22 @@ impl DirSizesCollector {
         ));
 
         s.push_str(&format!(
-            "{: <41} {}\n",
-            &format!("Size of {} git repos:", self.numb_git_repos_bare_repos),
+            "Size of git db: {: >35}\n",
+            self.total_git_db_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap()
+        ));
+
+        s.push_str(&format!(
+            "{: <43} {}\n",
+            &format!("Size of {} git bare repos:", self.numb_git_repos_bare_repos),
             self.total_git_repos_bare_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
 
         s.push_str(&format!(
-            "{: <41} {}\n",
+            "{: <43} {}\n",
             &format!("Size of {} git repo checkouts:", self.numb_git_checkouts),
             self.total_git_chk_size
                 .file_size(file_size_opts::DECIMAL)
@@ -128,6 +137,7 @@ pub(crate) struct CargoCacheDirs {
     pub(crate) registry: PathBuf,
     pub(crate) registry_cache: PathBuf,
     pub(crate) registry_sources: PathBuf,
+    pub(crate) git_repo_db: PathBuf,
     pub(crate) git_repos_bare: PathBuf,
     pub(crate) git_checkouts: PathBuf,
 }
@@ -175,6 +185,7 @@ impl CargoCacheDirs {
         let registry = cargo_home.join("registry/");
         let reg_cache = registry.join("cache/");
         let reg_src = registry.join("src/");
+        let git_repo_db = cargo_home.join("git/");
         let git_repos_bare = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
@@ -184,6 +195,7 @@ impl CargoCacheDirs {
             registry,
             registry_cache: reg_cache,
             registry_sources: reg_src,
+            git_repo_db,
             git_repos_bare,
             git_checkouts,
         })
