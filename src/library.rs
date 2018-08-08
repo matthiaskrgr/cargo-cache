@@ -56,48 +56,59 @@ impl DirSizesCollector {
     }
     pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
         let mut s = String::new();
+
         s.push_str(&format!("Cargo cache '{}':\n\n", &ccd.cargo_home.display()));
+
         s.push_str(&format!(
-            "Total size:                   {}\n",
+            "Total size: {: >35}\n",
             self.total_size.file_size(file_size_opts::DECIMAL).unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of {} installed binaries:     {}\n",
-            self.numb_bins,
+            "{: <41} {}\n",
+            &format!("Size of {} installed binaries:", self.numb_bins,),
             self.total_bin_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of registry:                  {}\n",
+            "Size of registry: {: >33}\n",
             self.total_reg_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of {} crate archives:           {}\n",
-            self.numb_reg_cache_entries,
+            "{: <44}{}\n",
+            &format!("Size of {} crate archives:", self.numb_reg_cache_entries),
             self.total_reg_cache_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of {} crate source checkouts:   {}\n",
-            self.numb_reg_src_checkouts,
+            "{: <43} {}\n",
+            &format!(
+                "Size of {} crate source checkouts:",
+                self.numb_reg_src_checkouts
+            ),
             self.total_reg_src_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of {} git repos:                {}\n",
-            self.numb_git_db_repos,
+            "{: <41} {}\n",
+            &format!("Size of {} git repos:", self.numb_git_db_repos),
             self.total_git_db_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s.push_str(&format!(
-            "Size of {} git repo checkouts:        {}", /* no \n due to println*/
-            self.numb_git_checkouts,
+            "{: <41} {}\n",
+            &format!("Size of {} git repo checkouts:", self.numb_git_checkouts),
             self.total_git_chk_size
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
