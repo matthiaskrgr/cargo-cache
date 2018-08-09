@@ -65,6 +65,8 @@ impl DirSizesCollector {
         // create a string and concatenate all the things we want to print with it
         // and only print it in the end, this should save a few syscalls and be faster than
         // printing every line one by one
+
+        // @TODO use format_args!() ?
         let mut s = String::new();
 
         s.push_str(&format!("Cargo cache '{}':\n\n", &ccd.cargo_home.display()));
