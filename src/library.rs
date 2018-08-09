@@ -37,13 +37,17 @@ impl DirSizesCollector {
         let reg_src = cumulative_dir_size(&ccd.registry_sources);
         let reg_index = cumulative_dir_size(&ccd.registry_index);
 
+        let total_reg_size = reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size;
+        let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
+
         Self {
-            total_size: cumulative_dir_size(&ccd.cargo_home).dir_size,
+            //no need to recompute all of this from scratch
+            total_size: total_reg_size + total_git_db_size + bindir.dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
-            total_reg_size: reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size,
+            total_reg_size,
 
-            total_git_db_size: git_repos_bare.dir_size + git_checkouts.dir_size,
+            total_git_db_size,
             total_git_repos_bare_size: git_repos_bare.dir_size,
             numb_git_repos_bare_repos: git_repos_bare.file_number,
 
