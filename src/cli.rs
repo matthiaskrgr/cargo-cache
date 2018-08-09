@@ -4,7 +4,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")
         .long("list-dirs")
-        .help("List found directory paths.");
+        .help("List all found directory paths");
 
     let remove_dir = Arg::with_name("remove-dir").short("r").long("remove-dir")
         .help("Remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
@@ -13,18 +13,18 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let gc_repos = Arg::with_name("gc-repos")
         .short("g")
         .long("gc")
-        .help("Recompress git repositories (may take some time).");
+        .help("Recompress git repositories (may take some time)");
 
     let info = Arg::with_name("info")
         .short("i")
         .long("info")
         .conflicts_with("list-dirs")
-        .help("Give information on directories");
+        .help("Print information on found cache directories");
 
     let keep_duplicate_crates = Arg::with_name("keep-duplicate-crates")
         .short("k")
         .long("keep-duplicate-crates")
-        .help("Remove all but N versions of duplicate crates in the source cache")
+        .help("Remove all but N versions of crate in the source archives directory")
         .takes_value(true)
         .value_name("N");
 
@@ -36,12 +36,12 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let autoclean = Arg::with_name("autoclean")
         .short("a")
         .long("autoclean")
-        .help("Removes registry src checkouts and git repo checkouts");
+        .help("Removes crate source checkouts and git repo checkouts");
 
     let autoclean_expensive = Arg::with_name("autoclean-expensive")
         .short("e")
         .long("autoclean-expensive")
-        .help("Removes registry src checkouts, git repo checkouts and gcs repos");
+        .help("As --autoclean, but also recompresses git repositories");
 
     App::new("cargo-cache")
         .version(crate_version!())
@@ -97,16 +97,16 @@ Manage cargo cache\n
 USAGE:
     cargo [FLAGS] [OPTIONS]\n
 FLAGS:
-    -a, --autoclean              Removes registry src checkouts and git repo checkouts
-    -e, --autoclean-expensive    Removes registry src checkouts, git repo checkouts and gcs repos
+    -a, --autoclean              Removes crate source checkouts and git repo checkouts
+    -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
     -d, --dry-run                Don't remove anything, just pretend
-    -g, --gc                     Recompress git repositories (may take some time).
+    -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Give information on directories
-    -l, --list-dirs              List found directory paths.
+    -i, --info                   Print information on found cache directories
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
-    -k, --keep-duplicate-crates <N>      Remove all but N versions of duplicate crates in the source cache
+    -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all\n";
 
@@ -130,16 +130,16 @@ Manage cargo cache\n
 USAGE:
     cargo cache [FLAGS] [OPTIONS]\n
 FLAGS:
-    -a, --autoclean              Removes registry src checkouts and git repo checkouts
-    -e, --autoclean-expensive    Removes registry src checkouts, git repo checkouts and gcs repos
+    -a, --autoclean              Removes crate source checkouts and git repo checkouts
+    -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
     -d, --dry-run                Don't remove anything, just pretend
-    -g, --gc                     Recompress git repositories (may take some time).
+    -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Give information on directories
-    -l, --list-dirs              List found directory paths.
+    -i, --info                   Print information on found cache directories
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
-    -k, --keep-duplicate-crates <N>      Remove all but N versions of duplicate crates in the source cache
+    -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all\n";
 

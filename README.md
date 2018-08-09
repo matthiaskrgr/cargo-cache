@@ -19,22 +19,19 @@ Size of 4 git repo checkouts:               9.61 MB
 Usage:
 
 ````
-cargo cache [...]
-
-
-    cargo [FLAGS] [OPTIONS] [SUBCOMMAND]
+USAGE:
+    cargo cache [FLAGS] [OPTIONS]
 FLAGS:
-    -a, --autoclean              Removes registry src checkouts and git repo checkouts
-    -e, --autoclean-expensive    Removes registry src checkouts, git repo checkouts and gcs repos
+    -a, --autoclean              Removes crate source checkouts and git repo checkouts
+    -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
     -d, --dry-run                Don't remove anything, just pretend
-    -g, --gc                     Recompress git repositories (may take some time).
+    -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Give information on directories
-    -l, --list-dirs              List found directory paths.
+    -i, --info                   Print information on found cache directories
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information
 OPTIONS:
-    -k, --keep-duplicate-crates <N>      Remove all but N versions of duplicate crates in the source cache
+    -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
-
 ````
