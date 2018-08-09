@@ -154,7 +154,7 @@ OPTIONS:
     fn bench_clap_help(b: &mut Bencher) {
         build_release();
         b.iter(|| {
-            Command::new("target/debug/cargo-cache")
+            Command::new("target/release/cargo-cache")
                 .arg("--help")
                 .output()
         })
@@ -164,7 +164,7 @@ OPTIONS:
     fn bench_clap_help_submodule(b: &mut Bencher) {
         build_release();
         b.iter(|| {
-            Command::new("target/debug/cargo-cache")
+            Command::new("target/release/cargo-cache")
                 .arg("cache")
                 .arg("--help")
                 .output()
