@@ -192,7 +192,6 @@ impl CargoCacheDirs {
         let registry_index = registry.join("index/");
         let reg_cache = registry.join("cache/");
         let reg_src = registry.join("src/");
-        //let git_repo_db = cargo_home.join("git/");
         let git_repos_bare = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
@@ -203,7 +202,6 @@ impl CargoCacheDirs {
             registry_index,
             registry_cache: reg_cache,
             registry_sources: reg_src,
-            //git_repo_db,
             git_repos_bare,
             git_checkouts,
         })
