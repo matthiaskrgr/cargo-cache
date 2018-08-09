@@ -260,6 +260,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // for the file number, we don't want the actual number of files but only the number of
     // files in the current directory.
     let mut numb_files = 0_u64;
+    // @TODO is it faster to just cast Iter to Vec and vec.len() ?
     if dir.display().to_string().contains("registry") {
         for _ in WalkDir::new(dir.display().to_string())
             .max_depth(2)
