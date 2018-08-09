@@ -35,14 +35,15 @@ impl DirSizesCollector {
         let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
         let reg_cache = cumulative_dir_size(&ccd.registry_cache);
         let reg_src = cumulative_dir_size(&ccd.registry_sources);
+        let reg_index = cumulative_dir_size(&ccd.registry_index);
 
         Self {
             total_size: cumulative_dir_size(&ccd.cargo_home).dir_size,
             numb_bins: bindir.file_number,
             total_bin_size: bindir.dir_size,
-            total_reg_size: cumulative_dir_size(&ccd.registry).dir_size,
+            total_reg_size: reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size,
 
-            total_git_db_size: cumulative_dir_size(&ccd.git_repo_db).dir_size,
+            total_git_db_size: git_repos_bare.dir_size + git_checkouts.dir_size,
             total_git_repos_bare_size: git_repos_bare.dir_size,
             numb_git_repos_bare_repos: git_repos_bare.file_number,
 
@@ -137,7 +138,8 @@ pub(crate) struct CargoCacheDirs {
     pub(crate) registry: PathBuf,
     pub(crate) registry_cache: PathBuf,
     pub(crate) registry_sources: PathBuf,
-    pub(crate) git_repo_db: PathBuf,
+    pub(crate) registry_index: PathBuf,
+    //pub(crate) git_repo_db: PathBuf,
     pub(crate) git_repos_bare: PathBuf,
     pub(crate) git_checkouts: PathBuf,
 }
@@ -183,9 +185,10 @@ impl CargoCacheDirs {
         let cargo_home = cargo_home_path;
         let bin = cargo_home.join("bin/");
         let registry = cargo_home.join("registry/");
+        let registry_index = registry.join("index/");
         let reg_cache = registry.join("cache/");
         let reg_src = registry.join("src/");
-        let git_repo_db = cargo_home.join("git/");
+        //let git_repo_db = cargo_home.join("git/");
         let git_repos_bare = cargo_home.join("git/db/");
         let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
 
@@ -193,9 +196,10 @@ impl CargoCacheDirs {
             cargo_home,
             bin_dir: bin,
             registry,
+            registry_index,
             registry_cache: reg_cache,
             registry_sources: reg_src,
-            git_repo_db,
+            //git_repo_db,
             git_repos_bare,
             git_checkouts,
         })
