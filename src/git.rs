@@ -17,7 +17,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     print!("Recompressing '{}': ", repo_name);
     // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
-        return Err((ErrorKind::GitRepoDirNotFound, format!("{}", path.display())));
+        return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
     }
 
     // get size before
@@ -106,7 +106,7 @@ pub(crate) fn git_gc_everything(
 
         for entry in fs::read_dir(&path).unwrap() {
             let repo = entry.unwrap().path();
-            let repostr = format!("{}", repo.display());
+            let repostr = repo.display();
             // compress
             let (size_before, size_after) = match gc_repo(&repo, dry_run) {
                 // run gc
