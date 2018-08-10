@@ -56,7 +56,7 @@ fn main() {
 
     let mut size_changed: bool = false;
 
-    let cargo_cache = match CargoCacheDirs::new() {
+    let cargo_cache = match CargoCachePaths::new() {
         Ok(cargo_cache) => cargo_cache,
         Err((_, msg)) => {
             eprintln!("{}", msg);

@@ -29,7 +29,7 @@ pub(crate) struct DirSizesCollector {
 }
 
 impl DirSizesCollector {
-    pub(crate) fn new(ccd: &CargoCacheDirs) -> Self {
+    pub(crate) fn new(ccd: &CargoCachePaths) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
         let git_repos_bare = cumulative_dir_size(&ccd.git_repos_bare);
         let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
@@ -61,7 +61,7 @@ impl DirSizesCollector {
             numb_reg_src_checkouts: reg_src.file_number,
         }
     }
-    pub(crate) fn print_pretty(&self, ccd: &CargoCacheDirs) {
+    pub(crate) fn print_pretty(&self, ccd: &CargoCachePaths) {
         // create a string and concatenate all the things we want to print with it
         // and only print it in the end, this should save a few syscalls and be faster than
         // printing every line one by one
@@ -141,14 +141,13 @@ impl DirSizesCollector {
     }
 }
 
-pub(crate) struct CargoCacheDirs {
+pub(crate) struct CargoCachePaths {
     pub(crate) cargo_home: PathBuf,
     pub(crate) bin_dir: PathBuf,
     pub(crate) registry: PathBuf,
     pub(crate) registry_cache: PathBuf,
     pub(crate) registry_sources: PathBuf,
     pub(crate) registry_index: PathBuf,
-    //pub(crate) git_repo_db: PathBuf,
     pub(crate) git_repos_bare: PathBuf,
     pub(crate) git_checkouts: PathBuf,
 }
@@ -167,7 +166,8 @@ pub(crate) enum ErrorKind {
     RemoveDirNoArg,
 }
 
-impl CargoCacheDirs {
+impl CargoCachePaths {
+    // holds the PathBufs to the different componens of the cargo cache
     pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
@@ -377,7 +377,7 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
-pub(crate) fn print_info(c: &CargoCacheDirs, s: &DirSizesCollector) {
+pub(crate) fn print_info(c: &CargoCachePaths, s: &DirSizesCollector) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",
@@ -487,7 +487,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
 pub(crate) fn remove_dir_via_cmdline(
     directory: Option<&str>,
     dry_run: bool,
-    ccd: &CargoCacheDirs,
+    ccd: &CargoCachePaths,
     size_changed: &mut bool,
 ) -> Result<(), (ErrorKind, String)> {
     fn rm(
