@@ -249,7 +249,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // WalkDir iterator into rayon par_iter
 
     // parallelize using rayon
-    let sizes_sum = files
+    let dir_size = files
         .par_iter()
         .map(|f| {
             fs::metadata(f)
@@ -259,24 +259,20 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
 
     // for the file number, we don't want the actual number of files but only the number of
     // files in the current directory.
-    let mut numb_files = 0_u64;
-    // @TODO is it faster to just cast Iter to Vec and vec.len() ?
-    if dir.display().to_string().contains("registry") {
-        for _ in WalkDir::new(dir.display().to_string())
+
+    let file_number = if dir.display().to_string().contains("registry") {
+        WalkDir::new(dir.display().to_string())
             .max_depth(2)
             .min_depth(2)
-        {
-            numb_files += 1;
-        }
     } else {
-        for _ in WalkDir::new(dir.display().to_string()).max_depth(1) {
-            numb_files += 1;
-        }
-    }
+        WalkDir::new(dir.display().to_string()).max_depth(1)
+    }.into_iter()
+    .collect::<Vec<_>>()
+    .len() as u64;
 
     DirInfoObj {
-        dir_size: sizes_sum,
-        file_number: numb_files,
+        dir_size,
+        file_number,
     }
 }
 
