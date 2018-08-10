@@ -251,7 +251,9 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // I would like to get rid of the vector here but not sure how to convert
     // WalkDir iterator into rayon par_iter
 
-    let dir_size = WalkDir::new(dir.display().to_string())
+    let walkdir_start = dir.display().to_string();
+
+    let dir_size = WalkDir::new(&walkdir_start)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
         .collect::<Vec<_>>()
@@ -265,12 +267,12 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // for the file number, we don't want the actual number of files but only the number of
     // files in the current directory.
 
-    let file_number = if dir.display().to_string().contains("registry") {
-        WalkDir::new(dir.display().to_string())
+    let file_number = if walkdir_start.contains("registry") {
+        WalkDir::new(&walkdir_start)
             .max_depth(2)
             .min_depth(2)
     } else {
-        WalkDir::new(dir.display().to_string()).max_depth(1)
+        WalkDir::new(&walkdir_start).max_depth(1)
     }.into_iter()
     .collect::<Vec<_>>()
     .len() as u64;
