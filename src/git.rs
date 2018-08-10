@@ -218,8 +218,17 @@ mod gittest {
             .output();
         assert!(git_commit.is_ok());
 
-        let (before, after) =
+        let (dryrun_before, dryrun_after) =
             match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
+                Err(_) => (0, 0),
+                Ok((x, y)) => (x, y),
+            };
+        // dryrun should not change sizes!
+        assert_eq!(dryrun_before, 0);
+        assert_eq!(dryrun_after, 0);
+
+        let (before, after) =
+            match gc_repo(&PathBuf::from("target/gitrepo/"), false /* dry run */) {
                 Err(_) => (0, 0),
                 Ok((x, y)) => (x, y),
             };
