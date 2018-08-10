@@ -233,6 +233,8 @@ impl CargoCacheDirs {
 }
 
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
+    //@TODO: can we Walkdir only once?
+
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
         return DirInfoObj {
