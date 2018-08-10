@@ -5,7 +5,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
-pub(crate) struct DirInfoObj {
+pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
     pub(crate) dir_size: u64,
@@ -235,12 +235,12 @@ impl CargoCacheDirs {
     }
 }
 
-pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
+pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     //@TODO: can we Walkdir only once?
 
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
-        return DirInfoObj {
+        return DirInfo {
             dir_size: 0,
             file_number: 0,
         };
@@ -275,7 +275,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     .collect::<Vec<_>>()
     .len() as u64;
 
-    DirInfoObj {
+    DirInfo {
         dir_size,
         file_number,
     }
