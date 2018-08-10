@@ -164,15 +164,12 @@ pub(crate) fn git_gc_everything(
     );
 }
 
-/*
 #[cfg(test)]
 mod gittest {
     use super::*;
     use std::fs::File;
-    use std::io::prelude::*;
     use std::path::PathBuf;
     use std::process::Command;
-    use test::Bencher;
 
     #[test]
     fn test_gc_repo() {
@@ -183,6 +180,7 @@ mod gittest {
             .current_dir("target")
             .output();
         assert!(git_init.is_ok());
+        // create a file and add some text
         let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
         file.write_all(b"Hello hello hello this is a test \n hello \n hello")
             .unwrap();
@@ -199,12 +197,36 @@ mod gittest {
             .current_dir("target/gitrepo/")
             .output();
         assert!(git_commit.is_ok());
-        let gc = match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
-            Err(_) => (0, 0),
-            Ok((x, y)) => (x, y),
-        };
-        println!("{:?}", gc);
+        // create another commit
+        let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
+        file.write_all(
+            b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
+        \n this is some more text\n
+        lorem ipsum",
+        ).unwrap();
+        let git_add = Command::new("git")
+            .arg("add")
+            .arg("testfile.txt")
+            .current_dir("target/gitrepo/")
+            .output();
+        assert!(git_add.is_ok());
+        let git_commit = Command::new("git")
+            .arg("commit")
+            .arg("-m")
+            .arg("another commit msg")
+            .current_dir("target/gitrepo/")
+            .output();
+        assert!(git_commit.is_ok());
+
+        let (before, after) =
+            match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
+                Err(_) => (0, 0),
+                Ok((x, y)) => (x, y),
+            };
+        assert!(
+            !before > after,
+            format!("gc is funky: before: {}  after: {}", before, after)
+        );
     }
 
 }
-*/

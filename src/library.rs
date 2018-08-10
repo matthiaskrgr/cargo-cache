@@ -268,9 +268,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfoObj {
     // files in the current directory.
 
     let file_number = if walkdir_start.contains("registry") {
-        WalkDir::new(&walkdir_start)
-            .max_depth(2)
-            .min_depth(2)
+        WalkDir::new(&walkdir_start).max_depth(2).min_depth(2)
     } else {
         WalkDir::new(&walkdir_start).max_depth(1)
     }.into_iter()
