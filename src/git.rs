@@ -73,12 +73,6 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .output()
         {
             Ok(_) => {}
-            /* debug:
-            println!("git gc error\nstatus: {}", out.status);
-            println!("stdout:\n {}", String::from_utf8_lossy(&out.stdout));
-            println!("stderr:\n {}", String::from_utf8_lossy(&out.stderr));
-            //if out.status.success() {}
-            } */
             Err(e) => return Err((ErrorKind::GitGCFailed, format!("{:?}", e))),
         }
         let repo_size_after = cumulative_dir_size(path).dir_size;
@@ -132,9 +126,9 @@ pub(crate) fn git_gc_everything(
             size_sum_after += size_after;
         }
         (size_sum_before, size_sum_after)
-    } // fn
+    } // fn gc_subdirs
 
-    // gc cloned git repos of crates or whatever
+    // gc cloned git repos of crates and registries
     if !git_repos_bare_dir.is_dir() {
         println!(
             "WARNING:   {} is not a directory",
