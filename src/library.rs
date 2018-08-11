@@ -470,12 +470,18 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     };
     let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
     let size_before_human_readabel = size_before.file_size(file_size_opts::DECIMAL).unwrap();
-    // percentage
-    #[cfg_attr(feature = "cargo-clippy", allow(cast_precision_loss))]
-    let percentage: f64 =
-        ((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100);
-    // format
-    let percentage = format!("{:.*}", 2, percentage);
+    // calculate change in percentage
+    // when printing, we are going to cut off everything but a few decimal places anyway, so
+    // precision is not much of an issue.
+    #[cfg_attr(
+        feature = "cargo-clippy",
+        allow(cast_precision_loss, cast_possible_truncation)
+    )]
+    let perc: f32 =
+        (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
+    // truncate to 2 decimal digits
+    // this is faster than casting to string and truncating the string
+    let percentage: f32 = ((perc * f32::from(100_i8)).trunc()) / (f32::from(100_u8));
 
     if size_before == size_after {
         if dspl_sze_before {
