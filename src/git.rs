@@ -14,7 +14,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
         None => "<unknown>".to_string(),
     };
 
-    print!("Recompressing '{}': ", repo_name);
+    print!("Recompressing '{}': ", &repo_name);
     // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
         return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
