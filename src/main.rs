@@ -73,7 +73,7 @@ fn main() {
     let dir_sizes = DirSizes::new(&cargo_cache);
 
     if config.is_present("info") {
-        print_info(&cargo_cache, &dir_sizes);
+        println!("{}", get_info(&cargo_cache, &dir_sizes));
         process::exit(0);
     }
 

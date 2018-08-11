@@ -394,67 +394,69 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
-pub(crate) fn print_info(c: &CargoCachePaths, s: &DirSizes) {
-    println!("Found CARGO_HOME / cargo cache base dir");
-    println!(
-        "\t\t\t'{}' of size: {}",
+pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes) -> String {
+    let mut strn = String::new();
+    strn.push_str("Found CARGO_HOME / cargo cache base dir\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}' of size: {}\n",
         &c.cargo_home.display(),
         s.total_size.file_size(file_size_opts::DECIMAL).unwrap()
-    );
+    ));
 
-    println!("Found {} binaries installed in", s.numb_bins);
-    println!(
-        "\t\t\t'{}', size: {}",
+    strn.push_str(&format!("Found {} binaries installed in\n", s.numb_bins));
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.bin_dir.display(),
         s.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
-    );
-    println!("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.");
+    ));
+    strn.push_str("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.\n");
 
-    println!("Found registry base dir:");
-    println!(
-        "\t\t\t'{}', size: {}",
+    strn.push_str("Found registry base dir:\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.registry.display(),
         s.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
-    );
-    println!("Found registry crate source cache:");
-    println!(
-        "\t\t\t'{}', size: {}",
+    ));
+    strn.push_str("Found registry crate source cache:\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.registry_cache.display(),
         s.total_reg_cache_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    );
-    println!("\t\t\tNote: removed crate sources will be redownloaded if necessary");
-    println!("Found registry unpacked sources");
-    println!(
-        "\t\t\t'{}', size: {}",
+    ));
+    strn.push_str("\t\t\tNote: removed crate sources will be redownloaded if necessary\n");
+    strn.push_str("Found registry unpacked sources\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.registry_sources.display(),
         s.total_reg_src_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    );
-    println!("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).");
+    ));
+    strn.push_str("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).\n");
 
-    println!("Found git repo database:");
-    println!(
-        "\t\t\t'{}', size: {}",
+    strn.push_str("Found git repo database:\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.git_repos_bare.display(),
         s.total_git_repos_bare_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    );
-    println!("\t\t\tNote: removed git repositories will be recloned if necessary");
-    println!("Found git repo checkouts:");
-    println!(
-        "\t\t\t'{}', size: {}",
+    ));
+    strn.push_str("\t\t\tNote: removed git repositories will be recloned if necessary\n");
+    strn.push_str("Found git repo checkouts:\n");
+    strn.push_str(&format!(
+        "\t\t\t'{}', size: {}\n",
         &c.git_checkouts.display(),
         s.total_git_chk_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
+    ));
+    strn.push_str(
+        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if necessary (no net access needed, if repos are up-to-date).\n"
     );
-    println!(
-        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if necessary (no net access needed, if repos are up-to-date)."
-    );
+    strn
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
