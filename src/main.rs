@@ -66,7 +66,7 @@ fn main() {
 
     if config.is_present("list-dirs") {
         // only print the directories and exit, don't calculate anything else
-        cargo_cache.print_dir_paths();
+        println!("{}", cargo_cache.get_dir_paths());
         process::exit(0);
     }
 

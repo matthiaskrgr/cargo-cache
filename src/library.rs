@@ -212,30 +212,41 @@ impl CargoCachePaths {
         })
     }
 
-    pub(crate) fn print_dir_paths(&self) {
-        println!();
-        println!("binaries directory:           {}", &self.bin_dir.display());
-        println!("registry directory:           {}", &self.registry.display());
-        println!("registry index:               {}", &self.registry_index.display());
+    pub(crate) fn get_dir_paths(&self) -> String {
+        let mut s = String::from("\n");
 
-        println!(
-            "registry crate source cache:  {}",
+        s.push_str(&format!(
+            "binaries directory:           {}\n",
+            &self.bin_dir.display()
+        ));
+        s.push_str(&format!(
+            "registry directory:           {}\n",
+            &self.registry.display()
+        ));
+        s.push_str(&format!(
+            "registry index:               {}\n",
+            &self.registry_index.display()
+        ));
+
+        s.push_str(&format!(
+            "registry crate source cache:  {}\n",
             &self.registry_cache.display()
-        );
-        println!(
-            "registry unpacked sources:    {}",
+        ));
+        s.push_str(&format!(
+            "registry unpacked sources:    {}\n",
             &self.registry_sources.display()
-        );
-        println!(
-            "git db directory:             {}",
+        ));
+        s.push_str(&format!(
+            "git db directory:             {}\n",
             &self.git_repos_bare.display()
-        );
-        println!(
-            "git checkouts dir:            {}",
+        ));
+        s.push_str(&format!(
+            "git checkouts dir:            {}\n",
             &self.git_checkouts.display()
-        );
+        ));
+        s
     }
-}
+} // impl CargoCachePaths
 
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     //@TODO: can we Walkdir only once?
