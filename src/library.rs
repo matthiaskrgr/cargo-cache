@@ -285,12 +285,11 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // files in the current directory.
 
     let file_number = if walkdir_start.contains("registry") {
-        WalkDir::new(&walkdir_start).max_depth(2).min_depth(2)
+        WalkDir::new(&walkdir_start).max_depth(2).min_depth(2).into_iter().count() as u64
     } else {
-        WalkDir::new(&walkdir_start).max_depth(1)
-    }.into_iter()
-    .collect::<Vec<_>>()
-    .len() as u64;
+        fs::read_dir(&dir).unwrap().into_iter().count() as u64
+    };
+
 
     DirInfo {
         dir_size,
