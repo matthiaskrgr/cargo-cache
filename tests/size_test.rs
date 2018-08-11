@@ -80,8 +80,8 @@ Size of git repo checkouts:        0 B\n",
         // make sure the sizes match
         // @TODO make this compare texts again, not just lines
         assert_eq!(
-            desired_output.lines().collect::<Vec<_>>().len(),
-            cc_output.lines().collect::<Vec<_>>().len()
+            desired_output.lines().count(),
+            cc_output.lines().count()
         );
     }
 }
