@@ -480,7 +480,6 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     let perc: f32 =
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
     // truncate to 2 decimal digits
-    // this is faster than casting to string and truncating the string
     let percentage: f32 = ((perc * f32::from(100_i8)).trunc()) / (f32::from(100_u8));
 
     if size_before == size_after {
@@ -551,8 +550,7 @@ pub(crate) fn remove_dir_via_cmdline(
         }
     };
 
-    //@TODO remove vec
-    let inputs = input.split(',').collect::<Vec<&str>>();
+    let inputs = input.split(',');
     let valid_dirs = vec![
         "git-db",
         "git-repos",
@@ -572,18 +570,19 @@ pub(crate) fn remove_dir_via_cmdline(
     let mut invalid_dirs = String::new();
     let mut terminate: bool = false;
 
-    for word in &inputs {
-        if valid_dirs.contains(word) {
+    for word in inputs {
+        if valid_dirs.contains(&word) {
             // dir is recognized
             // dedupe
-            match *word {
+            match word {
                 "all" => {
                     rm_git_repos = true;
                     rm_git_checkouts = true;
                     rm_registry_sources = true;
                     rm_registry_crate_cache = true;
-                    // we rm everything, no need to look further, break out of loop
-                    break; // for word in &inputs
+                    // we clean the entire cache anyway,
+                    // no need to look further, break out of loop
+                    break; // for word in inputs
                 }
                 "registry" | "registry-crate-cache" => {
                     rm_registry_sources = true;
@@ -607,10 +606,10 @@ pub(crate) fn remove_dir_via_cmdline(
             invalid_dirs.push_str(" ");
             terminate = true;
         }
-    } // for word in &inputs
+    } // for word in inputs
     if terminate {
-        // remove the last character which is a trailing whitespace
-        invalid_dirs.pop();
+        // remove trailing whitespace
+        invalid_dirs.trim();
         return Err((
             ErrorKind::InvalidDeletableDir,
             format!("Invalid deletable dirs: {}", invalid_dirs),
