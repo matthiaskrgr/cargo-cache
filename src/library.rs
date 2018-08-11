@@ -216,32 +216,36 @@ impl CargoCachePaths {
         let mut s = String::from("\n");
 
         s.push_str(&format!(
-            "binaries directory:           {}\n",
-            &self.bin_dir.display()
-        ));
-        s.push_str(&format!(
-            "registry directory:           {}\n",
-            &self.registry.display()
-        ));
-        s.push_str(&format!(
-            "registry index:               {}\n",
-            &self.registry_index.display()
+            "cargo home:                 {}\n",
+            &self.cargo_home.display()
         ));
 
         s.push_str(&format!(
-            "registry crate source cache:  {}\n",
+            "binaries directory:         {}\n",
+            &self.bin_dir.display()
+        ));
+        s.push_str(&format!(
+            "registry directory:         {}\n",
+            &self.registry.display()
+        ));
+        s.push_str(&format!(
+            "registry index:             {}\n",
+            &self.registry_index.display()
+        ));
+        s.push_str(&format!(
+            "crate source archives:      {}\n",
             &self.registry_cache.display()
         ));
         s.push_str(&format!(
-            "registry unpacked sources:    {}\n",
+            "unpacked crate sources:     {}\n",
             &self.registry_sources.display()
         ));
         s.push_str(&format!(
-            "git db directory:             {}\n",
+            "bare git repos:             {}\n",
             &self.git_repos_bare.display()
         ));
         s.push_str(&format!(
-            "git checkouts dir:            {}\n",
+            "git repo checkouts:         {}\n",
             &self.git_checkouts.display()
         ));
         s
