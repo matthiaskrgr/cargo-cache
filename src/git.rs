@@ -94,6 +94,12 @@ pub(crate) fn git_gc_everything(
     // gc repos and registries inside cargo cache
 
     fn gc_subdirs(path: &PathBuf, dry_run: bool) -> (u64, u64) {
+        if path.is_file() {
+            panic!("gc_subdirs() tried to compress file instead of directory")
+        } else if !path.is_dir() {
+            // if the directory does not exist, skip it
+            return (0, 0);
+        }
         // takes directory, finds all subdirectories and tries to gc those
         let mut size_sum_before: u64 = 0;
         let mut size_sum_after: u64 = 0;
@@ -129,13 +135,6 @@ pub(crate) fn git_gc_everything(
     } // fn gc_subdirs
 
     // gc cloned git repos of crates and registries
-    if !git_repos_bare_dir.is_dir() {
-        println!(
-            "WARNING:   {} is not a directory",
-            git_repos_bare_dir.display()
-        );
-        return;
-    }
     let mut total_size_before: u64 = 0;
     let mut total_size_after: u64 = 0;
 
