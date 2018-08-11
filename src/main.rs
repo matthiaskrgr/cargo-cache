@@ -46,14 +46,13 @@ use crate::library::*;
 
 fn main() {
     // parse args
-    // dummy subcommand:
-    // https://github.com/kbknapp/clap-rs/issues/937
 
+    // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
     let config = cli::gen_clap();
     // we need this in case we call "cargo-cache" directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
-    // indicates if size changed and whether we should print a before/after size diff
 
+    // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 
     let cargo_cache = match CargoCachePaths::new() {
