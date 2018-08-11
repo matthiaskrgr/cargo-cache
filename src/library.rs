@@ -12,7 +12,7 @@ pub(crate) struct DirInfo {
     pub(crate) file_number: u64,
 }
 
-pub(crate) struct DirSizesCollector {
+pub(crate) struct DirSizes {
     pub(crate) total_size: u64,     // total size of cargo root dir
     numb_bins: u64,                 // number of binaries found
     total_bin_size: u64,            // total size of binaries found
@@ -28,7 +28,7 @@ pub(crate) struct DirSizesCollector {
     numb_reg_src_checkouts: u64,    // number of source checkouts
 }
 
-impl DirSizesCollector {
+impl DirSizes {
     pub(crate) fn new(ccd: &CargoCachePaths) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
         let git_repos_bare = cumulative_dir_size(&ccd.git_repos_bare);
@@ -379,7 +379,7 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
-pub(crate) fn print_info(c: &CargoCachePaths, s: &DirSizesCollector) {
+pub(crate) fn print_info(c: &CargoCachePaths, s: &DirSizes) {
     println!("Found CARGO_HOME / cargo cache base dir");
     println!(
         "\t\t\t'{}' of size: {}",

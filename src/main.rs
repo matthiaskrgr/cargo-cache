@@ -70,7 +70,7 @@ fn main() {
         process::exit(0);
     }
 
-    let dir_sizes = DirSizesCollector::new(&cargo_cache);
+    let dir_sizes = DirSizes::new(&cargo_cache);
 
     if config.is_present("info") {
         print_info(&cargo_cache, &dir_sizes);
@@ -144,7 +144,7 @@ fn main() {
     if size_changed && !config.is_present("dry-run") {
         let cache_size_old = dir_sizes.total_size;
         // recalculate file sizes by constructing a new DSC object
-        let cache_size_new = DirSizesCollector::new(&cargo_cache).total_size;
+        let cache_size_new = DirSizes::new(&cargo_cache).total_size;
 
         let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(
