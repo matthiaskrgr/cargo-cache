@@ -61,7 +61,7 @@ impl DirSizesCollector {
             numb_reg_src_checkouts: reg_src.file_number,
         }
     }
-    pub(crate) fn print_pretty(&self, ccd: &CargoCachePaths) {
+    pub(crate) fn print_pretty(&self, ccd: &CargoCachePaths) -> String {
         // create a string and concatenate all the things we want to print with it
         // and only print it in the end, this should save a few syscalls and be faster than
         // printing every line one by one
@@ -137,7 +137,7 @@ impl DirSizesCollector {
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
-        println!("{}", s);
+        s
     }
 }
 

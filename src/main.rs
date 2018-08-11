@@ -77,7 +77,7 @@ fn main() {
         process::exit(0);
     }
 
-    dir_sizes.print_pretty(&cargo_cache);
+    println!("{}", dir_sizes.print_pretty(&cargo_cache));
 
     if config.is_present("remove-dir") {
         match remove_dir_via_cmdline(
