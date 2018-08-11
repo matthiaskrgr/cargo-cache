@@ -216,6 +216,8 @@ impl CargoCachePaths {
         println!();
         println!("binaries directory:           {}", &self.bin_dir.display());
         println!("registry directory:           {}", &self.registry.display());
+        println!("registry index:               {}", &self.registry_index.display());
+
         println!(
             "registry crate source cache:  {}",
             &self.registry_cache.display()
