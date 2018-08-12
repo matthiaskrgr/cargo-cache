@@ -67,7 +67,7 @@ impl DirSizes {
         // printing every line one by one
 
         // @TODO use format_args!() ?
-        let mut s = String::new();
+        let mut s = String::with_capacity(470);
 
         s.push_str(&format!(
             "Cargo cache '{}/':\n\n",
@@ -137,6 +137,7 @@ impl DirSizes {
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap()
         ));
+
         s
     }
 }
@@ -213,8 +214,8 @@ impl CargoCachePaths {
     }
 
     pub(crate) fn get_dir_paths(&self) -> String {
-        let mut s = String::from("\n");
-
+        let mut s = String::with_capacity(500);
+        s.push_str("\n");
         s.push_str(&format!(
             "cargo home:                 {}\n",
             &self.cargo_home.display()
@@ -285,11 +286,14 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // files in the current directory.
 
     let file_number = if walkdir_start.contains("registry") {
-        WalkDir::new(&walkdir_start).max_depth(2).min_depth(2).into_iter().count() as u64
+        WalkDir::new(&walkdir_start)
+            .max_depth(2)
+            .min_depth(2)
+            .into_iter()
+            .count() as u64
     } else {
         fs::read_dir(&dir).unwrap().into_iter().count() as u64
     };
-
 
     DirInfo {
         dir_size,
@@ -394,7 +398,7 @@ pub(crate) fn rm_old_crates(
 }
 
 pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes) -> String {
-    let mut strn = String::new();
+    let mut strn = String::with_capacity(1020);
     strn.push_str("Found CARGO_HOME / cargo cache base dir\n");
     strn.push_str(&format!(
         "\t\t\t'{}' of size: {}\n",
