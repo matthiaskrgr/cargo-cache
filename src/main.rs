@@ -76,6 +76,13 @@ fn main() {
         process::exit(0);
     }
 
+    if config.is_present("top-cache-items") {
+        let val = value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
+        if val > 0 {
+            println!("{}", get_top_crates(val, &cargo_cache));
+        }
+        process::exit(0);
+    }
     println!("{}", dir_sizes.print_pretty(&cargo_cache));
 
     if config.is_present("remove-dir") {

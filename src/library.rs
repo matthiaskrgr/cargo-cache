@@ -292,7 +292,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
             .into_iter()
             .count() as u64
     } else {
-        fs::read_dir(&dir).unwrap().into_iter().count() as u64
+        fs::read_dir(&dir).unwrap().count() as u64
     };
 
     DirInfo {
@@ -632,4 +632,185 @@ pub(crate) fn remove_dir_via_cmdline(
         rm(&ccd.registry_cache, dry_run, size_changed)?
     }
     Ok(())
+}
+
+pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
+    // we now have all the sizes and names and version sorted
+    #[derive(Debug)]
+    struct FileDesc {
+        name: String,
+        version: String,
+        size: u64,
+    }
+
+    impl FileDesc {
+        fn new(path: &PathBuf, recursive: bool) -> Self {
+            let last = path.to_str().unwrap().split('/').last().unwrap();
+
+            let mut i = last.split('-').collect::<Vec<_>>();
+            let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+            let name = i.join("-");
+
+            let size = if recursive {
+                let walkdir = WalkDir::new(path.display().to_string());
+
+                walkdir
+                    .into_iter()
+                    .map(|e| e.unwrap().path().to_owned())
+                    .collect::<Vec<_>>()
+                    .par_iter()
+                    .map(|f| {
+                        fs::metadata(f)
+                            .unwrap_or_else(|_| {
+                                panic!("Failed to get metadata of file '{}'", &path.display())
+                            }).len()
+                    }).sum()
+            } else {
+                //  recursive ?
+                fs::metadata(&path)
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to get metadata of file '{}'", &path.display())
+                    }).len()
+            };
+
+            Self {
+                name,
+                version,
+                size,
+            }
+        } // fn new()
+    } // impl FileDesc
+
+    let mut output = String::new();
+
+    let sources = [
+        &ccd.registry_sources,
+        &ccd.registry_cache,
+        &ccd.git_repos_bare,
+        &ccd.git_checkouts,
+    ];
+
+    for cache_dir in &sources {
+        output.push_str(&format!("\nSummary for: {:?}\n", cache_dir));
+
+        let recursive: bool = *cache_dir != &ccd.registry_cache;
+
+        // if we check bare git repos or checkouts, we need to calculate sizes slightly different
+        let is_git: bool = *cache_dir == &ccd.git_checkouts || *cache_dir == &ccd.git_repos_bare;
+
+        // get list of package all "...\.crate$" files and sort it
+        let mut collection = Vec::new();
+        if is_git {
+            let crate_list = fs::read_dir(&cache_dir)
+                .unwrap()
+                .map(|cratepath| cratepath.unwrap().path())
+                .collect::<Vec<PathBuf>>();
+            collection.extend_from_slice(&crate_list);
+        } else {
+            for repo in fs::read_dir(cache_dir).unwrap() {
+                let crate_list = fs::read_dir(&repo.unwrap().path())
+                    .unwrap()
+                    .map(|cratepath| cratepath.unwrap().path())
+                    .collect::<Vec<PathBuf>>();
+
+                collection.extend_from_slice(&crate_list);
+            }
+        }
+        collection.sort();
+
+        let collections_vec = collection.clone()/*@FIXME*/.iter().map(|path| FileDesc::new(path, recursive)).collect::<Vec<_>>();
+
+        let mut summary: Vec<String> = Vec::new();
+        let mut current_name = String::new();
+        let mut counter: u32 = 0;
+        let mut total_size: u64 = 0;
+        let mut max_cratename_len = 0;
+
+        // first find out max_cratename_len
+        for pkg in &collections_vec {
+            if pkg.name.len() > max_cratename_len {
+                max_cratename_len = pkg.name.len();
+            }
+        }
+
+        #[cfg_attr(feature = "cargo-clippy", allow(if_not_else))]
+        for pkg in &collections_vec {
+            if pkg.name != current_name {
+                // don't push the first empty string
+                if !current_name.is_empty() {
+                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                    let average_crate_size = (total_size / u64::from(counter))
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap();
+
+                    if *cache_dir == &ccd.registry_sources {
+                        summary.push(format!(
+                            "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                            total_size,
+                            current_name,
+                            counter,
+                            format!("src avg: {: >9}", average_crate_size),
+                            total_size_hr,
+                            width = max_cratename_len
+                        ));
+                    } else if *cache_dir == &ccd.registry_cache {
+                        summary.push(format!(
+                            "{:0>20} {: <width$} archives: {: <3} {: <20}  total: {}\n",
+                            total_size,
+                            current_name,
+                            counter,
+                            format!("crate avg: {: >9}", average_crate_size),
+                            total_size_hr,
+                            width = max_cratename_len
+                        ));
+                    } else if *cache_dir == &ccd.git_repos_bare {
+                        summary.push(format!(
+                            "{:0>20} {: <width$} repo: {: <3} {: <20}  total: {}\n",
+                            total_size,
+                            current_name,
+                            counter,
+                            format!("repo avg: {: >9}", average_crate_size),
+                            total_size_hr,
+                            width = max_cratename_len
+                        ));
+                    } else if *cache_dir == &ccd.git_checkouts {
+                        summary.push(format!(
+                            "{:0>20} {: <width$} repo ckt: {: <3} {: <20}  total: {}\n",
+                            total_size,
+                            current_name,
+                            counter,
+                            format!("ckt avg: {: >9}", average_crate_size),
+                            total_size_hr,
+                            width = max_cratename_len
+                        ));
+                    } else {
+                        unreachable!("unknown cache source dir summary requested!");
+                    }
+                } // !current_name.is_empty()
+                  // new package, reset counting
+                current_name = pkg.name.clone();
+                counter = 1;
+                total_size = pkg.size;
+            } else {
+                counter += 1;
+                total_size += pkg.size;
+            }
+        }
+
+        summary.sort();
+        summary.reverse();
+
+        let mut outstring = String::new();
+
+        for (c, i) in summary.iter().enumerate() {
+            if c == limit as usize {
+                break;
+            }
+            let i = &i[21..]; // remove first word used for sorting
+            outstring.push_str(i);
+        }
+
+        output.push_str(&outstring);
+    }
+    output
 }

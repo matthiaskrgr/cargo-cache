@@ -8,7 +8,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
     let remove_dir = Arg::with_name("remove-dir").short("r").long("remove-dir")
         .help("Remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
-        .takes_value(true).value_name("dir1,dir2,dir3");
+        .takes_value(true)
+        .value_name("dir1,dir2,dir3");
 
     let gc_repos = Arg::with_name("gc-repos")
         .short("g")
@@ -43,6 +44,13 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .long("autoclean-expensive")
         .help("As --autoclean, but also recompresses git repositories");
 
+    let list_top_cache_items = Arg::with_name("top-cache-items")
+        .short("t")
+        .long("top-cache-items")
+        .help("List the top N items taking most space in the cache")
+        .takes_value(true)
+        .value_name("N");
+
     App::new("cargo-cache")
         .version(crate_version!())
         .bin_name("cargo")
@@ -62,6 +70,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
                 .arg(&dry_run)
                 .arg(&autoclean)
                 .arg(&autoclean_expensive)
+                .arg(&list_top_cache_items)
                 .setting(AppSettings::Hidden)
         ) // subcommand
         .arg(&list_dirs)
@@ -72,6 +81,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&dry_run)
         .arg(&autoclean)
         .arg(&autoclean_expensive)
+        .arg(&list_top_cache_items)
         .get_matches()
 }
 
