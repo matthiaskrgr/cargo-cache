@@ -718,7 +718,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         }
         collection.sort();
 
-        let collections_vec = collection.clone()/*@FIXME*/.iter().map(|path| FileDesc::new(path, recursive)).collect::<Vec<_>>();
+        let collections_vec = collection.iter().map(|path| FileDesc::new(path, recursive)).collect::<Vec<_>>();
 
         let mut summary: Vec<String> = Vec::new();
         let mut current_name = String::new();
