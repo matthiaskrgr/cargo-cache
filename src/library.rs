@@ -727,14 +727,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         let mut current_name = String::new();
         let mut counter: u32 = 0;
         let mut total_size: u64 = 0;
-        let mut max_cratename_len = 0;
+        //let mut max_cratename_len = 0;
 
         // first find out max_cratename_len
-        for pkg in &collections_vec {
-            if pkg.name.len() > max_cratename_len {
-                max_cratename_len = pkg.name.len();
-            }
-        }
+        let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
 
         #[cfg_attr(feature = "cargo-clippy", allow(if_not_else))]
         for pkg in &collections_vec {
