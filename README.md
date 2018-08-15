@@ -2,6 +2,11 @@ Requires rust nightly 1.29 (due to rust 2018 edition usage).
 
 DISCLAIMER: I only tested this on linux.
 
+Installation:
+````
+cargo install --git https://github.com/matthiaskrgr/cargo-cache
+````
+
 Sample output:
 ````
 Cargo cache '/home/matthias/.cargo':
