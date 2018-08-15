@@ -550,7 +550,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
 
         #[cfg_attr(feature = "cargo-clippy", allow(if_not_else))]
-        collections_vec.iter().for_each(|pkg| {
+        collections_vec.into_iter().for_each(|pkg| {
             {
                 if pkg.name != current_name {
                     // don't push the first empty string
@@ -605,7 +605,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
                         }
                     } // !current_name.is_empty()
                       // new package, reset counting
-                    current_name = pkg.name.clone();
+                    current_name = pkg.name;
                     counter = 1;
                     total_size = pkg.size;
                 } else {
@@ -618,7 +618,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         summary.sort();
         summary.reverse();
 
-        for (c, i) in summary.iter().enumerate() {
+        for (c, i) in summary.into_iter().enumerate() {
             if c == limit as usize {
                 break;
             }
