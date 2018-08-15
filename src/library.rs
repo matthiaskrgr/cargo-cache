@@ -718,7 +718,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         }
         collection.sort();
 
-        let collections_vec = collection.iter().map(|path| FileDesc::new(path, recursive)).collect::<Vec<_>>();
+        let collections_vec = collection
+            .iter()
+            .map(|path| FileDesc::new(path, recursive))
+            .collect::<Vec<_>>();
 
         let mut summary: Vec<String> = Vec::new();
         let mut current_name = String::new();
@@ -800,17 +803,13 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         summary.sort();
         summary.reverse();
 
-        let mut outstring = String::new();
-
         for (c, i) in summary.iter().enumerate() {
             if c == limit as usize {
                 break;
             }
             let i = &i[21..]; // remove first word used for sorting
-            outstring.push_str(i);
+            output.push_str(i);
         }
-
-        output.push_str(&outstring);
     }
     output
 }
