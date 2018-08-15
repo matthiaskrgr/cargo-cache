@@ -733,69 +733,70 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
 
         #[cfg_attr(feature = "cargo-clippy", allow(if_not_else))]
-        collections_vec.iter().for_each(|pkg| { {
-            if pkg.name != current_name {
-                // don't push the first empty string
-                if !current_name.is_empty() {
-                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
-                    let average_crate_size = (total_size / u64::from(counter))
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap();
+        collections_vec.iter().for_each(|pkg| {
+            {
+                if pkg.name != current_name {
+                    // don't push the first empty string
+                    if !current_name.is_empty() {
+                        let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                        let average_crate_size = (total_size / u64::from(counter))
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap();
 
-                    if *cache_dir == &ccd.registry_sources {
-                        summary.push(format!(
-                            "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
-                            total_size,
-                            current_name,
-                            counter,
-                            format!("src avg: {: >9}", average_crate_size),
-                            total_size_hr,
-                            width = max_cratename_len
-                        ));
-                    } else if *cache_dir == &ccd.registry_cache {
-                        summary.push(format!(
-                            "{:0>20} {: <width$} archives: {: <3} {: <20}  total: {}\n",
-                            total_size,
-                            current_name,
-                            counter,
-                            format!("crate avg: {: >9}", average_crate_size),
-                            total_size_hr,
-                            width = max_cratename_len
-                        ));
-                    } else if *cache_dir == &ccd.git_repos_bare {
-                        summary.push(format!(
-                            "{:0>20} {: <width$} repo: {: <3} {: <20}  total: {}\n",
-                            total_size,
-                            current_name,
-                            counter,
-                            format!("repo avg: {: >9}", average_crate_size),
-                            total_size_hr,
-                            width = max_cratename_len
-                        ));
-                    } else if *cache_dir == &ccd.git_checkouts {
-                        summary.push(format!(
-                            "{:0>20} {: <width$} repo ckt: {: <3} {: <20}  total: {}\n",
-                            total_size,
-                            current_name,
-                            counter,
-                            format!("ckt avg: {: >9}", average_crate_size),
-                            total_size_hr,
-                            width = max_cratename_len
-                        ));
-                    } else {
-                        unreachable!("unknown cache source dir summary requested!");
-                    }
-                } // !current_name.is_empty()
-                  // new package, reset counting
-                current_name = pkg.name.clone();
-                counter = 1;
-                total_size = pkg.size;
-            } else {
-                counter += 1;
-                total_size += pkg.size;
+                        if *cache_dir == &ccd.registry_sources {
+                            summary.push(format!(
+                                "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                                total_size,
+                                current_name,
+                                counter,
+                                format!("src avg: {: >9}", average_crate_size),
+                                total_size_hr,
+                                width = max_cratename_len
+                            ));
+                        } else if *cache_dir == &ccd.registry_cache {
+                            summary.push(format!(
+                                "{:0>20} {: <width$} archives: {: <3} {: <20}  total: {}\n",
+                                total_size,
+                                current_name,
+                                counter,
+                                format!("crate avg: {: >9}", average_crate_size),
+                                total_size_hr,
+                                width = max_cratename_len
+                            ));
+                        } else if *cache_dir == &ccd.git_repos_bare {
+                            summary.push(format!(
+                                "{:0>20} {: <width$} repo: {: <3} {: <20}  total: {}\n",
+                                total_size,
+                                current_name,
+                                counter,
+                                format!("repo avg: {: >9}", average_crate_size),
+                                total_size_hr,
+                                width = max_cratename_len
+                            ));
+                        } else if *cache_dir == &ccd.git_checkouts {
+                            summary.push(format!(
+                                "{:0>20} {: <width$} repo ckt: {: <3} {: <20}  total: {}\n",
+                                total_size,
+                                current_name,
+                                counter,
+                                format!("ckt avg: {: >9}", average_crate_size),
+                                total_size_hr,
+                                width = max_cratename_len
+                            ));
+                        } else {
+                            unreachable!("unknown cache source dir summary requested!");
+                        }
+                    } // !current_name.is_empty()
+                      // new package, reset counting
+                    current_name = pkg.name.clone();
+                    counter = 1;
+                    total_size = pkg.size;
+                } else {
+                    counter += 1;
+                    total_size += pkg.size;
+                }
             }
-        }
-    });
+        });
 
         summary.sort();
         summary.reverse();
