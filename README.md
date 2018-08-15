@@ -1,4 +1,4 @@
-Requires rust nightly 1.29 (due to rust 2018 edition usage).
+Requires rust nightly 1.30 (due to rust 2018 edition usage).
 
 DISCLAIMER: I only tested this on linux.
 
@@ -22,7 +22,6 @@ Size of 4 git repo checkouts:               9.61 MB
 ````
 
 Usage:
-
 ````
 USAGE:
     cargo cache [FLAGS] [OPTIONS]
