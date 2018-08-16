@@ -13,6 +13,7 @@ pub(crate) struct DirInfo {
     pub(crate) file_number: u64,
 }
 
+#[cfg_attr(feature = "cargo-clippy", allow(similar_names))] // FP due to derives
 #[derive(Debug, Clone)]
 pub(crate) struct DirSizes {
     pub(crate) total_size: u64,                // total size of cargo root dir
