@@ -213,13 +213,13 @@ pub(crate) fn rm_old_crates(
         for pkgpath in &crate_list {
             let path_end = match pkgpath.into_iter().last() {
                 Some(path_end) => path_end,
-                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
+                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.to_owned()))),
             };
 
             let mut vec = path_end.to_str().unwrap().split('-').collect::<Vec<&str>>();
             let pkgver = match vec.pop() {
                 Some(pkgver) => pkgver,
-                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.clone()))),
+                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.to_owned()))),
             };
             let pkgname = vec.join("-");
 
