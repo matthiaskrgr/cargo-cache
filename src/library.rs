@@ -5,6 +5,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
+#[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
@@ -12,6 +13,7 @@ pub(crate) struct DirInfo {
     pub(crate) file_number: u64,
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct DirSizes {
     pub(crate) total_size: u64,                // total size of cargo root dir
     pub(crate) numb_bins: u64,                 // number of binaries found
@@ -63,6 +65,7 @@ impl DirSizes {
     }
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct CargoCachePaths {
     pub(crate) cargo_home: PathBuf,
     pub(crate) bin_dir: PathBuf,
@@ -74,6 +77,7 @@ pub(crate) struct CargoCachePaths {
     pub(crate) git_checkouts: PathBuf,
 }
 
+#[derive(Debug, Clone)]
 pub(crate) enum ErrorKind {
     GitRepoNotOpened,
     GitRepoDirNotFound,
@@ -453,7 +457,7 @@ pub(crate) fn remove_dir_via_cmdline(
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     // we now have all the sizes and names and version sorted
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     struct FileDesc {
         name: String,
         version: String,
