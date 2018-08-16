@@ -821,6 +821,48 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 mod libtests {
     use super::*;
 
+    impl DirSizes {
+        pub(super) fn new_manually(
+            DI_bindir: &DirInfo,
+            DI_git_repos_bare: &DirInfo,
+            DI_git_checkout: &DirInfo,
+            DI_reg_cache: &DirInfo,
+            DI_reg_src: &DirInfo,
+            DI_reg_index: &DirInfo,
+        ) -> DirSizes {
+            let bindir = DI_bindir;
+            let git_repos_bare = DI_git_repos_bare;
+            let git_checkouts = DI_git_checkout;
+            let reg_cache = DI_reg_cache;
+            let reg_src = DI_reg_src;
+            let reg_index = DI_reg_index;
+
+            let total_reg_size = reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size;
+            let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
+
+            Self {
+                //no need to recompute all of this from scratch
+                total_size: total_reg_size + total_git_db_size + bindir.dir_size,
+                numb_bins: bindir.file_number,
+                total_bin_size: bindir.dir_size,
+                total_reg_size,
+
+                total_git_db_size,
+                total_git_repos_bare_size: git_repos_bare.dir_size,
+                numb_git_repos_bare_repos: git_repos_bare.file_number,
+
+                total_git_chk_size: git_checkouts.dir_size,
+                numb_git_checkouts: git_checkouts.file_number,
+
+                total_reg_cache_size: reg_cache.dir_size,
+                numb_reg_cache_entries: reg_cache.file_number,
+
+                total_reg_src_size: reg_src.dir_size,
+                numb_reg_src_checkouts: reg_src.file_number,
+            }
+        }
+    }
+
     #[allow(non_snake_case)]
     #[test]
     fn test_DirInfo() {
@@ -831,4 +873,46 @@ mod libtests {
         assert_eq!(x.dir_size, 10);
         assert_eq!(x.file_number, 20);
     }
+}
+
+#[allow(non_snake_case)]
+#[test]
+fn test_DirSizes() {
+    // DirInfors to construct DirSizes from
+    let bindir = DirInfo {
+        dir_size: 121_212,
+        file_number: 31,
+    };
+    let git_repos_bare = DirInfo {
+        dir_size: 121_212,
+        file_number: 37,
+    };
+    let git_checkouts = DirInfo {
+        dir_size: 34984,
+        file_number: 8,
+    };
+    let reg_cache = DirInfo {
+        dir_size: 89,
+        file_number: 23445,
+    };
+    let reg_src = DirInfo {
+        dir_size: 1989,
+        file_number: 123_909_849,
+    };
+    let reg_index = DirInfo {
+        dir_size: 23,
+        file_number: 12345,
+    };
+
+    // create a DirSizes object
+    let dirSizes = DirSizes::new_manually(
+        &bindir,
+        &git_repos_bare,
+        &git_checkouts,
+        &reg_cache,
+        &reg_src,
+        &reg_index,
+    );
+
+    
 }
