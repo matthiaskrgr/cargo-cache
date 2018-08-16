@@ -35,7 +35,6 @@
 mod cli;
 mod git;
 mod library;
-mod output;
 
 use std::{fs, process};
 
@@ -44,7 +43,6 @@ use humansize::{file_size_opts, FileSize};
 
 use crate::git::*;
 use crate::library::*;
-use crate::output::*;
 
 fn main() {
     // parse args
