@@ -663,6 +663,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
                 walkdir
                     .into_iter()
                     .map(|e| e.unwrap().path().to_owned())
+                    .filter(|f| f.exists())
                     .collect::<Vec<_>>()
                     .par_iter()
                     .map(|f| {
