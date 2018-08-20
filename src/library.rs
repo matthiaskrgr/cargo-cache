@@ -917,8 +917,6 @@ fn test_DirSizes() {
         &reg_index,
     );
 
-
-//     CCD   ...   we need cargo cache dirs
-    let ouput = dirSizes.print_pretty(CCD);
-
+    //     CCD   ...   we need cargo cache dirs
+    //  let ouput = dirSizes.print_pretty(CCD);
 }
