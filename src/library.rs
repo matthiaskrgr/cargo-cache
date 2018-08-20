@@ -279,6 +279,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     let dir_size = WalkDir::new(&walkdir_start)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
+        .filter(|f| f.exists()) // avoid broken symlinks
         .collect::<Vec<_>>()
         .par_iter()
         .map(|f| {
