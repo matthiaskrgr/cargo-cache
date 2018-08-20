@@ -822,6 +822,7 @@ mod libtests {
     use super::*;
 
     impl DirSizes {
+        #[allow(non_snake_case)]
         pub(super) fn new_manually(
             DI_bindir: &DirInfo,
             DI_git_repos_bare: &DirInfo,
@@ -829,7 +830,7 @@ mod libtests {
             DI_reg_cache: &DirInfo,
             DI_reg_src: &DirInfo,
             DI_reg_index: &DirInfo,
-        ) -> DirSizes {
+        ) -> Self {
             let bindir = DI_bindir;
             let git_repos_bare = DI_git_repos_bare;
             let git_checkouts = DI_git_checkout;
@@ -914,5 +915,8 @@ fn test_DirSizes() {
         &reg_index,
     );
 
-    
+
+//     CCD   ...   we need cargo cache dirs
+    let ouput = dirSizes.print_pretty(CCD);
+
 }
