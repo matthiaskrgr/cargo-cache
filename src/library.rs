@@ -822,6 +822,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 #[cfg(test)]
 mod libtests {
     use super::*;
+    use test::Bencher;
 
     impl DirSizes {
         #[allow(non_snake_case)]
@@ -876,51 +877,50 @@ mod libtests {
         assert_eq!(x.dir_size, 10);
         assert_eq!(x.file_number, 20);
     }
-}
 
-#[allow(non_snake_case)]
-#[test]
-fn test_DirSizes() {
-    // DirInfors to construct DirSizes from
-    let bindir = DirInfo {
-        dir_size: 121_212,
-        file_number: 31,
-    };
-    let git_repos_bare = DirInfo {
-        dir_size: 121_212,
-        file_number: 37,
-    };
-    let git_checkouts = DirInfo {
-        dir_size: 34984,
-        file_number: 8,
-    };
-    let reg_cache = DirInfo {
-        dir_size: 89,
-        file_number: 23445,
-    };
-    let reg_src = DirInfo {
-        dir_size: 1_938_493_989,
-        file_number: 123_909_849,
-    };
-    let reg_index = DirInfo {
-        dir_size: 23,
-        file_number: 12345,
-    };
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_DirSizes() {
+        // DirInfors to construct DirSizes from
+        let bindir = DirInfo {
+            dir_size: 121_212,
+            file_number: 31,
+        };
+        let git_repos_bare = DirInfo {
+            dir_size: 121_212,
+            file_number: 37,
+        };
+        let git_checkouts = DirInfo {
+            dir_size: 34984,
+            file_number: 8,
+        };
+        let reg_cache = DirInfo {
+            dir_size: 89,
+            file_number: 23445,
+        };
+        let reg_src = DirInfo {
+            dir_size: 1_938_493_989,
+            file_number: 123_909_849,
+        };
+        let reg_index = DirInfo {
+            dir_size: 23,
+            file_number: 12345,
+        };
 
-    // create a DirSizes object
-    let dirSizes = DirSizes::new_manually(
-        &bindir,
-        &git_repos_bare,
-        &git_checkouts,
-        &reg_cache,
-        &reg_src,
-        &reg_index,
-    );
+        // create a DirSizes object
+        let dirSizes = DirSizes::new_manually(
+            &bindir,
+            &git_repos_bare,
+            &git_checkouts,
+            &reg_cache,
+            &reg_src,
+            &reg_index,
+        );
 
-    let cache_root = PathBuf::from("/home/user/.cargo");
-    let output_is = dirSizes.print_pretty(&cache_root);
+        let cache_root = PathBuf::from("/home/user/.cargo");
+        let output_is = dirSizes.print_pretty(&cache_root);
 
-    let output_should = "Cargo cache '/home/user/.cargo/':
+        let output_should = "Cargo cache '/home/user/.cargo/':
 
 Total size:                             1.94 GB
 Size of 31 installed binaries:            121.21 KB
@@ -931,5 +931,51 @@ Size of git db:                           156.20 KB
 Size of 37 bare git repos:                  121.21 KB
 Size of 8 git repo checkouts:               34.98 KB";
 
-    assert_eq!(output_is, output_should);
+        assert_eq!(output_is, output_should);
+    }
+
+    #[bench]
+    fn bench_pretty_print(b: &mut Bencher) {
+        // DirInfors to construct DirSizes from
+        let bindir = DirInfo {
+            dir_size: 121_212,
+            file_number: 31,
+        };
+        let git_repos_bare = DirInfo {
+            dir_size: 121_212,
+            file_number: 37,
+        };
+        let git_checkouts = DirInfo {
+            dir_size: 34984,
+            file_number: 8,
+        };
+        let reg_cache = DirInfo {
+            dir_size: 89,
+            file_number: 23445,
+        };
+        let reg_src = DirInfo {
+            dir_size: 1_938_493_989,
+            file_number: 123_909_849,
+        };
+        let reg_index = DirInfo {
+            dir_size: 23,
+            file_number: 12345,
+        };
+
+        // create a DirSizes object
+        let dir_sizes = DirSizes::new_manually(
+            &bindir,
+            &git_repos_bare,
+            &git_checkouts,
+            &reg_cache,
+            &reg_src,
+            &reg_index,
+        );
+
+        let cache_root = PathBuf::from("/home/user/.cargo");
+
+        b.iter(|| {
+            dir_sizes.print_pretty(&cache_root);
+        })
+    }
 }
