@@ -64,7 +64,7 @@ impl DirSizes {
             numb_reg_src_checkouts: reg_src.file_number,
         }
     }
-    pub(crate) fn print_pretty(&self, ccd: &CargoCachePaths) -> String {
+    pub(crate) fn print_pretty(&self, cache_root_dir: &PathBuf) -> String {
         // create a string and concatenate all the things we want to print with it
         // and only print it in the end, this should save a few syscalls and be faster than
         // printing every line one by one
@@ -74,7 +74,7 @@ impl DirSizes {
 
         s.push_str(&format!(
             "Cargo cache '{}/':\n\n",
-            &ccd.cargo_home.display()
+            &cache_root_dir.display()
         ));
 
         s.push_str(&format!(
