@@ -899,7 +899,7 @@ fn test_DirSizes() {
         file_number: 23445,
     };
     let reg_src = DirInfo {
-        dir_size: 1989,
+        dir_size: 1_938_493_989,
         file_number: 123_909_849,
     };
     let reg_index = DirInfo {
@@ -917,6 +917,19 @@ fn test_DirSizes() {
         &reg_index,
     );
 
-    //     CCD   ...   we need cargo cache dirs
-    //  let ouput = dirSizes.print_pretty(CCD);
+    let cache_root = PathBuf::from("/home/user/.cargo");
+    let output_is = dirSizes.print_pretty(&cache_root);
+
+    let output_should = "Cargo cache '/home/user/.cargo/':
+
+Total size:                             1.94 GB
+Size of 31 installed binaries:            121.21 KB
+Size of registry:                           1.94 GB
+Size of 23445 crate archives:               89 B
+Size of 123909849 crate source checkouts:   1.94 GB
+Size of git db:                           156.20 KB
+Size of 37 bare git repos:                  121.21 KB
+Size of 8 git repo checkouts:               34.98 KB";
+
+    assert_eq!(output_is, output_should);
 }
