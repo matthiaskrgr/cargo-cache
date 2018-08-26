@@ -1,13 +1,17 @@
+## cargo cache
+
+[![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
+
 Requires rust nightly 1.30 (due to rust 2018 edition usage).
 
 DISCLAIMER: I only tested this on linux.
 
-Installation:
+#### Installation:
 ````
 cargo install --git https://github.com/matthiaskrgr/cargo-cache
 ````
 
-Sample output:
+#### Sample output:
 ````
 Cargo cache '/home/matthias/.cargo':
 
@@ -21,7 +25,7 @@ Size of 95 bare git repos:                  377.87 MB
 Size of 4 git repo checkouts:               9.61 MB
 ````
 
-Usage:
+#### Usage:
 ````
 USAGE:
     cargo cache [FLAGS] [OPTIONS]
