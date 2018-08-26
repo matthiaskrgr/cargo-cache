@@ -34,8 +34,8 @@ rayon = "1.0" # parallel for iterators
 bencher = "0.1" # benchmarks
 
 [[bin]]
-path = "src/main.rs"
 name = "cargo-cache"
+path = "src/main.rs"
 
 [badges]
 travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
