@@ -15,11 +15,14 @@ env:
   matrix:
     - RELEASE="--release"
     - RELEASE=""
+    - CLIPPY="true"
     - CARGO_AUDIT="true"
 
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit; fi
-  - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo audit ; exit ; fi
+  - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo audit; exit; fi
+  - if [[ "$CLIPPY" == "true" ]]; then rustup component add clippy-preview --toolchain=nightly; fi
+  - if [[ "$CLIPPY" == "true" ]]; then cargo clippy --all-targets --all-features -- -D warnings ; exit ; fi
   - cargo build --verbose --all ${RELEASE}
   - cargo test --verbose --all ${RELEASE}
   - cargo run
