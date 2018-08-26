@@ -9,16 +9,17 @@ rust:
 #  - stable
 #  - beta
   - nightly
-#matrix:
-#  allow_failures:
-#    - rust: nightly
+
 
 env:
   matrix:
     - RELEASE="--release"
     - RELEASE=""
+    - MISC="true"
 
 script:
+  - if [[ "$MISC" == "true" ]]; then cargo install cargo-audit; fi
+  - if [[ "$MISC" == "true" ]]; then cargo audit ; exit ; fi
   - cargo build --verbose --all ${RELEASE}
   - cargo test --verbose --all ${RELEASE}
   - cargo run
