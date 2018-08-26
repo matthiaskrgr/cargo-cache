@@ -15,7 +15,7 @@ edition = "2018"
 clap = "2.32" # cmdline arg parsing
 
 # https://github.com/BurntSushi/walkdir
-walkdir = "2.1" # walk content of directory/CARGO_HOME recursively
+walkdir = "2.2" # walk content of directory/CARGO_HOME recursively
 
 # https://github.com/LeopoldArkham/humansize
 humansize = "1.1" # convert digits of bytes to human readable size
