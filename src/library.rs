@@ -73,13 +73,15 @@ impl DirSizes {
             // max line width
             const MAX_WIDTH: i64 = 40;
 
-            let len_padding = (MAX_WIDTH + indent_lvl * 2) - (beginning.len() as i64);
+            let left = MAX_WIDTH + (indent_lvl * 2);
+            let right = beginning.len() as i64;
+            let len_padding = left - right;
             assert!(
                 len_padding > 0,
                 format!(
                     "len_padding is negative: '{} - {} = {}' ",
-                    MAX_WIDTH + (indent_lvl * 2),
-                    beginning.len(),
+                    left,
+                    right,
                     len_padding
                 )
             );
@@ -90,7 +92,7 @@ impl DirSizes {
                 allow(cast_sign_loss, cast_possible_truncation)
             )]
             // I tried mittigating via previous assert()
-            formatted_line.push_str(&String::from(" ").repeat(len_padding as usize));
+            formatted_line.push_str(&" ".repeat(len_padding as usize));
             formatted_line.push_str(end);
             formatted_line.push_str("\n");
             formatted_line
