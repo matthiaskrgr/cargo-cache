@@ -1027,7 +1027,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             file_number: 69,
         };
         let git_repos_bare = DirInfo {
-            dir_size: 30_961_3689,
+            dir_size: 3_0961_3689,
             file_number: 123,
         };
         let git_checkouts = DirInfo {
@@ -1039,7 +1039,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             file_number: 3654,
         };
         let reg_src = DirInfo {
-            dir_size: 90_559_6846,
+            dir_size: 9_0559_6846,
             file_number: 1615,
         };
         let reg_index = DirInfo {
@@ -1099,7 +1099,7 @@ Size of 36 git repo checkouts:              3.92 GB\n";
             file_number: 4,
         };
         let reg_index = DirInfo {
-            dir_size: 125_5000_000,
+            dir_size: 12_5500_0000,
             file_number: 1,
         };
 
