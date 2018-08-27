@@ -1,16 +1,10 @@
-
-use humansize::{file_size_opts, FileSize};
-use std::path::PathBuf;
-
-
-
 pub(crate) struct DirSizes {
     numb_reg_src_checkouts: u64, // number of source checkouts
     total_reg_src_size: u64,
 }
 
 impl DirSizes {
-    pub(crate) fn print_pretty(&self, cache_root_dir: &PathBuf) -> String {
+    pub(crate) fn print_pretty(&self) -> String {
         fn pad_strings(indent_lvl: i8, beginning: &str, end: &str) -> String {
             const MAX_WIDTH: i8 = 37;
 
@@ -26,27 +20,18 @@ impl DirSizes {
 
         s.push_str(&pad_strings(
             2,
-            &format!(
-                "Size of {} crate source checkouts: ",
-                self.numb_reg_src_checkouts
-            ),
-            &self
-                .total_reg_src_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
+            &format!("Size of {} crate source checkouts: ", 1_938_493_989),
+            "bla",
         ));
 
         s
     }
 }
 
-
 fn main() {
-
     impl DirSizes {
         #[allow(non_snake_case)]
         pub(crate) fn new_manually(a: u64, b: u64) -> Self {
-
             Self {
                 total_reg_src_size: a,
                 numb_reg_src_checkouts: b,
@@ -54,18 +39,13 @@ fn main() {
         }
     }
 
+    // create a DirSizes object
+    let dirSizes = DirSizes::new_manually(1_938_493_989, 123_909_849);
 
+    let output_is = dirSizes.print_pretty();
 
-        // create a DirSizes object
-        let dirSizes = DirSizes::new_manually(1_938_493_989, 123_909_849);
-
-        let cache_root = PathBuf::from("/home/user/.cargo");
-        let output_is = dirSizes.print_pretty(&cache_root);
-
-        let output_should = "Cargo cache '/home/user/.cargo/':
+    let output_should = "Cargo cache '/home/user/.cargo/':
 Size of 123909849 crate source checkouts:1.94 GB";
 
-        assert_eq!(output_is, output_should);
-
-
+    assert_eq!(output_is, output_should);
 }
