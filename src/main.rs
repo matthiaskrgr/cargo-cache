@@ -1,17 +1,13 @@
-#![feature(test)]
 
 use humansize::{file_size_opts, FileSize};
 use std::path::PathBuf;
 
-fn main() {}
 
-#[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     pub(crate) dir_size: u64,
     pub(crate) file_number: u64,
 }
 
-#[derive(Debug, Clone)]
 pub(crate) struct DirSizes {
     numb_reg_src_checkouts: u64, // number of source checkouts
     total_reg_src_size: u64,
@@ -48,18 +44,15 @@ impl DirSizes {
     }
 }
 
-#[derive(Debug, Clone)]
 pub(crate) struct CargoCachePaths {
     pub(crate) registry_sources: PathBuf,
 }
 
-#[cfg(test)]
-mod libtests {
-    use super::*;
+fn main() {
 
     impl DirSizes {
         #[allow(non_snake_case)]
-        pub(super) fn new_manually(DI_reg_src: &DirInfo) -> Self {
+        pub(crate) fn new_manually(DI_reg_src: &DirInfo) -> Self {
             let reg_src = DI_reg_src;
 
             Self {
@@ -69,9 +62,8 @@ mod libtests {
         }
     }
 
-    #[test]
-    #[allow(non_snake_case)]
-    fn test_DirSizes() {
+
+
         let reg_src = DirInfo {
             dir_size: 1_938_493_989,
             file_number: 123_909_849,
@@ -87,6 +79,6 @@ mod libtests {
 Size of 123909849 crate source checkouts:1.94 GB";
 
         assert_eq!(output_is, output_should);
-    }
+
 
 }
