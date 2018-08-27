@@ -11,20 +11,10 @@ impl DirSizes {
             let len_padding: i8 = (MAX_WIDTH + indent_lvl * 2) - (beginning.len() as i8);
             let mut formatted_line = beginning.to_string();
             formatted_line.push_str(&String::from(" ").repeat(len_padding as usize));
-            formatted_line.push_str(&end);
-            formatted_line.push_str("\n");
             formatted_line
         }
 
-        let mut s = String::new();
-
-        s.push_str(&pad_strings(
-            2,
-            &format!("Size of {} crate source checkouts: ", 1_938_493_989),
-            "bla",
-        ));
-
-        s
+        pad_strings(2, "Size of 1938493989 crate source checkouts: ", "bla").to_string()
     }
 }
 
