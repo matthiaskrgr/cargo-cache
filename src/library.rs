@@ -146,9 +146,6 @@ pub(crate) struct CargoCachePaths {
 }
 
 
-impl CargoCachePaths {
-    // holds the PathBufs to the different componens of the cargo cache
-} // impl CargoCachePaths
 
 #[cfg(test)]
 mod libtests {
