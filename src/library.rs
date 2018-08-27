@@ -846,7 +846,6 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 mod libtests {
     use super::*;
     use test::Bencher;
-    use pretty_assertions::assert_eq;
 
     impl DirSizes {
         #[allow(non_snake_case)]
