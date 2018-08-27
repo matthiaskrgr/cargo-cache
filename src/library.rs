@@ -1132,4 +1132,61 @@ Size of 0 git repo checkouts:               0 B\n";
         assert_eq!(output_is, output_should);
     }
 
+
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_DirSizes_actually_empty() {
+        // DirInfors to construct DirSizes from
+        let bindir = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+        let git_repos_bare = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+        let git_checkouts = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+        let reg_cache = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+        let reg_src = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+        let reg_index = DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
+
+        // create a DirSizes object
+        let dirSizes = DirSizes::new_manually(
+            &bindir,
+            &git_repos_bare,
+            &git_checkouts,
+            &reg_cache,
+            &reg_src,
+            &reg_index,
+        );
+
+        let cache_root = PathBuf::from("/home/user/.cargo");
+        let output_is = dirSizes.print_pretty(&cache_root);
+
+        let output_should = "Cargo cache '/home/user/.cargo/':
+
+Total size:                             0 B
+Size of 0 installed binaries:             0 B
+Size of registry:                         0 B
+Size of 0 crate archives:                   0 B
+Size of 0 crate source checkouts:           0 B
+Size of git db:                           0 B
+Size of 0 bare git repos:                   0 B
+Size of 0 git repo checkouts:               0 B\n";
+
+        assert_eq!(output_is, output_should);
+    }
 }
