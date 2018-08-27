@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use humansize::{file_size_opts, FileSize};
 
-
 #[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -30,7 +29,6 @@ pub(crate) struct DirSizes {
 }
 
 impl DirSizes {
-
     pub(crate) fn print_pretty(&self, cache_root_dir: &PathBuf) -> String {
         // create a string and concatenate all the things we want to print with it
         // and only print it in the end, this should save a few syscalls and be faster than
@@ -147,28 +145,10 @@ pub(crate) struct CargoCachePaths {
     pub(crate) git_checkouts: PathBuf,
 }
 
-#[derive(Debug, Clone)]
-pub(crate) enum ErrorKind {
-    GitRepoNotOpened,
-    GitRepoDirNotFound,
-    GitGCFailed,
-    GitPackRefsFailed,
-    GitReflogFailed,
-    MalformedPackageName,
-    CargoFailedGetConfig,
-    CargoHomeNotDirectory,
-    InvalidDeletableDir,
-    RemoveFailed,
-    RemoveDirNoArg,
-}
 
 impl CargoCachePaths {
     // holds the PathBufs to the different componens of the cargo cache
-
-
 } // impl CargoCachePaths
-
-
 
 #[cfg(test)]
 mod libtests {
