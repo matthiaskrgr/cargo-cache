@@ -3,10 +3,6 @@ use humansize::{file_size_opts, FileSize};
 use std::path::PathBuf;
 
 
-pub(crate) struct DirInfo {
-    pub(crate) dir_size: u64,
-    pub(crate) file_number: u64,
-}
 
 pub(crate) struct DirSizes {
     numb_reg_src_checkouts: u64, // number of source checkouts
@@ -44,33 +40,24 @@ impl DirSizes {
     }
 }
 
-pub(crate) struct CargoCachePaths {
-    pub(crate) registry_sources: PathBuf,
-}
 
 fn main() {
 
     impl DirSizes {
         #[allow(non_snake_case)]
-        pub(crate) fn new_manually(DI_reg_src: &DirInfo) -> Self {
-            let reg_src = DI_reg_src;
+        pub(crate) fn new_manually(a: u64, b: u64) -> Self {
 
             Self {
-                total_reg_src_size: reg_src.dir_size,
-                numb_reg_src_checkouts: reg_src.file_number,
+                total_reg_src_size: a,
+                numb_reg_src_checkouts: b,
             }
         }
     }
 
 
 
-        let reg_src = DirInfo {
-            dir_size: 1_938_493_989,
-            file_number: 123_909_849,
-        };
-
         // create a DirSizes object
-        let dirSizes = DirSizes::new_manually(&reg_src);
+        let dirSizes = DirSizes::new_manually(1_938_493_989, 123_909_849);
 
         let cache_root = PathBuf::from("/home/user/.cargo");
         let output_is = dirSizes.print_pretty(&cache_root);
