@@ -33,6 +33,9 @@ rayon = "1.0" # parallel for iterators
 # https://github.com/bluss/bencher/
 bencher = "0.1" # benchmarks
 
+# https://github.com/colin-kiegel/rust-pretty-assertions
+pretty_assertions = "0.5" # colored diff assertions
+
 [[bin]]
 name = "cargo-cache"
 path = "src/main.rs"
