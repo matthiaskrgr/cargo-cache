@@ -42,4 +42,5 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
+    -t, --top-cache-items <N>            List the top N items taking most space in the cache
 ````
