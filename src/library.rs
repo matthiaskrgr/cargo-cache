@@ -740,7 +740,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     for cache_dir in &sources {
         // do not try to read nonexisting directory (issue #9)
         if !cache_dir.exists() {
-            println!("Skipping '{}' because it doesn't exist.", cache_dir.display());
+            eprintln!("Skipping '{}' because it doesn't exist.", cache_dir.display());
             continue;
         }
 
