@@ -21,7 +21,7 @@ env:
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit; fi
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo audit; exit; fi
-  - if [[ "$CLIPPY" == "true" ]]; then rustup component add clippy-preview --toolchain=nightly; fi
+  - if [[ "$CLIPPY" == "true" ]]; then rustup component add clippy-preview --toolchain=nightly || cargo install cargo-clippy --force || cargo install --git https://github.com/rust-lang-nursery/rust-clippy/ --force ; fi
   - if [[ "$CLIPPY" == "true" ]]; then cargo clippy --all-targets --all-features -- -D warnings ; exit ; fi
   - cargo build --verbose --all ${RELEASE}
   - cargo test --verbose --all ${RELEASE}
