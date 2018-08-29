@@ -738,6 +738,12 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     ];
 
     for cache_dir in &sources {
+        // do not try to read nonexisting directory (issue #9)
+        if !cache_dir.exists() {
+            println!("Skipping '{}' because it doesn't exist.", cache_dir.display());
+            continue;
+        }
+
         output.push_str(&format!("\nSummary for: {:?}\n", cache_dir));
 
         let recursive: bool = *cache_dir != &ccd.registry_cache;
