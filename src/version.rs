@@ -9,7 +9,7 @@ pub(crate) struct VersionInfo {
 }
 
 impl VersionInfo {
-    pub(crate) fn new() -> VersionInfo {
+    pub(crate) fn new() -> Self {
         // these are set by cargo
         let major = env!("CARGO_PKG_VERSION_MAJOR").parse::<u8>().unwrap();
         let minor = env!("CARGO_PKG_VERSION_MINOR").parse::<u8>().unwrap();
@@ -47,7 +47,7 @@ impl VersionInfo {
     }
 }
 
-impl std::fmt::Display for VersionInfo {
+impl std::fmt::Display for Self {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
