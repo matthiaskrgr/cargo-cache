@@ -87,6 +87,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
+    use pretty_assertions::assert_eq;
     use std::process::Command;
     use test::Bencher;
 
