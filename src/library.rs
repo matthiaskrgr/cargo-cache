@@ -80,9 +80,7 @@ impl DirSizes {
                 len_padding > 0,
                 format!(
                     "len_padding is negative: '{} - {} = {}' ",
-                    left,
-                    right,
-                    len_padding
+                    left, right, len_padding
                 )
             );
 
@@ -740,7 +738,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     for cache_dir in &sources {
         // do not try to read nonexisting directory (issue #9)
         if !cache_dir.exists() {
-            eprintln!("Skipping '{}' because it doesn't exist.", cache_dir.display());
+            eprintln!(
+                "Skipping '{}' because it doesn't exist.",
+                cache_dir.display()
+            );
             continue;
         }
 
@@ -1137,8 +1138,6 @@ Size of 0 git repo checkouts:               0 B\n";
 
         assert_eq!(output_is, output_should);
     }
-
-
 
     #[allow(non_snake_case)]
     #[test]
