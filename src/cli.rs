@@ -174,7 +174,7 @@ OPTIONS:
     }
 
     #[bench]
-    fn bench_clap_help_submodule(b: &mut Bencher) {
+    fn bench_clap_help_subcommand(b: &mut Bencher) {
         build_release();
         b.iter(|| {
             Command::new("target/release/cargo-cache")
