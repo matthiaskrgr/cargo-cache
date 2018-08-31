@@ -91,6 +91,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
+    use crate::version;
     use pretty_assertions::assert_eq;
     use std::process::Command;
     use test::Bencher;
@@ -116,7 +117,8 @@ mod clitests {
             .output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
-        let help_desired = "cargo-cache 0.1.0
+        let mut help_desired = format!("cargo-cache {}", version::VersionInfo::new());
+        help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
 USAGE:
@@ -134,7 +136,7 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n";
+    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -148,7 +150,8 @@ OPTIONS:
             .output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
-        let help_desired = "cargo-cache 0.1.0
+        let mut help_desired = format!("cargo-cache {}", version::VersionInfo::new());
+        help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
 USAGE:
@@ -166,7 +169,7 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n";
+    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n");
 
         assert_eq!(help_desired, help_real);
     }

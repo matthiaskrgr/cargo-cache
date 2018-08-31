@@ -52,11 +52,7 @@ impl std::fmt::Display for VersionInfo {
         write!(
             f,
             "{}.{}.{} ({} {})",
-            self.major,
-            self.minor,
-            self.patch,
-            self.commit_hash,
-            self.commit_date
+            self.major, self.minor, self.patch, self.commit_hash, self.commit_date
         )?;
         Ok(())
     }
