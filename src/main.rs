@@ -35,6 +35,7 @@
 mod cli;
 mod git;
 mod library;
+mod version;
 
 use std::{fs, process};
 

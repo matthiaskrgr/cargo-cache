@@ -1,6 +1,10 @@
-use clap::{crate_version, App, AppSettings, Arg, ArgMatches, SubCommand};
+use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
+
+use crate::version;
 
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
+    let version = format!("{}", version::VersionInfo::new());
+
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")
         .long("list-dirs")
@@ -52,13 +56,13 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .value_name("N");
 
     App::new("cargo-cache")
-        .version(crate_version!())
+        .version(&*version)
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
         .subcommand(
             SubCommand::with_name("cache")
-                .version(crate_version!())
+                .version(&*version)
                 .bin_name("cargo-cache")
                 .about("Manage cargo cache")
                 .author("matthiaskrgr")
