@@ -37,7 +37,7 @@ impl VersionInfo {
         .trim()
         .to_string();
 
-        VersionInfo {
+        Self {
             major,
             minor,
             patch,
@@ -47,7 +47,7 @@ impl VersionInfo {
     }
 }
 
-impl std::fmt::Display for Self {
+impl std::fmt::Display for VersionInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
