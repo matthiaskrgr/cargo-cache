@@ -91,12 +91,22 @@ mod clitests {
     use std::process::Command;
     use test::Bencher;
 
+    fn cargo_build_release() {
+        // build crate in release mode
+        let cmd = Command::new("cargo").arg("build").arg("--release").output();
+        assert!(cmd.unwrap().status.success());
+    }
+
+    fn cargo_build_debug() {
+        // build crate in debug mode
+        let cmd = Command::new("cargo").arg("build").output();
+        assert!(cmd.unwrap().status.success());
+    }
+
     #[test]
     fn run_help() {
-        // build
-        let status = Command::new("cargo").arg("build").output();
-        // make sure the build succeeded
-        assert!(status.is_ok(), "cargo build did not succeed");
+        cargo_build_debug();
+
         let cc_help = Command::new("target/debug/cargo-cache")
             .arg("--help")
             .output();
@@ -126,10 +136,8 @@ OPTIONS:
     }
     #[test]
     fn run_help_subcommand() {
-        // build
-        let status = Command::new("cargo").arg("build").output();
-        // make sure the build succeeded
-        assert!(status.is_ok(), "cargo build did not succeed");
+        cargo_build_debug();
+
         let cc_help = Command::new("target/debug/cargo-cache")
             .arg("cache")
             .arg("--help")
@@ -159,14 +167,9 @@ OPTIONS:
         assert_eq!(help_desired, help_real);
     }
 
-    fn build_release() {
-        let cmd = Command::new("cargo").arg("build").arg("--release").output();
-        assert!(cmd.unwrap().status.success());
-    }
-
     #[bench]
     fn bench_clap_help(b: &mut Bencher) {
-        build_release();
+        cargo_build_release();
         b.iter(|| {
             Command::new("target/release/cargo-cache")
                 .arg("--help")
@@ -176,7 +179,7 @@ OPTIONS:
 
     #[bench]
     fn bench_clap_help_subcommand(b: &mut Bencher) {
-        build_release();
+        cargo_build_release();
         b.iter(|| {
             Command::new("target/release/cargo-cache")
                 .arg("cache")
