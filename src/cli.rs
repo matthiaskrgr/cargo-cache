@@ -159,7 +159,8 @@ OPTIONS:
     }
 
     fn build_release() {
-        let _ = Command::new("cargo").arg("build").arg("--release").output();
+        let cmd = Command::new("cargo").arg("build").arg("--release").output();
+        assert!(cmd.unwrap().status.success());
     }
 
     #[bench]
