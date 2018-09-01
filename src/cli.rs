@@ -1,9 +1,7 @@
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
-use crate::version;
-
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-    let version = format!("{}", version::VersionInfo::new());
+    let version = include_str!(concat!(env!("OUT_DIR"), "/commit-info.txt"));
 
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")

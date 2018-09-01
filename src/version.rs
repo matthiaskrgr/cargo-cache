@@ -8,15 +8,16 @@ pub(crate) struct VersionInfo {
     commit_date: String,
 }
 
+#[allow(dead_code)]
 impl VersionInfo {
     pub(crate) fn new() -> Self {
         // these are set by cargo
         let major = env!("CARGO_PKG_VERSION_MAJOR").parse::<u8>().unwrap();
         let minor = env!("CARGO_PKG_VERSION_MINOR").parse::<u8>().unwrap();
         let patch = env!("CARGO_PKG_VERSION_PATCH").parse::<u16>().unwrap();
+
         // for commit hash and date we have to dive a bit deeper.
         // code inspired by rls
-
         let commit_hash = String::from_utf8(
             Command::new("git")
                 .args(&["rev-parse", "--short", "HEAD"])
