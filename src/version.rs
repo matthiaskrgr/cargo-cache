@@ -8,7 +8,6 @@ pub(crate) struct VersionInfo {
     commit_date: String,
 }
 
-#[allow(dead_code)]
 impl VersionInfo {
     pub(crate) fn new() -> Self {
         // these are set by cargo
