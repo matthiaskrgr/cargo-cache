@@ -3,7 +3,7 @@ use std::process::Command;
 pub(crate) struct VersionInfo {
     major: u8,
     minor: u8,
-    patch: u16,
+    patch: u8,
     commit_hash: String,
     commit_date: String,
 }
@@ -13,7 +13,7 @@ impl VersionInfo {
         // these are set by cargo
         let major = env!("CARGO_PKG_VERSION_MAJOR").parse::<u8>().unwrap();
         let minor = env!("CARGO_PKG_VERSION_MINOR").parse::<u8>().unwrap();
-        let patch = env!("CARGO_PKG_VERSION_PATCH").parse::<u16>().unwrap();
+        let patch = env!("CARGO_PKG_VERSION_PATCH").parse::<u8>().unwrap();
 
         // for commit hash and date we have to dive a bit deeper.
         // code inspired by rls
@@ -21,7 +21,7 @@ impl VersionInfo {
             Command::new("git")
                 .args(&["rev-parse", "--short", "HEAD"])
                 .output()
-                .expect("'git rev-parse --short HEAD' failed")
+                .expect("`git rev-parse --short HEAD` failed!")
                 .stdout,
         ).unwrap()
         .trim()
@@ -31,7 +31,7 @@ impl VersionInfo {
             Command::new("git")
                 .args(&["log", "-1", "--date=short", "--pretty=format:%cd"])
                 .output()
-                .expect("git log -1 --date=short --pretty=format:%cd' failed")
+                .expect("`git log -1 --date=short --pretty=format:%cd` failed!")
                 .stdout,
         ).unwrap()
         .trim()

@@ -7,7 +7,7 @@ mod version;
 
 fn main() {
     // generate version info from git hashes
-    let version = format!("{}", version::VersionInfo::new());
+    let version = version::VersionInfo::new().to_string();
 
     let out_dir = PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
