@@ -334,10 +334,10 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
             .max_depth(2)
             .min_depth(2)
             .into_iter()
-            .count() as u64
+            .count()
     } else {
-        fs::read_dir(&dir).unwrap().count() as u64
-    };
+        fs::read_dir(&dir).unwrap().count()
+    } as u64;
 
     DirInfo {
         dir_size,
