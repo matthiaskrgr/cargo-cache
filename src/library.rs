@@ -702,6 +702,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 mod libtests {
     use super::*;
     use pretty_assertions::assert_eq;
+    use std::env;
 
     #[allow(non_snake_case)]
     #[test]
@@ -712,6 +713,84 @@ mod libtests {
         };
         assert_eq!(x.dir_size, 10);
         assert_eq!(x.file_number, 20);
+    }
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_CargoCachePaths_gen() {
+        // set cargo cache root dir to /tmp
+        env::set_var("/tmp/", "CARGO_HOME");
+        let dir_paths = CargoCachePaths::new();
+        assert!(dir_paths.is_ok());
+    }
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_CargoCachePaths_paths() {
+        // get cargo target dir
+        let mut target_dir = std::env::current_dir().unwrap();
+        target_dir.push("target");
+        let mut cargo_home = target_dir;
+        cargo_home.push("cargo_home");
+        //make sure this worked
+        let CH_string = format!("{}", cargo_home.display());
+        assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
+
+        // create the directory
+        if !std::path::PathBuf::from(&CH_string).is_dir() {
+            std::fs::DirBuilder::new().create(&CH_string).unwrap();
+        }
+        assert!(fs::metadata(&CH_string).unwrap().is_dir());
+        assert!(std::path::PathBuf::from(&CH_string).is_dir());
+
+        // set cargo home to this directory
+        std::env::set_var("CARGO_HOME", CH_string);
+        let ccp = CargoCachePaths::new().unwrap();
+
+        // test all the paths
+        assert!(ccp.cargo_home.display().to_string().ends_with("cargo_home"));
+        assert!(
+            ccp.bin_dir
+                .display()
+                .to_string()
+                .ends_with("cargo_home/bin/")
+        );
+        assert!(
+            ccp.registry
+                .display()
+                .to_string()
+                .ends_with("cargo_home/registry/")
+        );
+        assert!(
+            ccp.registry_index
+                .display()
+                .to_string()
+                .ends_with("cargo_home/registry/index/")
+        );
+        assert!(
+            ccp.registry_cache
+                .display()
+                .to_string()
+                .ends_with("cargo_home/registry/cache/")
+        );
+        assert!(
+            ccp.registry_sources
+                .display()
+                .to_string()
+                .ends_with("cargo_home/registry/src/")
+        );
+        assert!(
+            ccp.git_repos_bare
+                .display()
+                .to_string()
+                .ends_with("cargo_home/git/db/")
+        );
+        assert!(
+            ccp.git_checkouts
+                .display()
+                .to_string()
+                .ends_with("cargo_home/git/checkouts/")
+        );
     }
 
 }
