@@ -698,13 +698,20 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     output
 }
 
-#[allow(non_snake_case)]
-#[test]
-fn test_DirInfo() {
-    let x = DirInfo {
-        dir_size: 10,
-        file_number: 20,
-    };
-    assert_eq!(x.dir_size, 10);
-    assert_eq!(x.file_number, 20);
+#[cfg(test)]
+mod libtests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_DirInfo() {
+        let x = DirInfo {
+            dir_size: 10,
+            file_number: 20,
+        };
+        assert_eq!(x.dir_size, 10);
+        assert_eq!(x.file_number, 20);
+    }
+
 }
