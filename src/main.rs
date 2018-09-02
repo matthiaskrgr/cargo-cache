@@ -33,6 +33,7 @@
 #![feature(test)]
 
 mod cli;
+mod dirsizes;
 mod git;
 mod library;
 #[cfg(test)]
@@ -43,6 +44,7 @@ use std::{fs, process};
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
+use crate::dirsizes::*;
 use crate::git::*;
 use crate::library::*;
 
