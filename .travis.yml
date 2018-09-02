@@ -13,11 +13,11 @@ rust:
 
 env:
   matrix:
-    - RELEASE="--release"
     - RELEASE=""
     - CLIPPY="true"
     - CARGO_AUDIT="true"
     - RUSTFMT="true"
+    - RELEASE="--release"
 
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit; fi
