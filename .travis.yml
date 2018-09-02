@@ -25,7 +25,7 @@ script:
   - if [[ "$CLIPPY" == "true" ]]; then rustup component add clippy-preview --toolchain=nightly || cargo install clippy --force || cargo install --git https://github.com/rust-lang-nursery/rust-clippy/ --force clippy ; fi
   - if [[ "$CLIPPY" == "true" ]]; then cargo clippy --all-targets --all-features -- -D warnings ; exit ; fi
   - if [[ "$RUSTFMT" == "true" ]]; then rustup component add rustfmt --toolchain=nightly || cargo install rustfmt --force || cargo install --git https://github.com/rust-lang-nursery/rustfmt/ --force; fi
-  - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --verbose -- --check ; exit ; fi
+  - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
   - cargo build --all ${RELEASE}
   - cargo test --all ${RELEASE}
   - cargo run
