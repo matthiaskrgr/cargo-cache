@@ -1,3 +1,5 @@
+#![feature(tool_lints)]
+#![feature(test)]
 // these [allow()] by default, make them warn:
 #![warn(
     ellipsis_inclusive_range_patterns,
@@ -11,27 +13,22 @@
     rust_2018_idioms
 )]
 // enable additional clippy warnings
-#![cfg_attr(
-    feature = "cargo-clippy",
-    warn(
-        clippy,
-        clippy_correctness,
-        clippy_perf,
-        clippy_complexity,
-        clippy_style,
-        clippy_pedantic,
-        clippy_nursery,
-        shadow_reuse,
-        shadow_same,
-        shadow_unrelated,
-        pub_enum_variant_names,
-        string_add,
-        string_add_assign,
-        needless_borrow
-    )
+#[warn(
+    clippy::all,
+    clippy::correctness,
+    clippy::perf,
+    clippy::complexity,
+    clippy::style,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::shadow_reuse,
+    clippy::shadow_same,
+    clippy::shadow_unrelated,
+    clippy::pub_enum_variant_names,
+    clippy::string_add,
+    clippy::string_add_assign,
+    clippy::needless_borrow
 )]
-#![feature(test)]
-
 mod cli;
 mod dirsizes;
 mod git;

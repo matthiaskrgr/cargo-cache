@@ -3,8 +3,7 @@ use std::path::PathBuf;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
-
-#[cfg_attr(feature = "cargo-clippy", allow(similar_names))] // FP due to derives
+#[allow(clippy::similar_names)] // FP due to derives
 #[derive(Debug, Clone)]
 pub(crate) struct DirSizes {
     pub(crate) total_size: u64,                // total size of cargo root dir
@@ -76,10 +75,8 @@ impl DirSizes {
             );
 
             let mut formatted_line = beginning.to_string();
-            #[cfg_attr(
-                feature = "cargo-clippy",
-                allow(cast_sign_loss, cast_possible_truncation)
-            )]
+
+            #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
             // I tried mittigating via previous assert()
             formatted_line.push_str(&" ".repeat(len_padding as usize));
             formatted_line.push_str(end);
