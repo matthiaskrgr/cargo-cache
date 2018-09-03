@@ -32,7 +32,6 @@
 )]
 #![feature(test)]
 
-mod cargocachepaths;
 mod cli;
 mod dirsizes;
 mod git;
@@ -45,7 +44,6 @@ use std::{fs, process};
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
-use crate::cargocachepaths::*;
 use crate::dirsizes::*;
 use crate::git::*;
 use crate::library::*;
