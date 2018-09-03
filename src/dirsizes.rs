@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use crate::cargocachepaths::*;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
