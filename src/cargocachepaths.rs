@@ -184,4 +184,32 @@ mod libtests {
                 .ends_with("cargo_home/git/checkouts/")
         );
     }
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_CargoCachePaths_print() {
+        // get cargo target dir
+        let mut target_dir = std::env::current_dir().unwrap();
+        target_dir.push("target");
+        let mut cargo_home = target_dir;
+        cargo_home.push("cargo_home");
+        //make sure this worked
+        let CH_string = format!("{}", cargo_home.display());
+        assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
+
+        // create the directory
+        if !std::path::PathBuf::from(&CH_string).is_dir() {
+            std::fs::DirBuilder::new().create(&CH_string).unwrap();
+        }
+        assert!(fs::metadata(&CH_string).unwrap().is_dir());
+        assert!(std::path::PathBuf::from(&CH_string).is_dir());
+
+        // set cargo home to this directory
+        std::env::set_var("CARGO_HOME", CH_string);
+        let ccp = CargoCachePaths::new().unwrap();
+
+        let output = ccp.get_dir_paths();
+        let iter = output.lines();
+    }
+
 }
