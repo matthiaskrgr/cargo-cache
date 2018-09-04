@@ -794,4 +794,69 @@ mod libtests {
         );
     }
 
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_CargoCachePaths_print() {
+        // test --list-dirs output
+
+        // get cargo target dir
+        let mut target_dir = std::env::current_dir().unwrap();
+        target_dir.push("target");
+        let mut cargo_home = target_dir;
+        cargo_home.push("cargo_home");
+        //make sure this worked
+        let CH_string = format!("{}", cargo_home.display());
+        assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
+
+        // create the directory
+        if !std::path::PathBuf::from(&CH_string).is_dir() {
+            std::fs::DirBuilder::new().create(&CH_string).unwrap();
+        }
+        assert!(fs::metadata(&CH_string).unwrap().is_dir());
+        assert!(std::path::PathBuf::from(&CH_string).is_dir());
+
+        // set cargo home to this directory
+        std::env::set_var("CARGO_HOME", CH_string);
+        let ccp = CargoCachePaths::new().unwrap();
+
+        let output = ccp.get_dir_paths();
+        let mut iter = output.lines().skip(1); // ??
+
+        let cargo_home = iter.next().unwrap();
+        assert!(cargo_home.starts_with("cargo home:"));
+        assert!(cargo_home.ends_with("/cargo_home"));
+
+        let bins = iter.next().unwrap();
+        assert!(bins.starts_with("binaries directory:"));
+        assert!(bins.ends_with("/cargo_home/bin/"));
+
+        let registry = iter.next().unwrap();
+        assert!(registry.starts_with("registry directory:"));
+        assert!(registry.ends_with("/cargo_home/registry/"));
+
+        let registry_index = iter.next().unwrap();
+        assert!(registry_index.starts_with("registry index:"));
+        assert!(registry_index.ends_with("/cargo_home/registry/index/"));
+
+        let crate_archives = iter.next().unwrap();
+        assert!(crate_archives.starts_with("crate source archives:"));
+        assert!(crate_archives.ends_with("/cargo_home/registry/cache/"));
+
+        let crate_sources = iter.next().unwrap();
+        assert!(crate_sources.starts_with("unpacked crate sources:"));
+        assert!(crate_sources.ends_with("/cargo_home/registry/src/"));
+
+        let bare_repos = iter.next().unwrap();
+        assert!(bare_repos.starts_with("bare git repos:"));
+        assert!(bare_repos.ends_with("/cargo_home/git/db/"));
+
+        let git_repo_checkouts = iter.next().unwrap();
+        assert!(git_repo_checkouts.starts_with("git repo checkouts"));
+        assert!(git_repo_checkouts.ends_with("/cargo_home/git/checkouts/"));
+
+        // should be empty now
+        let last = iter.next();
+        assert!(!last.is_some(), "found another directory?!");
+    }
+
 }
