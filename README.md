@@ -1,6 +1,7 @@
 ## cargo cache
 
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
+![Minimum rust version: nightly](https://img.shields.io/badge/Minimum%20Rust%20Version-nightly-red.svg)
 
 Requires ````rust nightly 1.30```` (due to rust 2018 edition usage).
 
