@@ -73,7 +73,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
                 .arg(&autoclean)
                 .arg(&autoclean_expensive)
                 .arg(&list_top_cache_items)
-                .setting(AppSettings::Hidden)
+                .setting(AppSettings::Hidden),
         ) // subcommand
         .arg(&list_dirs)
         .arg(&remove_dir)
