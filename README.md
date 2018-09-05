@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
 
-Requires rust nightly 1.30 (due to rust 2018 edition usage).
+Requires ````rust nightly 1.30```` (due to rust 2018 edition usage).
 
 DISCLAIMER: I only tested this on linux.
 
