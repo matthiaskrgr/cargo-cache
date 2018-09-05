@@ -3,7 +3,7 @@ dist: trusty
 sudo: false
 
 #cache deps
-cache: cargo
+#cache: cargo
 
 rust:
 #  - stable
