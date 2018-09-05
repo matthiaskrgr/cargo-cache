@@ -43,7 +43,7 @@ pub(crate) enum ErrorKind {
 }
 
 impl CargoCachePaths {
-    // holds the PathBufs to the different componens of the cargo cache
+    // holds the PathBufs to the different components of the cargo cache
     pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
@@ -56,13 +56,11 @@ impl CargoCachePaths {
         };
 
         let cargo_home_path = cargo_cfg.home().clone().into_path_unlocked();
-        let cargo_home_str = cargo_home_path.display();
-        let cargo_home_path_clone = cargo_home_path.clone();
 
         if !cargo_home_path.is_dir() {
             let msg = format!(
                 "Error, no cargo home path directory '{}' found.",
-                &cargo_home_str
+                cargo_home_path.display()
             );
             return Err((ErrorKind::CargoHomeNotDirectory, msg));
         }
@@ -74,7 +72,7 @@ impl CargoCachePaths {
         let reg_cache = registry.join("cache/");
         let reg_src = registry.join("src/");
         let git_repos_bare = cargo_home.join("git/db/");
-        let git_checkouts = cargo_home_path_clone.join("git/checkouts/");
+        let git_checkouts = cargo_home.join("git/checkouts/");
 
         Ok(Self {
             cargo_home,
