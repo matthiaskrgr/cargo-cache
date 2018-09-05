@@ -8,7 +8,7 @@ DISCLAIMER: I only tested this on linux.
 
 #### Installation:
 ````
-cargo install --git https://github.com/matthiaskrgr/cargo-cache
+cargo +nightly install --git https://github.com/matthiaskrgr/cargo-cache
 ````
 
 #### Sample output:
