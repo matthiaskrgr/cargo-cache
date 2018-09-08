@@ -175,6 +175,7 @@ impl DirSizes {
 mod libtests {
     use super::*;
     use pretty_assertions::assert_eq;
+    use test::black_box;
     use test::Bencher;
 
     impl DirSizes {
@@ -317,8 +318,9 @@ Size of 8 git repo checkouts:               34.98 KB\n";
         let cache_root = PathBuf::from("/home/user/.cargo");
 
         b.iter(|| {
-            dir_sizes.print_pretty(&cache_root);
-        })
+            let x = dir_sizes.print_pretty(&cache_root);
+            black_box(x);
+        });
     }
 
     #[allow(non_snake_case)]

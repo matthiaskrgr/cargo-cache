@@ -92,6 +92,7 @@ mod clitests {
     use crate::version;
     use pretty_assertions::assert_eq;
     use std::process::Command;
+    use test::black_box;
     use test::Bencher;
 
     fn cargo_build_release() {
@@ -175,22 +176,26 @@ OPTIONS:
     #[bench]
     fn bench_clap_help(b: &mut Bencher) {
         cargo_build_release();
+        #[allow(unused_must_use)]
         b.iter(|| {
-            Command::new("target/release/cargo-cache")
+            let x = Command::new("target/release/cargo-cache")
                 .arg("--help")
-                .output()
-        })
+                .output();
+            black_box(x);
+        });
     }
 
     #[bench]
     fn bench_clap_help_subcommand(b: &mut Bencher) {
         cargo_build_release();
+        #[allow(unused_must_use)]
         b.iter(|| {
-            Command::new("target/release/cargo-cache")
+            let x = Command::new("target/release/cargo-cache")
                 .arg("cache")
                 .arg("--help")
-                .output()
-        })
+                .output();
+            black_box(x);
+        });
     }
 
 }

@@ -702,6 +702,7 @@ mod libtests {
     use super::*;
     use pretty_assertions::assert_eq;
     use std::env;
+    use test::black_box;
     use test::Bencher;
 
     #[allow(non_snake_case)]
@@ -880,9 +881,11 @@ mod libtests {
         // set cargo home to this directory
         std::env::set_var("CARGO_HOME", CH_string);
 
+        #[allow(unused_must_use)]
         b.iter(|| {
-            let _ = CargoCachePaths::new();
-        })
+            let x = CargoCachePaths::new();
+            black_box(x);
+        });
     }
 
     #[allow(non_snake_case)]
@@ -908,10 +911,11 @@ mod libtests {
         std::env::set_var("CARGO_HOME", CH_string);
 
         let ccp = CargoCachePaths::new().unwrap();
-
+        #[allow(unused_must_use)]
         b.iter(|| {
-            let _ = ccp.get_dir_paths();
-        })
+            let x = ccp.get_dir_paths();
+            black_box(x);
+        });
     }
 
 }
