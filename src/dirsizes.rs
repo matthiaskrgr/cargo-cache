@@ -5,7 +5,7 @@ use crate::library::*;
 use humansize::{file_size_opts, FileSize};
 #[allow(clippy::similar_names)] // FP due to derives
 #[derive(Debug, Clone)]
-pub(crate) struct DirSizes {
+pub(crate) struct DirSizes<'a> {
     pub(crate) total_size: u64,                // total size of cargo root dir
     pub(crate) numb_bins: u64,                 // number of binaries found
     pub(crate) total_bin_size: u64,            // total size of binaries found
@@ -19,10 +19,11 @@ pub(crate) struct DirSizes {
     pub(crate) total_reg_src_size: u64,        // registry sources size
     pub(crate) numb_reg_cache_entries: u64,    // number of source archives
     pub(crate) numb_reg_src_checkouts: u64,    // number of source checkouts
+    pub(crate) cache_root_path: &'a CargoCachePaths,
 }
 
-impl DirSizes {
-    pub(crate) fn new(ccd: &CargoCachePaths) -> Self {
+impl<'a> DirSizes<'a> {
+    pub(crate) fn new(ccd: &'a CargoCachePaths) -> Self {
         let bindir = cumulative_dir_size(&ccd.bin_dir);
         let git_repos_bare = cumulative_dir_size(&ccd.git_repos_bare);
         let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
@@ -32,6 +33,8 @@ impl DirSizes {
 
         let total_reg_size = reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size;
         let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
+
+        let cache_root_path = &ccd;
 
         Self {
             //no need to recompute all of this from scratch
@@ -52,6 +55,8 @@ impl DirSizes {
 
             total_reg_src_size: reg_src.dir_size,
             numb_reg_src_checkouts: reg_src.file_number,
+
+            cache_root_path,
         }
     }
     pub(crate) fn print_pretty(&self, cache_root_dir: &PathBuf) -> String {

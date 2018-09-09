@@ -271,7 +271,7 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
-pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes) -> String {
+pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     let mut strn = String::with_capacity(1020);
     strn.push_str("Found CARGO_HOME / cargo cache base dir\n");
     strn.push_str(&format!(
