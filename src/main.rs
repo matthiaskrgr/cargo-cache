@@ -32,8 +32,6 @@ mod cli;
 mod dirsizes;
 mod git;
 mod library;
-#[cfg(test)]
-mod version;
 
 use std::{fs, process};
 

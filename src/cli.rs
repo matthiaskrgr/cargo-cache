@@ -1,7 +1,10 @@
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
+use rustc_tools_util::*;
+
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-    let version = include_str!(concat!(env!("OUT_DIR"), "/commit-info.txt"));
+    let v = rustc_tools_util::get_version_info!();
+    let version = format!("{}", v).replacen("cargo-cache ", "", 1);
 
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")
@@ -89,8 +92,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
-    use crate::version;
     use pretty_assertions::assert_eq;
+    use rustc_tools_util::*;
     use std::process::Command;
     use test::black_box;
     use test::Bencher;
@@ -116,7 +119,8 @@ mod clitests {
             .output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
-        let mut help_desired = format!("cargo-cache {}", version::VersionInfo::new());
+
+        let mut help_desired = format!("{}", rustc_tools_util::get_version_info!());
         help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
@@ -149,7 +153,8 @@ OPTIONS:
             .output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
-        let mut help_desired = format!("cargo-cache {}", version::VersionInfo::new());
+
+        let mut help_desired = format!("{}", rustc_tools_util::get_version_info!());
         help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
