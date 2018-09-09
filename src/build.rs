@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo:rerun-if-changed=build.rs");
     println!(
         "cargo:rustc-env=GIT_HASH={}",
         rustc_tools_util::get_commit_hash().unwrap_or_default()
