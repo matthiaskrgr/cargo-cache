@@ -1,10 +1,11 @@
-use std::path::PathBuf;
+use std::fmt;
 
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
 #[allow(clippy::similar_names)] // FP due to derives
 #[derive(Debug, Clone)]
+#[allow(single_use_lifetimes)] // FP https://github.com/rust-lang/rust/issues/54079
 pub(crate) struct DirSizes<'a> {
     pub(crate) total_size: u64,                // total size of cargo root dir
     pub(crate) numb_bins: u64,                 // number of binaries found
@@ -19,7 +20,7 @@ pub(crate) struct DirSizes<'a> {
     pub(crate) total_reg_src_size: u64,        // registry sources size
     pub(crate) numb_reg_cache_entries: u64,    // number of source archives
     pub(crate) numb_reg_src_checkouts: u64,    // number of source checkouts
-    pub(crate) cache_root_path: &'a CargoCachePaths,
+    pub(crate) root_path: &'a std::path::PathBuf,
 }
 
 impl<'a> DirSizes<'a> {
@@ -34,7 +35,7 @@ impl<'a> DirSizes<'a> {
         let total_reg_size = reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size;
         let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
 
-        let cache_root_path = &ccd;
+        let root_path = &ccd.cargo_home;
 
         Self {
             //no need to recompute all of this from scratch
@@ -56,123 +57,147 @@ impl<'a> DirSizes<'a> {
             total_reg_src_size: reg_src.dir_size,
             numb_reg_src_checkouts: reg_src.file_number,
 
-            cache_root_path,
+            root_path,
         }
     }
-    pub(crate) fn print_pretty(&self, cache_root_dir: &PathBuf) -> String {
-        // create a string and concatenate all the things we want to print with it
-        // and only print it in the end, this should save a few syscalls and be faster than
-        // printing every line one by one
+}
 
-        fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
-            // max line width
-            const MAX_WIDTH: i64 = 40;
+fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
+    // max line width
+    const MAX_WIDTH: i64 = 40;
 
-            let left = MAX_WIDTH + (indent_lvl * 2);
-            let right = beginning.len() as i64;
-            let len_padding = left - right;
-            assert!(
-                len_padding > 0,
-                format!(
-                    "len_padding is negative: '{} - {} = {}' ",
-                    left, right, len_padding
-                )
-            );
+    let left = MAX_WIDTH + (indent_lvl * 2);
+    let right = beginning.len() as i64;
+    let len_padding = left - right;
+    assert!(
+        len_padding > 0,
+        format!(
+            "len_padding is negative: '{} - {} = {}' ",
+            left, right, len_padding
+        )
+    );
 
-            let mut formatted_line = beginning.to_string();
+    let mut formatted_line = beginning.to_string();
 
-            #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-            // I tried mittigating via previous assert()
-            formatted_line.push_str(&" ".repeat(len_padding as usize));
-            formatted_line.push_str(end);
-            formatted_line.push_str("\n");
-            formatted_line
-        }
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    // I tried mittigating via previous assert()
+    formatted_line.push_str(&" ".repeat(len_padding as usize));
+    formatted_line.push_str(end);
+    formatted_line.push_str("\n");
+    formatted_line
+}
 
-        // @TODO use format_args!() ?
-        let mut s = String::with_capacity(470);
+impl<'a> fmt::Display for DirSizes<'a> {
+    fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Cargo cache '{}/':\n\n", &self.root_path.display())?;
 
-        s.push_str(&format!(
-            "Cargo cache '{}/':\n\n",
-            &cache_root_dir.display()
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                0,
+                "Total size: ",
+                &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            0,
-            "Total size: ",
-            &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                1,
+                &format!("Size of {} installed binaries: ", self.numb_bins),
+                &self
+                    .total_bin_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            1,
-            &format!("Size of {} installed binaries: ", self.numb_bins),
-            &self
-                .total_bin_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                1,
+                "Size of registry: ",
+                &self
+                    .total_reg_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            1,
-            "Size of registry: ",
-            &self
-                .total_reg_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                2,
+                &format!("Size of {} crate archives: ", self.numb_reg_cache_entries),
+                &self
+                    .total_reg_cache_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            2,
-            &format!("Size of {} crate archives: ", self.numb_reg_cache_entries),
-            &self
-                .total_reg_cache_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                2,
+                &format!(
+                    "Size of {} crate source checkouts: ",
+                    self.numb_reg_src_checkouts
+                ),
+                &self
+                    .total_reg_src_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            2,
-            &format!(
-                "Size of {} crate source checkouts: ",
-                self.numb_reg_src_checkouts
-            ),
-            &self
-                .total_reg_src_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                1,
+                "Size of git db: ",
+                &self
+                    .total_git_db_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            1,
-            "Size of git db: ",
-            &self
-                .total_git_db_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                2,
+                &format!(
+                    "Size of {} bare git repos: ",
+                    self.numb_git_repos_bare_repos
+                ),
+                &self
+                    .total_git_repos_bare_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
 
-        s.push_str(&pad_strings(
-            2,
-            &format!(
-                "Size of {} bare git repos: ",
-                self.numb_git_repos_bare_repos
-            ),
-            &self
-                .total_git_repos_bare_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
-
-        s.push_str(&pad_strings(
-            2,
-            &format!("Size of {} git repo checkouts: ", self.numb_git_checkouts),
-            &self
-                .total_git_chk_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        ));
-
-        s
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                2,
+                &format!("Size of {} git repo checkouts: ", self.numb_git_checkouts),
+                &self
+                    .total_git_chk_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
+        Ok(())
     }
 }
 
@@ -180,10 +205,11 @@ impl<'a> DirSizes<'a> {
 mod libtests {
     use super::*;
     use pretty_assertions::assert_eq;
+    use std::path::PathBuf;
     use test::black_box;
     use test::Bencher;
 
-    impl DirSizes {
+    impl<'a> DirSizes<'a> {
         #[allow(non_snake_case)]
         pub(super) fn new_manually(
             DI_bindir: &DirInfo,
@@ -192,6 +218,7 @@ mod libtests {
             DI_reg_cache: &DirInfo,
             DI_reg_src: &DirInfo,
             DI_reg_index: &DirInfo,
+            path: &'a PathBuf,
         ) -> Self {
             let bindir = DI_bindir;
             let git_repos_bare = DI_git_repos_bare;
@@ -222,6 +249,7 @@ mod libtests {
 
                 total_reg_src_size: reg_src.dir_size,
                 numb_reg_src_checkouts: reg_src.file_number,
+                root_path: path,
             }
         }
     }
@@ -255,6 +283,8 @@ mod libtests {
             file_number: 12345,
         };
 
+        let pb = PathBuf::from("/home/user/.cargo");
+
         // create a DirSizes object
         let dirSizes = DirSizes::new_manually(
             &bindir,
@@ -263,10 +293,10 @@ mod libtests {
             &reg_cache,
             &reg_src,
             &reg_index,
+            &pb,
         );
 
-        let cache_root = PathBuf::from("/home/user/.cargo");
-        let output_is = dirSizes.print_pretty(&cache_root);
+        let output_is = format!("{}", dirSizes);
 
         let output_should = "Cargo cache '/home/user/.cargo/':
 
@@ -310,6 +340,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             file_number: 12345,
         };
 
+        let pb = PathBuf::from("/home/user/.cargo");
         // create a DirSizes object
         let dir_sizes = DirSizes::new_manually(
             &bindir,
@@ -318,12 +349,11 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             &reg_cache,
             &reg_src,
             &reg_index,
+            &pb,
         );
 
-        let cache_root = PathBuf::from("/home/user/.cargo");
-
         b.iter(|| {
-            let x = dir_sizes.print_pretty(&cache_root);
+            let x = format!("{}", dir_sizes);
             black_box(x);
         });
     }
@@ -357,6 +387,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             file_number: 0,
         };
 
+        let pb = PathBuf::from("/home/user/.cargo");
         // create a DirSizes object
         let dirSizes = DirSizes::new_manually(
             &bindir,
@@ -365,10 +396,10 @@ Size of 8 git repo checkouts:               34.98 KB\n";
             &reg_cache,
             &reg_src,
             &reg_index,
+            &pb,
         );
 
-        let cache_root = PathBuf::from("/home/user/.cargo");
-        let output_is = dirSizes.print_pretty(&cache_root);
+        let output_is = format!("{}", dirSizes);
 
         let output_should = "Cargo cache '/home/user/.cargo/':
 
@@ -413,6 +444,8 @@ Size of 36 git repo checkouts:              3.92 GB\n";
             file_number: 1,
         };
 
+        let pb = PathBuf::from("/home/user/.cargo");
+
         // create a DirSizes object
         let dirSizes = DirSizes::new_manually(
             &bindir,
@@ -421,10 +454,10 @@ Size of 36 git repo checkouts:              3.92 GB\n";
             &reg_cache,
             &reg_src,
             &reg_index,
+            &pb,
         );
 
-        let cache_root = PathBuf::from("/home/user/.cargo");
-        let output_is = dirSizes.print_pretty(&cache_root);
+        let output_is = format!("{}", dirSizes);
 
         let output_should = "Cargo cache '/home/user/.cargo/':
 
@@ -469,6 +502,8 @@ Size of 0 git repo checkouts:               0 B\n";
             file_number: 0,
         };
 
+        let pb = PathBuf::from("/home/user/.cargo");
+
         // create a DirSizes object
         let dirSizes = DirSizes::new_manually(
             &bindir,
@@ -477,10 +512,10 @@ Size of 0 git repo checkouts:               0 B\n";
             &reg_cache,
             &reg_src,
             &reg_index,
+            &pb,
         );
 
-        let cache_root = PathBuf::from("/home/user/.cargo");
-        let output_is = dirSizes.print_pretty(&cache_root);
+        let output_is = format!("{}", &dirSizes);
 
         let output_should = "Cargo cache '/home/user/.cargo/':
 
