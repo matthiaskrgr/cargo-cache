@@ -90,47 +90,40 @@ impl CargoCachePaths {
 
 impl std::fmt::Display for CargoCachePaths {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "\n")?;
-
-        write!(
+        writeln!(
             f,
-            "cargo home:                 {}\n",
+            "\ncargo home:                 {}",
             &self.cargo_home.display()
         )?;
-
-        write!(
+        writeln!(f, "binaries directory:         {}", &self.bin_dir.display())?;
+        writeln!(
             f,
-            "binaries directory:         {}\n",
-            &self.bin_dir.display()
-        )?;
-        write!(
-            f,
-            "registry directory:         {}\n",
+            "registry directory:         {}",
             &self.registry.display()
         )?;
-        write!(
+        writeln!(
             f,
-            "registry index:             {}\n",
+            "registry index:             {}",
             &self.registry_index.display()
         )?;
-        write!(
+        writeln!(
             f,
-            "crate source archives:      {}\n",
+            "crate source archives:      {}",
             &self.registry_cache.display()
         )?;
-        write!(
+        writeln!(
             f,
-            "unpacked crate sources:     {}\n",
+            "unpacked crate sources:     {}",
             &self.registry_sources.display()
         )?;
-        write!(
+        writeln!(
             f,
-            "bare git repos:             {}\n",
+            "bare git repos:             {}",
             &self.git_repos_bare.display()
         )?;
-        write!(
+        writeln!(
             f,
-            "git repo checkouts:         {}\n",
+            "git repo checkouts:         {}",
             &self.git_checkouts.display()
         )?;
 
