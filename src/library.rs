@@ -1,3 +1,4 @@
+use std::fmt;
 use std::fs;
 use std::path::PathBuf;
 
@@ -85,46 +86,57 @@ impl CargoCachePaths {
             git_checkouts,
         })
     }
+} // impl CargoCachePaths
 
-    pub(crate) fn get_dir_paths(&self) -> String {
-        let mut s = String::with_capacity(500);
-        s.push_str("\n");
-        s.push_str(&format!(
+impl std::fmt::Display for CargoCachePaths {
+    fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "\n")?;
+
+        write!(
+            f,
             "cargo home:                 {}\n",
             &self.cargo_home.display()
-        ));
+        )?;
 
-        s.push_str(&format!(
+        write!(
+            f,
             "binaries directory:         {}\n",
             &self.bin_dir.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "registry directory:         {}\n",
             &self.registry.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "registry index:             {}\n",
             &self.registry_index.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "crate source archives:      {}\n",
             &self.registry_cache.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "unpacked crate sources:     {}\n",
             &self.registry_sources.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "bare git repos:             {}\n",
             &self.git_repos_bare.display()
-        ));
-        s.push_str(&format!(
+        )?;
+        write!(
+            f,
             "git repo checkouts:         {}\n",
             &self.git_checkouts.display()
-        ));
-        s
+        )?;
+
+        Ok(())
     }
-} // impl CargoCachePaths
+}
 
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     //@TODO: can we Walkdir only once?
@@ -819,7 +831,7 @@ mod libtests {
         std::env::set_var("CARGO_HOME", CH_string);
         let ccp = CargoCachePaths::new().unwrap();
 
-        let output = ccp.get_dir_paths();
+        let output = ccp.to_string();
         let mut iter = output.lines().skip(1); // ??
 
         let cargo_home = iter.next().unwrap();
@@ -913,7 +925,7 @@ mod libtests {
         let ccp = CargoCachePaths::new().unwrap();
         #[allow(unused_must_use)]
         b.iter(|| {
-            let x = ccp.get_dir_paths();
+            let x = ccp.to_string();
             black_box(x);
         });
     }
