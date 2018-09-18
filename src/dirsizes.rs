@@ -203,10 +203,10 @@ impl<'a> fmt::Display for DirSizes<'a> {
 #[cfg(test)]
 mod libtests {
     use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
     use pretty_assertions::assert_eq;
     use std::path::PathBuf;
-    use test::black_box;
-    use test::Bencher;
 
     impl<'a> DirSizes<'a> {
         #[allow(non_snake_case)]

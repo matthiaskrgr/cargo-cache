@@ -705,10 +705,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 #[cfg(test)]
 mod libtests {
     use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
     use pretty_assertions::assert_eq;
     use std::env;
-    use test::black_box;
-    use test::Bencher;
 
     #[allow(non_snake_case)]
     #[test]

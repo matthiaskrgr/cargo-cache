@@ -92,11 +92,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
+    use crate::test::black_box;
+    use crate::test::Bencher;
     use pretty_assertions::assert_eq;
     use rustc_tools_util::*;
     use std::process::Command;
-    use test::black_box;
-    use test::Bencher;
 
     fn cargo_build_release() {
         // build crate in release mode

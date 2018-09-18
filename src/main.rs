@@ -33,6 +33,9 @@ mod dirsizes;
 mod git;
 mod library;
 
+#[cfg(test)]
+extern crate test; //hack
+
 use std::{fs, process};
 
 use clap::value_t;
