@@ -631,7 +631,8 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
                     }
                 }
                 collection.extend_from_slice(&both_levels_vec);
-            } else { // not checkouts
+            } else {
+                // not checkouts
                 let crate_list = fs::read_dir(&cache_dir)
                     .unwrap()
                     .map(|cratepath| cratepath.unwrap().path())
