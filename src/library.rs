@@ -524,12 +524,34 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     }
 
     impl FileDesc {
-        fn new(path: &PathBuf, recursive: bool) -> Self {
+        fn new(path: &PathBuf, recursive: bool, checkouts: bool) -> Self {
             let last = path.to_str().unwrap().split('/').last().unwrap();
 
             let mut i = last.split('-').collect::<Vec<_>>();
-            let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-            let name = i.join("-");
+            let name;
+            let version;
+            if checkouts {
+                let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
+                let last = paths.pop().unwrap();
+                let last_but_one = paths.pop().unwrap();
+                let last_but_2 = paths.pop().unwrap();
+
+                i = vec![last_but_2, last_but_one, last];
+
+                let string = last_but_one
+                    .split('/')
+                    .collect::<Vec<_>>()
+                    .pop()
+                    .unwrap()
+                    .to_string();
+                let mut vec = string.split('-').collect::<Vec<_>>();
+                let _ = vec.pop();
+                name = vec.join("-").to_string();
+                version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+            } else {
+                version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+                name = i.join("-");
+            }
 
             let size = if recursive {
                 let walkdir = WalkDir::new(path.display().to_string());
@@ -588,14 +610,34 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         // if we check bare git repos or checkouts, we need to calculate sizes slightly different
         let is_git: bool = *cache_dir == &ccd.git_checkouts || *cache_dir == &ccd.git_repos_bare;
 
+        let checkouts = *cache_dir == &ccd.git_checkouts;
+
         // get list of package all "...\.crate$" files and sort it
         let mut collection = Vec::new();
         if is_git {
-            let crate_list = fs::read_dir(&cache_dir)
-                .unwrap()
-                .map(|cratepath| cratepath.unwrap().path())
-                .collect::<Vec<PathBuf>>();
-            collection.extend_from_slice(&crate_list);
+            if checkouts {
+                let crate_list = fs::read_dir(&cache_dir)
+                    .unwrap()
+                    .map(|cratepath| cratepath.unwrap().path())
+                    .collect::<Vec<PathBuf>>();
+                // need to take 2 levels into account
+                let mut both_levels_vec: Vec<PathBuf> = Vec::new();
+                for repo in crate_list {
+                    for i in fs::read_dir(&repo)
+                        .unwrap()
+                        .map(|cratepath| cratepath.unwrap().path())
+                    {
+                        both_levels_vec.push(i);
+                    }
+                }
+                collection.extend_from_slice(&both_levels_vec);
+            } else { // not checkouts
+                let crate_list = fs::read_dir(&cache_dir)
+                    .unwrap()
+                    .map(|cratepath| cratepath.unwrap().path())
+                    .collect::<Vec<PathBuf>>();
+                collection.extend_from_slice(&crate_list);
+            }
         } else {
             for repo in fs::read_dir(cache_dir).unwrap() {
                 let crate_list = fs::read_dir(&repo.unwrap().path())
@@ -610,14 +652,13 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 
         let collections_vec = collection
             .iter()
-            .map(|path| FileDesc::new(path, recursive))
+            .map(|path| FileDesc::new(path, recursive, checkouts))
             .collect::<Vec<_>>();
 
         let mut summary: Vec<String> = Vec::new();
         let mut current_name = String::new();
         let mut counter: u32 = 0;
         let mut total_size: u64 = 0;
-        //let mut max_cratename_len = 0;
 
         // first find out max_cratename_len
         let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
