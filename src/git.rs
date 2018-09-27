@@ -202,7 +202,8 @@ mod gittest {
             b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
         \n this is some more text\n
         lorem ipsum",
-        ).unwrap();
+        )
+        .unwrap();
         let git_add = Command::new("git")
             .arg("add")
             .arg("testfile.txt")

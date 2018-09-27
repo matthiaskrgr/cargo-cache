@@ -159,7 +159,8 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
             fs::metadata(f)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &dir.display()))
                 .len()
-        }).sum();
+        })
+        .sum();
 
     // for the file number, we don't want the actual number of files but only the number of
     // files in the current directory.
@@ -220,7 +221,8 @@ pub(crate) fn rm_old_crates(
                 removed_size += fs::metadata(pkgpath)
                     .unwrap_or_else(|_| {
                         panic!("Failed to get metadata of file '{}'", &pkgpath.display())
-                    }).len();
+                    })
+                    .len();
                 if dry_run {
                     println!(
                         "dry run: not actually deleting {} {} at {}",
@@ -246,7 +248,8 @@ pub(crate) fn rm_old_crates(
                     removed_size += fs::metadata(pkgpath)
                         .unwrap_or_else(|_| {
                             panic!("Failed to get metadata of file '{}'", &pkgpath.display())
-                        }).len();
+                        })
+                        .len();
                     if dry_run {
                         println!(
                             "dry run: not actually deleting {} {} at {}",
@@ -566,14 +569,17 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
                         fs::metadata(f)
                             .unwrap_or_else(|_| {
                                 panic!("Failed to get metadata of file '{}'", &path.display())
-                            }).len()
-                    }).sum()
+                            })
+                            .len()
+                    })
+                    .sum()
             } else {
                 //  recursive ?
                 fs::metadata(&path)
                     .unwrap_or_else(|_| {
                         panic!("Failed to get metadata of file '{}'", &path.display())
-                    }).len()
+                    })
+                    .len()
             };
 
             Self {
