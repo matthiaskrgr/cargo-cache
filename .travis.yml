@@ -27,9 +27,10 @@ script:
   - if [[ "$RUSTFMT" == "true" ]]; then rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang-nursery/rustfmt/ --force; fi
   - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
   - cargo build --all ${RELEASE}
-  - cargo test --all --all-features ${RELEASE}
-  - if [[ "$RELEASE" == "true" ]]; then cargo bench; fi
-  - if [[ "$RELEASE" == "true" ]]; then cargo bench --features bench; fi
+  - cargo test --all ${RELEASE}
+  - if [[ "$RELEASE" == "--release" ]]; then cargo test --features bench; fi
+  - if [[ "$RELEASE" == "--release" ]]; then cargo bench; fi
+  - if [[ "$RELEASE" == "--release" ]]; then cargo bench --features bench; fi
   - cargo run
   - cargo install --force --path . ${DEBUG}
   - cargo-cache
@@ -40,5 +41,5 @@ script:
   - cargo cache --info
   - cargo cache --list-dirs
   - cargo cache --keep-duplicate-crates 10 --dry-run
-  - cargo cache --keep-duplicate-crates 1 --dry-run
-  - cargo cache --keep-duplicate-crates 0 --dry-run
+  - cargo cache --keep-duplicate-crates 1  --dry-run
+  - cargo cache --keep-duplicate-crates 0  --dry-run
