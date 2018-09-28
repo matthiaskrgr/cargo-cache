@@ -12,21 +12,19 @@
     rust_2018_idioms
 )]
 // enable additional clippy warnings
-#[warn(
+#![warn(
     clippy::all,
     clippy::correctness,
     clippy::perf,
     clippy::complexity,
     clippy::style,
     clippy::pedantic,
-    clippy::nursery,
     clippy::shadow_reuse,
     clippy::shadow_same,
     clippy::shadow_unrelated,
     clippy::pub_enum_variant_names,
     clippy::string_add,
-    clippy::string_add_assign,
-    clippy::needless_borrow
+    clippy::string_add_assign
 )]
 mod cli;
 mod dirsizes;

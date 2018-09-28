@@ -1,3 +1,30 @@
+#![feature(tool_lints)]
+#![warn(
+    ellipsis_inclusive_range_patterns,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unsafe_code,
+    unused,
+    rust_2018_compatibility,
+    rust_2018_idioms
+)]
+// enable additional clippy warnings
+#![warn(
+    clippy::all,
+    clippy::correctness,
+    clippy::perf,
+    clippy::complexity,
+    clippy::style,
+    clippy::pedantic,
+    clippy::shadow_reuse,
+    clippy::shadow_same,
+    clippy::shadow_unrelated,
+    clippy::pub_enum_variant_names,
+    clippy::string_add,
+    clippy::string_add_assign
+)]
+
 use std::path::*;
 use std::process::Command;
 use walkdir::WalkDir;

@@ -528,9 +528,9 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 
     impl FileDesc {
         fn new(path: &PathBuf, recursive: bool, checkouts: bool) -> Self {
-            let last = path.to_str().unwrap().split('/').last().unwrap();
+            let last_item = path.to_str().unwrap().split('/').last().unwrap();
 
-            let mut i = last.split('-').collect::<Vec<_>>();
+            let mut i = last_item.split('-').collect::<Vec<_>>();
             let name;
             let version;
             if checkouts {
