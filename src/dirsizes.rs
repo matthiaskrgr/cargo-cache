@@ -203,8 +203,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
 #[cfg(test)]
 mod libtests {
     use super::*;
-    use crate::test::black_box;
-    use crate::test::Bencher;
+
     use pretty_assertions::assert_eq;
     use std::path::PathBuf;
 
@@ -309,52 +308,6 @@ Size of 37 bare git repos:                  121.21 KB
 Size of 8 git repo checkouts:               34.98 KB\n";
 
         assert_eq!(output_is, output_should);
-    }
-
-    #[bench]
-    fn bench_pretty_print(b: &mut Bencher) {
-        // DirInfors to construct DirSizes from
-        let bindir = DirInfo {
-            dir_size: 121_212,
-            file_number: 31,
-        };
-        let git_repos_bare = DirInfo {
-            dir_size: 121_212,
-            file_number: 37,
-        };
-        let git_checkouts = DirInfo {
-            dir_size: 34984,
-            file_number: 8,
-        };
-        let reg_cache = DirInfo {
-            dir_size: 89,
-            file_number: 23445,
-        };
-        let reg_src = DirInfo {
-            dir_size: 1_938_493_989,
-            file_number: 123_909_849,
-        };
-        let reg_index = DirInfo {
-            dir_size: 23,
-            file_number: 12345,
-        };
-
-        let pb = PathBuf::from("/home/user/.cargo");
-        // create a DirSizes object
-        let dir_sizes = DirSizes::new_manually(
-            &bindir,
-            &git_repos_bare,
-            &git_checkouts,
-            &reg_cache,
-            &reg_src,
-            &reg_index,
-            &pb,
-        );
-
-        b.iter(|| {
-            let x = format!("{}", dir_sizes);
-            black_box(x);
-        });
     }
 
     #[allow(non_snake_case)]
@@ -529,4 +482,59 @@ Size of 0 git repo checkouts:               0 B\n";
 
         assert_eq!(output_is, output_should);
     }
+}
+
+#[cfg(all(test, feature = "bench"))]
+mod benchmarks {
+    use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
+    use std::path::PathBuf;
+
+    #[bench]
+    fn bench_pretty_print(b: &mut Bencher) {
+        // DirInfors to construct DirSizes from
+        let bindir = DirInfo {
+            dir_size: 121_212,
+            file_number: 31,
+        };
+        let git_repos_bare = DirInfo {
+            dir_size: 121_212,
+            file_number: 37,
+        };
+        let git_checkouts = DirInfo {
+            dir_size: 34984,
+            file_number: 8,
+        };
+        let reg_cache = DirInfo {
+            dir_size: 89,
+            file_number: 23445,
+        };
+        let reg_src = DirInfo {
+            dir_size: 1_938_493_989,
+            file_number: 123_909_849,
+        };
+        let reg_index = DirInfo {
+            dir_size: 23,
+            file_number: 12345,
+        };
+
+        let pb = PathBuf::from("/home/user/.cargo");
+        // create a DirSizes object
+        let dir_sizes = DirSizes::new_manually(
+            &bindir,
+            &git_repos_bare,
+            &git_checkouts,
+            &reg_cache,
+            &reg_src,
+            &reg_index,
+            &pb,
+        );
+
+        b.iter(|| {
+            let x = format!("{}", dir_sizes);
+            black_box(x);
+        });
+    }
+
 }

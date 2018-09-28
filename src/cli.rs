@@ -92,17 +92,9 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
-    use crate::test::black_box;
-    use crate::test::Bencher;
     use pretty_assertions::assert_eq;
     use rustc_tools_util::*;
     use std::process::Command;
-
-    fn cargo_build_release() {
-        // build crate in release mode
-        let cmd = Command::new("cargo").arg("build").arg("--release").output();
-        assert!(cmd.unwrap().status.success());
-    }
 
     fn cargo_build_debug() {
         // build crate in debug mode
@@ -176,6 +168,20 @@ OPTIONS:
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n");
 
         assert_eq!(help_desired, help_real);
+    }
+
+}
+
+#[cfg(all(test, feature = "bench"))]
+mod benchmarks {
+    use crate::test::black_box;
+    use crate::test::Bencher;
+    use std::process::Command;
+
+    fn cargo_build_release() {
+        // build crate in release mode
+        let cmd = Command::new("cargo").arg("build").arg("--release").output();
+        assert!(cmd.unwrap().status.success());
     }
 
     #[bench]

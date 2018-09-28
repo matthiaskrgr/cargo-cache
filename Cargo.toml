@@ -9,6 +9,8 @@ keywords = ["cargo", "cache", "delete", "manage", "size"]
 build = "src/build.rs"
 edition = "2018"
 
+[features]
+bench = [] # run benchmarks
 
 [dependencies]
 # https://github.com/kbknapp/clap-rs
@@ -49,5 +51,9 @@ path = "src/main.rs"
 travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
 [profile.release]
+lto = true
+codegen-units = 1
+
+[profile.bench]
 lto = true
 codegen-units = 1

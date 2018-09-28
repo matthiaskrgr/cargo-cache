@@ -1,5 +1,5 @@
 #![feature(tool_lints)]
-#![feature(test)]
+#![cfg_attr(all(test, feature = "bench"), feature(test))]
 // these [allow()] by default, make them warn:
 #![warn(
     ellipsis_inclusive_range_patterns,
@@ -31,7 +31,7 @@ mod dirsizes;
 mod git;
 mod library;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
 use std::{fs, process};

@@ -753,8 +753,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 #[cfg(test)]
 mod libtests {
     use super::*;
-    use crate::test::black_box;
-    use crate::test::Bencher;
+
     use pretty_assertions::assert_eq;
     use std::env;
 
@@ -911,6 +910,14 @@ mod libtests {
         let last = iter.next();
         assert!(!last.is_some(), "found another directory?!");
     }
+
+}
+
+#[cfg(all(test, feature = "bench"))]
+mod benchmarks {
+    use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
 
     #[allow(non_snake_case)]
     #[bench]
