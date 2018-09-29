@@ -32,7 +32,7 @@ git2 = "0.7" # check if repo is git repo
 rayon = "1.0" # parallel for iterators
 
 # https://github.com/rust-lang-nursery/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "cdde22c2cc01c62474b2b73a93e6ad4a4498e230" } # git version information
+rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "37ba42b7bc0d3dc93eb8fa4d17edcd8303415afe" } # git version information
 
 [dev-dependencies]
 # https://github.com/colin-kiegel/rust-pretty-assertions
@@ -40,7 +40,7 @@ pretty_assertions = "0.5" # colored diff assertions
 
 [build-dependencies]
 # https://github.com/rust-lang-nursery/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "cdde22c2cc01c62474b2b73a93e6ad4a4498e230" } # git version information
+rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "37ba42b7bc0d3dc93eb8fa4d17edcd8303415afe" } # git version information
 
 
 [[bin]]
