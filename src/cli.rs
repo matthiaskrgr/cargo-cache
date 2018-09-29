@@ -92,23 +92,14 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
 #[cfg(test)]
 mod clitests {
+    use crate::test_helpers::bin_path;
     use pretty_assertions::assert_eq;
     use rustc_tools_util::*;
     use std::process::Command;
 
-    fn cargo_build_debug() {
-        // build crate in debug mode
-        let cmd = Command::new("cargo").arg("build").output();
-        assert!(cmd.unwrap().status.success());
-    }
-
     #[test]
     fn run_help() {
-        cargo_build_debug();
-
-        let cc_help = Command::new("target/debug/cargo-cache")
-            .arg("--help")
-            .output();
+        let cc_help = Command::new(bin_path()).arg("--help").output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
@@ -137,12 +128,7 @@ OPTIONS:
     }
     #[test]
     fn run_help_subcommand() {
-        cargo_build_debug();
-
-        let cc_help = Command::new("target/debug/cargo-cache")
-            .arg("cache")
-            .arg("--help")
-            .output();
+        let cc_help = Command::new(bin_path()).arg("cache").arg("--help").output();
         assert!(cc_help.is_ok(), "cargo-cache --help failed");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
@@ -176,35 +162,23 @@ OPTIONS:
 mod benchmarks {
     use crate::test::black_box;
     use crate::test::Bencher;
+    use crate::test_helpers::bin_path;
     use std::process::Command;
-
-    fn cargo_build_release() {
-        // build crate in release mode
-        let cmd = Command::new("cargo").arg("build").arg("--release").output();
-        assert!(cmd.unwrap().status.success());
-    }
 
     #[bench]
     fn bench_clap_help(b: &mut Bencher) {
-        cargo_build_release();
         #[allow(unused_must_use)]
         b.iter(|| {
-            let x = Command::new("target/release/cargo-cache")
-                .arg("--help")
-                .output();
+            let x = Command::new(bin_path()).arg("--help").output();
             black_box(x);
         });
     }
 
     #[bench]
     fn bench_clap_help_subcommand(b: &mut Bencher) {
-        cargo_build_release();
         #[allow(unused_must_use)]
         b.iter(|| {
-            let x = Command::new("target/release/cargo-cache")
-                .arg("cache")
-                .arg("--help")
-                .output();
+            let x = Command::new(bin_path()).arg("cache").arg("--help").output();
             black_box(x);
         });
     }

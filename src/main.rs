@@ -33,6 +33,8 @@ mod cli;
 mod dirsizes;
 mod git;
 mod library;
+#[cfg(any(test, feature = "bench"))]
+mod test_helpers;
 
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack

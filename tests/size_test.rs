@@ -1,6 +1,8 @@
 // note: to make debug prints work:
 // cargo test -- --nocapture
+mod test_helpers;
 
+use crate::test_helpers::bin_path;
 use std::path::*;
 use std::process::Command;
 use walkdir::WalkDir;
@@ -50,24 +52,8 @@ fn build_and_check_size_test() {
         ]
     );
 
-    // make sure cargo cache is built
-
-    let debug_build = PathBuf::from("target/debug/").is_dir();
-
-    let cargo_build = if debug_build {
-        Command::new("cargo").arg("build").output()
-    } else {
-        Command::new("cargo").arg("build").arg("--release").output()
-    };
-    assert!(cargo_build.is_ok(), "could not build cargo cache");
     // run it on the fake cargo cache dir
-    let cargo_cache = Command::new(if debug_build {
-        "target/debug/cargo-cache"
-    } else {
-        "target/release/cargo-cache"
-    })
-    .env("CARGO_HOME", &fchp)
-    .output();
+    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", &fchp).output();
     assert!(cargo_cache.is_ok(), "cargo cache failed to run");
     let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
     // we need to get the actual path to fake cargo home dir and make it an absolute path

@@ -46,6 +46,8 @@ rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", r
 [[bin]]
 name = "cargo-cache"
 path = "src/main.rs"
+test = true
+bench = true
 
 [badges]
 travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
