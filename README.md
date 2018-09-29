@@ -3,11 +3,15 @@
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
 ![Minimum rust version: nightly](https://img.shields.io/badge/Minimum%20Rust%20Version-nightly-red.svg)
 
-Requires ````rust nightly 1.30```` (due to `tool_lints` feature).
+Requires ````rust nightly 1.31```` or ````rust beta 1.30````.
 
 DISCLAIMER: I only tested this on linux.
 
 #### Installation:
+````
+cargo +beta install --git https://github.com/matthiaskrgr/cargo-cache
+````
+or
 ````
 cargo +nightly install --git https://github.com/matthiaskrgr/cargo-cache
 ````
