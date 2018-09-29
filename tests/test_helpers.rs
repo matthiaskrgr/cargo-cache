@@ -1,13 +1,12 @@
+use std::path::PathBuf;
+
 #[allow(dead_code)]
 pub(crate) fn bin_path() -> String {
-    let string = if cfg!(release) {
+    if PathBuf::from("target/release/cargo-cache").is_file() {
         String::from("target/release/cargo-cache")
-    } else {
+    } else if PathBuf::from("target/debug/cargo-cache").is_file() {
         String::from("target/debug/cargo-cache")
-    };
-
-    if !std::path::PathBuf::from(&string).is_file() {
-        panic!("executable '{}' not found!", string);
+    } else {
+        panic!("No cargo-cache executable found!");
     }
-    string
 }
