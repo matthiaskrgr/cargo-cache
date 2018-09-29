@@ -1,6 +1,7 @@
 // note: to make debug prints work:
 // cargo test -- --nocapture
-#[path = "../src/test_helpers.rs"] mod test_helpers;
+#[path = "../src/test_helpers.rs"]
+mod test_helpers;
 
 use crate::test_helpers::bin_path;
 use std::path::*;
