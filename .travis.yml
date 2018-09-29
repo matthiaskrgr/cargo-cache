@@ -12,6 +12,8 @@ rust:
 
 
 env:
+  global:
+    - RUST_BACKTRACE=full
   matrix:
     - RELEASE="" DEBUG="--debug"
     - CLIPPY="true"
