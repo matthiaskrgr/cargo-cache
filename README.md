@@ -1,7 +1,9 @@
 ## cargo cache
 
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
-![Minimum rust version: nightly](https://img.shields.io/badge/Minimum%20Rust%20Version-nightly-red.svg)
+![Nightly 1.31 Supported](https://img.shields.io/badge/nightly%201.31-supported-brightgreen.svg)
+![Beta 1.30 Supported](https://img.shields.io/badge/beta%201.30-supported-brightgreen.svg)
+![Stable 1.29 Unsupported](https://img.shields.io/badge/stable%201.29-unsupported-red.svg)
 
 Requires ````rust nightly 1.31```` or ````rust beta 1.30````.
 
