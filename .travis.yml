@@ -6,9 +6,9 @@ sudo: false
 #cache: cargo
 
 rust:
-#  - stable
-#  - beta
   - nightly
+  - beta
+#  - stable
 
 
 env:
@@ -19,6 +19,16 @@ env:
     - RUSTFMT="true"
     - RELEASE="--release"
 
+matrix:
+  fast_finish: false
+  exclude:
+    - rust: beta
+      env: CLIPPY="true"
+    - rust: beta
+      env: RUSTFMT="true"
+    - rust: beta
+      env: CARGO_AUDIT="true"
+
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit; fi
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo audit; exit; fi
@@ -28,10 +38,10 @@ script:
   - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
   - cargo build --all ${RELEASE}
   - cargo test --all ${RELEASE}
-  - if [[ "$RELEASE" == "" ]]; then cargo test --features bench; fi
-  - if [[ "$RELEASE" == "--release" ]]; then cargo test --features bench --release; fi
-  - if [[ "$RELEASE" == "--release" ]]; then cargo bench; fi
-  - if [[ "$RELEASE" == "--release" ]]; then cargo bench --features bench; fi
+  - if [[ "$RELEASE" == "" ]] &&  [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench; fi
+  - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench --release; fi
+  - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench; fi
+  - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench --features bench; fi
   - cargo run ${RELEASE}
   - cargo install --force --path . ${DEBUG}
   - cargo-cache
