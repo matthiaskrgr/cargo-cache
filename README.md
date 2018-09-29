@@ -5,18 +5,17 @@
 ![Beta 1.30 Supported](https://img.shields.io/badge/beta%201.30-supported-brightgreen.svg)
 ![Stable 1.29 Unsupported](https://img.shields.io/badge/stable%201.29-unsupported-red.svg)
 
-Requires ````rust nightly 1.31```` or ````rust beta 1.30````.
+Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
+
+Requires ````rust nightly 1.31```` or````rust beta 1.30````.
 
 DISCLAIMER: I only tested this on linux.
 
 #### Installation:
-````
-cargo +beta install --git https://github.com/matthiaskrgr/cargo-cache
-````
-or
-````
-cargo +nightly install --git https://github.com/matthiaskrgr/cargo-cache
-````
+```cargo +beta install --git https://github.com/matthiaskrgr/cargo-cache``` or
+
+```cargo +nightly install --git https://github.com/matthiaskrgr/cargo-cache```
+
 
 #### Sample output:
 ````
