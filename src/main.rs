@@ -1,4 +1,4 @@
-#![feature(tool_lints)]
+#![cfg_attr(feature = "cargo-clippy", feature(tool_lints))]
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // these [allow()] by default, make them warn:
 #![warn(
@@ -12,19 +12,22 @@
     rust_2018_idioms
 )]
 // enable additional clippy warnings
-#![warn(
-    clippy::all,
-    clippy::correctness,
-    clippy::perf,
-    clippy::complexity,
-    clippy::style,
-    clippy::pedantic,
-    clippy::shadow_reuse,
-    clippy::shadow_same,
-    clippy::shadow_unrelated,
-    clippy::pub_enum_variant_names,
-    clippy::string_add,
-    clippy::string_add_assign
+#![cfg_attr(
+    feature = "cargo-clippy",
+    warn(
+        clippy::all,
+        clippy::correctness,
+        clippy::perf,
+        clippy::complexity,
+        clippy::style,
+        clippy::pedantic,
+        clippy::shadow_reuse,
+        clippy::shadow_same,
+        clippy::shadow_unrelated,
+        clippy::pub_enum_variant_names,
+        clippy::string_add,
+        clippy::string_add_assign
+    )
 )]
 mod cli;
 mod dirsizes;

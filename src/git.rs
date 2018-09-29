@@ -85,7 +85,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     }
 }
 
-#[allow(clippy::stutter)]
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::stutter))]
 pub(crate) fn git_gc_everything(
     git_repos_bare_dir: &PathBuf,
     registry_cache_dir: &PathBuf,

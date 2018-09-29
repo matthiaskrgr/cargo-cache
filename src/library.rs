@@ -345,7 +345,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-    #[allow(clippy::cast_possible_wrap)] // FP due to derives
+    #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_wrap))] // FP due to derives
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
@@ -359,9 +359,12 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     // when printing, we are going to cut off everything but a few decimal places anyway, so
     // precision is not much of an issue.
 
-    #[allow(
-        clippy::cast_precision_loss,
-        clippy::cast_possible_truncation
+    #[cfg_attr(
+        feature = "cargo-clippy",
+        allow(
+            clippy::cast_precision_loss,
+            clippy::cast_possible_truncation
+        )
     )]
     let perc: f32 =
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
@@ -670,7 +673,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
         // first find out max_cratename_len
         let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
 
-        #[allow(clippy::if_not_else)]
+        #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
         collections_vec.into_iter().for_each(|pkg| {
             {
                 if pkg.name != current_name {

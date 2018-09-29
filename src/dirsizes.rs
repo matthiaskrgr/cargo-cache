@@ -3,7 +3,7 @@ use std::fmt;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
-#[allow(clippy::similar_names)] // FP due to derives
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::similar_names))] // FP due to derives
 #[derive(Debug, Clone)]
 pub(crate) struct DirSizes<'a> {
     pub(crate) total_size: u64,                // total size of cargo root dir
@@ -78,7 +78,10 @@ fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
 
     let mut formatted_line = beginning.to_string();
 
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    #[cfg_attr(
+        feature = "cargo-clippy",
+        allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)
+    )] // FP due to derives
     // I tried mittigating via previous assert()
     formatted_line.push_str(&" ".repeat(len_padding as usize));
     formatted_line.push_str(end);
