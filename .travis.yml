@@ -28,10 +28,11 @@ script:
   - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
   - cargo build --all ${RELEASE}
   - cargo test --all ${RELEASE}
-  - if [[ "$RELEASE" == "--release" ]]; then cargo test --features bench; fi
+  - if [[ "$RELEASE" == "" ]]; then cargo test --features bench; fi
+  - if [[ "$RELEASE" == "--release" ]]; then cargo test --features bench --release; fi
   - if [[ "$RELEASE" == "--release" ]]; then cargo bench; fi
   - if [[ "$RELEASE" == "--release" ]]; then cargo bench --features bench; fi
-  - cargo run
+  - cargo run ${RELEASE}
   - cargo install --force --path . ${DEBUG}
   - cargo-cache
   - cargo cache
