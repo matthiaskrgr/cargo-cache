@@ -864,7 +864,7 @@ mod libtests {
         assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
 
         // create the directory
-        if !std::path::PathBuf::from(&CH_string).is_dir() {
+        if !std::path::PathBuf::from(&CH_string).exists() {
             std::fs::DirBuilder::new().create(&CH_string).unwrap();
         }
         assert!(fs::metadata(&CH_string).unwrap().is_dir());
