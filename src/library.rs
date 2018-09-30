@@ -758,6 +758,7 @@ mod libtests {
     use super::*;
 
     use pretty_assertions::assert_eq;
+    use regex::Regex;
     use std::env;
 
     #[allow(non_snake_case)]
@@ -878,36 +879,60 @@ mod libtests {
         let mut iter = output.lines().skip(1); // ??
 
         let cargo_home = iter.next().unwrap();
-        assert!(cargo_home.starts_with("cargo home:"));
-        assert!(cargo_home.ends_with("/cargo_home"));
+        assert!(
+            Regex::new(r"cargo home:.*/cargo_home")
+                .unwrap()
+                .is_match(cargo_home)
+        );
 
         let bins = iter.next().unwrap();
-        assert!(bins.starts_with("binaries directory:"));
-        assert!(bins.ends_with("/cargo_home/bin/"));
+        assert!(
+            Regex::new(r"binaries directory:.*/cargo_home/bin/")
+                .unwrap()
+                .is_match(bins)
+        );
 
         let registry = iter.next().unwrap();
-        assert!(registry.starts_with("registry directory:"));
-        assert!(registry.ends_with("/cargo_home/registry/"));
+        assert!(
+            Regex::new(r"registry directory:.*/cargo_home/registry/")
+                .unwrap()
+                .is_match(registry)
+        );
 
         let registry_index = iter.next().unwrap();
-        assert!(registry_index.starts_with("registry index:"));
-        assert!(registry_index.ends_with("/cargo_home/registry/index/"));
+        assert!(
+            Regex::new(r"registry index:.*/cargo_home/registry/index/")
+                .unwrap()
+                .is_match(registry_index)
+        );
 
         let crate_archives = iter.next().unwrap();
-        assert!(crate_archives.starts_with("crate source archives:"));
-        assert!(crate_archives.ends_with("/cargo_home/registry/cache/"));
+        assert!(
+            Regex::new(r"crate source archives:.*/cargo_home/registry/cache/")
+                .unwrap()
+                .is_match(crate_archives)
+        );
 
         let crate_sources = iter.next().unwrap();
-        assert!(crate_sources.starts_with("unpacked crate sources:"));
-        assert!(crate_sources.ends_with("/cargo_home/registry/src/"));
+        assert!(
+            Regex::new(r"unpacked crate sources:.*/cargo_home/registry/src/")
+                .unwrap()
+                .is_match(crate_sources)
+        );
 
         let bare_repos = iter.next().unwrap();
-        assert!(bare_repos.starts_with("bare git repos:"));
-        assert!(bare_repos.ends_with("/cargo_home/git/db/"));
+        assert!(
+            Regex::new(r"bare git repos:.*/cargo_home/git/db/")
+                .unwrap()
+                .is_match(bare_repos)
+        );
 
         let git_repo_checkouts = iter.next().unwrap();
-        assert!(git_repo_checkouts.starts_with("git repo checkouts"));
-        assert!(git_repo_checkouts.ends_with("/cargo_home/git/checkouts/"));
+        assert!(
+            Regex::new(r"git repo checkouts.*/cargo_home/git/checkouts/")
+                .unwrap()
+                .is_match(git_repo_checkouts)
+        );
 
         // should be empty now
         let last = iter.next();
