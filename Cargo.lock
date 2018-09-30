@@ -117,6 +117,7 @@ dependencies = [
  "humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "regex 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_tools_util 0.1.0 (git+https://github.com/rust-lang-nursery/rust-clippy?rev=37ba42b7bc0d3dc93eb8fa4d17edcd8303415afe)",
  "walkdir 2.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

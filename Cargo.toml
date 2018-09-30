@@ -38,6 +38,8 @@ rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", r
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "0.5" # colored diff assertions
 
+# https://github.com/rust-lang/regex
+regex = "1.0" # use regex iun test
 [build-dependencies]
 # https://github.com/rust-lang-nursery/rust-clippy
 rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "37ba42b7bc0d3dc93eb8fa4d17edcd8303415afe" } # git version information

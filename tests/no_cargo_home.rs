@@ -2,6 +2,7 @@
 mod test_helpers;
 
 use crate::test_helpers::bin_path;
+use regex::Regex;
 use std::process::Command;
 
 #[test]
@@ -18,6 +19,8 @@ fn no_cargo_home_dir() {
     // stderr
     let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
     assert!(!stderr.is_empty(), "found no stderr!");
-    assert!(stderr.starts_with("Error, no cargo home path directory "));
-    assert!(stderr.ends_with("./xyxyxxxyyyxxyxyxqwertywasd\' found.\n"));
+    let re =
+        Regex::new(r"Error, no cargo home path directory .*./xyxyxxxyyyxxyxyxqwertywasd' found.\n")
+            .unwrap();
+    assert!(re.is_match(&stderr));
 }
