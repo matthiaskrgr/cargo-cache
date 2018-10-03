@@ -805,7 +805,12 @@ mod libtests {
         let ccp = CargoCachePaths::new().unwrap();
 
         // test all the paths
-        assert!(ccp.cargo_home.display().to_string().ends_with("cargo_home_cargo_cache_paths"));
+        assert!(
+            ccp.cargo_home
+                .display()
+                .to_string()
+                .ends_with("cargo_home_cargo_cache_paths")
+        );
         assert!(
             ccp.bin_dir
                 .display()
@@ -908,16 +913,20 @@ mod libtests {
 
         let crate_archives = iter.next().unwrap();
         assert!(
-            Regex::new(r"crate source archives:.*/cargo_home_cargo_cache_paths_print/registry/cache/")
-                .unwrap()
-                .is_match(crate_archives)
+            Regex::new(
+                r"crate source archives:.*/cargo_home_cargo_cache_paths_print/registry/cache/"
+            )
+            .unwrap()
+            .is_match(crate_archives)
         );
 
         let crate_sources = iter.next().unwrap();
         assert!(
-            Regex::new(r"unpacked crate sources:.*/cargo_home_cargo_cache_paths_print/registry/src/")
-                .unwrap()
-                .is_match(crate_sources)
+            Regex::new(
+                r"unpacked crate sources:.*/cargo_home_cargo_cache_paths_print/registry/src/"
+            )
+            .unwrap()
+            .is_match(crate_sources)
         );
 
         let bare_repos = iter.next().unwrap();
