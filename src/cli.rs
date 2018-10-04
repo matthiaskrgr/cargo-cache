@@ -107,7 +107,7 @@ mod clitests {
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
-        let mut help_desired = format!("{}", rustc_tools_util::get_version_info!());
+        let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
@@ -140,7 +140,7 @@ OPTIONS:
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
-        let mut help_desired = format!("{}", rustc_tools_util::get_version_info!());
+        let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str("
 matthiaskrgr
 Manage cargo cache\n
