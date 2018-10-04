@@ -178,7 +178,11 @@ mod gittest {
             .arg("gitrepo")
             .current_dir("target")
             .output();
-        assert!(git_init.is_ok());
+        assert!(
+            git_init.is_ok(),
+            "git_init did not succeed: '{:?}'",
+            git_init
+        );
         // create a file and add some text
         let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
         file.write_all(b"Hello hello hello this is a test \n hello \n hello")
@@ -188,14 +192,18 @@ mod gittest {
             .arg("testfile.txt")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_add.is_ok());
+        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
         let git_commit = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("commit msg")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_commit.is_ok());
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
         // create another commit
         let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
         file.write_all(
@@ -209,14 +217,18 @@ mod gittest {
             .arg("testfile.txt")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_add.is_ok());
+        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
         let git_commit = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("another commit msg")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_commit.is_ok());
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
 
         let (dryrun_before, dryrun_after) =
             match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
@@ -234,7 +246,7 @@ mod gittest {
             };
         assert!(
             !before > after,
-            format!("gc is funky: before: {}  after: {}", before, after)
+            format!("git gc is funky: before: {}  after: {}", before, after)
         );
     }
 
