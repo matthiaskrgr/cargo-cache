@@ -42,7 +42,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
         let repo_path = repo.path();
         // delete all history of all checkouts and so on.
         // this will enable us to remove *all* dangling commits
-        match Command::new("git")
+        if let Err(e) = Command::new("git")
             .arg("reflog")
             .arg("expire")
             .arg("--expire=1.minute")
@@ -50,32 +50,31 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .current_dir(repo_path)
             .output()
         {
-            Ok(_) => {}
-            Err(e) => return Err((ErrorKind::GitReflogFailed, format!("{:?}", e))),
+            return Err((ErrorKind::GitReflogFailed, format!("{:?}", e)));
         }
+
         // pack refs of branches/tags etc into one file
-        match Command::new("git")
+        if let Err(e) = Command::new("git")
             .arg("pack-refs")
             .arg("--all")
             .arg("--prune")
             .current_dir(repo_path)
             .output()
         {
-            Ok(_) => {}
-            Err(e) => return Err((ErrorKind::GitPackRefsFailed, format!("{:?}", e))),
+            return Err((ErrorKind::GitPackRefsFailed, format!("{:?}", e)));
         }
 
         // recompress the repo from scratch and ignore all dangling objects
-        match Command::new("git")
+        if let Err(e) = Command::new("git")
             .arg("gc")
             .arg("--aggressive")
             .arg("--prune=now")
             .current_dir(repo_path)
             .output()
         {
-            Ok(_) => {}
-            Err(e) => return Err((ErrorKind::GitGCFailed, format!("{:?}", e))),
+            return Err((ErrorKind::GitGCFailed, format!("{:?}", e)));
         }
+
         let repo_size_after = cumulative_dir_size(path).dir_size;
         println!(
             "{}",
