@@ -963,10 +963,10 @@ mod benchmarks {
         let mut target_dir = std::env::current_dir().unwrap();
         target_dir.push("target");
         let mut cargo_home = target_dir;
-        cargo_home.push("cargo_home");
+        cargo_home.push("cargo_home_bench_new");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
+        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_bench_new"));
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -992,10 +992,10 @@ mod benchmarks {
         let mut target_dir = std::env::current_dir().unwrap();
         target_dir.push("target");
         let mut cargo_home = target_dir;
-        cargo_home.push("cargo_home");
+        cargo_home.push("cargo_home_bench_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home"));
+        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_bench_print"));
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
