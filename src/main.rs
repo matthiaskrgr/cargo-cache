@@ -91,17 +91,14 @@ fn main() {
     print!("{}", dir_sizes);
 
     if config.is_present("remove-dir") {
-        match remove_dir_via_cmdline(
+        if let Err((_, msg)) = remove_dir_via_cmdline(
             config.value_of("remove-dir"),
             config.is_present("dry-run"),
             &cargo_cache,
             &mut size_changed,
         ) {
-            Ok(_) => {}
-            Err((_, msg)) => {
-                eprintln!("{}", msg);
-                process::exit(1);
-            }
+            eprintln!("{}", msg);
+            process::exit(1);
         }
     }
 

@@ -48,7 +48,7 @@ impl CargoCachePaths {
     pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
-            Err(_) => {
+            _ => {
                 return Err((
                     ErrorKind::CargoFailedGetConfig,
                     "Failed to get cargo config!".to_string(),
@@ -414,14 +414,11 @@ pub(crate) fn remove_dir_via_cmdline(
             println!("dry-run: would delete: '{}'", dir.display());
         } else {
             println!("removing: '{}'", dir.display());
-            match fs::remove_dir_all(&dir) {
-                Ok(_) => {}
-                Err(_) => {
-                    return Err((
-                        ErrorKind::RemoveFailed,
-                        format!("failed to remove directory {}", dir.display()),
-                    ))
-                }
+            if fs::remove_dir_all(&dir).is_err() {
+                return Err((
+                    ErrorKind::RemoveFailed,
+                    format!("failed to remove directory {}", dir.display()),
+                ));
             }
             *size_changed = true;
         }

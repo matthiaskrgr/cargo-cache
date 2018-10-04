@@ -232,8 +232,8 @@ mod gittest {
 
         let (dryrun_before, dryrun_after) =
             match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
-                Err(_) => (0, 0),
                 Ok((x, y)) => (x, y),
+                _ => (0, 0),
             };
         // dryrun should not change sizes!
         assert_eq!(dryrun_before, 0);
@@ -241,8 +241,8 @@ mod gittest {
 
         let (before, after) =
             match gc_repo(&PathBuf::from("target/gitrepo/"), false /* dry run */) {
-                Err(_) => (0, 0),
                 Ok((x, y)) => (x, y),
+                _ => (0, 0),
             };
         assert!(
             !before > after,
