@@ -13,6 +13,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
         Some(name) => name.to_os_string().into_string().unwrap(),
         None => "<unknown>".to_string(),
     };
+    debug_assert_ne!(repo_name, "<unknown>", "unknown repo name: '{:?}'", &path);
 
     print!("Recompressing '{}': ", &repo_name);
     // if something went wrong and this is not actually a directory, return an error
