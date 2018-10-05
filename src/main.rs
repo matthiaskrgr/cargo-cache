@@ -35,6 +35,7 @@ mod git;
 mod library;
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
+mod top_items;
 
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
@@ -47,6 +48,7 @@ use humansize::{file_size_opts, FileSize};
 use crate::dirsizes::*;
 use crate::git::*;
 use crate::library::*;
+use crate::top_items::*;
 
 fn main() {
     // parse args
