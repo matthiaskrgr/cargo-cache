@@ -7,78 +7,77 @@ use walkdir::WalkDir;
 
 use crate::library::*;
 
+#[derive(Debug, Clone)]
+struct FileDesc {
+    name: String,
+    version: String,
+    size: u64,
+}
+
+impl FileDesc {
+    fn new(path: &PathBuf, recursive: bool, checkouts: bool) -> Self {
+        let last_item = path.to_str().unwrap().split('/').last().unwrap();
+
+        let mut i = last_item.split('-').collect::<Vec<_>>();
+        let name;
+        let version;
+        if checkouts {
+            let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
+            let last = paths.pop().unwrap();
+            let last_but_one = paths.pop().unwrap();
+            let last_but_2 = paths.pop().unwrap();
+
+            i = vec![last_but_2, last_but_one, last];
+
+            let string = last_but_one
+                .split('/')
+                .collect::<Vec<_>>()
+                .pop()
+                .unwrap()
+                .to_string();
+            let mut vec = string.split('-').collect::<Vec<_>>();
+            let _ = vec.pop();
+            name = vec.join("-").to_string();
+            version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        } else {
+            version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+            name = i.join("-");
+        }
+
+        let size = if recursive {
+            let walkdir = WalkDir::new(path.display().to_string());
+
+            walkdir
+                .into_iter()
+                .map(|e| e.unwrap().path().to_owned())
+                .filter(|f| f.exists())
+                .collect::<Vec<_>>()
+                .par_iter()
+                .map(|f| {
+                    fs::metadata(f)
+                        .unwrap_or_else(|_| {
+                            panic!("Failed to get metadata of file '{}'", &path.display())
+                        })
+                        .len()
+                })
+                .sum()
+        } else {
+            //  recursive ?
+            fs::metadata(&path)
+                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
+                .len()
+        };
+
+        Self {
+            name,
+            version,
+            size,
+        }
+    } // fn new()
+}
+
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     // we now have all the sizes and names and version sorted
-    #[derive(Debug, Clone)]
-    struct FileDesc {
-        name: String,
-        version: String,
-        size: u64,
-    }
-
-    impl FileDesc {
-        fn new(path: &PathBuf, recursive: bool, checkouts: bool) -> Self {
-            let last_item = path.to_str().unwrap().split('/').last().unwrap();
-
-            let mut i = last_item.split('-').collect::<Vec<_>>();
-            let name;
-            let version;
-            if checkouts {
-                let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
-                let last = paths.pop().unwrap();
-                let last_but_one = paths.pop().unwrap();
-                let last_but_2 = paths.pop().unwrap();
-
-                i = vec![last_but_2, last_but_one, last];
-
-                let string = last_but_one
-                    .split('/')
-                    .collect::<Vec<_>>()
-                    .pop()
-                    .unwrap()
-                    .to_string();
-                let mut vec = string.split('-').collect::<Vec<_>>();
-                let _ = vec.pop();
-                name = vec.join("-").to_string();
-                version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-            } else {
-                version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-                name = i.join("-");
-            }
-
-            let size = if recursive {
-                let walkdir = WalkDir::new(path.display().to_string());
-
-                walkdir
-                    .into_iter()
-                    .map(|e| e.unwrap().path().to_owned())
-                    .filter(|f| f.exists())
-                    .collect::<Vec<_>>()
-                    .par_iter()
-                    .map(|f| {
-                        fs::metadata(f)
-                            .unwrap_or_else(|_| {
-                                panic!("Failed to get metadata of file '{}'", &path.display())
-                            })
-                            .len()
-                    })
-                    .sum()
-            } else {
-                //  recursive ?
-                fs::metadata(&path)
-                    .unwrap_or_else(|_| {
-                        panic!("Failed to get metadata of file '{}'", &path.display())
-                    })
-                    .len()
-            };
-
-            Self {
-                name,
-                version,
-                size,
-            }
-        } // fn new()
-    } // impl FileDesc
 
     let mut output = String::new();
 
