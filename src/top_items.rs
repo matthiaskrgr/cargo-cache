@@ -76,6 +76,39 @@ impl FileDesc {
     } // fn new()
 }
 
+impl FileDesc {
+    fn new_from_reg_src(path: &PathBuf) -> Self {
+        let last_item = path.to_str().unwrap().split('/').last().unwrap();
+
+        let mut i = last_item.split('-').collect::<Vec<_>>();
+
+        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        let name = i.join("-");
+        let walkdir = WalkDir::new(path.display().to_string());
+
+        let size = walkdir
+            .into_iter()
+            .map(|e| e.unwrap().path().to_owned())
+            .filter(|f| f.exists())
+            .collect::<Vec<_>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to get metadata of file '{}'", &path.display())
+                    })
+                    .len()
+            })
+            .sum();
+
+        Self {
+            name,
+            version,
+            size,
+        }
+    }
+}
+
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     // we now have all the sizes and names and version sorted
 
@@ -236,5 +269,100 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
             output.push_str(i);
         }
     }
+
+    println!(
+        "\n\n\nX: {}\n\n\n",
+        registry_source_stats(&ccd.registry_sources, 20)
+    );
+
+    output
+}
+
+fn dir_exists(path: &PathBuf) -> bool {
+    if !path.exists() {
+        eprintln!("Skipping '{}' because it doesn't exist.", path.display());
+        return false;
+    }
+    true
+}
+
+// registry src
+fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
+    let mut output = String::new();
+    // don't crash if the directory does not exist (issue #9)
+    if !dir_exists(&path) {
+        return output;
+    }
+
+    output.push_str(&format!("\nSummary of: {}\n", path.display()));
+
+    let mut collection = Vec::new();
+
+    for repo in fs::read_dir(path).unwrap() {
+        let crate_list = fs::read_dir(&repo.unwrap().path())
+            .unwrap()
+            .map(|cratepath| cratepath.unwrap().path())
+            .collect::<Vec<PathBuf>>();
+
+        collection.extend_from_slice(&crate_list);
+    }
+    collection.sort();
+
+    let collections_vec = collection
+        .iter()
+        .map(|path| FileDesc::new_from_reg_src(path))
+        .collect::<Vec<_>>();
+
+    let mut summary: Vec<String> = Vec::new();
+    let mut current_name = String::new();
+    let mut counter: u32 = 0;
+    let mut total_size: u64 = 0;
+
+    // first find out max_cratename_len
+    let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
+
+    #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
+    collections_vec.into_iter().for_each(|pkg| {
+        {
+            if pkg.name != current_name {
+                // don't push the first empty string
+                if !current_name.is_empty() {
+                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                    let average_crate_size = (total_size / u64::from(counter))
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap();
+
+                    summary.push(format!(
+                        "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                        total_size,
+                        current_name,
+                        counter,
+                        format!("src avg: {: >9}", average_crate_size),
+                        total_size_hr,
+                        width = max_cratename_len
+                    ));
+                } // !current_name.is_empty()
+                  // new package, reset counting
+                current_name = pkg.name;
+                counter = 1;
+                total_size = pkg.size;
+            } else {
+                counter += 1;
+                total_size += pkg.size;
+            }
+        }
+    });
+
+    summary.sort();
+    summary.reverse();
+
+    for (c, i) in summary.into_iter().enumerate() {
+        if c == limit as usize {
+            break;
+        }
+        let i = &i[21..]; // remove first word used for sorting
+        output.push_str(i);
+    }
+
     output
 }
