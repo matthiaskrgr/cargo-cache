@@ -122,6 +122,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     ];
 
     for cache_dir in &sources {
+        if *cache_dir == &ccd.registry_sources {
+            return registry_source_stats(&ccd.registry_sources, limit);
+        }
+
         // do not try to read nonexisting directory (issue #9)
         if !cache_dir.exists() {
             eprintln!(
