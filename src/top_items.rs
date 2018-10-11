@@ -17,9 +17,7 @@ struct FileDesc {
 impl FileDesc {
     fn new_from_reg_src(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
-
         let mut i = last_item.split('-').collect::<Vec<_>>();
-
         let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
         let name = i.join("-");
         let walkdir = WalkDir::new(path.display().to_string());
@@ -48,14 +46,9 @@ impl FileDesc {
 
     fn new_from_reg_cache(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
-
         let mut i = last_item.split('-').collect::<Vec<_>>();
-        let name;
-        let version;
-
-        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-        name = i.join("-");
-
+        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        let name = i.join("-");
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
@@ -69,12 +62,9 @@ impl FileDesc {
 
     fn new_from_git_bare(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
-
         let mut i = last_item.split('-').collect::<Vec<_>>();
-        let name;
-        let version;
-        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-        name = i.join("-");
+        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        let name = i.join("-");
 
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -103,9 +93,6 @@ impl FileDesc {
     fn new_from_git_checkouts(path: &PathBuf) -> Self {
         //let last_item = path.to_str().unwrap().split('/').last().unwrap();
         //let mut i = last_item.split('-').collect::<Vec<_>>();
-        let name;
-        let version;
-
         let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
         let last = paths.pop().unwrap();
         let last_but_one = paths.pop().unwrap();
@@ -121,8 +108,8 @@ impl FileDesc {
             .to_string();
         let mut vec = string.split('-').collect::<Vec<_>>();
         let _ = vec.pop();
-        name = vec.join("-").to_string();
-        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        let name = vec.join("-").to_string();
+        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
 
         let walkdir = WalkDir::new(path.display().to_string());
 
