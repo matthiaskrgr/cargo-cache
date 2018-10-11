@@ -137,11 +137,23 @@ impl FileDesc {
 }
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
-    // todo: obtain these in parallel via rayon?
-    let reg_src = registry_source_stats(&ccd.registry_sources, limit);
-    let reg_cache = registry_cache_stats(&ccd.registry_cache, limit);
-    let bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit);
-    let repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit);
+    let (reg_src_and_cache, git_bare_repos_and_checkouts) = rayon::join(
+        || {
+            rayon::join(
+                || registry_source_stats(&ccd.registry_sources, limit),
+                || registry_cache_stats(&ccd.registry_cache, limit),
+            )
+        },
+        || {
+            rayon::join(
+                || git_repos_bare_stats(&ccd.git_repos_bare, limit),
+                || git_checkouts_stats(&ccd.git_checkouts, limit),
+            )
+        },
+    );
+
+    let (reg_src, reg_cache) = reg_src_and_cache;
+    let (bare_repos, repo_checkouts) = git_bare_repos_and_checkouts;
 
     let mut output = String::new();
 
