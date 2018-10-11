@@ -136,6 +136,10 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
             output.push_str(&git_repos_bare_stats(&ccd.git_repos_bare, limit));
             continue;
         }
+        if *cache_dir == &ccd.git_checkouts {
+            output.push_str(&git_checkouts_stats(&ccd.git_checkouts, limit));
+            continue;
+        }
         // do not try to read nonexisting directory (issue #9)
         if !cache_dir.exists() {
             eprintln!(
@@ -517,6 +521,99 @@ fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
                         current_name,
                         counter,
                         format!("repo avg: {: >9}", average_crate_size),
+                        total_size_hr,
+                        width = max_cratename_len
+                    ));
+                } // !current_name.is_empty()
+                  // new package, reset counting
+                current_name = pkg.name;
+                counter = 1;
+                total_size = pkg.size;
+            } else {
+                counter += 1;
+                total_size += pkg.size;
+            }
+        }
+    });
+
+    summary.sort();
+    summary.reverse();
+
+    for (c, i) in summary.into_iter().enumerate() {
+        if c == limit as usize {
+            break;
+        }
+        let i = &i[21..]; // remove first word used for sorting
+        output.push_str(i);
+    }
+
+    output
+}
+
+// bare git repos
+fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
+    let mut output = String::new();
+    // don't crash if the directory does not exist (issue #9)
+    if !dir_exists(&path) {
+        return output;
+    }
+
+    output.push_str(&format!("\nSummary of: {}\n", path.display()));
+
+    let recursive = true;
+    let checkouts = true;
+
+    // get list of package all "...\.crate$" files and sort it
+    let mut collection = Vec::new();
+
+    let crate_list = fs::read_dir(&path)
+        .unwrap()
+        .map(|cratepath| cratepath.unwrap().path())
+        .collect::<Vec<PathBuf>>();
+    // need to take 2 levels into account
+    let mut both_levels_vec: Vec<PathBuf> = Vec::new();
+    for repo in crate_list {
+        for i in fs::read_dir(&repo)
+            .unwrap()
+            .map(|cratepath| cratepath.unwrap().path())
+        {
+            both_levels_vec.push(i);
+        }
+    }
+    collection.extend_from_slice(&both_levels_vec);
+
+    collection.sort();
+
+    let collections_vec = collection
+        .iter()
+        .map(|path| FileDesc::new(path, recursive, checkouts))
+        .collect::<Vec<_>>();
+
+    let mut summary: Vec<String> = Vec::new();
+    let mut current_name = String::new();
+    let mut counter: u32 = 0;
+    let mut total_size: u64 = 0;
+
+    // first find out max_cratename_len
+    let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
+
+    #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
+    collections_vec.into_iter().for_each(|pkg| {
+        {
+            if pkg.name != current_name {
+                // don't push the first empty string
+                if !current_name.is_empty() {
+                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                    let average_crate_size = (total_size / u64::from(counter))
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap();
+
+                    summary.push(format!(
+                        "{:0>20} {: <width$} repo ckt: {: <3} {: <20}  total: {}\n",
+                        total_size,
+                        current_name,
+                        counter,
+                        format!("ckt avg: {: >9}", average_crate_size),
                         total_size_hr,
                         width = max_cratename_len
                     ));
