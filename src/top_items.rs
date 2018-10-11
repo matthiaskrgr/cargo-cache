@@ -110,6 +110,7 @@ impl FileDesc {
 }
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
+    // todo: obtain these in parallel via rayon?
     let reg_src = registry_source_stats(&ccd.registry_sources, limit);
     let reg_cache = registry_cache_stats(&ccd.registry_cache, limit);
     let bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit);
