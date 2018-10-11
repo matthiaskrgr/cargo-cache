@@ -15,68 +15,6 @@ struct FileDesc {
 }
 
 impl FileDesc {
-    fn new(path: &PathBuf, recursive: bool, checkouts: bool) -> Self {
-        let last_item = path.to_str().unwrap().split('/').last().unwrap();
-
-        let mut i = last_item.split('-').collect::<Vec<_>>();
-        let name;
-        let version;
-        if checkouts {
-            let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
-            let last = paths.pop().unwrap();
-            let last_but_one = paths.pop().unwrap();
-            let last_but_2 = paths.pop().unwrap();
-
-            i = vec![last_but_2, last_but_one, last];
-
-            let string = last_but_one
-                .split('/')
-                .collect::<Vec<_>>()
-                .pop()
-                .unwrap()
-                .to_string();
-            let mut vec = string.split('-').collect::<Vec<_>>();
-            let _ = vec.pop();
-            name = vec.join("-").to_string();
-            version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-        } else {
-            version = i.pop().unwrap().trim_right_matches(".crate").to_string();
-            name = i.join("-");
-        }
-
-        let size = if recursive {
-            let walkdir = WalkDir::new(path.display().to_string());
-
-            walkdir
-                .into_iter()
-                .map(|e| e.unwrap().path().to_owned())
-                .filter(|f| f.exists())
-                .collect::<Vec<_>>()
-                .par_iter()
-                .map(|f| {
-                    fs::metadata(f)
-                        .unwrap_or_else(|_| {
-                            panic!("Failed to get metadata of file '{}'", &path.display())
-                        })
-                        .len()
-                })
-                .sum()
-        } else {
-            //  recursive ?
-            fs::metadata(&path)
-                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
-                .len()
-        };
-
-        Self {
-            name,
-            version,
-            size,
-        }
-    } // fn new()
-}
-
-impl FileDesc {
     fn new_from_reg_src(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
 
@@ -106,7 +44,109 @@ impl FileDesc {
             version,
             size,
         }
-    }
+    } // fn new_from_reg_src()
+
+    fn new_from_reg_cache(path: &PathBuf) -> Self {
+        let last_item = path.to_str().unwrap().split('/').last().unwrap();
+
+        let mut i = last_item.split('-').collect::<Vec<_>>();
+        let name;
+        let version;
+
+        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        name = i.join("-");
+
+        let size = fs::metadata(&path)
+            .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
+            .len();
+
+        Self {
+            name,
+            version,
+            size,
+        }
+    } // fn new_from_reg_cache
+
+    fn new_from_git_bare(path: &PathBuf) -> Self {
+        let last_item = path.to_str().unwrap().split('/').last().unwrap();
+
+        let mut i = last_item.split('-').collect::<Vec<_>>();
+        let name;
+        let version;
+        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        name = i.join("-");
+
+        let walkdir = WalkDir::new(path.display().to_string());
+
+        let size = walkdir
+            .into_iter()
+            .map(|e| e.unwrap().path().to_owned())
+            .filter(|f| f.exists())
+            .collect::<Vec<_>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to get metadata of file '{}'", &path.display())
+                    })
+                    .len()
+            })
+            .sum();
+
+        Self {
+            name,
+            version,
+            size,
+        }
+    } // fn new_from_git_bare()
+
+    fn new_from_git_checkouts(path: &PathBuf) -> Self {
+        //let last_item = path.to_str().unwrap().split('/').last().unwrap();
+        //let mut i = last_item.split('-').collect::<Vec<_>>();
+        let name;
+        let version;
+
+        let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
+        let last = paths.pop().unwrap();
+        let last_but_one = paths.pop().unwrap();
+        let last_but_2 = paths.pop().unwrap();
+
+        let mut i = vec![last_but_2, last_but_one, last];
+
+        let string = last_but_one
+            .split('/')
+            .collect::<Vec<_>>()
+            .pop()
+            .unwrap()
+            .to_string();
+        let mut vec = string.split('-').collect::<Vec<_>>();
+        let _ = vec.pop();
+        name = vec.join("-").to_string();
+        version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+
+        let walkdir = WalkDir::new(path.display().to_string());
+
+        let size = walkdir
+            .into_iter()
+            .map(|e| e.unwrap().path().to_owned())
+            .filter(|f| f.exists())
+            .collect::<Vec<_>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to get metadata of file '{}'", &path.display())
+                    })
+                    .len()
+            })
+            .sum();
+
+        Self {
+            name,
+            version,
+            size,
+        }
+    } // fn new()
 }
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
@@ -225,9 +265,6 @@ fn registry_cache_stats(path: &PathBuf, limit: u32) -> String {
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let recursive: bool = false;
-    let checkouts = false;
-
     // get list of package all "...\.crate$" files and sort it
     let mut collection = Vec::new();
 
@@ -243,7 +280,7 @@ fn registry_cache_stats(path: &PathBuf, limit: u32) -> String {
 
     let collections_vec = collection
         .iter()
-        .map(|path| FileDesc::new(path, recursive, checkouts))
+        .map(|path| FileDesc::new_from_reg_cache(path))
         .collect::<Vec<_>>();
 
     let mut summary: Vec<String> = Vec::new();
@@ -310,13 +347,6 @@ fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let recursive: bool = true;
-
-    // if we check bare git repos or checkouts, we need to calculate sizes slightly different
-    //let is_git: bool = true;
-
-    let checkouts = false;
-
     // get list of package all "...\.crate$" files and sort it
     let mut collection = Vec::new();
     let crate_list = fs::read_dir(&path)
@@ -328,7 +358,7 @@ fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
 
     let collections_vec = collection
         .iter()
-        .map(|path| FileDesc::new(path, recursive, checkouts))
+        .map(|path| FileDesc::new_from_git_bare(path))
         .collect::<Vec<_>>();
 
     let mut summary: Vec<String> = Vec::new();
@@ -395,9 +425,6 @@ fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let recursive = true;
-    let checkouts = true;
-
     // get list of package all "...\.crate$" files and sort it
     let mut collection = Vec::new();
 
@@ -421,7 +448,7 @@ fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
 
     let collections_vec = collection
         .iter()
-        .map(|path| FileDesc::new(path, recursive, checkouts))
+        .map(|path| FileDesc::new_from_git_checkouts(path))
         .collect::<Vec<_>>();
 
     let mut summary: Vec<String> = Vec::new();
