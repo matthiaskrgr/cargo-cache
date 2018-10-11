@@ -133,10 +133,11 @@ impl FileDesc {
             version,
             size,
         }
-    } // fn new()
+    } // fn new_from_git_checkouts()
 }
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
+    // run the functions in parallel for a tiny speedup
     let (reg_src_and_cache, git_bare_repos_and_checkouts) = rayon::join(
         || {
             rayon::join(
