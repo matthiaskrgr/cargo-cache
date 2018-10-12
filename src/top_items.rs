@@ -10,7 +10,6 @@ use crate::library::*;
 #[derive(Debug, Clone)]
 struct FileDesc {
     name: String,
-    version: String,
     size: u64,
 }
 
@@ -18,7 +17,7 @@ impl FileDesc {
     fn new_from_reg_src(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
         let mut i = last_item.split('-').collect::<Vec<_>>();
-        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        i.pop();
         let name = i.join("-");
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -37,33 +36,25 @@ impl FileDesc {
             })
             .sum();
 
-        Self {
-            name,
-            version,
-            size,
-        }
+        Self { name, size }
     } // fn new_from_reg_src()
 
     fn new_from_reg_cache(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
         let mut i = last_item.split('-').collect::<Vec<_>>();
-        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        i.pop();
         let name = i.join("-");
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
 
-        Self {
-            name,
-            version,
-            size,
-        }
+        Self { name, size }
     } // fn new_from_reg_cache
 
     fn new_from_git_bare(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
         let mut i = last_item.split('-').collect::<Vec<_>>();
-        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        i.pop();
         let name = i.join("-");
 
         let walkdir = WalkDir::new(path.display().to_string());
@@ -83,11 +74,7 @@ impl FileDesc {
             })
             .sum();
 
-        Self {
-            name,
-            version,
-            size,
-        }
+        Self { name, size }
     } // fn new_from_git_bare()
 
     fn new_from_git_checkouts(path: &PathBuf) -> Self {
@@ -109,7 +96,7 @@ impl FileDesc {
         let mut vec = string.split('-').collect::<Vec<_>>();
         let _ = vec.pop();
         let name = vec.join("-").to_string();
-        let version = i.pop().unwrap().trim_right_matches(".crate").to_string();
+        i.pop();
 
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -128,11 +115,7 @@ impl FileDesc {
             })
             .sum();
 
-        Self {
-            name,
-            version,
-            size,
-        }
+        Self { name, size }
     } // fn new_from_git_checkouts()
 }
 
