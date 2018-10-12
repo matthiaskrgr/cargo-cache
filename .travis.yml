@@ -5,6 +5,7 @@ sudo: false
 os:
    - linux
    - osx
+   - windows
 
 #cache deps
 #cache: cargo
@@ -68,9 +69,21 @@ matrix:
       rust: nightly
       env: RELEASE="--release"
 
+# windows nightly
+
+    - os: windows
+      rust: nightly
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: windows
+      rust: nightly
+      env: RELEASE="--release"
+
+
   exclude:
     - os: osx
     - os: linux
+    - os: windows
 
 
 script:
