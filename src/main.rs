@@ -1,4 +1,3 @@
-#![cfg_attr(feature = "cargo-clippy", feature(tool_lints))]
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // these [allow()] by default, make them warn:
 #![warn(
