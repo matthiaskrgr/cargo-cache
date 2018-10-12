@@ -27,13 +27,51 @@ env:
 
 matrix:
   fast_finish: false
-  exclude:
-    - rust: beta
+  include:
+# nightly + tools
+    - os: linux
+      rust: nightly
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: linux
+      rust: nightly
       env: CLIPPY="true"
-    - rust: beta
-      env: RUSTFMT="true"
-    - rust: beta
+
+    - os: linux
+      rust: nightly
       env: CARGO_AUDIT="true"
+
+    - os: linux
+      rust: nightly
+      env: RUSTFMT="true"
+
+    - os: linux
+      rust: nightly
+      env: RELEASE="--release"
+
+# beta
+    - os: linux
+      rust: beta
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: linux
+      rust: beta
+      env: RELEASE="--release"
+
+# osx nightly
+
+    - os: osx
+      rust: nightly
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: osx
+      rust: nightly
+      env: RELEASE="--release"
+
+  exclude:
+    - os: osx
+    - os: linux
+
 
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit; fi
