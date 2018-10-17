@@ -5,6 +5,7 @@ authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
 description = "Manage cargo cache, show sizes and delete directories."
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
 repository = "https://github.com/matthiaskrgr/cargo-cache"
+license = ""
 keywords = ["cargo", "cache", "delete", "manage", "size"]
 build = "src/build.rs"
 edition = "2018"
