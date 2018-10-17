@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-
 use std::fs;
 use std::io::{stdout, Write};
 use std::path::PathBuf;

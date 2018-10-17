@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;

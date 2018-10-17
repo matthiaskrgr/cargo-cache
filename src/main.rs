@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // these [allow()] by default, make them warn:
 #![warn(
