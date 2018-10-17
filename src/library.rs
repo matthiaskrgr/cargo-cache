@@ -45,6 +45,7 @@ pub(crate) enum ErrorKind {
 
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
+    #[cfg_attr(feature = "cargo-clippy", allow(clippy::new_ret_no_self))] // fp https://github.com/rust-lang-nursery/rust-clippy/issues/3313
     pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
