@@ -43,7 +43,7 @@ impl FileDesc {
     } // fn new_from_reg_src()
 }
 
-pub(crate) fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
+fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
     let mut collection = Vec::new();
 
     for repo in fs::read_dir(path).unwrap() {
@@ -62,25 +62,15 @@ pub(crate) fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
         .collect::<Vec<_>>()
 }
 
-// registry src
-pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
-    let mut stdout = String::new();
-    // don't crash if the directory does not exist (issue #9)
-    if !dir_exists(&path) {
-        return stdout;
-    }
-
-    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
-
-    let file_descs = file_desc_list_from_path(&path);
-
+fn states_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
+    // take our list of file information and calculate the actual stats
     let mut summary: Vec<String> = Vec::new();
     let mut current_name = String::new();
     let mut counter: u32 = 0;
     let mut total_size: u64 = 0;
 
     // first find out max_cratename_len
-    let max_cratename_len = file_descs.iter().map(|p| p.name.len()).max().unwrap();
+    let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap();
 
     #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
     file_descs.into_iter().for_each(|pkg| {
@@ -116,6 +106,21 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
 
     summary.sort();
     summary.reverse();
+    summary
+}
+
+// registry src
+pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
+    let mut stdout = String::new();
+    // don't crash if the directory does not exist (issue #9)
+    if !dir_exists(&path) {
+        return stdout;
+    }
+
+    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
+
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&path);
+    let summary: Vec<String> = states_from_file_desc_list(file_descs);
 
     for (count, data) in summary.into_iter().enumerate() {
         if count == limit as usize {
