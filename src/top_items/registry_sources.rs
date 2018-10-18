@@ -14,7 +14,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
-use crate::top_items::common::*;
+use crate::top_items::common::{dir_exists, FileDesc};
 
 impl FileDesc {
     pub(crate) fn new_from_reg_src(path: &PathBuf) -> Self {
@@ -43,16 +43,7 @@ impl FileDesc {
     } // fn new_from_reg_src()
 }
 
-// registry src
-pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
-    let mut stdout = String::new();
-    // don't crash if the directory does not exist (issue #9)
-    if !dir_exists(&path) {
-        return stdout;
-    }
-
-    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
-
+pub(crate) fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
     let mut collection = Vec::new();
 
     for repo in fs::read_dir(path).unwrap() {
@@ -65,10 +56,23 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
     }
     collection.sort();
 
-    let collections_vec = collection
+    collection
         .iter()
         .map(|path| FileDesc::new_from_reg_src(path))
-        .collect::<Vec<_>>();
+        .collect::<Vec<_>>()
+}
+
+// registry src
+pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
+    let mut stdout = String::new();
+    // don't crash if the directory does not exist (issue #9)
+    if !dir_exists(&path) {
+        return stdout;
+    }
+
+    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
+
+    let file_descs = file_desc_list_from_path(&path);
 
     let mut summary: Vec<String> = Vec::new();
     let mut current_name = String::new();
@@ -76,10 +80,10 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
     let mut total_size: u64 = 0;
 
     // first find out max_cratename_len
-    let max_cratename_len = collections_vec.iter().map(|p| p.name.len()).max().unwrap();
+    let max_cratename_len = file_descs.iter().map(|p| p.name.len()).max().unwrap();
 
     #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
-    collections_vec.into_iter().for_each(|pkg| {
+    file_descs.into_iter().for_each(|pkg| {
         {
             if pkg.name != current_name {
                 // don't push the first empty string
@@ -113,12 +117,12 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
     summary.sort();
     summary.reverse();
 
-    for (c, i) in summary.into_iter().enumerate() {
-        if c == limit as usize {
+    for (count, data) in summary.into_iter().enumerate() {
+        if count == limit as usize {
             break;
         }
-        let i = &i[21..]; // remove first word used for sorting
-        stdout.push_str(i);
+        let data = &data[21..]; // remove first word used for sorting
+        stdout.push_str(data);
     }
 
     stdout
