@@ -58,7 +58,7 @@ impl FileDesc {
             .len();
 
         Self { name, size }
-    } // fn new_from_reg_cache
+    } // fn new_from_reg_cache()
 
     fn new_from_git_bare(path: &PathBuf) -> Self {
         let last_item = path.to_str().unwrap().split('/').last().unwrap();
@@ -126,7 +126,7 @@ impl FileDesc {
 
         Self { name, size }
     } // fn new_from_git_checkouts()
-}
+} // impl FileDesc
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     // run the functions in parallel for a tiny speedup
@@ -144,26 +144,27 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
             )
         },
     );
-
+    // split up tupels into single variables
     let (reg_src, reg_cache) = reg_src_and_cache;
     let (bare_repos, repo_checkouts) = git_bare_repos_and_checkouts;
 
+    // concat the strings in the order we want them
     let mut output = String::new();
-
     output.push_str(&reg_src);
     output.push_str(&reg_cache);
     output.push_str(&bare_repos);
     output.push_str(&repo_checkouts);
-
     output
 }
 
 fn dir_exists(path: &PathBuf) -> bool {
+    // check if a directory exists and print an warning message if not
     if !path.exists() {
         eprintln!("Skipping '{}' because it doesn't exist.", path.display());
-        return false;
+        false
+    } else {
+        true
     }
-    true
 }
 
 // registry src
