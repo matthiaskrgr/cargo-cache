@@ -70,7 +70,7 @@ fn states_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     let mut total_size: u64 = 0;
 
     // first find out max_cratename_len
-    let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap();
+    let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
 
     #[cfg_attr(feature = "cargo-clippy", allow(clippy::if_not_else))]
     file_descs.into_iter().for_each(|pkg| {
@@ -131,4 +131,20 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
     }
 
     stdout
+}
+
+#[cfg(test)]
+mod top_crates_registry_sources {
+    use super::*;
+    use crate::top_items::common::FileDesc;
+
+    #[test]
+    fn stats_from_file_desc_none() {
+        // empty list
+        let list: Vec<FileDesc> = Vec::new();
+        let stats: Vec<String> = states_from_file_desc_list(list);
+        // list should be empty
+        let empty: Vec<String> = Vec::new();
+        assert_eq!(stats, empty);
+    }
 }
