@@ -159,23 +159,24 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 
 fn dir_exists(path: &PathBuf) -> bool {
     // check if a directory exists and print an warning message if not
-    if !path.exists() {
+    if path.exists() {
+        true
+    } else {
         eprintln!("Skipping '{}' because it doesn't exist.", path.display());
         false
-    } else {
-        true
     }
 }
 
 // registry src
 fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
-    let mut output = String::new();
+
+    let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(&path) {
-        return output;
+        return stdout;
     }
 
-    output.push_str(&format!("\nSummary of: {}\n", path.display()));
+    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
 
     let mut collection = Vec::new();
 
@@ -242,10 +243,10 @@ fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
             break;
         }
         let i = &i[21..]; // remove first word used for sorting
-        output.push_str(i);
+        stdout.push_str(i);
     }
 
-    output
+    stdout
 }
 
 // registry cache
