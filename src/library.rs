@@ -371,10 +371,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
 
     #[cfg_attr(
         feature = "cargo-clippy",
-        allow(
-            clippy::cast_precision_loss,
-            clippy::cast_possible_truncation
-        )
+        allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)
     )]
     let perc: f32 =
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
@@ -579,54 +576,46 @@ mod libtests {
         let ccp = CargoCachePaths::new().unwrap();
 
         // test all the paths
-        assert!(
-            ccp.cargo_home
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths")
-        );
-        assert!(
-            ccp.bin_dir
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/bin/")
-        );
-        assert!(
-            ccp.registry
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/")
-        );
-        assert!(
-            ccp.registry_index
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/index/")
-        );
-        assert!(
-            ccp.registry_cache
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/cache/")
-        );
-        assert!(
-            ccp.registry_sources
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/src/")
-        );
-        assert!(
-            ccp.git_repos_bare
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/git/db/")
-        );
-        assert!(
-            ccp.git_checkouts
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/git/checkouts/")
-        );
+        assert!(ccp
+            .cargo_home
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths"));
+        assert!(ccp
+            .bin_dir
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/bin/"));
+        assert!(ccp
+            .registry
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/registry/"));
+        assert!(ccp
+            .registry_index
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/registry/index/"));
+        assert!(ccp
+            .registry_cache
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/registry/cache/"));
+        assert!(ccp
+            .registry_sources
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/registry/src/"));
+        assert!(ccp
+            .git_repos_bare
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/git/db/"));
+        assert!(ccp
+            .git_checkouts
+            .display()
+            .to_string()
+            .ends_with("cargo_home_cargo_cache_paths/git/checkouts/"));
     }
 
     #[allow(non_snake_case)]
@@ -679,29 +668,25 @@ mod libtests {
         );
 
         let registry_index = iter.next().unwrap();
-        assert!(
-            Regex::new(r"registry index:.*/cargo_home_cargo_cache_paths_print/registry/index/")
-                .unwrap()
-                .is_match(registry_index)
-        );
+        assert!(Regex::new(
+            r"registry index:.*/cargo_home_cargo_cache_paths_print/registry/index/"
+        )
+        .unwrap()
+        .is_match(registry_index));
 
         let crate_archives = iter.next().unwrap();
-        assert!(
-            Regex::new(
-                r"crate source archives:.*/cargo_home_cargo_cache_paths_print/registry/cache/"
-            )
-            .unwrap()
-            .is_match(crate_archives)
-        );
+        assert!(Regex::new(
+            r"crate source archives:.*/cargo_home_cargo_cache_paths_print/registry/cache/"
+        )
+        .unwrap()
+        .is_match(crate_archives));
 
         let crate_sources = iter.next().unwrap();
-        assert!(
-            Regex::new(
-                r"unpacked crate sources:.*/cargo_home_cargo_cache_paths_print/registry/src/"
-            )
-            .unwrap()
-            .is_match(crate_sources)
-        );
+        assert!(Regex::new(
+            r"unpacked crate sources:.*/cargo_home_cargo_cache_paths_print/registry/src/"
+        )
+        .unwrap()
+        .is_match(crate_sources));
 
         let bare_repos = iter.next().unwrap();
         assert!(
@@ -711,11 +696,11 @@ mod libtests {
         );
 
         let git_repo_checkouts = iter.next().unwrap();
-        assert!(
-            Regex::new(r"git repo checkouts.*/cargo_home_cargo_cache_paths_print/git/checkouts/")
-                .unwrap()
-                .is_match(git_repo_checkouts)
-        );
+        assert!(Regex::new(
+            r"git repo checkouts.*/cargo_home_cargo_cache_paths_print/git/checkouts/"
+        )
+        .unwrap()
+        .is_match(git_repo_checkouts));
 
         // should be empty now
         let last = iter.next();
