@@ -4,6 +4,7 @@
 ![Nightly 1.31 Supported](https://img.shields.io/badge/nightly%201.31-supported-brightgreen.svg)
 ![Beta 1.30 Supported](https://img.shields.io/badge/beta%201.30-supported-brightgreen.svg)
 ![Stable 1.29 Unsupported](https://img.shields.io/badge/stable%201.29-unsupported-red.svg)
+[![dependency status](https://deps.rs/repo/github/matthiaskrgr/cargo-cache/status.svg)](https://deps.rs/repo/github/matthiaskrgr/cargo-cache)
 
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
