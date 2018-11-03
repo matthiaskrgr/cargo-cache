@@ -75,7 +75,7 @@ impl FileDesc {
             .to_string();
         let mut vec = string.split('-').collect::<Vec<_>>();
         let _ = vec.pop();
-        let name = vec.join("-").to_string();
+        let name = vec.join("-");
         i.pop();
 
         let walkdir = WalkDir::new(path.display().to_string());
