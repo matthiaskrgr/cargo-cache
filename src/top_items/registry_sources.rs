@@ -43,7 +43,8 @@ impl FileDesc {
     } // fn new_from_reg_src()
 }
 
-pub(crate) fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
+// registry sources (extracted tarballs)
+fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
     let mut collection = Vec::new();
 
     for repo in fs::read_dir(path).unwrap() {
