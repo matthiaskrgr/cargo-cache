@@ -62,52 +62,136 @@ fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
         .collect::<Vec<_>>()
 }
 
-fn states_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
+fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
+    struct Pair {
+        current: Option<FileDesc>,
+        previous: Option<FileDesc>,
+    }
     // take our list of file information and calculate the actual stats
     let mut summary: Vec<String> = Vec::new();
-    let mut current_name = String::new();
-    let mut previous_name = String::new();
+    //let mut current_name = String::new();
+    //let mut previous_name = String::new();
     let mut line = String::new();
-    let mut counter: u32 = 1;
+    let mut counter: u32 = 0;
     let mut total_size: u64 = 0;
-    let mut pkg_size: u64 = 0;
 
     // first find out max_cratename_len
     let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
 
-    file_descs.into_iter().for_each(|pkg| {
-        current_name = pkg.name;
-        pkg_size = pkg.size;
-        total_size += pkg.size;
+    // iterate over the fikles
+    let mut iter = file_descs.into_iter();
 
-        if current_name == previous_name || (!current_name.is_empty() && previous_name.is_empty()) {
-            let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
-            let average_crate_size = (total_size / u64::from(counter))
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap();
+    let mut state = Pair {
+        current: None,
+        previous: None,
+    };
+    // start
+    state.previous = state.current;
+    state.current = iter.next();
 
-            line = format!(
-                "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
-                total_size,
-                current_name,
-                counter,
-                format!("src avg: {: >9}", average_crate_size),
-                total_size_hr,
-                width = max_cratename_len
-            );
+    // loop until .previous and .current are None
+    while state.previous.is_some() || state.current.is_some() {
+        match &state {
+            Pair {
+                current: None,
+                previous: None,
+            } => {
+                // we reached the end of the queue
+            }
 
-            // !current_name.is_empty()
-            // new package, reset counting
-            //current_name = pkg.name.clone();
-            counter = 1;
-            total_size = pkg.size;
-            summary.push(line.clone());
-        } else {
-            counter += 1;
-            //total_size += pkg.size;
-        }
-        previous_name = current_name.clone();
-    });
+            Pair {
+                current: Some(current),
+                previous: None,
+            } => {
+                // this should always be first line ever
+                assert!(line.is_empty());
+                // compute line but don't save it
+                let current_name = &current.name;
+                let current_size = &current.size;
+                total_size += current_size;
+                let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                counter += 1;
+                let average_crate_size = (total_size / u64::from(counter))
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap();
+                line = format!(
+                    "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                    total_size,
+                    current_name,
+                    counter,
+                    format!("src avg: {: >9}", average_crate_size),
+                    total_size_hr,
+                    width = max_cratename_len
+                );
+            }
+
+            Pair {
+                current: Some(current),
+                previous: Some(previous),
+            } => {
+                if current.name == previous.name {
+                    // update line but don't save it
+                    assert!(!line.is_empty());
+                    let current_name = &current.name;
+                    let current_size = &current.size;
+                    total_size += current_size;
+                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                    counter += 1;
+                    let average_crate_size = (total_size / u64::from(counter))
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap();
+                    line = format!(
+                        "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                        total_size,
+                        current_name,
+                        counter,
+                        format!("src avg: {: >9}", average_crate_size),
+                        total_size_hr,
+                        width = max_cratename_len
+                    );
+                } else if current.name != previous.name {
+                    // save old line and compute new one
+                    assert!(!line.is_empty());
+                    summary.push(line.clone());
+                    counter = 0;
+                    total_size = 0;
+
+                    let current_name = &current.name;
+                    let current_size = &current.size;
+                    total_size += current_size;
+                    let total_size_hr = total_size.file_size(file_size_opts::DECIMAL).unwrap();
+                    counter += 1;
+                    let average_crate_size = (total_size / u64::from(counter))
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap();
+                    line = format!(
+                        "{:0>20} {: <width$} src ckt: {: <3} {: <20}  total: {}\n",
+                        total_size,
+                        current_name,
+                        counter,
+                        format!("src avg: {: >9}", average_crate_size),
+                        total_size_hr,
+                        width = max_cratename_len
+                    );
+                }
+            }
+
+            Pair {
+                current: None,
+                previous: Some(_previous),
+            } => {
+                //  save old line
+                assert!(!line.is_empty()); // line must not be empty
+                summary.push(line.clone());
+                counter = 0;
+                total_size = 0;
+            }
+        };
+
+        // switch and queue next()
+        state.previous = state.current;
+        state.current = iter.next();
+    }
 
     summary.sort();
     summary.reverse();
@@ -125,7 +209,7 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
     stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
 
     let file_descs: Vec<FileDesc> = file_desc_list_from_path(&path);
-    let summary: Vec<String> = states_from_file_desc_list(file_descs);
+    let summary: Vec<String> = stats_from_file_desc_list(file_descs);
 
     for (count, data) in summary.into_iter().enumerate() {
         if count == limit as usize {
@@ -142,12 +226,13 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
 mod top_crates_registry_sources {
     use super::*;
     use crate::top_items::common::FileDesc;
+    //    use pretty_assertions::assert_eq;
 
     #[test]
     fn stats_from_file_desc_none() {
         // empty list
         let list: Vec<FileDesc> = Vec::new();
-        let stats: Vec<String> = states_from_file_desc_list(list);
+        let stats: Vec<String> = stats_from_file_desc_list(list);
         // list should be empty
         let empty: Vec<String> = Vec::new();
         assert_eq!(stats, empty);
@@ -160,7 +245,7 @@ mod top_crates_registry_sources {
             size: 1,
         };
         let list: Vec<FileDesc> = vec![fd];
-        let stats: Vec<String> = states_from_file_desc_list(list);
+        let stats: Vec<String> = stats_from_file_desc_list(list);
         let wanted: Vec<String> = vec![
             "00000000000000000001 crate src ckt: 1   src avg:       1 B    total: 1 B\n"
                 .to_string(),
@@ -168,8 +253,8 @@ mod top_crates_registry_sources {
         assert_eq!(stats, wanted);
     }
 
-    /*#[test]
-    fn stats_from_file_desc_two_diff() {
+    #[test]
+    fn stats_from_file_desc_two() {
         let fd1 = FileDesc {
             name: "crate-A".to_string(),
             size: 1,
@@ -179,14 +264,174 @@ mod top_crates_registry_sources {
             size: 2,
         };
         let list: Vec<FileDesc> = vec![fd1, fd2];
-        let stats: Vec<String> = states_from_file_desc_list(list);
+        let stats: Vec<String> = stats_from_file_desc_list(list);
         let wanted: Vec<String> = vec![
-            "00000000000000000001 crate-A src ckt: 1   src avg:       1 B    total: 1 B\n"
-                .to_string(),
             "00000000000000000002 crate-B src ckt: 1   src avg:       2 B    total: 2 B\n"
+                .to_string(),
+            "00000000000000000001 crate-A src ckt: 1   src avg:       1 B    total: 1 B\n"
                 .to_string(),
         ];
         assert_eq!(stats, wanted);
-    } */
+    }
+
+    #[test]
+    fn stats_from_file_desc_multiple() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd3 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 10,
+        };
+        let fd4 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 6,
+        };
+        let fd5 = FileDesc {
+            name: "crate-E".to_string(),
+            size: 4,
+        };
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000010 crate-C src ckt: 1   src avg:      10 B    total: 10 B\n"
+                .to_string(),
+            "00000000000000000006 crate-D src ckt: 1   src avg:       6 B    total: 6 B\n"
+                .to_string(),
+            "00000000000000000004 crate-E src ckt: 1   src avg:       4 B    total: 4 B\n"
+                .to_string(),
+            "00000000000000000002 crate-B src ckt: 1   src avg:       2 B    total: 2 B\n"
+                .to_string(),
+            "00000000000000000001 crate-A src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_2_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000006 crate-A src ckt: 2   src avg:       3 B    total: 6 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_3_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000009 crate-A src ckt: 3   src avg:       3 B    total: 9 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_3_one_2() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000018 crate-A src ckt: 3   src avg:       6 B    total: 18 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_multi() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let fd4 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 8,
+        };
+
+        let fd6 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 100,
+        };
+
+        let fd8 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 1,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000100 crate-C src ckt: 2   src avg:      50 B    total: 100 B\n"
+                .to_string(),
+            "00000000000000000018 crate-A src ckt: 3   src avg:       6 B    total: 18 B\n"
+                .to_string(),
+            "00000000000000000010 crate-B src ckt: 2   src avg:       5 B    total: 10 B\n"
+                .to_string(),
+            "00000000000000000001 crate-D src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
 
 }
