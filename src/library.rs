@@ -54,7 +54,6 @@ pub(crate) enum ErrorKind {
 
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
-    #[cfg_attr(feature = "cargo-clippy", allow(clippy::new_ret_no_self))] // fp https://github.com/rust-lang-nursery/rust-clippy/issues/3313
     pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
@@ -355,7 +354,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-    #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_wrap))] // FP due to derives
+    #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_wrap))]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();

@@ -12,7 +12,6 @@ use std::fmt;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
-#[cfg_attr(feature = "cargo-clippy", allow(clippy::similar_names))] // FP due to derives
 #[derive(Debug, Clone)]
 pub(crate) struct DirSizes<'a> {
     pub(crate) total_size: u64,                // total size of cargo root dir
