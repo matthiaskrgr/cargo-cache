@@ -8,4 +8,5 @@
 // except according to those terms.
 
 pub(crate) mod common;
+pub(crate) mod registry_cache;
 pub(crate) mod registry_sources;
