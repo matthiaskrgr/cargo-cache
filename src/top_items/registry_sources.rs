@@ -69,11 +69,9 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     }
     // take our list of file information and calculate the actual stats
     let mut summary: Vec<String> = Vec::new();
-    //let mut current_name = String::new();
-    //let mut previous_name = String::new();
-    let mut line = String::new();
-    let mut counter: u32 = 0;
-    let mut total_size: u64 = 0;
+    let mut line = String::new(); // line we will print
+    let mut counter: u32 = 0; // how many of a crate do we have
+    let mut total_size: u64 = 0; // total size of these crates
 
     // first find out max_cratename_len
     let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
@@ -85,11 +83,12 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
         current: None,
         previous: None,
     };
-    // start
+
+    // start looping
     state.previous = state.current;
     state.current = iter.next();
 
-    // loop until .previous and .current are None
+    // loop until .previous and .current are None which means we are at the end
     while state.previous.is_some() || state.current.is_some() {
         match &state {
             Pair {
@@ -150,12 +149,13 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                         width = max_cratename_len
                     );
                 } else if current.name != previous.name {
-                    // save old line and compute new one
+                    // save old line
                     assert!(!line.is_empty());
                     summary.push(line.clone());
+                    // reset counters
                     counter = 0;
                     total_size = 0;
-
+                    // and update line
                     let current_name = &current.name;
                     let current_size = &current.size;
                     total_size += current_size;
@@ -180,9 +180,10 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                 current: None,
                 previous: Some(_previous),
             } => {
-                //  save old line
+                // save old line
                 assert!(!line.is_empty()); // line must not be empty
                 summary.push(line.clone());
+                // reset counters
                 counter = 0;
                 total_size = 0;
             }
@@ -192,9 +193,9 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
         state.previous = state.current;
         state.current = iter.next();
     }
-
+    // sort the string vector
     summary.sort();
-    summary.reverse();
+    summary.reverse(); // largest package (biggest number) first
     summary
 }
 
@@ -226,7 +227,7 @@ pub(crate) fn registry_source_stats(path: &PathBuf, limit: u32) -> String {
 mod top_crates_registry_sources {
     use super::*;
     use crate::top_items::common::FileDesc;
-    //    use pretty_assertions::assert_eq;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn stats_from_file_desc_none() {
