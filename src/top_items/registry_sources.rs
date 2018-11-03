@@ -72,7 +72,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     let mut line = String::new(); // line we will print
     let mut counter: u32 = 0; // how many of a crate do we have
     let mut total_size: u64 = 0; // total size of these crates
-
+    let mut dbg_line_len: usize = line.len() ;
     // first find out max_cratename_len
     let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
 
@@ -103,7 +103,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                 previous: None,
             } => {
                 // this should always be first line ever
-                debug_assert!(line.is_empty());
+                debug_assert!(dbg_line_len == 0);
                 // compute line but don't save it
                 let current_name = &current.name;
                 let current_size = &current.size;
@@ -122,6 +122,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                     total_size_hr,
                     width = max_cratename_len
                 );
+                dbg_line_len = line.len();
             }
 
             Pair {
@@ -130,7 +131,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    debug_assert!(!line.is_empty());
+                    debug_assert!(dbg_line_len > 0);
                     let current_name = &current.name;
                     let current_size = &current.size;
                     total_size += current_size;
@@ -148,10 +149,11 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                         total_size_hr,
                         width = max_cratename_len
                     );
+                    dbg_line_len = line.len();
                 } else if current.name != previous.name {
                     // save old line
-                    debug_assert!(!line.is_empty());
-                    summary.push(line.clone());
+                    debug_assert!(dbg_line_len > 0);
+                    summary.push(line);
                     // reset counters
                     counter = 0;
                     total_size = 0;
@@ -173,6 +175,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                         total_size_hr,
                         width = max_cratename_len
                     );
+                    dbg_line_len = line.len();
                 }
             }
 
@@ -181,8 +184,9 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                 previous: Some(_previous),
             } => {
                 // save old line
-                debug_assert!(!line.is_empty()); // line must not be empty
-                summary.push(line.clone());
+                debug_assert!(dbg_line_len > 0); // line must not be empty
+                summary.push(line);
+                line = String::new();
                 // reset counters
                 counter = 0;
                 total_size = 0;
