@@ -16,11 +16,26 @@ use rayon::iter::*;
 use walkdir::WalkDir;
 
 impl FileDesc {
-    fn new_from_git_bare(path: &PathBuf) -> Self {
-        let last_item = path.to_str().unwrap().split('/').last().unwrap();
-        let mut i = last_item.split('-').collect::<Vec<_>>();
+    fn new_from_git_checkouts(path: &PathBuf) -> Self {
+        //let last_item = path.to_str().unwrap().split('/').last().unwrap();
+        //let mut i = last_item.split('-').collect::<Vec<_>>();
+        let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
+        let last = paths.pop().unwrap();
+        let last_but_one = paths.pop().unwrap();
+        let last_but_2 = paths.pop().unwrap();
+
+        let mut i = vec![last_but_2, last_but_one, last];
+
+        let string = last_but_one
+            .split('/')
+            .collect::<Vec<_>>()
+            .pop()
+            .unwrap()
+            .to_string();
+        let mut vec = string.split('-').collect::<Vec<_>>();
+        let _ = vec.pop();
+        let name = vec.join("-");
         i.pop();
-        let name = i.join("-");
 
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -40,11 +55,11 @@ impl FileDesc {
             .sum();
 
         Self { name, size }
-    } // fn new_from_git_bare()
-}
+    } // fn new_from_git_checkouts()
+} // impl FileDesc
 
 // bare git repos
-pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
+pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(&path) {
@@ -55,16 +70,28 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
 
     // get list of package all "...\.crate$" files and sort it
     let mut collection = Vec::new();
+
     let crate_list = fs::read_dir(&path)
         .unwrap()
         .map(|cratepath| cratepath.unwrap().path())
         .collect::<Vec<PathBuf>>();
-    collection.extend_from_slice(&crate_list);
+    // need to take 2 levels into account
+    let mut both_levels_vec: Vec<PathBuf> = Vec::new();
+    for repo in crate_list {
+        for i in fs::read_dir(&repo)
+            .unwrap()
+            .map(|cratepath| cratepath.unwrap().path())
+        {
+            both_levels_vec.push(i);
+        }
+    }
+    collection.extend_from_slice(&both_levels_vec);
+
     collection.sort();
 
     let collections_vec = collection
         .iter()
-        .map(|path| FileDesc::new_from_git_bare(path))
+        .map(|path| FileDesc::new_from_git_checkouts(path))
         .collect::<Vec<_>>();
 
     let mut summary: Vec<String> = Vec::new();
@@ -87,11 +114,11 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
                         .unwrap();
 
                     summary.push(format!(
-                        "{:0>20} {: <width$} repo: {: <3} {: <20}  total: {}\n",
+                        "{:0>20} {: <width$} repo ckt: {: <3} {: <20}  total: {}\n",
                         total_size,
                         current_name,
                         counter,
-                        format!("repo avg: {: >9}", average_crate_size),
+                        format!("ckt avg: {: >9}", average_crate_size),
                         total_size_hr,
                         width = max_cratename_len
                     ));

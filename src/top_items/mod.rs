@@ -8,6 +8,7 @@
 // except according to those terms.
 
 pub(crate) mod common;
+pub(crate) mod git_checkouts;
+pub(crate) mod git_repos_bare;
 pub(crate) mod registry_cache;
 pub(crate) mod registry_sources;
-pub(crate) mod git_repos_bare;
