@@ -103,7 +103,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                 previous: None,
             } => {
                 // this should always be first line ever
-                assert!(line.is_empty());
+                debug_assert!(line.is_empty());
                 // compute line but don't save it
                 let current_name = &current.name;
                 let current_size = &current.size;
@@ -130,7 +130,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    assert!(!line.is_empty());
+                    debug_assert!(!line.is_empty());
                     let current_name = &current.name;
                     let current_size = &current.size;
                     total_size += current_size;
@@ -181,7 +181,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                 previous: Some(_previous),
             } => {
                 // save old line
-                assert!(!line.is_empty()); // line must not be empty
+                debug_assert!(!line.is_empty()); // line must not be empty
                 summary.push(line.clone());
                 // reset counters
                 counter = 0;
