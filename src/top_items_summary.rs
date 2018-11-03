@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::library::*;
+use crate::library::CargoCachePaths;
 use crate::top_items::git_checkouts::*;
 use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_cache::*;
