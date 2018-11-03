@@ -72,7 +72,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     let mut line = String::new(); // line we will print
     let mut counter: u32 = 0; // how many of a crate do we have
     let mut total_size: u64 = 0; // total size of these crates
-    let mut dbg_line_len: usize = line.len() ;
+    let mut dbg_line_len: usize = line.len();
     // first find out max_cratename_len
     let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
 
@@ -439,4 +439,57 @@ mod top_crates_registry_sources {
         assert_eq!(stats, wanted);
     }
 
+}
+
+#[cfg(all(test, feature = "bench"))]
+mod benchmarks {
+    use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
+
+    #[bench]
+    fn bench_few(b: &mut Bencher) {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let fd4 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 8,
+        };
+
+        let fd6 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 100,
+        };
+
+        let fd8 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 1,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
+        b.iter(|| {
+            let list = list.clone();
+            let stats: Vec<String> = stats_from_file_desc_list(list);
+            black_box(stats);
+        });
+    }
 }
