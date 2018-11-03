@@ -150,7 +150,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
                     );
                 } else if current.name != previous.name {
                     // save old line
-                    assert!(!line.is_empty());
+                    debug_assert!(!line.is_empty());
                     summary.push(line.clone());
                     // reset counters
                     counter = 0;
