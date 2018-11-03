@@ -10,3 +10,4 @@
 pub(crate) mod common;
 pub(crate) mod registry_cache;
 pub(crate) mod registry_sources;
+pub(crate) mod git_repos_bare;
