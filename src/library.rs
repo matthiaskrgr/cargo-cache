@@ -214,7 +214,7 @@ pub(crate) fn rm_old_crates(
         let mut last_pkgname = String::new();
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
-            let path_end = match pkgpath.into_iter().last() {
+            let path_end = match pkgpath.iter().last() {
                 Some(path_end) => path_end,
                 None => return Err((ErrorKind::MalformedPackageName, (pkgpath.to_owned()))),
             };
