@@ -226,3 +226,270 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
 
     output
 }
+
+#[cfg(test)]
+mod top_crates_git_repos_bare {
+    use super::*;
+    use crate::top_items::common::FileDesc;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn stats_from_file_desc_none() {
+        // empty list
+        let list: Vec<FileDesc> = Vec::new();
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        // list should be empty
+        let empty: Vec<String> = Vec::new();
+        assert_eq!(stats, empty);
+    }
+
+    #[test]
+    fn stats_from_file_desc_one() {
+        let fd = FileDesc {
+            name: "crate".to_string(),
+            size: 1,
+        };
+        let list: Vec<FileDesc> = vec![fd];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000001 crate src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_two() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let list: Vec<FileDesc> = vec![fd1, fd2];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000002 crate-B src ckt: 1   src avg:       2 B    total: 2 B\n"
+                .to_string(),
+            "00000000000000000001 crate-A src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_multiple() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd3 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 10,
+        };
+        let fd4 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 6,
+        };
+        let fd5 = FileDesc {
+            name: "crate-E".to_string(),
+            size: 4,
+        };
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000010 crate-C src ckt: 1   src avg:      10 B    total: 10 B\n"
+                .to_string(),
+            "00000000000000000006 crate-D src ckt: 1   src avg:       6 B    total: 6 B\n"
+                .to_string(),
+            "00000000000000000004 crate-E src ckt: 1   src avg:       4 B    total: 4 B\n"
+                .to_string(),
+            "00000000000000000002 crate-B src ckt: 1   src avg:       2 B    total: 2 B\n"
+                .to_string(),
+            "00000000000000000001 crate-A src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_2_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000006 crate-A src ckt: 2   src avg:       3 B    total: 6 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_3_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000009 crate-A src ckt: 3   src avg:       3 B    total: 9 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_3_one_2() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000018 crate-A src ckt: 3   src avg:       6 B    total: 18 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_multi() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let fd4 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 8,
+        };
+
+        let fd6 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 100,
+        };
+
+        let fd8 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 1,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
+        let stats: Vec<String> = stats_from_file_desc_list(list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000100 crate-C src ckt: 2   src avg:      50 B    total: 100 B\n"
+                .to_string(),
+            "00000000000000000018 crate-A src ckt: 3   src avg:       6 B    total: 18 B\n"
+                .to_string(),
+            "00000000000000000010 crate-B src ckt: 2   src avg:       5 B    total: 10 B\n"
+                .to_string(),
+            "00000000000000000001 crate-D src ckt: 1   src avg:       1 B    total: 1 B\n"
+                .to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+}
+
+#[cfg(all(test, feature = "bench"))]
+mod benchmarks {
+    use super::*;
+    use crate::test::black_box;
+    use crate::test::Bencher;
+
+    #[bench]
+    fn bench_few(b: &mut Bencher) {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 12,
+        };
+
+        let fd4 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 8,
+        };
+
+        let fd6 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 100,
+        };
+
+        let fd8 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 1,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
+        b.iter(|| {
+            let list = list.clone();
+            let stats: Vec<String> = stats_from_file_desc_list(list);
+            black_box(stats);
+        });
+    }
+}
