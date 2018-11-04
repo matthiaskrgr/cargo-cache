@@ -57,9 +57,7 @@ fn file_desc_from_path(path: &PathBuf) -> Vec<FileDesc> {
         .iter()
         .map(|path| FileDesc::new_from_git_bare(path))
         .collect::<Vec<_>>()
-
 }
-
 
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     struct Pair {
@@ -202,7 +200,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     summary
 }
 
-
 // bare git repos
 pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
     let mut output = String::new();
@@ -212,7 +209,6 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
     }
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
-
 
     let collections_vec = file_desc_from_path(&path);
     let mut summary: Vec<String> = stats_from_file_desc_list(collections_vec);
