@@ -85,6 +85,15 @@ fn main() {
         process::exit(0);
     }
 
+    if config.is_present("top-cache-items") {
+        let limit =
+            value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
+        if limit > 0 {
+            println!("{}", get_top_crates(limit, &cargo_cache));
+        }
+        process::exit(0);
+    }
+
     let dir_sizes = DirSizes::new(&cargo_cache);
 
     if config.is_present("info") {
@@ -92,13 +101,6 @@ fn main() {
         process::exit(0);
     }
 
-    if config.is_present("top-cache-items") {
-        let val = value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
-        if val > 0 {
-            println!("{}", get_top_crates(val, &cargo_cache));
-        }
-        process::exit(0);
-    }
     // no println!() here!
     print!("{}", dir_sizes);
 
