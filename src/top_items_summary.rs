@@ -8,12 +8,15 @@
 // except according to those terms.
 
 use crate::library::CargoCachePaths;
+use crate::top_items::binaries::*;
 use crate::top_items::git_checkouts::*;
 use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
+    let binaries = binary_stats(&ccd.bin_dir, limit);
+
     // run the functions in parallel for a tiny speedup
     let (reg_src_and_cache, git_bare_repos_and_checkouts) = rayon::join(
         || {
@@ -35,6 +38,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 
     // concat the strings in the order we want them
     let mut output = String::new();
+    output.push_str(&binaries);
     output.push_str(&reg_src);
     output.push_str(&reg_cache);
     output.push_str(&bare_repos);

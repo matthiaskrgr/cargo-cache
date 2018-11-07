@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+pub(crate) mod binaries;
 pub(crate) mod common;
 pub(crate) mod git_checkouts;
 pub(crate) mod git_repos_bare;
