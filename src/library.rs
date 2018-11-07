@@ -649,7 +649,9 @@ mod libtests {
         assert!(
             Regex::new(r"cargo home:.*/cargo_home_cargo_cache_paths_print")
                 .unwrap()
-                .is_match(cargo_home)
+                .is_match(cargo_home),
+            "cargo home: \"{:?}\"",
+            cargo_home
         );
 
         let bins = iter.next().unwrap();
