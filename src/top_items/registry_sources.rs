@@ -18,7 +18,7 @@ use crate::top_items::common::{dir_exists, FileDesc};
 
 impl FileDesc {
     pub(crate) fn new_from_reg_src(path: &PathBuf) -> Self {
-        let last_item = path.to_str().unwrap().split('/').last().unwrap();
+        let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
         let mut i = last_item.split('-').collect::<Vec<_>>();
         i.pop();
         let name = i.join("-");

@@ -15,13 +15,7 @@ use humansize::{file_size_opts, FileSize};
 
 impl FileDesc {
     fn new_from_binary(path: &PathBuf) -> Self {
-        let name = path
-            .to_str()
-            .unwrap()
-            .split('/')
-            .last()
-            .unwrap()
-            .to_string();
+        let name = path.file_name().unwrap().to_str().unwrap().to_string();
 
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
@@ -46,8 +40,6 @@ fn file_desc_from_path(path: &PathBuf) -> Vec<FileDesc> {
 }
 
 fn stats_from_file_desc_list(file_descs: &[FileDesc]) -> Vec<String> {
-    println!("debug: {:?}", file_descs);
-
     // take our list of file information and calculate the actual stats
     let mut summary: Vec<String> = Vec::new();
 
