@@ -43,5 +43,6 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     output.push_str(&reg_cache);
     output.push_str(&bare_repos);
     output.push_str(&repo_checkouts);
-    output
+    // strip newlines at the end and the beginning
+    output.trim().to_string()
 }
