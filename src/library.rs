@@ -579,7 +579,7 @@ mod libtests {
             .cargo_home
             .display()
             .to_string()
-            .ends_with("cargo_home_cargo_cache_paths"));
+            .ends_with("cargo_home_cargo_cache_paths"), "cargo_home: '{:?}'", &ccp.cargo_home);
         assert!(ccp
             .bin_dir
             .display()
