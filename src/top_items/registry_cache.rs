@@ -203,13 +203,8 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32) -> String {
     let file_descs: Vec<FileDesc> = file_desc_list_from_path(&path);
     let summary: Vec<String> = stats_from_file_desc_list(file_descs);
 
-    // @TODO use iterator.take()
-    for (count, data) in summary.into_iter().enumerate() {
-        if count == limit as usize {
-            break;
-        }
-        let data = &data[21..]; // remove first word used for sorting
-        stdout.push_str(data);
+    for data in summary.into_iter().take(limit as usize) {
+        stdout.push_str(&data[21..]); // remove first word used for sorting
     }
 
     stdout

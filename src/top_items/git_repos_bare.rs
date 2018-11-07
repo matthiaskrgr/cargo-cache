@@ -213,12 +213,8 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
     let collections_vec = file_desc_from_path(&path);
     let summary: Vec<String> = stats_from_file_desc_list(collections_vec);
 
-    for (c, i) in summary.into_iter().enumerate() {
-        if c == limit as usize {
-            break;
-        }
-        let i = &i[21..]; // remove first word used for sorting
-        output.push_str(i);
+    for data in summary.into_iter().take(limit as usize) {
+        output.push_str(&data[21..]); // remove first word used for sorting
     }
 
     output
