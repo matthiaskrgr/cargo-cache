@@ -605,10 +605,6 @@ mod libtests {
 
         let ccp = CargoCachePaths::new(PathBuf::from(CH_string)).unwrap();
 
-        // sleep a bit, maybe this fixes test race condition
-        let ten_milli_secs = std::time::Duration::from_millis(10);
-        std::thread::sleep(ten_milli_secs);
-
         // test all the paths
         assert!(
             ccp.cargo_home
