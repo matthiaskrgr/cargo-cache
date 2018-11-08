@@ -71,7 +71,7 @@ fn main() {
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 
-    let cargo_cache = match CargoCachePaths::new() {
+    let cargo_cache = match CargoCachePaths::default() {
         Ok(cargo_cache) => cargo_cache,
         Err((_, msg)) => {
             eprintln!("{}", msg);

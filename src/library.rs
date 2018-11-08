@@ -54,7 +54,10 @@ pub(crate) enum ErrorKind {
 
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
-    pub(crate) fn new() -> Result<Self, (ErrorKind, String)> {
+
+    // @TODO make mew() accept the cargo home dir as parameter and have
+    // default() get it by itself
+    pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
             _ => {
@@ -547,7 +550,7 @@ mod libtests {
     fn test_CargoCachePaths_gen() {
         // set cargo cache root dir to /tmp
         env::set_var("/tmp/", "CARGO_HOME");
-        let dir_paths = CargoCachePaths::new();
+        let dir_paths = CargoCachePaths::default();
         assert!(dir_paths.is_ok());
     }
 
@@ -572,7 +575,7 @@ mod libtests {
 
         // set cargo home to this directory
         std::env::set_var("CARGO_HOME", CH_string);
-        let ccp = CargoCachePaths::new().unwrap();
+        let ccp = CargoCachePaths::default().unwrap();
 
         // sleep a bit, maybe this fixes test race condition
         let ten_milli_secs = std::time::Duration::from_millis(10);
@@ -647,7 +650,7 @@ mod libtests {
 
         // set cargo home to this directory
         std::env::set_var("CARGO_HOME", CH_string);
-        let ccp = CargoCachePaths::new().unwrap();
+        let ccp = CargoCachePaths::default().unwrap();
 
         let output = ccp.to_string();
         let mut iter = output.lines().skip(1); // ??
@@ -747,7 +750,7 @@ mod benchmarks {
 
         #[allow(unused_must_use)]
         b.iter(|| {
-            let x = CargoCachePaths::new();
+            let x = CargoCachePaths::default();
             black_box(x);
         });
     }
@@ -774,7 +777,7 @@ mod benchmarks {
         // set cargo home to this directory
         std::env::set_var("CARGO_HOME", CH_string);
 
-        let ccp = CargoCachePaths::new().unwrap();
+        let ccp = CargoCachePaths::default().unwrap();
         #[allow(unused_must_use)]
         b.iter(|| {
             let x = ccp.to_string();
