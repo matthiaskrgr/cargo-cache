@@ -54,9 +54,6 @@ pub(crate) enum ErrorKind {
 
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
-
-    // @TODO make mew() accept the cargo home dir as parameter and have
-    // default() get it by itself
     pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
         let cargo_cfg = match cargo::util::config::Config::default() {
             Ok(cargo_cfg) => cargo_cfg,
@@ -532,7 +529,41 @@ mod libtests {
 
     use pretty_assertions::assert_eq;
     use regex::Regex;
-    use std::env;
+
+    // @TODO add env test
+
+    impl CargoCachePaths {
+        pub(crate) fn new(dir: PathBuf) -> Result<Self, (ErrorKind, String)> {
+            if !dir.is_dir() {
+                let msg = format!(
+                    "Error, no cargo home path directory '{}' found.",
+                    dir.display()
+                );
+                return Err((ErrorKind::CargoHomeNotDirectory, msg));
+            }
+
+            // get the paths to the relevant directories
+            let cargo_home = dir;
+            let bin = cargo_home.join("bin/");
+            let registry = cargo_home.join("registry/");
+            let registry_index = registry.join("index/");
+            let reg_cache = registry.join("cache/");
+            let reg_src = registry.join("src/");
+            let git_repos_bare = cargo_home.join("git/db/");
+            let git_checkouts = cargo_home.join("git/checkouts/");
+
+            Ok(Self {
+                cargo_home,
+                bin_dir: bin,
+                registry,
+                registry_index,
+                registry_cache: reg_cache,
+                registry_sources: reg_src,
+                git_repos_bare,
+                git_checkouts,
+            })
+        }
+    }
 
     #[allow(non_snake_case)]
     #[test]
@@ -549,8 +580,7 @@ mod libtests {
     #[test]
     fn test_CargoCachePaths_gen() {
         // set cargo cache root dir to /tmp
-        env::set_var("/tmp/", "CARGO_HOME");
-        let dir_paths = CargoCachePaths::default();
+        let dir_paths = CargoCachePaths::new(PathBuf::from("/tmp"));
         assert!(dir_paths.is_ok());
     }
 
@@ -573,9 +603,7 @@ mod libtests {
         assert!(fs::metadata(&CH_string).unwrap().is_dir());
         assert!(std::path::PathBuf::from(&CH_string).is_dir());
 
-        // set cargo home to this directory
-        std::env::set_var("CARGO_HOME", CH_string);
-        let ccp = CargoCachePaths::default().unwrap();
+        let ccp = CargoCachePaths::new(PathBuf::from(CH_string)).unwrap();
 
         // sleep a bit, maybe this fixes test race condition
         let ten_milli_secs = std::time::Duration::from_millis(10);
@@ -649,8 +677,7 @@ mod libtests {
         assert!(std::path::PathBuf::from(&CH_string).is_dir());
 
         // set cargo home to this directory
-        std::env::set_var("CARGO_HOME", CH_string);
-        let ccp = CargoCachePaths::default().unwrap();
+        let ccp = CargoCachePaths::new(PathBuf::from(CH_string)).unwrap();
 
         let output = ccp.to_string();
         let mut iter = output.lines().skip(1); // ??
@@ -745,12 +772,9 @@ mod benchmarks {
         assert!(fs::metadata(&CH_string).unwrap().is_dir());
         assert!(std::path::PathBuf::from(&CH_string).is_dir());
 
-        // set cargo home to this directory
-        std::env::set_var("CARGO_HOME", CH_string);
-
         #[allow(unused_must_use)]
         b.iter(|| {
-            let x = CargoCachePaths::default();
+            let x = CargoCachePaths::new(PathBuf::from(&CH_string));
             black_box(x);
         });
     }
@@ -774,10 +798,7 @@ mod benchmarks {
         assert!(fs::metadata(&CH_string).unwrap().is_dir());
         assert!(std::path::PathBuf::from(&CH_string).is_dir());
 
-        // set cargo home to this directory
-        std::env::set_var("CARGO_HOME", CH_string);
-
-        let ccp = CargoCachePaths::default().unwrap();
+        let ccp = CargoCachePaths::new(PathBuf::from(CH_string)).unwrap();
         #[allow(unused_must_use)]
         b.iter(|| {
             let x = ccp.to_string();
