@@ -83,9 +83,9 @@ script:
   - cargo build --all ${RELEASE}
   # we set ENV vars in tests but these leak in to other tests when running them in parallel messing with the results.
   # run tests sequentially
-  - cargo test -j 1 --all ${RELEASE}
-  - if [[ "$RELEASE" == "" ]] &&  [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test -j 1 --features bench; fi
-  - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test -j 1 --features bench --release; fi
+  - cargo test --all ${RELEASE}
+  - if [[ "$RELEASE" == "" ]] &&  [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench; fi
+  - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench --release; fi
   - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench; fi
   - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench --features bench; fi
   - cargo run ${RELEASE}
