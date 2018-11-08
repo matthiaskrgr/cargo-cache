@@ -28,26 +28,6 @@ env:
 matrix:
   fast_finish: false
   include:
-# nightly + tools
-    - os: linux
-      rust: nightly
-      env: RELEASE="" DEBUG="--debug"
-
-    - os: linux
-      rust: nightly
-      env: CLIPPY="true"
-
-    - os: linux
-      rust: nightly
-      env: CARGO_AUDIT="true"
-
-    - os: linux
-      rust: nightly
-      env: RUSTFMT="true"
-
-    - os: linux
-      rust: nightly
-      env: RELEASE="--release"
 
 # beta
     - os: linux
@@ -67,6 +47,27 @@ matrix:
     - os: osx
       rust: nightly
       env: RELEASE="--release"
+
+# nightly + tools
+    - os: linux
+      rust: nightly
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: linux
+      rust: nightly
+      env: RELEASE="--release"
+
+    - os: linux
+      rust: nightly
+      env: CLIPPY="true"
+
+    - os: linux
+      rust: nightly
+      env: CARGO_AUDIT="true"
+
+    - os: linux
+      rust: nightly
+      env: RUSTFMT="true"
 
   exclude:
     - os: osx
