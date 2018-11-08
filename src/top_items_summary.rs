@@ -42,7 +42,13 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
     let (bare_repos, repo_checkouts) = git_bare_repos_and_checkouts;
 
     // concat the strings in the order we want them
-    let mut output = String::new();
+    let mut output = String::with_capacity(
+        &binaries.len()
+            + &reg_src.len()
+            + &reg_cache.len()
+            + &bare_repos.len()
+            + &repo_checkouts.len(),
+    );
     output.push_str(&binaries);
     output.push_str(&reg_src);
     output.push_str(&reg_cache);
