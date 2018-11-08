@@ -15,23 +15,28 @@ use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
 
 pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
-    let binaries = binary_stats(&ccd.bin_dir, limit);
-
     // run the functions in parallel for a tiny speedup
-    let (reg_src_and_cache, git_bare_repos_and_checkouts) = rayon::join(
+    let (binaries, other) = rayon::join(
+        || binary_stats(&ccd.bin_dir, limit),
         || {
             rayon::join(
-                || registry_source_stats(&ccd.registry_sources, limit),
-                || registry_cache_stats(&ccd.registry_cache, limit),
-            )
-        },
-        || {
-            rayon::join(
-                || git_repos_bare_stats(&ccd.git_repos_bare, limit),
-                || git_checkouts_stats(&ccd.git_checkouts, limit),
+                || {
+                    rayon::join(
+                        || registry_source_stats(&ccd.registry_sources, limit),
+                        || registry_cache_stats(&ccd.registry_cache, limit),
+                    )
+                },
+                || {
+                    rayon::join(
+                        || git_repos_bare_stats(&ccd.git_repos_bare, limit),
+                        || git_checkouts_stats(&ccd.git_checkouts, limit),
+                    )
+                },
             )
         },
     );
+    // destruct all the tupels
+    let (reg_src_and_cache /*tup*/, git_bare_repos_and_checkouts /*tup*/) = other;
     // split up tupels into single variables
     let (reg_src, reg_cache) = reg_src_and_cache;
     let (bare_repos, repo_checkouts) = git_bare_repos_and_checkouts;
