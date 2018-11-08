@@ -43,11 +43,7 @@ pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
 
     // concat the strings in the order we want them
     let mut output = String::with_capacity(
-        &binaries.len()
-            + &reg_src.len()
-            + &reg_cache.len()
-            + &bare_repos.len()
-            + &repo_checkouts.len(),
+        binaries.len() + reg_src.len() + reg_cache.len() + bare_repos.len() + repo_checkouts.len(),
     );
     output.push_str(&binaries);
     output.push_str(&reg_src);
