@@ -89,7 +89,7 @@ fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
     #[cfg_attr(
         feature = "cargo-clippy",
         allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)
-    )] // FP due to derives
+    )]
     // I tried mittigating via previous assert()
     formatted_line.push_str(&" ".repeat(len_padding as usize));
     formatted_line.push_str(end);
