@@ -9,6 +9,7 @@
 
 use std::fmt;
 
+use crate::cache::dircache;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
@@ -31,39 +32,44 @@ pub(crate) struct DirSizes<'a> {
 }
 
 impl<'a> DirSizes<'a> {
-    pub(crate) fn new(ccd: &'a CargoCachePaths) -> Self {
-        let bindir = cumulative_dir_size(&ccd.bin_dir);
-        let git_repos_bare = cumulative_dir_size(&ccd.git_repos_bare);
-        let git_checkouts = cumulative_dir_size(&ccd.git_checkouts);
-        let reg_cache = cumulative_dir_size(&ccd.registry_cache);
-        let reg_src = cumulative_dir_size(&ccd.registry_sources);
-        let reg_index = cumulative_dir_size(&ccd.registry_index);
+    pub(crate) fn new(cache: &mut dircache::DirCache, ccd: &'a CargoCachePaths) -> Self {
+        let bin_dir_size = cache.bin.total_size();
+        let numb_bins = cache.bin.number_of_files();
+        let reg_index_size = cache.registry_index.total_size();
 
-        let total_reg_size = reg_index.dir_size + reg_cache.dir_size + reg_src.dir_size;
-        let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
+        let total_git_repos_bare_size = cache.git_repos_bare.total_size();
+        let numb_git_repos_bare_repos = cache.git_repos_bare.number_of_checkout_repos();
+
+        let total_git_chk_size = cache.git_checkouts.total_size();
+        let numb_git_checkouts = cache.git_checkouts.number_of_files_at_depth_2();
+
+        let total_reg_cache_entries = cache.registry_cache.number_of_files();
+        let total_reg_cache_size = cache.registry_cache.total_size();
+
+        let total_reg_src_size = cache.registry_sources.total_size();
+        let numb_reg_src_checkouts = cache.registry_sources.number_of_files_at_depth_2();
 
         let root_path = &ccd.cargo_home;
+        let total_reg_size = total_reg_cache_size + total_reg_src_size + reg_index_size;
+        let total_git_db_size = total_git_repos_bare_size + total_git_chk_size;
 
+        let total_bin_size = bin_dir_size;
+
+        let total_size = total_reg_size + total_git_db_size + total_bin_size;
         Self {
-            //no need to recompute all of this from scratch
-            total_size: total_reg_size + total_git_db_size + bindir.dir_size,
-            numb_bins: bindir.file_number,
-            total_bin_size: bindir.dir_size,
-            total_reg_size,
-
-            total_git_db_size,
-            total_git_repos_bare_size: git_repos_bare.dir_size,
-            numb_git_repos_bare_repos: git_repos_bare.file_number,
-
-            total_git_chk_size: git_checkouts.dir_size,
-            numb_git_checkouts: git_checkouts.file_number,
-
-            total_reg_cache_size: reg_cache.dir_size,
-            numb_reg_cache_entries: reg_cache.file_number,
-
-            total_reg_src_size: reg_src.dir_size,
-            numb_reg_src_checkouts: reg_src.file_number,
-
+            total_size,                  // total size of cargo root dir
+            numb_bins: numb_bins as u64, // number of binaries found
+            total_bin_size,              // total size of binaries found
+            total_reg_size,              // registry size
+            total_git_db_size,           // size of bare repos and checkouts combined
+            total_git_repos_bare_size,   // git db size
+            numb_git_repos_bare_repos: numb_git_repos_bare_repos.unwrap() as u64, // number of cloned repos
+            numb_git_checkouts: numb_git_checkouts as u64, // number of checked out repos
+            total_git_chk_size,                            // git checkout size
+            total_reg_cache_size,                          // registry cache size  // wrong
+            total_reg_src_size,                            // registry sources size  // wrong
+            numb_reg_cache_entries: total_reg_cache_entries as u64, // number of source archives // wrong
+            numb_reg_src_checkouts: numb_reg_src_checkouts as u64, // number of source checkouts // wrong
             root_path,
         }
     }

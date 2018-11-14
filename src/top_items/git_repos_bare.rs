@@ -10,6 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::dircache::DirCache;
 use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
@@ -43,17 +44,11 @@ impl FileDesc {
     } // fn new_from_git_bare()
 }
 
-fn file_desc_from_path(path: &PathBuf) -> Vec<FileDesc> {
+fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
-    let mut collection = Vec::new();
-    let crate_list = fs::read_dir(&path)
-        .unwrap()
-        .map(|cratepath| cratepath.unwrap().path())
-        .collect::<Vec<PathBuf>>();
-    collection.extend_from_slice(&crate_list);
-    collection.sort();
-
-    collection
+    cache
+        .git_repos_bare
+        .bare_repo_folders() // bad
         .iter()
         .map(|path| FileDesc::new_from_git_bare(path))
         .collect::<Vec<_>>()
@@ -201,7 +196,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
 }
 
 // bare git repos
-pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
+pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(&path) {
@@ -210,7 +205,7 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32) -> String {
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let collections_vec = file_desc_from_path(&path);
+    let collections_vec = file_desc_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(collections_vec);
 
     for data in summary.into_iter().take(limit as usize) {

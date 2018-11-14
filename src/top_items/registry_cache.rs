@@ -10,6 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::dircache::DirCache;
 use crate::top_items::common::{dir_exists, FileDesc};
 use humansize::{file_size_opts, FileSize};
 
@@ -28,22 +29,10 @@ impl FileDesc {
 }
 
 // registry cache (extracted tarballs)
-fn file_desc_list_from_path(path: &PathBuf) -> Vec<FileDesc> {
-    let mut collection = Vec::new();
-
-    // get list of package all "...\.crate$" files and sort it
-
-    for repo in fs::read_dir(path).unwrap() {
-        let crate_list = fs::read_dir(&repo.unwrap().path())
-            .unwrap()
-            .map(|cratepath| cratepath.unwrap().path())
-            .collect::<Vec<PathBuf>>();
-
-        collection.extend_from_slice(&crate_list);
-    }
-    collection.sort();
-
-    collection
+fn file_desc_list_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
+    cache
+        .registry_cache
+        .files()
         .iter()
         .map(|path| FileDesc::new_from_reg_cache(path))
         .collect::<Vec<_>>()
@@ -191,7 +180,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
 }
 
 // registry cache
-pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32) -> String {
+pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(&path) {
@@ -200,7 +189,7 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32) -> String {
 
     stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&path);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(file_descs);
 
     for data in summary.into_iter().take(limit as usize) {

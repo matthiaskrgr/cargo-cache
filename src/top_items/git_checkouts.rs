@@ -10,6 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::dircache::DirCache;
 use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
@@ -58,29 +59,12 @@ impl FileDesc {
     } // fn new_from_git_checkouts()
 } // impl FileDesc
 
-fn file_desc_from_path(path: &PathBuf) -> Vec<FileDesc> {
+fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
-    let mut collection = Vec::new();
 
-    let crate_list = fs::read_dir(&path)
-        .unwrap()
-        .map(|cratepath| cratepath.unwrap().path())
-        .collect::<Vec<PathBuf>>();
-    // need to take 2 levels into account
-    let mut both_levels_vec: Vec<PathBuf> = Vec::new();
-    for repo in crate_list {
-        for i in fs::read_dir(&repo)
-            .unwrap()
-            .map(|cratepath| cratepath.unwrap().path())
-        {
-            both_levels_vec.push(i);
-        }
-    }
-    collection.extend_from_slice(&both_levels_vec);
-
-    collection.sort();
-
-    collection
+    cache
+        .git_checkouts
+        .checkout_folders()
         .iter()
         .map(|path| FileDesc::new_from_git_checkouts(path))
         .collect::<Vec<_>>()
@@ -227,8 +211,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
     summary
 }
 
-// bare git repos
-pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
+pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(&path) {
@@ -237,7 +220,7 @@ pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32) -> String {
 
     output.push_str(&format!("\nSummary of: {}\n", path.display()));
 
-    let collections_vec = file_desc_from_path(&path);
+    let collections_vec = file_desc_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(collections_vec);
 
     for data in summary.into_iter().take(limit as usize) {

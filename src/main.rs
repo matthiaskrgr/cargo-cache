@@ -38,6 +38,7 @@
         clippy::redundant_clone
     )
 )]
+mod cache;
 mod cli;
 mod dirsizes;
 mod git;
@@ -55,7 +56,7 @@ use std::{fs, process};
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
-use crate::dirsizes::*;
+use crate::cache::dircache::DirCache;
 use crate::git::*;
 use crate::library::*;
 use crate::top_items_summary::*;
@@ -85,16 +86,18 @@ fn main() {
         process::exit(0);
     }
 
+    let mut cache = DirCache::new(CargoCachePaths::default().unwrap());
+
     if config.is_present("top-cache-items") {
         let limit =
             value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
         if limit > 0 {
-            println!("{}", get_top_crates(limit, &cargo_cache));
+            println!("{}", get_top_crates(limit, &cargo_cache, &mut cache));
         }
         process::exit(0);
     }
 
-    let dir_sizes = DirSizes::new(&cargo_cache);
+    let dir_sizes = dirsizes::DirSizes::new(&mut cache, &cargo_cache);
 
     if config.is_present("info") {
         println!("{}", get_info(&cargo_cache, &dir_sizes));
@@ -165,8 +168,11 @@ fn main() {
     }
     if size_changed && !config.is_present("dry-run") {
         let cache_size_old = dir_sizes.total_size;
-        // recalculate file sizes by constructing a new DSC object
-        let cache_size_new = DirSizes::new(&cargo_cache).total_size;
+        // recalculate file sizes by constructing a new DSC object with new cache
+        //let mut cache_2 = CargoCachePaths::default().unwrap();
+        // @TODO add way to invalidate the cache so it is reconstructed
+        let mut cache_throwaway = DirCache::new(CargoCachePaths::default().unwrap());
+        let cache_size_new = dirsizes::DirSizes::new(&mut cache_throwaway, &cargo_cache).total_size;
 
         let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(

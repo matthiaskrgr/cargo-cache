@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use crate::cache::dircache::DirCache;
 use crate::library::CargoCachePaths;
 use crate::top_items::binaries::*;
 use crate::top_items::git_checkouts::*;
@@ -14,37 +15,25 @@ use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
 
-pub(crate) fn get_top_crates(limit: u32, ccd: &CargoCachePaths) -> String {
+pub(crate) fn get_top_crates(
+    limit: u32,
+    ccd: &CargoCachePaths,
+    mut cache: &mut DirCache,
+) -> String {
     // run the functions in parallel for a tiny speedup
-    let (binaries, other) = rayon::join(
-        || binary_stats(&ccd.bin_dir, limit),
-        || {
-            rayon::join(
-                || {
-                    rayon::join(
-                        || registry_source_stats(&ccd.registry_sources, limit),
-                        || registry_cache_stats(&ccd.registry_cache, limit),
-                    )
-                },
-                || {
-                    rayon::join(
-                        || git_repos_bare_stats(&ccd.git_repos_bare, limit),
-                        || git_checkouts_stats(&ccd.git_checkouts, limit),
-                    )
-                },
-            )
-        },
-    );
-    // destruct all the tupels
-    let (reg_src_and_cache /*tup*/, git_bare_repos_and_checkouts /*tup*/) = other;
-    // split up tupels into single variables
-    let (reg_src, reg_cache) = reg_src_and_cache;
-    let (bare_repos, repo_checkouts) = git_bare_repos_and_checkouts;
+    let binaries = binary_stats(&ccd.bin_dir, limit, &mut cache);
+
+    let reg_src = registry_source_stats(&ccd.registry_sources, limit, &mut cache);
+    let reg_cache = registry_cache_stats(&ccd.registry_cache, limit, &mut cache);
+
+    let bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut cache);
+    let repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, &mut cache);
 
     // concat the strings in the order we want them
     let mut output = String::with_capacity(
         binaries.len() + reg_src.len() + reg_cache.len() + bare_repos.len() + repo_checkouts.len(),
     );
+
     output.push_str(&binaries);
     output.push_str(&reg_src);
     output.push_str(&reg_cache);
