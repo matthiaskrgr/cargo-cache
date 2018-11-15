@@ -203,7 +203,15 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32, mut cache: &mut D
         return output;
     }
 
-    output.push_str(&format!("\nSummary of: {}\n", path.display()));
+    output.push_str(&format!(
+        "\nSummary of: {} ({} total)\n",
+        path.display(),
+        cache
+            .git_repos_bare
+            .total_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
+    ));
 
     let collections_vec = file_desc_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(collections_vec);

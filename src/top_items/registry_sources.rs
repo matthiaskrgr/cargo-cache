@@ -206,7 +206,15 @@ pub(crate) fn registry_source_stats(
         return stdout;
     }
 
-    stdout.push_str(&format!("\nSummary of: {}\n", path.display()));
+    stdout.push_str(&format!(
+        "\nSummary of: {} ({} total)\n",
+        path.display(),
+        cache
+            .registry_sources
+            .total_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
+    ));
 
     let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(file_descs);
