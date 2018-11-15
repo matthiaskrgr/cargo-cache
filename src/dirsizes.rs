@@ -225,6 +225,7 @@ mod libtests {
     use std::path::PathBuf;
 
     impl<'a> DirSizes<'a> {
+        #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_truncation))]
         #[allow(non_snake_case)]
         pub(super) fn new_manually(
             DI_bindir: &DirInfo,
