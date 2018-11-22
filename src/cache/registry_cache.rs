@@ -31,6 +31,12 @@ impl RegistryCache {
         }
     }
 
+    pub(crate) fn invalidate(&mut self) {
+        self.total_size = None;
+        self.number_of_files = None;
+        self.files_calculated = false;
+    }
+
     #[inline]
     pub(crate) fn path_exists(&mut self) -> bool {
         self.path.exists()

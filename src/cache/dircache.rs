@@ -32,4 +32,13 @@ impl DirCache {
             ),
         }
     }
+
+    pub(crate) fn invalidate(&mut self) {
+        self.bin.invalidate();
+        self.git_checkouts.invalidate();
+        self.git_repos_bare.invalidate();
+        self.registry_cache.invalidate();
+        self.registry_index.invalidate();
+        self.registry_sources.invalidate();
+    }
 }

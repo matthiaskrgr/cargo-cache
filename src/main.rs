@@ -176,12 +176,14 @@ fn main() {
         }
     }
     if size_changed && !config.is_present("dry-run") {
+        // size have changed
+        // in order to get a diff, save the old sizes
         let cache_size_old = dir_sizes.total_size;
-        // recalculate file sizes by constructing a new DSC object with new cache
-        //let mut cache_2 = CargoCachePaths::default().unwrap();
-        // @TODO add way to invalidate the cache so it is reconstructed
-        let mut cache_throwaway = DirCache::new(CargoCachePaths::default().unwrap());
-        let cache_size_new = dirsizes::DirSizes::new(&mut cache_throwaway, &cargo_cache).total_size;
+
+        // and invalidate the cache
+        cache.invalidate();
+        // and requery it to let it do its thing
+        let cache_size_new = dirsizes::DirSizes::new(&mut cache, &cargo_cache).total_size;
 
         let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(

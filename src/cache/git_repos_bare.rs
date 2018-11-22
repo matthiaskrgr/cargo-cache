@@ -38,6 +38,13 @@ impl GitRepoCache {
         }
     }
 
+    pub(crate) fn invalidate(&mut self) {
+        self.total_size = None;
+        self.files_calculated = false;
+        self.repos_calculated = false;
+        self.number_of_repos = None;
+    }
+
     #[inline]
     pub(crate) fn path_exists(&mut self) -> bool {
         self.path.exists()
