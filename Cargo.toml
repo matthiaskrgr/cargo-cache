@@ -30,20 +30,21 @@ cargo = "0.31" # get CARGO_HOME
 git2 = "0.7" # check if repo is git repo
 
 # https://github.com/rayon-rs/rayon
-rayon = "1.0" # parallel for iterators
+rayon = "1.0" # parallel for iteratorsn
 
-# https://github.com/rust-lang-nursery/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "f40c4fa51d308bd32b4b3e3302bad8965d10ffbc" } # git version information
+# https://github.com/rust-lang/rust-clippy
+rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "1d5108c264bef944c435d4184dfdeb048e6acc2e" } # git version information
 
 [dev-dependencies]
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "0.5" # colored diff assertions
 
 # https://github.com/rust-lang/regex
-regex = "1.0" # use regex iun test
+regex = "1.0" # use regex in tests
+
 [build-dependencies]
-# https://github.com/rust-lang-nursery/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang-nursery/rust-clippy", rev = "f40c4fa51d308bd32b4b3e3302bad8965d10ffbc" } # git version information
+# https://github.com/rust-lang/rust-clippy
+rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "1d5108c264bef944c435d4184dfdeb048e6acc2e" } # git version information
 
 
 [[bin]]
