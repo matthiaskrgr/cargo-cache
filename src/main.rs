@@ -144,10 +144,19 @@ fn main() {
     }
 
     if config.is_present("keep-duplicate-crates") {
-        let val =
-            value_t!(config.value_of("keep-duplicate-crates"), u64).unwrap_or(10 /* default*/);
+        let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
+        let limit = match clap_val {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!(
+                    "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
+                    e
+                );
+                process::exit(1);
+            }
+        };
         match rm_old_crates(
-            val,
+            limit,
             config.is_present("dry-run"),
             &cargo_cache.registry_cache,
             &mut size_changed,
