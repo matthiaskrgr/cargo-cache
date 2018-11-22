@@ -17,85 +17,64 @@ pub(crate) struct RegistrySourceCache {
     number_of_repos: Option<usize>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    #[allow(unused)]
-    number_of_files: Option<usize>,
+    // number_of_files: Option<usize>,
     repos_calculated: bool,
     checkout_folders: Vec<PathBuf>,
 }
 
 impl RegistrySourceCache {
-    // use this to init
     pub(crate) fn new(path: PathBuf) -> Self {
-        // calculate only if it's needed
+        // calculate only as needed and cache
         Self {
             path,
             total_size: None,
-            number_of_files: None,
+            // number_of_files: None,
             files_calculated: false,
             files: Vec::new(),
-
             repos_calculated: false,
             checkout_folders: Vec::new(),
             number_of_repos: None,
         }
     }
 
+    #[inline]
     pub(crate) fn path_exists(&mut self) -> bool {
         self.path.exists()
-    }
-
-    #[allow(unused)]
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_repos.is_some() {
-            self.number_of_repos.unwrap()
-        } else {
-            // we don't have the value cached
-            if self.path_exists() {
-                let count = self.files().len();
-                self.number_of_repos = Some(count);
-                count
-            } else {
-                0
-            }
-        }
     }
 
     pub(crate) fn number_of_files_at_depth_2(&mut self) -> usize {
         let root_dir_depth = self.path.iter().count();
         if self.number_of_repos.is_some() {
             self.number_of_repos.unwrap()
+        } else if self.path_exists() {
+            // dir must exist, dir must be as depth ${path}+2
+            let count = self
+                .files
+                .iter()
+                .filter(|p| p.is_dir())
+                .filter(|p| p.iter().count() == root_dir_depth + 2)
+                .count();
+            self.number_of_repos = Some(count);
+            count
         } else {
-            // we don't have the value cached
-            if self.path_exists() {
-                // dir must exist, dir must be as depth ${path}+2
-                let count = self
-                    .files
-                    .iter()
-                    .filter(|p| p.is_dir())
-                    .filter(|p| p.iter().count() == root_dir_depth + 2)
-                    .count();
-                self.number_of_repos = Some(count);
-                count
-            } else {
-                0
-            }
+            0
         }
     }
 
     pub(crate) fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
+        } else if self.path.is_dir() {
+            // get the size of all files in path dir
+            let total_size = self
+                .files()
+                .iter()
+                .map(|f| fs::metadata(f).unwrap().len())
+                .sum();
+            self.total_size = Some(total_size);
+            total_size
         } else {
-            // is it cached?
-            if self.path.is_dir() {
-                // get the size of all files in path dir
-                self.files()
-                    .iter()
-                    .map(|f| fs::metadata(f).unwrap().len())
-                    .sum()
-            } else {
-                0
-            }
+            0
         }
     }
 
@@ -114,17 +93,6 @@ impl RegistrySourceCache {
                 self.files = Vec::new();
             }
             &self.files
-        }
-    }
-
-    #[allow(unused)]
-    pub(crate) fn number_of_repos(&mut self) -> Option<usize> {
-        if self.number_of_repos.is_some() {
-            self.number_of_repos
-        } else {
-            let c = self.checkout_folders().iter().count();
-            self.number_of_repos = Some(c);
-            self.number_of_repos
         }
     }
 
@@ -160,4 +128,33 @@ impl RegistrySourceCache {
             &self.checkout_folders
         }
     }
+
+    /*
+    pub(crate) fn number_of_files(&mut self) -> usize {
+        if self.number_of_repos.is_some() {
+            self.number_of_repos.unwrap()
+        } else {
+            // we don't have the value cached
+            if self.path_exists() {
+                let count = self.files().len();
+                self.number_of_repos = Some(count);
+                count
+            } else {
+                0
+            }
+        }
+    }
+    */
+
+    /*
+    pub(crate) fn number_of_repos(&mut self) -> Option<usize> {
+        if self.number_of_repos.is_some() {
+            self.number_of_repos
+        } else {
+            let c = self.checkout_folders().iter().count();
+            self.number_of_repos = Some(c);
+            self.number_of_repos
+        }
+    }
+    */
 }
