@@ -12,7 +12,6 @@ use std::path::PathBuf;
 
 pub(crate) struct RegistryCache {
     path: PathBuf,
-
     total_size: Option<u64>,
     number_of_files: Option<usize>,
     files_calculated: bool,
@@ -20,12 +19,11 @@ pub(crate) struct RegistryCache {
 }
 
 impl RegistryCache {
-    // use this to init
     pub(crate) fn new(path: PathBuf) -> Self {
-        // calculate only if it's needed
+        // calculate once and save, return as needed
         Self {
             path,
-            //number_of_files_recursively: None,
+            // number_of_files_recursively: None,
             total_size: None,
             number_of_files: None,
             files_calculated: false,
@@ -40,32 +38,29 @@ impl RegistryCache {
     pub(crate) fn number_of_files(&mut self) -> usize {
         if self.number_of_files.is_some() {
             self.number_of_files.unwrap()
+        } else if self.path_exists() {
+            let count = self.files().len();
+            self.number_of_files = Some(count);
+            count
         } else {
-            // we don't have the value cached
-            if self.path_exists() {
-                let count = self.files().len();
-                self.number_of_files = Some(count);
-                count
-            } else {
-                0
-            }
+            0
         }
     }
 
     pub(crate) fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
+        } else if self.path.is_dir() {
+            // get the size of all files in path dir
+            let total_size = self
+                .files()
+                .iter()
+                .map(|f| fs::metadata(f).unwrap().len())
+                .sum();
+            self.total_size = Some(total_size);
+            total_size
         } else {
-            // is it cached?
-            if self.path.is_dir() {
-                // get the size of all files in path dir
-                self.files()
-                    .iter()
-                    .map(|f| fs::metadata(f).unwrap().len())
-                    .sum()
-            } else {
-                0
-            }
+            0
         }
     }
 
