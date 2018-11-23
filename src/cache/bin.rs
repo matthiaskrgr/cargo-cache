@@ -10,6 +10,8 @@
 use std::fs;
 use std::path::PathBuf;
 
+use rayon::iter::*;
+
 pub(crate) struct BinaryCache {
     path: PathBuf,
     number_of_files: Option<usize>,
@@ -59,7 +61,7 @@ impl BinaryCache {
         } else if self.path.is_dir() {
             let total_size = self
                 .files()
-                .iter()
+                .par_iter()
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.total_size = Some(total_size);

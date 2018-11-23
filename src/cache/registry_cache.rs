@@ -10,6 +10,8 @@
 use std::fs;
 use std::path::PathBuf;
 
+use rayon::iter::*;
+
 pub(crate) struct RegistryCache {
     path: PathBuf,
     total_size: Option<u64>,
@@ -61,7 +63,7 @@ impl RegistryCache {
             // get the size of all files in path dir
             let total_size = self
                 .files()
-                .iter()
+                .par_iter()
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.total_size = Some(total_size);

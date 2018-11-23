@@ -11,6 +11,8 @@ use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
+use rayon::iter::*;
+
 pub(crate) struct GitCheckoutCache {
     path: PathBuf,
     total_size: Option<u64>,
@@ -57,7 +59,7 @@ impl GitCheckoutCache {
             // dir must exist, dir must be as deep as ${path}+2
             let count = self
                 .files
-                .iter()
+                .par_iter()
                 .filter(|p| p.is_dir())
                 .filter(|p| p.iter().count() == root_dir_depth + 2)
                 .count();
@@ -75,7 +77,7 @@ impl GitCheckoutCache {
             // get the size of all files in path dir
             let total_size = self
                 .files()
-                .iter()
+                .par_iter()
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.total_size = Some(total_size);
