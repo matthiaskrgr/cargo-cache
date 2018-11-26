@@ -89,4 +89,132 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
     output
 }
 
-// @TODO add tests
+#[cfg(test)]
+mod top_crates_binaries {
+    use super::*;
+    use crate::top_items::common::FileDesc;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn stats_from_file_desc_none() {
+        // empty list
+        let list: Vec<FileDesc> = Vec::new();
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        // list should be empty
+        let empty: Vec<String> = Vec::new();
+        assert_eq!(stats, empty);
+    }
+
+    #[test]
+    fn stats_from_file_desc_one() {
+        let fd = FileDesc {
+            name: "cargo-cache".to_string(),
+            size: 1,
+        };
+        let list: Vec<FileDesc> = vec![fd];
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        let wanted: Vec<String> = vec!["00000000000000000001 cargo-cache size: 1 B\n".to_string()];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_two() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let list: Vec<FileDesc> = vec![fd1, fd2];
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000002 crate-B size: 2 B\n".to_string(),
+            "00000000000000000001 crate-A size: 1 B\n".to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_multiple() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd3 = FileDesc {
+            name: "crate-C".to_string(),
+            size: 10,
+        };
+        let fd4 = FileDesc {
+            name: "crate-D".to_string(),
+            size: 6,
+        };
+        let fd5 = FileDesc {
+            name: "crate-E".to_string(),
+            size: 4,
+        };
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5];
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000010 crate-C size: 10 B\n".to_string(),
+            "00000000000000000006 crate-D size: 6 B\n".to_string(),
+            "00000000000000000004 crate-E size: 4 B\n".to_string(),
+            "00000000000000000002 crate-B size: 2 B\n".to_string(),
+            "00000000000000000001 crate-A size: 1 B\n".to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    // @TODO: we should not actually encounter several files of identical names...
+    // maybe add an assert?
+    #[test]
+    fn stats_from_file_desc_same_name_2_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2];
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000003 crate-A size: 3 B\n".to_string(),
+            "00000000000000000003 crate-A size: 3 B\n".to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+    #[test]
+    fn stats_from_file_desc_same_name_3_one() {
+        let fd1 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd3 = FileDesc {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+
+        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
+        let stats: Vec<String> = stats_from_file_desc_list(&list);
+        let wanted: Vec<String> = vec![
+            "00000000000000000003 crate-A size: 3 B\n".to_string(),
+            "00000000000000000003 crate-A size: 3 B\n".to_string(),
+            "00000000000000000003 crate-A size: 3 B\n".to_string(),
+        ];
+        assert_eq!(stats, wanted);
+    }
+
+}
