@@ -202,7 +202,7 @@ pub(crate) fn registry_source_stats(
 ) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
-    if !dir_exists(&path) {
+    if !dir_exists(path) {
         return stdout;
     }
 

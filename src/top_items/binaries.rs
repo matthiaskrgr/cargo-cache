@@ -56,7 +56,7 @@ fn stats_from_file_desc_list(file_descs: &[FileDesc]) -> Vec<String> {
         summary.push(line);
     }
 
-    // sort the string vecregistry_sourcestor
+    // sort the string vector
     summary.sort();
     summary.reverse(); // largest package (biggest number) first
     summary
@@ -65,7 +65,7 @@ fn stats_from_file_desc_list(file_descs: &[FileDesc]) -> Vec<String> {
 pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
-    if !dir_exists(&path) {
+    if !dir_exists(path) {
         return output;
     }
 

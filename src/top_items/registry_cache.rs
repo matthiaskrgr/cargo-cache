@@ -183,7 +183,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<String> {
 pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
-    if !dir_exists(&path) {
+    if !dir_exists(path) {
         return stdout;
     }
 
