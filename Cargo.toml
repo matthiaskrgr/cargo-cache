@@ -33,7 +33,7 @@ git2 = "0.7.5" # check if repo is git repo
 rayon = "1.0.3" # parallel for iteratorsn
 
 # https://github.com/rust-lang/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "1d5108c264bef944c435d4184dfdeb048e6acc2e" } # git version information
+rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "dec389a5eea427c4faf20327baa7f34096a4e41f" } # git version information
 
 [dev-dependencies]
 # https://github.com/colin-kiegel/rust-pretty-assertions
@@ -44,7 +44,7 @@ regex = "1.0.6" # use regex in tests
 
 [build-dependencies]
 # https://github.com/rust-lang/rust-clippy
-rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "1d5108c264bef944c435d4184dfdeb048e6acc2e" } # git version information
+rustc_tools_util = { git = "https://github.com/rust-lang/rust-clippy", rev = "dec389a5eea427c4faf20327baa7f34096a4e41f" } # git version information
 
 
 [[bin]]
