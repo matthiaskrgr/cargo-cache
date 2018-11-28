@@ -16,7 +16,6 @@
     unreachable_pub,
     unsafe_code,
     unused,
-    rust_2018_compatibility,
     rust_2018_idioms
 )]
 // enable additional clippy warnings
