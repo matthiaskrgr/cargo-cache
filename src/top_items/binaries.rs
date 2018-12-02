@@ -58,7 +58,6 @@ impl PartialEq for BinInfo {
 #[inline(always)]
 fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
     // returns unsorted!
-
     cache
         .bin
         .files()
@@ -69,7 +68,7 @@ fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
 
 #[inline(always)]
 fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> String {
-    // sort the BinInfo slice in reverse
+    // sort the BinInfo Vec in reverse
     collections_vec.sort();
     collections_vec.reverse();
 
