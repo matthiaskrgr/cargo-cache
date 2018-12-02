@@ -31,10 +31,9 @@ impl BinInfo {
     }
 
     fn size_string(&self) -> String {
-        format!(
-            "size: {}",
-            &self.size.file_size(file_size_opts::DECIMAL).unwrap()
-        )
+        let mut s = String::from("size: ");
+        s.push_str(&self.size.file_size(file_size_opts::DECIMAL).unwrap());
+        s
     }
 }
 
