@@ -39,20 +39,11 @@ fn stats_from_file_desc_list(file_descs: &[FileDesc]) -> Vec<String> {
     // take our list of file information and calculate the actual stats
     let mut summary: Vec<String> = Vec::new();
 
-    // first find out max_cratename_len
-    let max_cratename_len = &file_descs.iter().map(|p| p.name.len()).max().unwrap_or(0);
-
     for binary in file_descs {
         let size = &binary.size;
         let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
         let name = &binary.name;
-        let line = format!(
-            "{:0>20} {: <width$} size: {}\n",
-            size,
-            name,
-            size_hr,
-            width = max_cratename_len,
-        );
+        let line = format!("{:0>20} {} size: {}\n", size, name, size_hr,);
         summary.push(line);
     }
 
@@ -82,8 +73,40 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
     let collections_vec = file_desc_from_path(&mut cache);
     let summary: Vec<String> = stats_from_file_desc_list(&collections_vec);
 
-    for data in summary.into_iter().take(limit as usize) {
-        output.push_str(&data[21..]); // remove first word used for sorting
+    let max_cratename_len = summary
+        .iter()
+        .take(limit as usize)
+        .map(|line| {
+            let pkg = line
+                .split_whitespace()
+                .nth(1) // 0 is the line used for sorting, 1 is package name
+                .unwrap();
+            pkg.len()
+        })
+        .max()
+        .unwrap_or(0);
+
+    for line in summary.into_iter().take(limit as usize) {
+        let mut split = line.split_whitespace();
+        let _numbers = split.next();
+        let package = split.next().unwrap();
+
+        let size = split.next().unwrap();
+        let number = split.next().unwrap();
+        let unit = split.next().unwrap();
+        debug_assert!(
+            !split.next().is_some(),
+            "line contained more words than expected!"
+        );
+
+        output.push_str(&format!(
+            "{: <width$} {} {} {}\n",
+            package,
+            size,
+            number,
+            unit,
+            width = max_cratename_len
+        ));
     }
 
     output
