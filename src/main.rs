@@ -37,6 +37,7 @@
         clippy::redundant_clone
     )
 )]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::inline_always,))]
 mod cache;
 mod cli;
 mod dirsizes;

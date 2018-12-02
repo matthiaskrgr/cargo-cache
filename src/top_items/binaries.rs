@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -14,43 +15,86 @@ use crate::cache::dircache::DirCache;
 use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
 
-impl FileDesc {
-    fn new_from_binary(path: &PathBuf) -> Self {
-        let name = path.file_name().unwrap().to_str().unwrap().to_string();
+#[derive(Clone, Debug, Eq)]
+struct BinInfo {
+    name: String,
+    size_bytes: u64,
+}
 
+impl BinInfo {
+    fn new(path: &PathBuf) -> Self {
+        let name = path.file_name().unwrap().to_str().unwrap().to_string();
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
+        Self {
+            name,
+            size_bytes: size,
+        }
+    }
 
-        Self { name, size }
-    } // fn new_from_git_bare()
+    fn size_string(&self) -> String {
+        format!(
+            "size: {}",
+            &self.size_bytes.file_size(file_size_opts::DECIMAL).unwrap()
+        )
+    }
 }
 
-fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
+impl PartialOrd for BinInfo {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for BinInfo {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.size_bytes.cmp(&other.size_bytes)
+    }
+}
+
+impl PartialEq for BinInfo {
+    fn eq(&self, other: &Self) -> bool {
+        self.size_bytes == other.size_bytes
+    }
+}
+
+#[inline(always)]
+fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
+    // returns unsorted!
+
     cache
         .bin
         .files()
         .iter()
-        .map(|path| FileDesc::new_from_binary(path))
-        .collect::<Vec<FileDesc>>()
+        .map(|path| BinInfo::new(path))
+        .collect::<Vec<BinInfo>>()
 }
 
-fn stats_from_file_desc_list(file_descs: &[FileDesc]) -> Vec<String> {
-    // take our list of file information and calculate the actual stats
-    let mut summary: Vec<String> = Vec::new();
+#[inline(always)]
+fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> String {
+    // sort the BinInfo slice in reverse
+    collections_vec.sort();
+    collections_vec.reverse();
 
-    for binary in file_descs {
-        let size = &binary.size;
-        let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
-        let name = &binary.name;
-        let line = format!("{:0>20} {} size: {}\n", size, name, size_hr,);
-        summary.push(line);
+    let mut output = String::new();
+
+    let max_cratename_len = collections_vec
+        .iter()
+        .take(limit as usize)
+        .map(|b| b.name.len())
+        .max()
+        .unwrap_or(0);
+
+    for bininfo in collections_vec.into_iter().take(limit as usize) {
+        output.push_str(&format!(
+            "{: <width$} {}\n",
+            bininfo.name,
+            bininfo.size_string(),
+            width = max_cratename_len + 3,
+        ));
     }
-
-    // sort the string vector
-    summary.sort();
-    summary.reverse(); // largest package (biggest number) first
-    summary
+    output
 }
 
 pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
@@ -70,44 +114,10 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
             .unwrap()
     ));
 
-    let collections_vec = file_desc_from_path(&mut cache);
-    let summary: Vec<String> = stats_from_file_desc_list(&collections_vec);
+    let collections_vec = bininfo_list_from_path(&mut cache); // this is already sorted
 
-    let max_cratename_len = summary
-        .iter()
-        .take(limit as usize)
-        .map(|line| {
-            let pkg = line
-                .split_whitespace()
-                .nth(1) // 0 is the line used for sorting, 1 is package name
-                .unwrap();
-            pkg.len()
-        })
-        .max()
-        .unwrap_or(0);
-
-    for line in summary.into_iter().take(limit as usize) {
-        let mut split = line.split_whitespace();
-        let _numbers = split.next();
-        let package = split.next().unwrap();
-
-        let size = split.next().unwrap();
-        let number = split.next().unwrap();
-        let unit = split.next().unwrap();
-        debug_assert!(
-            !split.next().is_some(),
-            "line contained more words than expected!"
-        );
-
-        output.push_str(&format!(
-            "{: <width$} {} {} {}\n",
-            package,
-            size,
-            number,
-            unit,
-            width = max_cratename_len
-        ));
-    }
+    let bininfo_string = bininfo_list_to_string(limit, collections_vec);
+    output.push_str(&bininfo_string);
 
     output
 }
@@ -115,81 +125,82 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
 #[cfg(test)]
 mod top_crates_binaries {
     use super::*;
-    use crate::top_items::common::FileDesc;
     use pretty_assertions::assert_eq;
 
     #[test]
     fn stats_from_file_desc_none() {
         // empty list
-        let list: Vec<FileDesc> = Vec::new();
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        // list should be empty
-        let empty: Vec<String> = Vec::new();
+        let list: Vec<BinInfo> = Vec::new();
+        let stats: String = bininfo_list_to_string(1, list);
+
+        let empty = String::new();
         assert_eq!(stats, empty);
     }
 
     #[test]
     fn stats_from_file_desc_one() {
-        let fd = FileDesc {
+        let bi = BinInfo {
             name: "cargo-cache".to_string(),
-            size: 1,
+            size_bytes: 1,
         };
-        let list: Vec<FileDesc> = vec![fd];
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        let wanted: Vec<String> = vec!["00000000000000000001 cargo-cache size: 1 B\n".to_string()];
+        let list: Vec<BinInfo> = vec![bi];
+        let stats: String = bininfo_list_to_string(1, list);
+        let wanted = "cargo-cache    size: 1 B\n".to_string();
         assert_eq!(stats, wanted);
     }
 
     #[test]
     fn stats_from_file_desc_two() {
-        let fd1 = FileDesc {
+        let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size: 1,
+            size_bytes: 1,
         };
-        let fd2 = FileDesc {
+        let bi2 = BinInfo {
             name: "crate-B".to_string(),
-            size: 2,
+            size_bytes: 2,
         };
-        let list: Vec<FileDesc> = vec![fd1, fd2];
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        let wanted: Vec<String> = vec![
-            "00000000000000000002 crate-B size: 2 B\n".to_string(),
-            "00000000000000000001 crate-A size: 1 B\n".to_string(),
-        ];
+        let list: Vec<BinInfo> = vec![bi1, bi2];
+        let stats: String = bininfo_list_to_string(2, list);
+        let mut wanted = String::from("crate-B    size: 2 B\n");
+        wanted.push_str("crate-A    size: 1 B\n");
+
         assert_eq!(stats, wanted);
     }
 
     #[test]
     fn stats_from_file_desc_multiple() {
-        let fd1 = FileDesc {
+        let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size: 1,
+            size_bytes: 1,
         };
-        let fd2 = FileDesc {
+        let bi2 = BinInfo {
             name: "crate-B".to_string(),
-            size: 2,
+            size_bytes: 2,
         };
-        let fd3 = FileDesc {
+        let bi3 = BinInfo {
             name: "crate-C".to_string(),
-            size: 10,
+            size_bytes: 10,
         };
-        let fd4 = FileDesc {
+        let bi4 = BinInfo {
             name: "crate-D".to_string(),
-            size: 6,
+            size_bytes: 6,
         };
-        let fd5 = FileDesc {
+        let bi5 = BinInfo {
             name: "crate-E".to_string(),
-            size: 4,
+            size_bytes: 4,
         };
-        let list: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5];
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        let wanted: Vec<String> = vec![
-            "00000000000000000010 crate-C size: 10 B\n".to_string(),
-            "00000000000000000006 crate-D size: 6 B\n".to_string(),
-            "00000000000000000004 crate-E size: 4 B\n".to_string(),
-            "00000000000000000002 crate-B size: 2 B\n".to_string(),
-            "00000000000000000001 crate-A size: 1 B\n".to_string(),
-        ];
+        let list: Vec<BinInfo> = vec![bi1, bi2, bi3, bi4, bi5];
+        let stats: String = bininfo_list_to_string(10, list);
+        let mut wanted = String::new();
+        for i in &[
+            "crate-C    size: 10 B\n",
+            "crate-D    size: 6 B\n",
+            "crate-E    size: 4 B\n",
+            "crate-B    size: 2 B\n",
+            "crate-A    size: 1 B\n",
+        ] {
+            wanted.push_str(i);
+        }
         assert_eq!(stats, wanted);
     }
 
@@ -197,46 +208,49 @@ mod top_crates_binaries {
     // maybe add an assert?
     #[test]
     fn stats_from_file_desc_same_name_2_one() {
-        let fd1 = FileDesc {
+        let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size: 3,
+            size_bytes: 3,
         };
-        let fd2 = FileDesc {
+        let bi2 = BinInfo {
             name: "crate-A".to_string(),
-            size: 3,
+            size_bytes: 3,
         };
 
-        let list: Vec<FileDesc> = vec![fd1, fd2];
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        let wanted: Vec<String> = vec![
-            "00000000000000000003 crate-A size: 3 B\n".to_string(),
-            "00000000000000000003 crate-A size: 3 B\n".to_string(),
-        ];
+        let list: Vec<BinInfo> = vec![bi1, bi2];
+        let stats: String = bininfo_list_to_string(2, list);
+        let mut wanted = String::new();
+        for i in &["crate-A    size: 3 B\n", "crate-A    size: 3 B\n"] {
+            wanted.push_str(i);
+        }
         assert_eq!(stats, wanted);
     }
 
     #[test]
     fn stats_from_file_desc_same_name_3_one() {
-        let fd1 = FileDesc {
+        let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size: 3,
+            size_bytes: 3,
         };
-        let fd2 = FileDesc {
+        let bi2 = BinInfo {
             name: "crate-A".to_string(),
-            size: 3,
+            size_bytes: 3,
         };
-        let fd3 = FileDesc {
+        let bi3 = BinInfo {
             name: "crate-A".to_string(),
-            size: 3,
+            size_bytes: 3,
         };
 
-        let list: Vec<FileDesc> = vec![fd1, fd2, fd3];
-        let stats: Vec<String> = stats_from_file_desc_list(&list);
-        let wanted: Vec<String> = vec![
-            "00000000000000000003 crate-A size: 3 B\n".to_string(),
-            "00000000000000000003 crate-A size: 3 B\n".to_string(),
-            "00000000000000000003 crate-A size: 3 B\n".to_string(),
-        ];
+        let list: Vec<BinInfo> = vec![bi1, bi2, bi3];
+        let stats: String = bininfo_list_to_string(4, list);
+        let mut wanted = String::new();
+        for i in &[
+            "crate-A    size: 3 B\n",
+            "crate-A    size: 3 B\n",
+            "crate-A    size: 3 B\n",
+        ] {
+            wanted.push_str(i);
+        }
         assert_eq!(stats, wanted);
     }
 
