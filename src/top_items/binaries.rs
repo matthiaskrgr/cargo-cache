@@ -18,7 +18,7 @@ use humansize::{file_size_opts, FileSize};
 #[derive(Clone, Debug, Eq)]
 struct BinInfo {
     name: String,
-    size_bytes: u64,
+    size: u64,
 }
 
 impl BinInfo {
@@ -27,16 +27,13 @@ impl BinInfo {
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
-        Self {
-            name,
-            size_bytes: size,
-        }
+        Self { name, size }
     }
 
     fn size_string(&self) -> String {
         format!(
             "size: {}",
-            &self.size_bytes.file_size(file_size_opts::DECIMAL).unwrap()
+            &self.size.file_size(file_size_opts::DECIMAL).unwrap()
         )
     }
 }
@@ -49,13 +46,13 @@ impl PartialOrd for BinInfo {
 
 impl Ord for BinInfo {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.size_bytes.cmp(&other.size_bytes)
+        self.size.cmp(&other.size)
     }
 }
 
 impl PartialEq for BinInfo {
     fn eq(&self, other: &Self) -> bool {
-        self.size_bytes == other.size_bytes
+        self.size == other.size
     }
 }
 
@@ -141,7 +138,7 @@ mod top_crates_binaries {
     fn stats_from_file_desc_one() {
         let bi = BinInfo {
             name: "cargo-cache".to_string(),
-            size_bytes: 1,
+            size: 1,
         };
         let list: Vec<BinInfo> = vec![bi];
         let stats: String = bininfo_list_to_string(1, list);
@@ -153,11 +150,11 @@ mod top_crates_binaries {
     fn stats_from_file_desc_two() {
         let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 1,
+            size: 1,
         };
         let bi2 = BinInfo {
             name: "crate-B".to_string(),
-            size_bytes: 2,
+            size: 2,
         };
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
@@ -171,23 +168,23 @@ mod top_crates_binaries {
     fn stats_from_file_desc_multiple() {
         let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 1,
+            size: 1,
         };
         let bi2 = BinInfo {
             name: "crate-B".to_string(),
-            size_bytes: 2,
+            size: 2,
         };
         let bi3 = BinInfo {
             name: "crate-C".to_string(),
-            size_bytes: 10,
+            size: 10,
         };
         let bi4 = BinInfo {
             name: "crate-D".to_string(),
-            size_bytes: 6,
+            size: 6,
         };
         let bi5 = BinInfo {
             name: "crate-E".to_string(),
-            size_bytes: 4,
+            size: 4,
         };
         let list: Vec<BinInfo> = vec![bi1, bi2, bi3, bi4, bi5];
         let stats: String = bininfo_list_to_string(10, list);
@@ -210,11 +207,11 @@ mod top_crates_binaries {
     fn stats_from_file_desc_same_name_2_one() {
         let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 3,
+            size: 3,
         };
         let bi2 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 3,
+            size: 3,
         };
 
         let list: Vec<BinInfo> = vec![bi1, bi2];
@@ -230,15 +227,15 @@ mod top_crates_binaries {
     fn stats_from_file_desc_same_name_3_one() {
         let bi1 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 3,
+            size: 3,
         };
         let bi2 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 3,
+            size: 3,
         };
         let bi3 = BinInfo {
             name: "crate-A".to_string(),
-            size_bytes: 3,
+            size: 3,
         };
 
         let list: Vec<BinInfo> = vec![bi1, bi2, bi3];
