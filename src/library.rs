@@ -55,14 +55,13 @@ pub(crate) enum ErrorKind {
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
     pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
-        let cargo_cfg = match cargo::util::config::Config::default() {
-            Ok(cargo_cfg) => cargo_cfg,
-            _ => {
-                return Err((
-                    ErrorKind::CargoFailedGetConfig,
-                    "Failed to get cargo config!".to_string(),
-                ));
-            }
+        let cargo_cfg = if let Ok(cargo_cfg) = cargo::util::config::Config::default() {
+            cargo_cfg
+        } else {
+            return Err((
+                ErrorKind::CargoFailedGetConfig,
+                "Failed to get cargo config!".to_string(),
+            ));
         };
 
         let cargo_home_path = cargo_cfg.home().clone().into_path_unlocked();
@@ -429,15 +428,14 @@ pub(crate) fn remove_dir_via_cmdline(
         Ok(())
     }
 
-    let input = match directory {
-        Some(value) => value,
-        None => {
-            return Err((
-                ErrorKind::RemoveDirNoArg,
-                "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
-                    .to_string(),
-            ));
-        }
+    let input = if let Some(value) = directory {
+        value
+    } else {
+        return Err((
+            ErrorKind::RemoveDirNoArg,
+            "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
+                .to_string(),
+        ));
     };
 
     let inputs = input.split(',');
