@@ -61,7 +61,7 @@ impl CargoCachePaths {
                 return Err((
                     ErrorKind::CargoFailedGetConfig,
                     "Failed to get cargo config!".to_string(),
-                ))
+                ));
             }
         };
 
@@ -436,7 +436,7 @@ pub(crate) fn remove_dir_via_cmdline(
                 ErrorKind::RemoveDirNoArg,
                 "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
                     .to_string(),
-            ))
+            ));
         }
     };
 
