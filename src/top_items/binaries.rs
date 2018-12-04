@@ -86,7 +86,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
             "{: <width$} {}\n",
             bininfo.name,
             bininfo.size_string(),
-            width = max_cratename_len + 3,
+            width = max_cratename_len + TOP_CRATES_SPACING,
         ));
     }
     output
