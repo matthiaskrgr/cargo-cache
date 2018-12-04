@@ -497,26 +497,22 @@ mod top_crates_git_checkouts {
     fn stats_from_file_desc_multi() {
         let fd1 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 2,
         };
         let fd2 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 4,
         };
         let fd3 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 12,
         };
 
         let fd4 = FileDesc {
             path: PathBuf::from("crate-B"),
-
             name: "crate-B".to_string(),
             size: 2,
         };
@@ -528,20 +524,17 @@ mod top_crates_git_checkouts {
 
         let fd6 = FileDesc {
             path: PathBuf::from("crate-C"),
-
             name: "crate-C".to_string(),
             size: 0,
         };
         let fd7 = FileDesc {
             path: PathBuf::from("crate-C"),
-
             name: "crate-C".to_string(),
             size: 100,
         };
 
         let fd8 = FileDesc {
             path: PathBuf::from("crate-D"),
-
             name: "crate-D".to_string(),
             size: 1,
         };
@@ -575,26 +568,22 @@ mod benchmarks {
     fn bench_few(b: &mut Bencher) {
         let fd1 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 2,
         };
         let fd2 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 4,
         };
         let fd3 = FileDesc {
             path: PathBuf::from("crate-A"),
-
             name: "crate-A".to_string(),
             size: 12,
         };
 
         let fd4 = FileDesc {
             path: PathBuf::from("crate-B"),
-
             name: "crate-B".to_string(),
             size: 2,
         };
@@ -606,20 +595,17 @@ mod benchmarks {
 
         let fd6 = FileDesc {
             path: PathBuf::from("crate-C"),
-
             name: "crate-C".to_string(),
             size: 0,
         };
         let fd7 = FileDesc {
             path: PathBuf::from("crate-C"),
-
             name: "crate-C".to_string(),
             size: 100,
         };
 
         let fd8 = FileDesc {
             path: PathBuf::from("crate-D"),
-
             name: "crate-D".to_string(),
             size: 1,
         };
