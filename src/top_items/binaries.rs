@@ -118,6 +118,42 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
 }
 
 #[cfg(test)]
+mod bininfo_struct {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn bininfo_new() {
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 123,
+        };
+        assert_eq!(bi.name, String::from("abc"));
+        assert_eq!(bi.size, 123);
+    }
+
+    #[test]
+    fn bininfo_size_str_small_size() {
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 123,
+        };
+        let size = bi.size_string();
+        assert_eq!(size, "size: 123 B");
+    }
+
+    #[test]
+    fn bininfo_size_str_large_size() {
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 1234567890,
+        };
+        let size = bi.size_string();
+        assert_eq!(size, "size: 1.23 GB");
+    }
+}
+
+#[cfg(test)]
 mod top_crates_binaries {
     use super::*;
     use pretty_assertions::assert_eq;
