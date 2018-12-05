@@ -146,10 +146,36 @@ mod bininfo_struct {
     fn bininfo_size_str_large_size() {
         let bi = BinInfo {
             name: String::from("abc"),
-            size: 1234567890,
+            size: 1_234_567_890,
         };
         let size = bi.size_string();
         assert_eq!(size, "size: 1.23 GB");
+    }
+
+    #[test]
+    fn bininfo_sort() {
+        let bi_a = BinInfo {
+            name: String::from("a"),
+            size: 5,
+        };
+
+        let bi_b = BinInfo {
+            name: String::from("b"),
+            size: 3,
+        };
+        let bi_c = BinInfo {
+            name: String::from("c"),
+            size: 10,
+        };
+
+        let mut v = vec![bi_a, bi_b, bi_c];
+        v.sort();
+        let mut order_string = String::new();
+        for bi in v {
+            order_string.push_str(&format!("{:?} ", bi));
+        }
+        println!("{}", order_string);
+        assert_eq!(order_string, String::from(r#"BinInfo { name: "b", size: 3 } BinInfo { name: "a", size: 5 } BinInfo { name: "c", size: 10 } "#))
     }
 }
 
