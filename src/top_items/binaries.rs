@@ -175,7 +175,7 @@ mod bininfo_struct {
             order_string.push_str(&format!("{:?} ", bi));
         }
         println!("{}", order_string);
-        assert_eq!(order_string, String::from(r#"BinInfo { name: "b", size: 3 } BinInfo { name: "a", size: 5 } BinInfo { name: "c", size: 10 } "#))
+        assert_eq!(order_string, String::from(r#"BinInfo { name: "b", size: 3 } BinInfo { name: "a", size: 5 } BinInfo { name: "c", size: 10 } "#));
     }
 }
 
