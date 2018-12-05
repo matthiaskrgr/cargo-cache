@@ -149,6 +149,7 @@ impl PartialEq for ChkInfo {
     }
 }
 
+#[inline]
 fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     cache
@@ -159,6 +160,7 @@ fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
         .collect::<Vec<_>>()
 }
 
+#[inline]
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
     struct Pair {
         current: Option<FileDesc>,
@@ -256,7 +258,8 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
     out
 }
 
-pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> String {
+#[inline] // only use din one place
+fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> String {
     // sort the ChkInfo Vec in reverse
     collections_vec.sort();
     collections_vec.reverse();
@@ -290,6 +293,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo
     output
 }
 
+#[inline]
 pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)

@@ -55,7 +55,7 @@ impl PartialEq for BinInfo {
     }
 }
 
-#[inline(always)]
+#[inline] // only called in one place
 fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
     // returns unsorted!
     cache
@@ -66,7 +66,7 @@ fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
         .collect::<Vec<BinInfo>>()
 }
 
-#[inline(always)]
+#[inline] // only called in one place
 fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> String {
     // sort the BinInfo Vec in reverse
     collections_vec.sort();
@@ -92,6 +92,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
     output
 }
 
+#[inline] // only called in one place
 pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
