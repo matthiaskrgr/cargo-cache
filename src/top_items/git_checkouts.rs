@@ -253,10 +253,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
         state.previous = state.current;
         state.current = iter.next();
     }
-    // sort the string vector
-
-    out.sort();
-    out.reverse();
     out
 }
 
