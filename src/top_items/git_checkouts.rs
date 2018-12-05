@@ -26,8 +26,6 @@ struct FileDesc {
 
 impl FileDesc {
     fn new_from_git_checkouts(path: &PathBuf) -> Self {
-        //let last_item = path.to_str().unwrap().split('/').last().unwrap();
-        //let mut i = last_item.split('-').collect::<Vec<_>>();
         let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
         let last = paths.pop().unwrap();
         let last_but_one = paths.pop().unwrap();
@@ -76,11 +74,11 @@ pub(crate) struct ChkInfo {
     name: String,
     size: u64,
     counter: u32,
-    total_size: u64,
+    total_size: u64, // sorted by this
 }
 
 impl ChkInfo {
-    // sorted by total size!
+    // sorted by total_size!
 
     fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
         let name: String;
@@ -88,22 +86,22 @@ impl ChkInfo {
         if path.exists() {
             let mut a = path.clone();
             a.pop();
-            let name_ = a.file_name().unwrap().to_str().unwrap().to_string();
+            let name_tmp = a.file_name().unwrap().to_str().unwrap().to_string();
             size = fs::metadata(&path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
-            let mut tmp = name_.split('-').collect::<Vec<_>>();
+            let mut tmp = name_tmp.split('-').collect::<Vec<_>>();
             let _ = tmp.pop();
             name = tmp.join("-");
         } else {
-            let name_ = path
+            let name_tmp = path
                 .file_name()
                 .unwrap()
                 .to_os_string()
                 .into_string()
                 .unwrap();
             size = 0;
-            name = name_;
+            name = name_tmp;
         }
         Self {
             name,
