@@ -47,7 +47,6 @@ matrix:
       env: RELEASE="--release"
 
 # osx nightly
-
     - os: osx
       rust: nightly
       env: RELEASE="" DEBUG="--debug"

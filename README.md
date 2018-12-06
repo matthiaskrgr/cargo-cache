@@ -3,20 +3,14 @@
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
 [![dependency status](https://deps.rs/repo/github/matthiaskrgr/cargo-cache/status.svg)](https://deps.rs/repo/github/matthiaskrgr/cargo-cache)
 
-![Nightly 1.32 Supported](https://img.shields.io/badge/nightly%201.32-supported-brightgreen.svg)
-![Beta 1.31 Supported](https://img.shields.io/badge/beta%201.31-supported-brightgreen.svg)
-![Stable 1.30 Unsupported](https://img.shields.io/badge/stable%201.30-unsupported-red.svg)
-
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
-Requires ````rust nightly 1.32```` or````rust beta 1.31````.
+Requires ````rust 1.31```` or later.
 
 DISCLAIMER: I only tested this on linux.
 
 #### Installation:
-```cargo +beta install --git https://github.com/matthiaskrgr/cargo-cache``` or
-
-```cargo +nightly install --git https://github.com/matthiaskrgr/cargo-cache```
+```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
 
 
 #### Sample output:
