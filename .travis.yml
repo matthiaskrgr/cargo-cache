@@ -12,7 +12,7 @@ os:
 rust:
   - nightly
   - beta
-#  - stable
+  - stable
 
 
 env:
@@ -28,6 +28,14 @@ env:
 matrix:
   fast_finish: false
   include:
+# stable
+    - os: linux
+      rust: stable
+      env: RELEASE="" DEBUG="--debug"
+
+    - os: linux
+      rust: stable
+      env: RELEASE="--release
 
 # beta
     - os: linux
