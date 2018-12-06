@@ -19,25 +19,21 @@
     rust_2018_idioms
 )]
 // enable additional clippy warnings
-#![cfg_attr(
-    feature = "cargo-clippy",
-    warn(
-        clippy::all,
-        clippy::correctness,
-        clippy::perf,
-        clippy::complexity,
-        clippy::style,
-        clippy::pedantic,
-        clippy::shadow_reuse,
-        clippy::shadow_same,
-        clippy::shadow_unrelated,
-        clippy::pub_enum_variant_names,
-        clippy::string_add,
-        clippy::string_add_assign,
-        clippy::redundant_clone
-    )
+#![warn(
+    clippy::all,
+    clippy::correctness,
+    clippy::perf,
+    clippy::complexity,
+    clippy::style,
+    clippy::pedantic,
+    clippy::shadow_reuse,
+    clippy::shadow_same,
+    clippy::shadow_unrelated,
+    clippy::pub_enum_variant_names,
+    clippy::string_add,
+    clippy::string_add_assign,
+    clippy::redundant_clone
 )]
-#![cfg_attr(feature = "cargo-clippy", allow(clippy::inline_always,))]
 mod cache;
 mod cli;
 mod dirsizes;

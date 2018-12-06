@@ -92,10 +92,7 @@ fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
 
     let mut formatted_line = beginning.to_string();
 
-    #[cfg_attr(
-        feature = "cargo-clippy",
-        allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)
-    )]
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     // I tried mittigating via previous assert()
     formatted_line.push_str(&" ".repeat(len_padding as usize));
     formatted_line.push_str(end);
@@ -225,7 +222,7 @@ mod libtests {
     use std::path::PathBuf;
 
     impl<'a> DirSizes<'a> {
-        #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_truncation))]
+        #[allow(clippy::cast_possible_truncation)]
         #[allow(non_snake_case)]
         pub(super) fn new_manually(
             DI_bindir: &DirInfo,

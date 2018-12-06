@@ -351,7 +351,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 }
 
 pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
-    #[cfg_attr(feature = "cargo-clippy", allow(clippy::cast_possible_wrap))]
+    #[allow(clippy::cast_possible_wrap)]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
@@ -365,10 +365,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     // when printing, we are going to cut off everything but a few decimal places anyway, so
     // precision is not much of an issue.
 
-    #[cfg_attr(
-        feature = "cargo-clippy",
-        allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)
-    )]
+    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     let perc: f32 =
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
     // truncate to 2 decimal digits
