@@ -261,7 +261,6 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut D
     stdout
 }
 
-
 #[cfg(test)]
 mod top_crates_git_repos_bare {
     use super::*;
