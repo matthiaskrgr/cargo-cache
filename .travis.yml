@@ -84,7 +84,7 @@ matrix:
 script:
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo install cargo-audit --debug; fi
   - if [[ "$CARGO_AUDIT" == "true" ]]; then cargo audit; exit; fi
-  - if [[ "$CLIPPY" == "true" ]]; then  cargo install --git https://github.com/matthiaskrgr/rust-clippy/ --branch fix_cargo_install --force clippy ; fi
+  - if [[ "$CLIPPY" == "true" ]]; then  cargo install --git https://github.com/matthiaskrgr/rust-clippy/ --branch fix_install --force clippy ; fi
   - if [[ "$CLIPPY" == "true" ]]; then cargo clippy --all-targets --all-features -- -D warnings ; exit ; fi
   - if [[ "$RUSTFMT" == "true" ]]; then rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force; fi
   - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
