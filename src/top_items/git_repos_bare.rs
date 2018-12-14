@@ -65,6 +65,7 @@ pub(crate) struct RepoInfo {
 }
 
 impl RepoInfo {
+    #[allow(clippy::useless_let_if_seq)] // FP: code would be less readble
     fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
         let name: String;
         let size: u64;
