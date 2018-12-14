@@ -65,13 +65,13 @@ pub(crate) struct RepoInfo {
 }
 
 impl RepoInfo {
-    #[allow(clippy::useless_let_if_seq)] // FP: code would be less readble
     fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
-        let name: String;
         let size: u64;
+        let name: String;
         if path.exists() {
-            let name_tmp = path.file_name().unwrap().to_str().unwrap().to_string(); // get the string
-                                                                                    // remove the hash from the path (mdbook-e6b52d90d4246c70 => mdbook)
+            // get the string
+            let name_tmp = path.file_name().unwrap().to_str().unwrap().to_string();
+            // remove the hash from the path (mdbook-e6b52d90d4246c70 => mdbook)
             let mut tmp_name = name_tmp.split('-').collect::<Vec<_>>();
             tmp_name.pop(); // remove the hash
             name = tmp_name.join("-");
