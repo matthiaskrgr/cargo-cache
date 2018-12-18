@@ -153,7 +153,7 @@ pub(crate) fn git_gc_everything(
     total_size_before += repos_before;
     total_size_after += repos_after;
 
-    println!("Recompressing registries....");
+    println!("\nRecompressing registries. Please be patient...");
     let mut repo_index = registry_cache_dir.clone();
     // cd "../index"
     repo_index.pop();
@@ -164,7 +164,7 @@ pub(crate) fn git_gc_everything(
     total_size_after += regs_after;
 
     println!(
-        "Compressed {} to {}",
+        "\nCompressed {} to {}",
         total_size_before
             .file_size(file_size_opts::DECIMAL)
             .unwrap(),
