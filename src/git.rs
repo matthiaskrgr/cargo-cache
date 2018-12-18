@@ -113,8 +113,14 @@ pub(crate) fn git_gc_everything(
         let mut size_sum_before: u64 = 0;
         let mut size_sum_after: u64 = 0;
 
-        for entry in fs::read_dir(&path).unwrap() {
-            let repo = entry.unwrap().path();
+        let mut git_repos: Vec<_> = fs::read_dir(&path)
+            .unwrap()
+            .map(|x| x.unwrap().path())
+            .collect();
+        // sort git repos in alphabetical order
+        git_repos.sort();
+
+        for repo in git_repos {
             let repostr = repo.display();
             // compress
             let (size_before, size_after) = match gc_repo(&repo, dry_run) {
