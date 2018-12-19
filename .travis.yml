@@ -29,50 +29,61 @@ matrix:
   fast_finish: false
   include:
 # stable
-    - os: linux
+    - name: "stable linux debug"
+      os: linux
       rust: stable
       env: RELEASE="" DEBUG="--debug"
 
-    - os: linux
+    - name: "stable linux release"
+      os: linux
       rust: stable
       env: RELEASE="--release
 
 # beta
-    - os: linux
+    - name: "beta linux debug"
+      os: linux
       rust: beta
       env: RELEASE="" DEBUG="--debug"
 
-    - os: linux
+    - name: "beta linux release"
+      os: linux
       rust: beta
       env: RELEASE="--release"
 
 # osx nightly
-    - os: osx
+    - name: "nightly osx debug"
+      os: osx
       rust: nightly
       env: RELEASE="" DEBUG="--debug"
 
-    - os: osx
+    - name: "nightly os release"
+      os: osx
       rust: nightly
       env: RELEASE="--release"
 
 # nightly + tools
-    - os: linux
+    - name: "nightly linux debug"
+      os: linux
       rust: nightly
       env: RELEASE="" DEBUG="--debug"
 
-    - os: linux
+    - name: "nightly linux release"
+      os: linux
       rust: nightly
       env: RELEASE="--release"
 
-    - os: linux
+    - name: "clippy"
+      os: linux
       rust: nightly
       env: CLIPPY="true"
 
-    - os: linux
+    - name: "cargo audit"
+      os: linux
       rust: nightly
       env: CARGO_AUDIT="true"
 
-    - os: linux
+    - name: "rustfmt"
+      os: linux
       rust: nightly
       env: RUSTFMT="true"
 
