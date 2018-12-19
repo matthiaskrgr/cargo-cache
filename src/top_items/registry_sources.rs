@@ -11,12 +11,12 @@ use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::dircache::DirCache;
+use crate::top_items::common::{dir_exists, format_table};
+
 use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
-
-use crate::cache::dircache::DirCache;
-use crate::top_items::common::{dir_exists, TOP_CRATES_SPACING};
 
 #[derive(Clone, Debug)]
 struct FileDesc {
@@ -217,34 +217,41 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
     out
 }
 pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcInfo>) -> String {
-    // sort the RepoINfo Vec in reverse, biggest item first
+    if collections_vec.is_empty() {
+        return String::new();
+    }
+
+    // sort the RepoImfo Vec in reverse, biggest item first
     collections_vec.sort();
     collections_vec.reverse();
-    let mut output = String::new();
-    let max_cratename_len = collections_vec
-        .iter()
-        .take(limit as usize)
-        .map(|p| p.name.len())
-        .max()
-        .unwrap_or(0);
+
+    let mut table_matrix: Vec<Vec<String>> = Vec::new();
+
+    table_matrix.push(vec![
+        String::from("Name"),
+        String::from("Count"),
+        String::from("Average"),
+        String::from("Total"),
+    ]);
+
     for regsrc in collections_vec.into_iter().take(limit as usize) {
-        let average_crate_size = (regsrc.total_size / u64::from(regsrc.counter))
+        let average_size = (regsrc.total_size / u64::from(regsrc.counter))
             .file_size(file_size_opts::DECIMAL)
             .unwrap();
-        let avg_string = format!("src avg: {: >9}", average_crate_size);
-        output.push_str(&format!(
-            "{: <width$} src ckt: {: <3} {: <20} total: {}\n",
+
+        let total_size = regsrc
+            .total_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap();
+
+        table_matrix.push(vec![
             regsrc.name,
-            regsrc.counter,
-            avg_string,
-            regsrc
-                .total_size
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-            width = max_cratename_len + TOP_CRATES_SPACING,
-        ));
+            regsrc.counter.to_string(),
+            average_size,
+            total_size,
+        ]);
     }
-    output
+    format_table(&table_matrix)
 }
 
 pub(crate) fn registry_source_stats(
@@ -301,7 +308,7 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(1, list_cb);
-        let wanted = String::from("crateA    src ckt: 1   src avg:       1 B   total: 1 B\n");
+        let wanted = String::from("Name   Count Average Total \ncrateA 1     1 B     1 B   \n");
         assert_eq!(is, wanted);
     }
 
@@ -323,8 +330,9 @@ mod top_crates_git_repos_bare {
 
         let mut wanted = String::new();
         for i in &[
-            "crate-B    src ckt: 1   src avg:       2 B   total: 2 B\n",
-            "crate-A    src ckt: 1   src avg:       1 B   total: 1 B\n",
+            "Name    Count Average Total \n",
+            "crate-B 1     2 B     2 B   \n",
+            "crate-A 1     1 B     1 B   \n",
         ] {
             wanted.push_str(i);
         }
@@ -365,11 +373,12 @@ mod top_crates_git_repos_bare {
 
         let mut wanted = String::new();
         for i in &[
-            "crate-C    src ckt: 1   src avg:      10 B   total: 10 B\n",
-            "crate-D    src ckt: 1   src avg:       6 B   total: 6 B\n",
-            "crate-E    src ckt: 1   src avg:       4 B   total: 4 B\n",
-            "crate-B    src ckt: 1   src avg:       2 B   total: 2 B\n",
-            "crate-A    src ckt: 1   src avg:       1 B   total: 1 B\n",
+            "Name    Count Average Total \n",
+            "crate-C 1     10 B    10 B  \n",
+            "crate-D 1     6 B     6 B   \n",
+            "crate-E 1     4 B     4 B   \n",
+            "crate-B 1     2 B     2 B   \n",
+            "crate-A 1     1 B     1 B   \n",
         ] {
             wanted.push_str(i);
         }
@@ -392,7 +401,8 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd1, fd2];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(2, list_cb);
-        let wanted = String::from("crate-A    src ckt: 2   src avg:       3 B   total: 6 B\n");
+        let wanted = String::from("Name    Count Average Total \ncrate-A 2     3 B     6 B   \n");
+
         assert_eq!(is, wanted);
     }
 
@@ -418,7 +428,8 @@ mod top_crates_git_repos_bare {
 
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(3, list_cb);
-        let wanted = String::from("crate-A    src ckt: 3   src avg:       3 B   total: 9 B\n");
+        let wanted = String::from("Name    Count Average Total \ncrate-A 3     3 B     9 B   \n");
+
         assert_eq!(is, wanted);
     }
 
@@ -443,7 +454,7 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(3, list_cb);
-        let wanted = String::from("crate-A    src ckt: 3   src avg:       6 B   total: 18 B\n");
+        let wanted = String::from("Name    Count Average Total \ncrate-A 3     6 B     18 B  \n");
         assert_eq!(is, wanted);
     }
 
@@ -500,10 +511,11 @@ mod top_crates_git_repos_bare {
         let mut wanted = String::new();
 
         for i in &[
-            "crate-C    src ckt: 2   src avg:      50 B   total: 100 B\n",
-            "crate-A    src ckt: 3   src avg:       6 B   total: 18 B\n",
-            "crate-B    src ckt: 2   src avg:       5 B   total: 10 B\n",
-            "crate-D    src ckt: 1   src avg:       1 B   total: 1 B\n",
+            "Name    Count Average Total \n",
+            "crate-C 2     50 B    100 B \n",
+            "crate-A 3     6 B     18 B  \n",
+            "crate-B 2     5 B     10 B  \n",
+            "crate-D 1     1 B     1 B   \n",
         ] {
             wanted.push_str(i);
         }

@@ -31,9 +31,7 @@ impl BinInfo {
     }
 
     fn size_string(&self) -> String {
-        let mut s = String::from("size: ");
-        s.push_str(&self.size.file_size(file_size_opts::DECIMAL).unwrap());
-        s
+        self.size.file_size(file_size_opts::DECIMAL).unwrap()
     }
 }
 
@@ -68,28 +66,23 @@ fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
 
 #[inline] // only called in one place
 fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> String {
+    if collections_vec.is_empty() {
+        return String::new();
+    }
     // sort the BinInfo Vec in reverse
     collections_vec.sort();
     collections_vec.reverse();
 
-    let mut output = String::new();
+    let mut table_matrix: Vec<Vec<String>> = Vec::new();
 
-    let max_cratename_len = collections_vec
-        .iter()
-        .take(limit as usize)
-        .map(|b| b.name.len())
-        .max()
-        .unwrap_or(0);
+    table_matrix.push(vec!["Name".into(), "Size".into()]); // table header
 
     for bininfo in collections_vec.into_iter().take(limit as usize) {
-        output.push_str(&format!(
-            "{: <width$} {}\n",
-            bininfo.name,
-            bininfo.size_string(),
-            width = max_cratename_len + TOP_CRATES_SPACING,
-        ));
+        let size = bininfo.size_string();
+        table_matrix.push(vec![bininfo.name, size]);
     }
-    output
+
+    format_table(&table_matrix)
 }
 
 #[inline] // only called in one place
@@ -140,7 +133,7 @@ mod bininfo_struct {
             size: 123,
         };
         let size = bi.size_string();
-        assert_eq!(size, "size: 123 B");
+        assert_eq!(size, "123 B");
     }
 
     #[test]
@@ -150,7 +143,7 @@ mod bininfo_struct {
             size: 1_234_567_890,
         };
         let size = bi.size_string();
-        assert_eq!(size, "size: 1.23 GB");
+        assert_eq!(size, "1.23 GB");
     }
 
     #[test]
@@ -229,7 +222,7 @@ mod top_crates_binaries {
         };
         let list: Vec<BinInfo> = vec![bi];
         let stats: String = bininfo_list_to_string(1, list);
-        let wanted = "cargo-cache    size: 1 B\n".to_string();
+        let wanted = String::from("Name        Size \ncargo-cache 1 B  \n");
         assert_eq!(stats, wanted);
     }
 
@@ -245,8 +238,7 @@ mod top_crates_binaries {
         };
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
-        let mut wanted = String::from("crate-B    size: 2 B\n");
-        wanted.push_str("crate-A    size: 1 B\n");
+        let wanted = String::from("Name    Size \ncrate-B 2 B  \ncrate-A 1 B  \n");
 
         assert_eq!(stats, wanted);
     }
@@ -277,11 +269,12 @@ mod top_crates_binaries {
         let stats: String = bininfo_list_to_string(10, list);
         let mut wanted = String::new();
         for i in &[
-            "crate-C    size: 10 B\n",
-            "crate-D    size: 6 B\n",
-            "crate-E    size: 4 B\n",
-            "crate-B    size: 2 B\n",
-            "crate-A    size: 1 B\n",
+            "Name    Size \n",
+            "crate-C 10 B \n",
+            "crate-D 6 B  \n",
+            "crate-E 4 B  \n",
+            "crate-B 2 B  \n",
+            "crate-A 1 B  \n",
         ] {
             wanted.push_str(i);
         }
@@ -304,7 +297,7 @@ mod top_crates_binaries {
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
         let mut wanted = String::new();
-        for i in &["crate-A    size: 3 B\n", "crate-A    size: 3 B\n"] {
+        for i in &["Name    Size \ncrate-A 3 B  \ncrate-A 3 B  \n"] {
             wanted.push_str(i);
         }
         assert_eq!(stats, wanted);
@@ -329,9 +322,10 @@ mod top_crates_binaries {
         let stats: String = bininfo_list_to_string(4, list);
         let mut wanted = String::new();
         for i in &[
-            "crate-A    size: 3 B\n",
-            "crate-A    size: 3 B\n",
-            "crate-A    size: 3 B\n",
+            "Name    Size \n",
+            "crate-A 3 B  \n",
+            "crate-A 3 B  \n",
+            "crate-A 3 B  \n",
         ] {
             wanted.push_str(i);
         }
