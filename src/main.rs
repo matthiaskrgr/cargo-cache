@@ -132,7 +132,8 @@ fn main() {
                 if config.is_present("dry-run") {
                     println!("would remove directory '{}'", dir.display());
                 } else {
-                    fs::remove_dir_all(&dir).unwrap();
+                    fs::remove_dir_all(&dir)
+                        .unwrap_or_else(|_| panic!("Failed to remove file '{}'", dir.display()));
                     size_changed = true;
                 }
             }
