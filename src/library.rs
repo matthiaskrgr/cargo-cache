@@ -48,7 +48,6 @@ pub(crate) enum ErrorKind {
     CargoFailedGetConfig,
     CargoHomeNotDirectory,
     InvalidDeletableDir,
-    RemoveFailed,
     RemoveDirNoArg,
 }
 
@@ -238,9 +237,9 @@ pub(crate) fn rm_old_crates(
                     );
                 } else {
                     println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                    fs::remove_file(pkgpath).unwrap_or_else(|_| {
-                        panic!("Failed to remove file '{}'", pkgpath.display())
-                    });
+                    if fs::remove_file(pkgpath).is_err() {
+                        warn_on_undeletable_file(&pkgpath);
+                    }
                     *size_changed = true;
                 }
                 continue;
@@ -265,9 +264,10 @@ pub(crate) fn rm_old_crates(
                         );
                     } else {
                         println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                        fs::remove_file(pkgpath).unwrap_or_else(|_| {
-                            panic!("Failed to remove file '{}'", pkgpath.display())
-                        });
+                        if fs::remove_file(pkgpath).is_err() {
+                            warn_on_undeletable_file(&pkgpath);
+                        }
+
                         *size_changed = true;
                     }
                 }
@@ -415,10 +415,7 @@ pub(crate) fn remove_dir_via_cmdline(
         } else {
             println!("removing: '{}'", dir.display());
             if fs::remove_dir_all(&dir).is_err() {
-                return Err((
-                    ErrorKind::RemoveFailed,
-                    format!("failed to remove directory {}", dir.display()),
-                ));
+                warn_on_undeletable_file(&dir);
             }
             *size_changed = true;
         }
@@ -514,6 +511,10 @@ pub(crate) fn remove_dir_via_cmdline(
         rm(&ccd.registry_cache, dry_run, size_changed)?
     }
     Ok(())
+}
+
+pub(crate) fn warn_on_undeletable_file(path: &PathBuf) {
+    eprintln!("Warning: failed to remove \"{}\".", path.display());
 }
 
 #[cfg(test)]
