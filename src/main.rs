@@ -8,13 +8,14 @@
 // except according to those terms.
 
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
+// deny unsafe code
+#![deny(unsafe_code)]
 // these [allow()] by default, make them warn:
 #![warn(
     ellipsis_inclusive_range_patterns,
     trivial_casts,
     trivial_numeric_casts,
     unreachable_pub,
-    unsafe_code,
     unused,
     rust_2018_idioms
 )]
