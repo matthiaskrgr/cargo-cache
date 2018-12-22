@@ -141,7 +141,9 @@ mod format_table_tests {
             ],
         ];
         let t = format_table(&v);
-        let output = String::from("wasdwasdwasd word word\noh           why  this\nAAAAAA            I don\'t get it\n");
+        let output = String::from(
+            "wasdwasdwasd word word\noh           why  this\nAAAAAA            I don\'t get it\n",
+        );
         // println!("{}", output);
         assert_eq!(t, output);
     }
