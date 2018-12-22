@@ -268,7 +268,7 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut D
 }
 
 #[cfg(test)]
-mod top_crates_git_repos_bare {
+mod top_crates_registry_cache {
     use super::*;
     use pretty_assertions::assert_eq;
 
@@ -292,7 +292,7 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd];
         let list_cb: Vec<RgchInfo> = stats_from_file_desc_list(list_fd);
         let is: String = regcache_list_to_string(1, list_cb);
-        let wanted = String::from("Name   Count Average Total \ncrateA 1     1 B     1 B   \n");
+        let wanted = String::from("Name   Count Average Total\ncrateA 1     1 B     1 B\n");
 
         assert_eq!(is, wanted);
     }
@@ -315,9 +315,9 @@ mod top_crates_git_repos_bare {
 
         let mut wanted = String::new();
         for i in &[
-            "Name    Count Average Total \n",
-            "crate-B 1     2 B     2 B   \n",
-            "crate-A 1     1 B     1 B   \n",
+            "Name    Count Average Total\n",
+            "crate-B 1     2 B     2 B\n",
+            "crate-A 1     1 B     1 B\n",
         ] {
             wanted.push_str(i);
         }
@@ -358,12 +358,12 @@ mod top_crates_git_repos_bare {
 
         let mut wanted = String::new();
         for i in &[
-            "Name    Count Average Total \n",
-            "crate-C 1     10 B    10 B  \n",
-            "crate-D 1     6 B     6 B   \n",
-            "crate-E 1     4 B     4 B   \n",
-            "crate-B 1     2 B     2 B   \n",
-            "crate-A 1     1 B     1 B   \n",
+            "Name    Count Average Total\n",
+            "crate-C 1     10 B    10 B\n",
+            "crate-D 1     6 B     6 B\n",
+            "crate-E 1     4 B     4 B\n",
+            "crate-B 1     2 B     2 B\n",
+            "crate-A 1     1 B     1 B\n",
         ] {
             wanted.push_str(i);
         }
@@ -386,7 +386,7 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd1, fd2];
         let list_cb: Vec<RgchInfo> = stats_from_file_desc_list(list_fd);
         let is: String = regcache_list_to_string(2, list_cb);
-        let wanted = String::from("Name    Count Average Total \ncrate-A 2     3 B     6 B   \n");
+        let wanted = String::from("Name    Count Average Total\ncrate-A 2     3 B     6 B\n");
 
         assert_eq!(is, wanted);
     }
@@ -413,7 +413,7 @@ mod top_crates_git_repos_bare {
 
         let list_cb: Vec<RgchInfo> = stats_from_file_desc_list(list_fd);
         let is: String = regcache_list_to_string(3, list_cb);
-        let wanted = String::from("Name    Count Average Total \ncrate-A 3     3 B     9 B   \n");
+        let wanted = String::from("Name    Count Average Total\ncrate-A 3     3 B     9 B\n");
 
         assert_eq!(is, wanted);
     }
@@ -439,7 +439,7 @@ mod top_crates_git_repos_bare {
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3];
         let list_cb: Vec<RgchInfo> = stats_from_file_desc_list(list_fd);
         let is: String = regcache_list_to_string(3, list_cb);
-        let wanted = String::from("Name    Count Average Total \ncrate-A 3     6 B     18 B  \n");
+        let wanted = String::from("Name    Count Average Total\ncrate-A 3     6 B     18 B\n");
 
         assert_eq!(is, wanted);
     }
@@ -497,11 +497,11 @@ mod top_crates_git_repos_bare {
         let mut wanted = String::new();
 
         for i in &[
-            "Name    Count Average Total \n",
-            "crate-C 2     50 B    100 B \n",
-            "crate-A 3     6 B     18 B  \n",
-            "crate-B 2     5 B     10 B  \n",
-            "crate-D 1     1 B     1 B   \n",
+            "Name    Count Average Total\n",
+            "crate-C 2     50 B    100 B\n",
+            "crate-A 3     6 B     18 B\n",
+            "crate-B 2     5 B     10 B\n",
+            "crate-D 1     1 B     1 B\n",
         ] {
             wanted.push_str(i);
         }

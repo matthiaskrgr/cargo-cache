@@ -176,14 +176,14 @@ mod bininfo_struct {
         v.sort();
         let mut order_string = String::new();
         for bi in v {
-            order_string.push_str(&format!("{:?} ", bi));
+            order_string.push_str(&format!("{:?}", bi));
         }
         println!("{}", order_string);
         let mut wanted = String::new();
         for i in &[
-            r#"BinInfo { name: "b", size: 3 } "#,
-            r#"BinInfo { name: "a", size: 5 } "#,
-            r#"BinInfo { name: "c", size: 10 } "#,
+            r#"BinInfo { name: "b", size: 3 }"#,
+            r#"BinInfo { name: "a", size: 5 }"#,
+            r#"BinInfo { name: "c", size: 10 }"#,
         ] {
             wanted.push_str(&i);
         }
@@ -210,14 +210,14 @@ mod bininfo_struct {
         v.sort();
         let mut order_string = String::new();
         for bi in v {
-            order_string.push_str(&format!("{:?} ", bi));
+            order_string.push_str(&format!("{:?}", bi));
         }
         println!("{}", order_string);
         let mut wanted = String::new();
         for i in &[
-            r#"BinInfo { name: "a", size: 5 } "#,
-            r#"BinInfo { name: "b", size: 5 } "#,
-            r#"BinInfo { name: "c", size: 5 } "#,
+            r#"BinInfo { name: "a", size: 5 }"#,
+            r#"BinInfo { name: "b", size: 5 }"#,
+            r#"BinInfo { name: "c", size: 5 }"#,
         ] {
             wanted.push_str(i);
         }
@@ -248,7 +248,7 @@ mod top_crates_binaries {
         };
         let list: Vec<BinInfo> = vec![bi];
         let stats: String = bininfo_list_to_string(1, list);
-        let wanted = String::from("Name        Size \ncargo-cache 1 B  \n");
+        let wanted = String::from("Name        Size\ncargo-cache 1 B\n");
         assert_eq!(stats, wanted);
     }
 
@@ -264,7 +264,7 @@ mod top_crates_binaries {
         };
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
-        let wanted = String::from("Name    Size \ncrate-B 2 B  \ncrate-A 1 B  \n");
+        let wanted = String::from("Name    Size\ncrate-B 2 B\ncrate-A 1 B\n");
         assert_eq!(stats, wanted);
     }
 
@@ -294,12 +294,12 @@ mod top_crates_binaries {
         let stats: String = bininfo_list_to_string(10, list);
         let mut wanted = String::new();
         for i in &[
-            "Name    Size \n",
-            "crate-C 10 B \n",
-            "crate-D 6 B  \n",
-            "crate-E 4 B  \n",
-            "crate-B 2 B  \n",
-            "crate-A 1 B  \n",
+            "Name    Size\n",
+            "crate-C 10 B\n",
+            "crate-D 6 B\n",
+            "crate-E 4 B\n",
+            "crate-B 2 B\n",
+            "crate-A 1 B\n",
         ] {
             wanted.push_str(i);
         }
@@ -322,7 +322,7 @@ mod top_crates_binaries {
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
         let mut wanted = String::new();
-        for i in &["Name    Size \n", "crate-A 3 B  \n", "crate-A 3 B  \n"] {
+        for i in &["Name    Size\n", "crate-A 3 B\n", "crate-A 3 B\n"] {
             wanted.push_str(i);
         }
         assert_eq!(stats, wanted);
@@ -347,10 +347,10 @@ mod top_crates_binaries {
         let stats: String = bininfo_list_to_string(4, list);
         let mut wanted = String::new();
         for i in &[
-            "Name    Size \n",
-            "crate-A 3 B  \n",
-            "crate-A 3 B  \n",
-            "crate-A 3 B  \n",
+            "Name    Size\n",
+            "crate-A 3 B\n",
+            "crate-A 3 B\n",
+            "crate-A 3 B\n",
         ] {
             wanted.push_str(i);
         }

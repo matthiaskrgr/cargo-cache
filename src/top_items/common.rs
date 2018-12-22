@@ -34,6 +34,7 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
     }
 
     // find out the largest elements of a column so we know how padding to apply
+    // assume all rows have the same length
     let mut max_lengths: Vec<usize> = vec![0; table[0].len()];
 
     for row in table {
@@ -50,7 +51,7 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
         let mut new_row = String::new();
         for (idx, cell) in row.iter().enumerate() {
             if cell.len() < max_lengths[idx] {
-                // not big enough
+                // we need to add padding
                 let diff = max_lengths[idx] - cell.len();
                 let mut cell_new = cell.clone();
                 cell_new.push_str(&" ".repeat(diff)); // pad the string
@@ -59,14 +60,15 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
                 // just add the new cell
                 new_row.push_str(&cell);
             }
-            new_row.push_str(SEPERATOR); // add space between each cell
+            // add space between each cell
+            new_row.push_str(SEPERATOR);
         }
-        out.push_str(&new_row);
+        let row = new_row.trim();
+        out.push_str(&row);
         out.push_str("\n");
+        out.trim();
         // move on to the next cell
     }
-
-    //@TODO trim trailing spaces
 
     out
 }
@@ -88,7 +90,7 @@ mod format_table_tests {
     fn one_cell() {
         let v = vec![vec!["hello".into()]];
         let t = format_table(&v);
-        let output = String::from("hello \n");
+        let output = String::from("hello\n");
         assert_eq!(t, output);
     }
 
@@ -101,7 +103,7 @@ mod format_table_tests {
             "very long perhaps a few words".into(),
         ]];
         let t = format_table(&v);
-        let output = String::from("hello a shrt very long perhaps a few words \n");
+        let output = String::from("hello a shrt very long perhaps a few words\n");
         assert_eq!(t, output);
     }
 
@@ -114,7 +116,7 @@ mod format_table_tests {
             vec!["very long perhaps a few words".into()],
         ];
         let t = format_table(&v);
-        let output = String::from("hello                         \na                             \nshrt                          \nvery long perhaps a few words \n");
+        let output = String::from("hello\na\nshrt\nvery long perhaps a few words\n");
         assert_eq!(t, output);
     }
 
@@ -139,7 +141,7 @@ mod format_table_tests {
             ],
         ];
         let t = format_table(&v);
-        let output = String::from("wasdwasdwasd word word           \noh           why  this           \nAAAAAA            I don\'t get it \n");
+        let output = String::from("wasdwasdwasd word word\noh           why  this\nAAAAAA            I don\'t get it\n");
         // println!("{}", output);
         assert_eq!(t, output);
     }
