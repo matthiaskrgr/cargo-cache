@@ -127,6 +127,16 @@ mod bininfo_struct {
     }
 
     #[test]
+    fn bininfo_new_cargo_cache() {
+        let bi = BinInfo {
+            name: String::from("cargo-cache"),
+            size: 1337,
+        };
+        assert_eq!(bi.name, String::from("cargo-cache"));
+        assert_eq!(bi.size, 1337);
+    }
+
+    #[test]
     fn bininfo_size_str_small_size() {
         let bi = BinInfo {
             name: String::from("abc"),
@@ -169,7 +179,15 @@ mod bininfo_struct {
             order_string.push_str(&format!("{:?} ", bi));
         }
         println!("{}", order_string);
-        assert_eq!(order_string, String::from(r#"BinInfo { name: "b", size: 3 } BinInfo { name: "a", size: 5 } BinInfo { name: "c", size: 10 } "#));
+        let mut wanted = String::new();
+        for i in &[
+            r#"BinInfo { name: "b", size: 3 } "#,
+            r#"BinInfo { name: "a", size: 5 } "#,
+            r#"BinInfo { name: "c", size: 10 } "#,
+        ] {
+            wanted.push_str(&i);
+        }
+        assert_eq!(order_string, wanted);
     }
 
     #[test]
@@ -195,7 +213,15 @@ mod bininfo_struct {
             order_string.push_str(&format!("{:?} ", bi));
         }
         println!("{}", order_string);
-        assert_eq!(order_string, String::from(r#"BinInfo { name: "a", size: 5 } BinInfo { name: "b", size: 5 } BinInfo { name: "c", size: 5 } "#));
+        let mut wanted = String::new();
+        for i in &[
+            r#"BinInfo { name: "a", size: 5 } "#,
+            r#"BinInfo { name: "b", size: 5 } "#,
+            r#"BinInfo { name: "c", size: 5 } "#,
+        ] {
+            wanted.push_str(i);
+        }
+        assert_eq!(order_string, wanted);
     }
 }
 
@@ -239,7 +265,6 @@ mod top_crates_binaries {
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
         let wanted = String::from("Name    Size \ncrate-B 2 B  \ncrate-A 1 B  \n");
-
         assert_eq!(stats, wanted);
     }
 
@@ -297,7 +322,7 @@ mod top_crates_binaries {
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
         let mut wanted = String::new();
-        for i in &["Name    Size \ncrate-A 3 B  \ncrate-A 3 B  \n"] {
+        for i in &["Name    Size \n", "crate-A 3 B  \n", "crate-A 3 B  \n"] {
             wanted.push_str(i);
         }
         assert_eq!(stats, wanted);
