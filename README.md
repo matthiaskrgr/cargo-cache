@@ -5,7 +5,7 @@
 
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
-Requires ````rust 1.31```` or later.
+`stable`, `beta` and `nightly` channels are supported.
 
 DISCLAIMER: I only tested this on linux.
 

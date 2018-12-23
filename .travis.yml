@@ -28,17 +28,6 @@ env:
 matrix:
   fast_finish: false
   include:
-# minimum required version
-    - name: "minimal rust linux debug"
-      os: linux
-      rust: 1.31.0
-      env: RELEASE="" DEBUG="--debug"
-
-    - name: "minimal rust linux release"
-      os: linux
-      rust: 1.31.0
-      env: RELEASE="--release
-
 # stable
     - name: "stable linux debug"
       os: linux
