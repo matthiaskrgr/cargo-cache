@@ -20,6 +20,7 @@ fn run_tests() {
     CARGO_HOME_is_empty();
 }
 
+#[allow(non_snake_case)]
 fn CARGO_HOME_is_nonexisting_dir() {
     // CARGO_HOME points to a directory that does not exist
     let cargo_cache = Command::new(bin_path())
@@ -40,6 +41,7 @@ fn CARGO_HOME_is_nonexisting_dir() {
     assert!(re.is_match(&stderr));
 }
 
+#[allow(non_snake_case)]
 fn CARGO_HOME_is_empty() {
     // CARGO_HOME is empty
     // we will fall back to default "~/.cargo"
