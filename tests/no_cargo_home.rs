@@ -15,7 +15,13 @@ use regex::Regex;
 use std::process::Command;
 
 #[test]
-fn no_cargo_home_dir() {
+fn run_tests() {
+    CARGO_HOME_is_nonexisting_dir();
+    CARGO_HOME_is_empty();
+}
+
+fn CARGO_HOME_is_nonexisting_dir() {
+    // CARGO_HOME points to a directory that does not exist
     let cargo_cache = Command::new(bin_path())
         .env("CARGO_HOME", "./xyxyxxxyyyxxyxyxqwertywasd")
         .output();
@@ -32,4 +38,22 @@ fn no_cargo_home_dir() {
         Regex::new(r"Error, no cargo home path directory .*./xyxyxxxyyyxxyxyxqwertywasd' found.\n")
             .unwrap();
     assert!(re.is_match(&stderr));
+}
+
+fn CARGO_HOME_is_empty() {
+    // CARGO_HOME is empty
+    // we will fall back to default "~/.cargo"
+    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", "").output();
+    // make sure we failed
+    let cmd = cargo_cache.unwrap();
+    assert!(cmd.status.success(), "bad exit status!");
+
+    // no stdout
+    assert!(!cmd.stdout.is_empty(), "unexpected stdout!");
+    // stderr
+    let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
+    let stdout = String::from_utf8_lossy(&cmd.stdout).into_owned();
+    assert!(stderr.is_empty(), "found stderr");
+    let re = Regex::new(r"Cargo cache.*\.cargo.*:").unwrap();
+    assert!(re.is_match(&stdout));
 }
