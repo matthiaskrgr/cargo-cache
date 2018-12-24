@@ -7,8 +7,6 @@ Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
 `stable`, `beta` and `nightly` channels are supported.
 
-DISCLAIMER: I only tested this on linux.
-
 #### Installation:
 ```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
 
