@@ -523,8 +523,9 @@ mod libtests {
 
     use pretty_assertions::assert_eq;
     use regex::Regex;
+    use std::env;
 
-    // @TODO add env test
+    use crate::test_helpers::assert_path_end;
 
     impl CargoCachePaths {
         pub(crate) fn new(dir: PathBuf) -> Result<Self, (ErrorKind, String)> {
@@ -575,8 +576,8 @@ mod libtests {
     #[test]
     fn test_CargoCachePaths_gen() {
         // set cargo cache root dir to /tmp
-        let dir_paths = CargoCachePaths::new(PathBuf::from("/tmp"));
-        assert!(dir_paths.is_ok());
+        let dir_paths = CargoCachePaths::new(env::temp_dir());
+        assert!(dir_paths.is_ok(), "dir paths: {:?}", dir_paths);
     }
 
     #[allow(non_snake_case)]
@@ -589,7 +590,17 @@ mod libtests {
         cargo_home.push("cargo_home_cargo_cache_paths");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_cargo_cache_paths"));
+
+        let path_string = if cfg!(windows) {
+            "cargo-cache\\target\\cargo_home_cargo_cache_paths"
+        } else {
+            "cargo-cache/target/cargo_home_cargo_cache_paths"
+        };
+        assert!(
+            CH_string.ends_with(path_string),
+            "CH_string is: {:?}",
+            CH_string
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -601,70 +612,35 @@ mod libtests {
         let ccp = CargoCachePaths::new(PathBuf::from(CH_string)).unwrap();
 
         // test all the paths
-        assert!(
-            ccp.cargo_home
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths"),
-            "cargo_home: '{:?}'",
-            &ccp.cargo_home
-        );
-        assert!(
-            ccp.bin_dir
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/bin"),
-            "actual path: \"{:?}\"",
-            ccp.bin_dir
-        );
-        assert!(
-            ccp.registry
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry"),
-            "actual path: \"{:?}\"",
-            ccp.registry
-        );
-        assert!(
-            ccp.registry_index
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/index"),
-            "actual path: \"{:?}\"",
-            ccp.registry_index
-        );
-        assert!(
-            ccp.registry_cache
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/cache"),
-            "actual path: \"{:?}\"",
-            ccp.registry_cache
-        );
-        assert!(
-            ccp.registry_sources
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/registry/src"),
-            "actual path: \"{:?}\"",
-            ccp.registry_sources
+        assert_path_end(&ccp.cargo_home, &["cargo_home_cargo_cache_paths"]);
+
+        assert_path_end(&ccp.bin_dir, &["cargo_home_cargo_cache_paths", "bin"]);
+
+        assert_path_end(&ccp.registry, &["cargo_home_cargo_cache_paths", "registry"]);
+
+        assert_path_end(
+            &ccp.registry_index,
+            &["cargo_home_cargo_cache_paths", "registry", "index"],
         );
 
-        assert!(
-            ccp.git_repos_bare
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/git/db"),
-            "actual path: \"{:?}\"",
-            ccp.git_repos_bare
+        assert_path_end(
+            &ccp.registry_cache,
+            &["cargo_home_cargo_cache_paths", "registry", "cache"],
         );
-        assert!(
-            ccp.git_checkouts
-                .display()
-                .to_string()
-                .ends_with("cargo_home_cargo_cache_paths/git/checkouts"),
-            "actual path: \"{:?}\"",
-            ccp.git_checkouts
+
+        assert_path_end(
+            &ccp.registry_sources,
+            &["cargo_home_cargo_cache_paths", "registry", "src"],
+        );
+
+        assert_path_end(
+            &ccp.git_repos_bare,
+            &["cargo_home_cargo_cache_paths", "git", "db"],
+        );
+
+        assert_path_end(
+            &ccp.git_checkouts,
+            &["cargo_home_cargo_cache_paths", "git", "checkouts"],
         );
     }
 
@@ -680,7 +656,17 @@ mod libtests {
         cargo_home.push("cargo_home_cargo_cache_paths_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_cargo_cache_paths_print"));
+
+        let path_string = if cfg!(windows) {
+            "cargo-cache\\target\\cargo_home_cargo_cache_paths_print"
+        } else {
+            "cargo-cache/target/cargo_home_cargo_cache_paths_print"
+        };
+        assert!(
+            CH_string.ends_with(path_string),
+            "CH_string is: {:?}",
+            CH_string
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).exists() {
@@ -696,60 +682,79 @@ mod libtests {
         let mut iter = output.lines().skip(1); // ??
 
         let cargo_home = iter.next().unwrap();
+
         assert!(
-            Regex::new(r"cargo home:.*/cargo_home_cargo_cache_paths_print")
-                .unwrap()
-                .is_match(cargo_home),
+            Regex::new(if cfg!(windows) {
+                r"cargo home:.*\\cargo_home_cargo_cache_paths_print"
+            } else {
+                r"cargo home:.*/cargo_home_cargo_cache_paths_print"
+            })
+            .unwrap()
+            .is_match(cargo_home),
             "cargo home: \"{:?}\"",
             cargo_home
         );
 
         let bins = iter.next().unwrap();
-        assert!(
-            Regex::new(r"binaries directory:.*/cargo_home_cargo_cache_paths_print/bin")
-                .unwrap()
-                .is_match(bins)
-        );
+        assert!(Regex::new(if cfg!(windows) {
+            r"binaries directory:.*\\cargo_home_cargo_cache_paths_print\\bin"
+        } else {
+            r"binaries directory:.*/cargo_home_cargo_cache_paths_print/bin"
+        })
+        .unwrap()
+        .is_match(bins));
 
         let registry = iter.next().unwrap();
-        assert!(
-            Regex::new(r"registry directory:.*/cargo_home_cargo_cache_paths_print/registry")
-                .unwrap()
-                .is_match(registry)
-        );
+        assert!(Regex::new(if cfg!(windows) {
+            r"registry directory:.*\\cargo_home_cargo_cache_paths_print\\registry"
+        } else {
+            r"registry directory:.*/cargo_home_cargo_cache_paths_print/registry"
+        })
+        .unwrap()
+        .is_match(registry));
 
         let registry_index = iter.next().unwrap();
-        assert!(
-            Regex::new(r"registry index:.*/cargo_home_cargo_cache_paths_print/registry/index")
-                .unwrap()
-                .is_match(registry_index)
-        );
+        assert!(Regex::new(if cfg!(windows) {
+            r"registry index:.*\\cargo_home_cargo_cache_paths_print\\registry\\index"
+        } else {
+            r"registry index:.*/cargo_home_cargo_cache_paths_print/registry/index"
+        })
+        .unwrap()
+        .is_match(registry_index));
 
         let crate_archives = iter.next().unwrap();
-        assert!(Regex::new(
+        assert!(Regex::new(if cfg!(windows) {
+            r"crate source archives:.*\\cargo_home_cargo_cache_paths_print\\registry\\cache"
+        } else {
             r"crate source archives:.*/cargo_home_cargo_cache_paths_print/registry/cache"
-        )
+        })
         .unwrap()
         .is_match(crate_archives));
 
         let crate_sources = iter.next().unwrap();
-        assert!(Regex::new(
+        assert!(Regex::new(if cfg!(windows) {
+            r"unpacked crate sources:.*\\cargo_home_cargo_cache_paths_print\\registry\\src"
+        } else {
             r"unpacked crate sources:.*/cargo_home_cargo_cache_paths_print/registry/src"
-        )
+        })
         .unwrap()
         .is_match(crate_sources));
 
         let bare_repos = iter.next().unwrap();
-        assert!(
-            Regex::new(r"bare git repos:.*/cargo_home_cargo_cache_paths_print/git/db")
-                .unwrap()
-                .is_match(bare_repos)
-        );
+        assert!(Regex::new(if cfg!(windows) {
+            r"bare git repos:.*\\cargo_home_cargo_cache_paths_print\\git\\db"
+        } else {
+            r"bare git repos:.*/cargo_home_cargo_cache_paths_print/git/db"
+        })
+        .unwrap()
+        .is_match(bare_repos));
 
         let git_repo_checkouts = iter.next().unwrap();
-        assert!(Regex::new(
+        assert!(Regex::new(if cfg!(windows) {
+            r"git repo checkouts.*\\cargo_home_cargo_cache_paths_print\\git\\checkouts"
+        } else {
             r"git repo checkouts.*/cargo_home_cargo_cache_paths_print/git/checkouts"
-        )
+        })
         .unwrap()
         .is_match(git_repo_checkouts));
 
@@ -776,7 +781,13 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_new");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_bench_new"));
+
+        let path_string = if cfg!(windows) {
+            "cargo-cache\\target\\cargo_home_bench_new"
+        } else {
+            "cargo-cache/target/cargo_home_bench_new"
+        };
+        assert!(CH_string.ends_with(path_string), "CH_string: {}", CH_string);
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -802,7 +813,12 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert!(CH_string.ends_with("cargo-cache/target/cargo_home_bench_print"));
+        let path_string = if cfg!(windows) {
+            "cargo-cache\\target\\cargo_home_bench_print"
+        } else {
+            "cargo-cache/target/cargo_home_bench_print"
+        };
+        assert!(CH_string.ends_with(path_string), "CH_string: {}", CH_string);
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {

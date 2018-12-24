@@ -28,6 +28,16 @@ env:
 matrix:
   fast_finish: false
   include:
+# windows
+    - name: "windows nightly debug"
+      os: windows
+      rust: nightly
+      env: RELEASE="" DEBUG="--debug"
+
+    - name: "windows nightly release"
+      os: windows
+      rust: nightly
+      env: RELEASE="--release
 # stable
     - name: "stable linux debug"
       os: linux
@@ -100,7 +110,7 @@ script:
   - if [[ "$RUSTFMT" == "true" ]]; then rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force; fi
   - if [[ "$RUSTFMT" == "true" ]]; then cargo fmt --all -- --check ; exit ; fi
   - cargo build --all ${RELEASE}
-  - cargo test --all ${RELEASE}
+  - cargo test --all ${RELEASE} -- --nocapture
   - if [[ "$RELEASE" == "" ]] &&  [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench; fi
   - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo test --features bench --release; fi
   - if [[ "$RELEASE" == "--release" ]] && [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench; fi
