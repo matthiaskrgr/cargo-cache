@@ -13,6 +13,7 @@
 mod test_helpers;
 
 use crate::test_helpers::bin_path;
+use regex::Regex;
 use std::path::*;
 use std::process::Command;
 use walkdir::WalkDir;
@@ -68,20 +69,38 @@ fn build_and_check_size_test() {
     let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
     // we need to get the actual path to fake cargo home dir and make it an absolute path
     let absolute_fchp = PathBuf::from(&fchp).canonicalize().unwrap();
-    let mut desired_output = format!("Cargo cache '{}':\n\n", absolute_fchp.display());
+    let mut desired_output = format!("Cargo cache '{}/':\n\n", absolute_fchp.display());
 
-    //@TODO this won't work because git repo is constantly growing
+    /*
+    Cargo cache '...cargo-cache/target/fake_cargo_home/':
+
+    Total size:                             21.96 MB
+    Size of 0 installed binaries:             0 B
+    Size of registry:                         21.96 MB
+    Size of 4 crate archives:                   407.74 KB
+    Size of 4 crate source checkouts:           2.04 MB
+    Size of git db:                           0 B
+    Size of 0 bare git repos:                   0 B
+    Size of 0 git repo checkouts:               0 B
+    */
 
     desired_output.push_str(
-        "\nTotal size:                   120.39 MB
-Size of 0 installed binaries:     0 B
-Size of registry:                  120.39 MB
-Size of registry crate cache:           407.94 KB
-Size of registry source checkouts:      2.04 MB
-Size of git db:                    0 B
-Size of git repo checkouts:        0 B\n",
+        "Total size:          .*MB
+Size of .* installed binaries:  .*B
+Size of registry:           .*MB
+Size of .* crate archives:       .*KB
+Size of .* crate source checkouts:  .*MB
+Size of git db:              .*B
+Size of .* bare git repos:   .*B
+Size of .* git repo checkouts:  .*B",
     );
-    // make sure the sizes match
-    // @TODO make this compare texts again, not just lines
-    assert_eq!(desired_output.lines().count(), cc_output.lines().count());
+
+    let regex = Regex::new(&desired_output);
+
+    assert!(
+        regex.clone().unwrap().is_match(&cc_output),
+        "regex: {:?}, cc_output: {}",
+        regex,
+        cc_output
+    );
 }
