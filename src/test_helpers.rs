@@ -9,8 +9,10 @@
 
 use std::path::PathBuf;
 
-#[allow(dead_code)]
+#[allow(dead_code)] // only used in tests
 pub(crate) fn bin_path() -> String {
+    // check if we have a release or debug binary to run tests with
+    // we need to take into account that linux and windows have different paths to the executable
     let path_release = if cfg!(windows) {
         "target\\release\\cargo-cache.exe"
     } else {
@@ -32,7 +34,7 @@ pub(crate) fn bin_path() -> String {
     }
 }
 
-#[allow(dead_code)]
+#[allow(dead_code)] // only used in tests
 pub(crate) fn assert_path_end(path: &PathBuf, wanted_vector: &[&str]) {
     // because windows and linux represent paths differently ( /foo/bar vs C:\\foo\\bar)
     // we need to take this into account when running test on windows/linux

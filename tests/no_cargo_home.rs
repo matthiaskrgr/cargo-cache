@@ -16,6 +16,8 @@ use std::process::Command;
 
 #[test]
 fn run_tests() {
+    // we need this fake harness to make sure the two tests don't modify CARGO_HOME at the same time
+    // which would be a race condition
     CARGO_HOME_is_nonexisting_dir();
     CARGO_HOME_is_empty();
 }

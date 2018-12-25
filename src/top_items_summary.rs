@@ -20,7 +20,6 @@ pub(crate) fn get_top_crates(
     ccd: &CargoCachePaths,
     mut cache: &mut DirCache,
 ) -> String {
-    // run the functions in parallel for a tiny speedup
     let binaries = binary_stats(&ccd.bin_dir, limit, &mut cache);
 
     let reg_src = registry_source_stats(&ccd.registry_sources, limit, &mut cache);

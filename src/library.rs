@@ -494,7 +494,7 @@ pub(crate) fn remove_dir_via_cmdline(
         invalid_dirs.trim();
         return Err((
             ErrorKind::InvalidDeletableDir,
-            format!("Invalid deletable dirs: {}", invalid_dirs),
+            format!("Invalid deletable dir(s): {}", invalid_dirs),
         ));
     }
     // finally delete
@@ -590,16 +590,9 @@ mod libtests {
         cargo_home.push("cargo_home_cargo_cache_paths");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-
-        let path_string = if cfg!(windows) {
-            "cargo-cache\\target\\cargo_home_cargo_cache_paths"
-        } else {
-            "cargo-cache/target/cargo_home_cargo_cache_paths"
-        };
-        assert!(
-            CH_string.ends_with(path_string),
-            "CH_string is: {:?}",
-            CH_string
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_cargo_cache_paths"],
         );
 
         // create the directory
@@ -656,16 +649,13 @@ mod libtests {
         cargo_home.push("cargo_home_cargo_cache_paths_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-
-        let path_string = if cfg!(windows) {
-            "cargo-cache\\target\\cargo_home_cargo_cache_paths_print"
-        } else {
-            "cargo-cache/target/cargo_home_cargo_cache_paths_print"
-        };
-        assert!(
-            CH_string.ends_with(path_string),
-            "CH_string is: {:?}",
-            CH_string
+        assert_path_end(
+            &cargo_home,
+            &[
+                "cargo-cache",
+                "target",
+                "cargo_home_cargo_cache_paths_print",
+            ],
         );
 
         // create the directory
@@ -770,6 +760,7 @@ mod benchmarks {
     use super::*;
     use crate::test::black_box;
     use crate::test::Bencher;
+    use crate::test_helpers::assert_path_end;
 
     #[allow(non_snake_case)]
     #[bench]
@@ -781,13 +772,10 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_new");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-
-        let path_string = if cfg!(windows) {
-            "cargo-cache\\target\\cargo_home_bench_new"
-        } else {
-            "cargo-cache/target/cargo_home_bench_new"
-        };
-        assert!(CH_string.ends_with(path_string), "CH_string: {}", CH_string);
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_bench_new"],
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -813,12 +801,10 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        let path_string = if cfg!(windows) {
-            "cargo-cache\\target\\cargo_home_bench_print"
-        } else {
-            "cargo-cache/target/cargo_home_bench_print"
-        };
-        assert!(CH_string.ends_with(path_string), "CH_string: {}", CH_string);
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_bench_print"],
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {

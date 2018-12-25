@@ -23,7 +23,7 @@ fn build_and_check_size_test() {
     // move into the directory of our dummy crate
     // set a fake CARGO_HOME and build the dummy crate there
     let crate_path = PathBuf::from("tests/size_test/");
-    let fchp = "target/fake_cargo_home"; // cake cargo_home path
+    let fchp = "target/fake_cargo_home"; // fake cargo_home path
     let status = Command::new("cargo")
         .arg("check")
         .arg("--target-dir")

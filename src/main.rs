@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+// bench feat. cannot be used in beta or stable so hide them behinde a feature
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // deny unsafe code
 #![deny(unsafe_code)]
@@ -63,7 +64,7 @@ fn main() {
 
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
     let config = cli::gen_clap();
-    // we need this in case we call "cargo-cache" directly
+    // we need this in case we call "cargo-cache" binary directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
 
     // indicates if size changed and whether we should print a before/after size diff
