@@ -68,8 +68,7 @@ fn build_and_check_size_test() {
     assert!(cargo_cache.is_ok(), "cargo cache failed to run");
     let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
     // we need to get the actual path to fake cargo home dir and make it an absolute path
-    let absolute_fchp = PathBuf::from(&fchp).canonicalize().unwrap();
-    let mut desired_output = format!("Cargo cache '{}/':\n\n", absolute_fchp.display());
+    let mut desired_output = format!("Cargo cache .*fake_cargo_home.*:\n\n");
 
     /*
     Cargo cache '...cargo-cache/target/fake_cargo_home/':
