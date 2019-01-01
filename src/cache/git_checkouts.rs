@@ -26,7 +26,7 @@ pub(crate) struct GitCheckoutCache {
 
 impl GitCheckoutCache {
     pub(crate) fn new(path: PathBuf) -> Self {
-        // lazy cache, compute and save only as needed
+        // lazy cache, compute only as needed and save
         Self {
             path,
             total_size: None,

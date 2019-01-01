@@ -47,7 +47,7 @@ impl RegistrySourceCache {
     }
 
     #[inline]
-    pub(crate) fn path_exists(&mut self) -> bool {
+    pub(crate) fn path_exists(&self) -> bool {
         self.path.exists()
     }
 

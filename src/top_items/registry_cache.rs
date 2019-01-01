@@ -138,6 +138,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgchInfo> {
                 previous: None,
             } => {
                 // we reached the end of the queue
+                unreachable!("dead code triggered: while loop condition did not hold inside match");
             }
 
             Pair {

@@ -174,6 +174,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
                 previous: None,
             } => {
                 // we reached the end of the queue
+                unreachable!("dead code triggered: while loop condition did not hold inside match");
             }
 
             Pair {
@@ -196,7 +197,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    //@TODO assert that chkinfo is not empty
+                    // @TODO assert that chkinfo is not empty
                     let current_size = &current.size;
                     total_size += current_size;
                     counter += 1;

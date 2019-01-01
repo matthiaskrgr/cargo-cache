@@ -28,7 +28,6 @@ pub(crate) fn get_top_crates(
     let bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut cache);
     let repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, &mut cache);
 
-    // concat the strings in the order we want them
     let mut output = String::with_capacity(
         binaries.len() + reg_src.len() + reg_cache.len() + bare_repos.len() + repo_checkouts.len(),
     );

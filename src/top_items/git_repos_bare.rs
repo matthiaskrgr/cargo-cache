@@ -156,6 +156,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RepoInfo> {
                 previous: None,
             } => {
                 // we reached the end of the queue
+                unreachable!("dead code triggered: while loop condition did not hold inside match");
             }
 
             Pair {
@@ -227,7 +228,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
     if collections_vec.is_empty() {
         return String::new();
     }
-    // sort the RepoINfo Vec in reverse, biggest item first
+    // sort the RepoInfo Vec in reverse, biggest item first
     collections_vec.sort();
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();

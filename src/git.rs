@@ -104,7 +104,10 @@ pub(crate) fn git_gc_everything(
 
     fn gc_subdirs(path: &PathBuf, dry_run: bool) -> (u64, u64) {
         if path.is_file() {
-            panic!("gc_subdirs() tried to compress file instead of directory")
+            panic!(
+                "gc_subdirs() tried to compress file instead of directory: '{}'",
+                path.display()
+            );
         } else if !path.is_dir() {
             // if the directory does not exist, skip it
             return (0, 0);

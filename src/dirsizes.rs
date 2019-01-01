@@ -244,7 +244,7 @@ mod libtests {
             let total_git_db_size = git_repos_bare.dir_size + git_checkouts.dir_size;
 
             Self {
-                //no need to recompute all of this from scratch
+                // no need to recompute all of this from scratch
                 total_size: total_reg_size + total_git_db_size + bindir.dir_size,
                 numb_bins: bindir.file_number as usize,
                 total_bin_size: bindir.dir_size,

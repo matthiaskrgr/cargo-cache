@@ -61,7 +61,6 @@ use crate::top_items_summary::*;
 
 fn main() {
     // parse args
-
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
     let config = cli::gen_clap();
     // we need this in case we call "cargo-cache" binary directly
@@ -176,7 +175,7 @@ fn main() {
         }
     }
     if size_changed && !config.is_present("dry-run") {
-        // size have changed
+        // size has changed
         // in order to get a diff, save the old sizes
         let cache_size_old = dir_sizes.total_size;
 

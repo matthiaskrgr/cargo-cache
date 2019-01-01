@@ -149,7 +149,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
 
     // traverse recursively and sum filesizes, parallelized by rayon
 
-    // I would like to get rid of the vector here but not sure how to convert
+    // @TODO I would like to get rid of the vector here but not sure how to convert
     // WalkDir iterator into rayon par_iter
 
     let walkdir_start = dir.display().to_string();
@@ -168,7 +168,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
         .sum();
 
     // for the file number, we don't want the actual number of files but only the number of
-    // files in the current directory.
+    // files in the current directory, limit search depth
 
     let file_number = if walkdir_start.contains("registry") {
         WalkDir::new(&walkdir_start)
@@ -195,7 +195,7 @@ pub(crate) fn rm_old_crates(
     println!();
 
     // remove crate sources from cache
-    // src can be completely nuked since we can always rebuilt it from cache
+    // src can be completely removed since we can always rebuilt it from cache (by extracting packages)
     let mut removed_size = 0;
     // walk registry repos
     for repo in fs::read_dir(&registry_src_path).unwrap() {
@@ -244,7 +244,7 @@ pub(crate) fn rm_old_crates(
                 }
                 continue;
             }
-            //println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
+            // println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
 
             if last_pkgname == pkgname {
                 versions_of_this_package += 1;
@@ -370,7 +370,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
     // truncate to 2 decimal digits
     let percentage: f32 = ((perc * f32::from(100_i8)).trunc()) / (f32::from(100_u8));
-
+;
     if size_before == size_after {
         if dspl_sze_before {
             format!(
@@ -585,10 +585,11 @@ mod libtests {
     fn test_CargoCachePaths_paths() {
         // get cargo target dir
         let mut target_dir = std::env::current_dir().unwrap();
+        // @TODO take $CARGO_TARGET_DIR into account
         target_dir.push("target");
         let mut cargo_home = target_dir;
         cargo_home.push("cargo_home_cargo_cache_paths");
-        //make sure this worked
+        // make sure this worked
         let CH_string = format!("{}", cargo_home.display());
         assert_path_end(
             &cargo_home,
@@ -750,7 +751,7 @@ mod libtests {
 
         // should be empty now
         let last = iter.next();
-        assert!(!last.is_some(), "found another directory?!");
+        assert!(!last.is_some(), "found another directory?!: '{:?}'", last);
     }
 
 }

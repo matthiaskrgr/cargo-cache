@@ -131,7 +131,8 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
     let mut regcacheinfo: RgSrcInfo = RgSrcInfo::new(&PathBuf::from("ERROR 1/err1"), 0, 0);
     let mut counter: u32 = 0; // how many of a crate do we have
     let mut total_size: u64 = 0; // total size of these crates
-                                 // iterate over the files
+
+    // iterate over the files
     let mut iter = file_descs.into_iter();
 
     let mut state = Pair {
@@ -151,6 +152,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                 previous: None,
             } => {
                 // we reached the end of the queue
+                unreachable!("dead code triggered: while loop condition did not hold inside match");
             }
 
             Pair {
@@ -181,7 +183,7 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                     regcacheinfo = RgSrcInfo::new(&current.path, counter, total_size);
                 } else if current.name != previous.name {
                     // save old line
-                    //  todo assert that regcacheinfo is not empty
+                    // todo assert that regcacheinfo is not empty
                     out.push(regcacheinfo);
                     // reset counters
                     counter = 0;
