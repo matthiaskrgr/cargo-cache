@@ -1,4 +1,4 @@
-// Copyright 2018 Matthias Krüger. See the COPYRIGHT
+// Copyright 2017-2019 Matthias Krüger. See the COPYRIGHT
 // file at the top-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
