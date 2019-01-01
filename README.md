@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
 [![dependency status](https://deps.rs/repo/github/matthiaskrgr/cargo-cache/status.svg)](https://deps.rs/repo/github/matthiaskrgr/cargo-cache)
+[![Latest Version](https://img.shields.io/crates/v/cargo-cache.svg](https://crates.io/crates/cargo-cache)
 
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
