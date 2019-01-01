@@ -120,7 +120,7 @@ script:
   - cargo-cache
   - cargo cache
   - cargo cache --help
-  - cargo cache --top-items 20
+  - cargo cache --top-cache-items 20
   - cargo cache --gc --dry-run
   - cargo cache --gc
   - cargo cache --info
