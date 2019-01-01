@@ -2,7 +2,7 @@
 name = "cargo-cache"
 version = "0.1.0"
 authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
-description = "Manage cargo cache, show sizes and delete directories."
+description = "Manage cargo cache (~/.cargo/), show sizes and remove directories selectively"
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
 repository = "https://github.com/matthiaskrgr/cargo-cache"
 license = "MIT/Apache-2.0"
@@ -30,7 +30,7 @@ cargo = "0.32.0" # get CARGO_HOME
 git2 = "0.8.0" # check if repo is git repo
 
 # https://github.com/rayon-rs/rayon
-rayon = "1.0.3" # parallel for iteratorsn
+rayon = "1.0.3" # parallelize iterators
 
 # https://github.com/rust-lang/rust-clippy
 rustc_tools_util = "0.1.0" # git version information
@@ -44,7 +44,7 @@ regex = "1.1.0" # use regex in tests
 
 [build-dependencies]
 # https://github.com/rust-lang/rust-clippy
-rustc_tools_util = "0.1.0"
+rustc_tools_util = "0.1.0" # git version information
 
 [[bin]]
 name = "cargo-cache"
