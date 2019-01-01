@@ -6,6 +6,7 @@ description = "Manage cargo cache (~/.cargo/), show sizes and remove directories
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
 repository = "https://github.com/matthiaskrgr/cargo-cache"
 license = "MIT/Apache-2.0"
+readme = "README.md"
 keywords = ["cargo", "cache", "delete", "manage", "size"]
 build = "src/build.rs"
 edition = "2018"
