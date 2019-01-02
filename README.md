@@ -113,6 +113,17 @@ Size of 138 git repo checkouts:             3.80 GB
 
 Size changed from 9.61 GB to 2.71 GB (-6.90 GB, -71.8%)
 ````
+Checking the sizes after cleanup:
+````
+Total size:                             2.78 GB
+Size of 84 installed binaries:            588.35 MB
+Size of registry:                         1.27 GB
+Size of 6136 crate archives:                1.18 GB
+Size of 0 crate source checkouts:           0 B
+Size of git db:                           918.98 MB
+Size of 172 bare git repos:                 918.98 MB
+Size of 0 git repo checkouts:               0 B
+````
 
 #### License:
 
