@@ -19,11 +19,11 @@ env:
   global:
     - RUST_BACKTRACE=full
   matrix:
+    - RELEASE="--release"
     - RELEASE="" DEBUG="--debug"
     - CLIPPY="true"
     - CARGO_AUDIT="true"
     - RUSTFMT="true"
-    - RELEASE="--release"
 
 matrix:
   fast_finish: false
