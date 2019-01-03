@@ -28,20 +28,19 @@ struct FileDesc {
 #[inline]
 fn name_from_pb(path: &PathBuf) -> String {
     // path:  ~/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/0f9966c
-    let  path_elms = path.iter().map(|p| p.to_str().unwrap()).collect::<Vec<&str>>();
-    let  path_slice = path_elms.as_slice();
-    // remove the last element
-    let (_last, elms) = path_slice.split_last().unwrap();
-    // path elms:   .. [ .cargo git checkouts cargo-cache-16826c8e13331adc ]
-    let (last, _elms) = elms.split_last().unwrap();
-    // last but one: cargo-cache-16826c8e13331adc
-    let last_but_one = last.split('-').collect::<Vec<_>>();
-    // vec: cargo cache 16826c8e13331adc
-    let slice = last_but_one.as_slice();
+    let dir = path
+        .iter()
+        .map(|p| p.to_str().unwrap())
+        .rev()
+        .nth(1)
+        .unwrap();
+    // dir cargo-cache-16826c8e13331adc
+    // skip the last element
+    let mut all_but_last = dir.split('-').rev().skip(1).collect::<Vec<_>>(); //  cannot .rev() again, need to collect again
 
-    let (__last, all_but_last) = slice.split_last().unwrap();
-
-    // slice: cargo cache
+    // vec: cache cargo
+    all_but_last.reverse();
+    // vec: cargo cache
     all_but_last.join("-")
     // "cargo-cache"
 }
