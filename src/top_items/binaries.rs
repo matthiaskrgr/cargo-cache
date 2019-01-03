@@ -127,12 +127,32 @@ mod bininfo_struct {
     }
 
     #[test]
+    fn bininfo_new_name_dot() {
+        let bi = BinInfo {
+            name: String::from("ab.cd"),
+            size: 1234,
+        };
+        assert_eq!(bi.name, String::from("ab.cd"));
+        assert_eq!(bi.size, 1234);
+    }
+
+    #[test]
     fn bininfo_new_cargo_cache() {
         let bi = BinInfo {
             name: String::from("cargo-cache"),
             size: 1337,
         };
         assert_eq!(bi.name, String::from("cargo-cache"));
+        assert_eq!(bi.size, 1337);
+    }
+
+    #[test]
+    fn bininfo_new_cargo_cache_exe() {
+        let bi = BinInfo {
+            name: String::from("cargo-cache.exe"),
+            size: 1337,
+        };
+        assert_eq!(bi.name, String::from("cargo-cache.exe"));
         assert_eq!(bi.size, 1337);
     }
 

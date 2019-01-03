@@ -25,25 +25,26 @@ struct FileDesc {
     size: u64,
 }
 
+#[inline]
+fn name_from_pb(path: &PathBuf) -> String {
+    // path:  ~/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/0f9966c
+    let mut path_elms = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
+    // remove the last element
+    path_elms.pop().unwrap();
+    // path elms:   .. [ .cargo git checkouts cargo-cache-16826c8e13331adc ]
+    let last_but_one = path_elms.pop().unwrap();
+    // last but one: cargo-cache-16826c8e13331adc
+    let mut vec = last_but_one.split('-').collect::<Vec<_>>();
+    // vec: cargo cache 16826c8e13331adc
+    let _ = vec.pop();
+    // vec: cargo cache
+    vec.join("-")
+    // "cargo-cache"
+}
+
 impl FileDesc {
     fn new_from_git_checkouts(path: &PathBuf) -> Self {
-        let mut paths = path.to_str().unwrap().split('/').collect::<Vec<&str>>();
-        let last = paths.pop().unwrap();
-        let last_but_one = paths.pop().unwrap();
-        let last_but_2 = paths.pop().unwrap();
-
-        let mut i = vec![last_but_2, last_but_one, last];
-
-        let string = last_but_one
-            .split('/')
-            .collect::<Vec<_>>()
-            .pop()
-            .unwrap()
-            .to_string();
-        let mut vec = string.split('-').collect::<Vec<_>>();
-        let _ = vec.pop();
-        let name = vec.join("-");
-        i.pop();
+        let name = name_from_pb(&path);
 
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -310,6 +311,23 @@ pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32, mut cache: &mut Di
 mod top_crates_git_checkouts {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn name_from_pb_cargo_cache() {
+        let path = PathBuf::from(
+            "/home/matthias/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/0f9966c",
+        );
+        let name = name_from_pb(&path);
+        assert_eq!(name, "cargo-cache");
+    }
+
+    #[test]
+    fn name_from_pb_alacritty() {
+        let path =
+            PathBuf::from("/home/matthias/.cargo/git/checkouts/alacritty-de74975f496aa2c0/f4fc9eb");
+        let name = name_from_pb(&path);
+        assert_eq!(name, "alacritty");
+    }
 
     #[test]
     fn stats_from_file_desc_none() {
