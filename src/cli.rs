@@ -12,8 +12,9 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rustc_tools_util::*;
 
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-    let v = rustc_tools_util::get_version_info!();
-    let version = format!("{}", v).replacen("cargo-cache ", "", 1);
+    let version = rustc_tools_util::get_version_info!()
+        .to_string()
+        .replacen("cargo-cache ", "", 1);
 
     let list_dirs = Arg::with_name("list-dirs")
         .short("L")
