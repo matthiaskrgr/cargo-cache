@@ -34,7 +34,7 @@ fn name_from_pb(path: &PathBuf) -> String {
         .rev()
         .nth(1)
         .unwrap();
-    // dir cargo-cache-16826c8e13331adc
+    // dir: cargo-cache-16826c8e13331adc
     // skip the last element
     let mut all_but_last = dir.split('-').rev().skip(1).collect::<Vec<_>>(); //  cannot .rev() again, need to collect again
 
@@ -89,22 +89,17 @@ impl ChkInfo {
         let name: String;
         let size: u64;
         if path.exists() {
-            let mut a = path.clone();
-            a.pop();
-            let name_tmp = a.file_name().unwrap().to_str().unwrap().to_string();
             size = fs::metadata(&path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
+            let mut p = path.clone();
+            p.pop();
+            let name_tmp = p.file_name().unwrap().to_str().unwrap().to_string();
             let mut tmp = name_tmp.split('-').collect::<Vec<_>>();
-            let _ = tmp.pop();
+            tmp.pop();
             name = tmp.join("-");
         } else {
-            let name_tmp = path
-                .file_name()
-                .unwrap()
-                .to_os_string()
-                .into_string()
-                .unwrap();
+            let name_tmp = path.file_name().unwrap().to_str().unwrap().to_string();
             size = 0;
             name = name_tmp;
         }
