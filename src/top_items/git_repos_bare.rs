@@ -24,15 +24,21 @@ struct FileDesc {
     size: u64,
 }
 
+#[inline]
+fn name_from_pb(path: &PathBuf) -> String {
+    // path: ~/.cargo/git/db/yaml-rust-07c50cf5815b3a80
+    let filename = path.file_name().unwrap().to_str().unwrap().to_string();
+    // filename: yaml-rust-07c50cf5815b3a80
+    let mut crate_name = filename.split('-').collect::<Vec<&str>>();
+    crate_name.pop(); // remove the last item
+                      // crate_name: [yaml rust]
+    crate_name.join("-")
+}
+
 impl FileDesc {
     fn new_from_git_bare(path: &PathBuf) -> Self {
-        let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
-        let mut i = last_item.split('-').collect::<Vec<_>>();
-        i.pop();
-        let name = i.join("-");
-
+        let name = name_from_pb(&path);
         let walkdir = WalkDir::new(path.display().to_string());
-
         let size = walkdir
             .into_iter()
             .map(|e| e.unwrap().path().to_owned())
@@ -74,18 +80,13 @@ impl RepoInfo {
             // remove the hash from the path (mdbook-e6b52d90d4246c70 => mdbook)
             let mut tmp_name = name_tmp.split('-').collect::<Vec<_>>();
             tmp_name.pop(); // remove the hash
-            name = tmp_name.join("-");
+            name = tmp_name.join("-"); // rejoin with "-"
             size = fs::metadata(&path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
         } else {
             // tests
-            name = path
-                .file_name()
-                .unwrap()
-                .to_os_string()
-                .into_string()
-                .unwrap();
+            name = path.file_name().unwrap().to_str().unwrap().to_string();
             size = 0;
         }
         Self {
@@ -290,6 +291,21 @@ pub(crate) fn git_repos_bare_stats(path: &PathBuf, limit: u32, mut cache: &mut D
 mod top_crates_git_repos_bare {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn name_from_pb_cargo_cache() {
+        let path =
+            PathBuf::from("/home/matthias/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/");
+        let name = name_from_pb(&path);
+        assert_eq!(name, "cargo-cache");
+    }
+
+    #[test]
+    fn name_from_pb_alacritty() {
+        let path = PathBuf::from("/home/matthias/.cargo/git/checkouts/alacritty-de74975f496aa2c0/");
+        let name = name_from_pb(&path);
+        assert_eq!(name, "alacritty");
+    }
 
     #[test]
     fn stats_from_file_desc_none() {

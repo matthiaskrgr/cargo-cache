@@ -37,8 +37,7 @@ fn name_from_pb(path: &PathBuf) -> String {
     // dir: cargo-cache-16826c8e13331adc
     // skip the last element
     let mut all_but_last = dir.split('-').rev().skip(1).collect::<Vec<_>>(); //  cannot .rev() again, need to collect again
-
-    // vec: cache cargo
+                                                                             // vec: cache cargo
     all_but_last.reverse();
     // vec: cargo cache
     all_but_last.join("-")

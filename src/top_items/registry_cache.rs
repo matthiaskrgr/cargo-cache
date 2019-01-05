@@ -22,12 +22,20 @@ struct FileDesc {
     size: u64,
 }
 
+#[inline]
+fn name_from_pb(path: &PathBuf) -> String {
+    // path:  .../xz2-0.1.4.crate
+    let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
+    // last_item: xz2-0.1.4.crate
+    let mut v = last_item.split('-').collect::<Vec<_>>();
+    v.pop(); // remove everything after last "-"
+             // xz2
+    v.join("-") // rejoin remaining elements with "-"
+}
+
 impl FileDesc {
     pub(crate) fn new_from_reg_cache(path: &PathBuf) -> Self {
-        let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
-        let mut i = last_item.split('-').collect::<Vec<_>>();
-        i.pop();
-        let name = i.join("-");
+        let name = name_from_pb(&path);
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
@@ -272,6 +280,23 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut D
 mod top_crates_registry_cache {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn name_from_pb_cargo_cache() {
+        let path = PathBuf::from(
+            "/home/matthias/.cargo/registry/cache/github.com-1ecc6299db9ec823/cargo-cache-0.1.1.crate"
+        );
+        let name = name_from_pb(&path);
+        assert_eq!(name, "cargo-cache");
+    }
+
+    #[test]
+    fn name_from_pb_alacritty() {
+        let path =
+            PathBuf::from("/home/matthias/.cargo/registry/cache/github.com-1ecc6299db9ec823/alacritty-0.0.1.crate");
+        let name = name_from_pb(&path);
+        assert_eq!(name, "alacritty");
+    }
 
     #[test]
     fn stats_from_file_desc_none() {
