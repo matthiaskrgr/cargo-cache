@@ -26,7 +26,7 @@ pub(crate) fn dir_exists(path: &PathBuf) -> bool {
 }
 
 pub(crate) fn format_table(table: &[Vec<String>]) -> String {
-    const SEPERATOR: &str = " ";
+    const SEPARATOR: &str = " ";
     let mut out = String::new();
 
     if table.is_empty() {
@@ -61,7 +61,7 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
                 new_row.push_str(&cell);
             }
             // add space between each cell
-            new_row.push_str(SEPERATOR);
+            new_row.push_str(SEPARATOR);
         }
         let row = new_row.trim();
         out.push_str(&row);

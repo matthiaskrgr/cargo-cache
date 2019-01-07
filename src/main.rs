@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// bench feat. cannot be used in beta or stable so hide them behinde a feature
+// bench feat. cannot be used in beta or stable so hide them behind a feature
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // deny unsafe code
 #![deny(unsafe_code)]
