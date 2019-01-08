@@ -49,7 +49,7 @@ mod top_items_summary;
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
-use std::{fs, process};
+use std::{process};
 
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
@@ -130,14 +130,13 @@ fn main() {
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
             if dir.is_dir() {
-                if config.is_present("dry-run") {
-                    println!("would remove directory '{}'", dir.display());
-                } else {
-                    if fs::remove_dir_all(&dir).is_err() {
-                        warn_on_undeletable_file(&dir);
-                    }
-                    size_changed = true;
-                }
+                remove_file(
+                    &dir,
+                    config.is_present("dry-run"),
+                    &mut size_changed,
+                    None,
+                    None,
+                )
             }
         }
     }

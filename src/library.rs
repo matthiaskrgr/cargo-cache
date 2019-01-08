@@ -228,20 +228,15 @@ pub(crate) fn rm_old_crates(
                         panic!("Failed to get metadata of file '{}'", &pkgpath.display())
                     })
                     .len();
-                if dry_run {
-                    println!(
-                        "dry run: not actually deleting {} {} at {}",
-                        pkgname,
-                        pkgver,
-                        pkgpath.display()
-                    );
-                } else {
-                    println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                    if fs::remove_file(pkgpath).is_err() {
-                        warn_on_undeletable_file(&pkgpath);
-                    }
-                    *size_changed = true;
-                }
+
+                let dryrun_msg = format!(
+                    "dry run: not actually deleting {} {} at {}",
+                    pkgname,
+                    pkgver,
+                    pkgpath.display()
+                );
+                remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg));
+
                 continue;
             }
             // println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
@@ -255,21 +250,14 @@ pub(crate) fn rm_old_crates(
                             panic!("Failed to get metadata of file '{}'", &pkgpath.display())
                         })
                         .len();
-                    if dry_run {
-                        println!(
-                            "dry run: not actually deleting {} {} at {}",
-                            pkgname,
-                            pkgver,
-                            pkgpath.display()
-                        );
-                    } else {
-                        println!("deleting: {} {} at {}", pkgname, pkgver, pkgpath.display());
-                        if fs::remove_file(pkgpath).is_err() {
-                            warn_on_undeletable_file(&pkgpath);
-                        }
 
-                        *size_changed = true;
-                    }
+                    let dryrun_msg = format!(
+                        "dry run: not actually deleting {} {} at {}",
+                        pkgname,
+                        pkgver,
+                        pkgpath.display()
+                    );
+                    remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg));
                 }
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
@@ -409,16 +397,9 @@ pub(crate) fn remove_dir_via_cmdline(
         size_changed: &mut bool,
     ) -> Result<(), (ErrorKind, String)> {
         // remove a specified subdirectory from cargo cache
-        if !dir.is_dir() {
-        } else if dry_run {
-            println!("dry-run: would delete: '{}'", dir.display());
-        } else {
-            println!("removing: '{}'", dir.display());
-            if fs::remove_dir_all(&dir).is_err() {
-                warn_on_undeletable_file(&dir);
-            }
-            *size_changed = true;
-        }
+        let msg = Some(format!("removing: '{}'", dir.display()));
+        remove_file(&dir, dry_run, size_changed, msg, None);
+
         Ok(())
     }
 
@@ -513,8 +494,40 @@ pub(crate) fn remove_dir_via_cmdline(
     Ok(())
 }
 
-pub(crate) fn warn_on_undeletable_file(path: &PathBuf) {
-    eprintln!("Warning: failed to remove \"{}\".", path.display());
+pub(crate) fn remove_file(
+    path: &PathBuf,
+    dry_run: bool,
+    size_changed: &mut bool,
+    deletion_msg: Option<String>,
+    dry_run_msg: Option<String>,
+) {
+    if dry_run {
+        if let Some(dr_msg) = dry_run_msg {
+            println!("{}", dr_msg)
+        } else {
+            println!("dry-run: would remove: '{}'", path.display());
+        }
+        return;
+    }
+    // print deletion message if we have one
+    if let Some(msg) = deletion_msg {
+        println!("{}", msg);
+    }
+
+    if path.is_file() && fs::remove_file(&path).is_err() {
+        eprintln!("Warning: failed to remove file \"{}\".", path.display());
+    } else {
+        *size_changed = true;
+    }
+
+    if path.is_dir() && fs::remove_dir_all(&path).is_err() {
+        eprintln!(
+            "Warning: failed to recursively remove directory \"{}\".",
+            path.display()
+        );
+    } else {
+        *size_changed = true;
+    }
 }
 
 #[cfg(test)]
