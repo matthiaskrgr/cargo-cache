@@ -1,11 +1,12 @@
-## Git
+## Version 0.1.2
 
-don't assume that we know if a folder will only contains directories or files, add some checks
-	this fixes crashes when trying to get the size of files there were actually dead symlinks
+run cargo update
+don't assume that we know if a folder will only contain directories or files, add some checks.
+	This fixes crashes when trying to get the size of files there were actually dead symlinks
 	or the contents of directories that turned out to be files
 	fixes #31
 add function that is responsible for all file/directory deletion and honours --dry-run.
-	no other function in the crate should call fs::remove.* to make sure --dry-run is always
+	No other function in the crate should call fs::remove.* to make sure --dry-run is always
 	taken into account.
 add error messages to unwrap() failures of fs::metadata() calls in the cache module
 add more usage examples to the readme
