@@ -60,6 +60,7 @@ impl GitRepoCache {
             let total_size = self
                 .files()
                 .par_iter()
+                .filter(|f| f.is_file())
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.total_size = Some(total_size);
@@ -78,6 +79,7 @@ impl GitRepoCache {
                 let v = walkdir
                     .into_iter()
                     .map(|d| d.unwrap().into_path())
+                    .filter(|d| d.is_file())
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {

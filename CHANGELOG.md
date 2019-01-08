@@ -1,5 +1,6 @@
 ## Git
 
+don't assume that we know if a folder will only contains directories or files, add some checks
 add function that is responsible for all file/directory deletion and honours --dry-run.
 	no other function in the crate should call fs::remove.* to make sure --dry-run is always
     taken into account.

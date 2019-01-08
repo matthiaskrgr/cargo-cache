@@ -100,6 +100,7 @@ impl GitCheckoutCache {
                 let v = walkdir
                     .into_iter()
                     .map(|d| d.unwrap().into_path())
+                    .filter(|f| f.exists())
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
@@ -126,6 +127,7 @@ impl GitCheckoutCache {
                     for i in fs::read_dir(&repo)
                         .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &repo))
                         .map(|cratepath| cratepath.unwrap().path())
+                        .filter(|f| f.is_dir())
                     {
                         both_levels_vec.push(i);
                     }

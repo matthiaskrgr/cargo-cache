@@ -78,6 +78,7 @@ impl RegistrySourceCache {
             let total_size = self
                 .files()
                 .par_iter()
+                .filter(|f| f.is_file())
                 .map(|f| {
                     fs::metadata(f)
                         .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))

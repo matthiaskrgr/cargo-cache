@@ -49,7 +49,7 @@ mod top_items_summary;
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
-use std::{process};
+use std::process;
 
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
