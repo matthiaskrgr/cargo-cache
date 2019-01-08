@@ -18,7 +18,6 @@ pub(crate) struct RegistryIndexCache {
     total_size: Option<u64>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    // number_of_files: Option<usize>,
 }
 
 impl RegistryIndexCache {
@@ -27,7 +26,6 @@ impl RegistryIndexCache {
         Self {
             path,
             total_size: None,
-            // number_of_files: None,
             files_calculated: false,
             files: Vec::new(),
         }
@@ -82,21 +80,4 @@ impl RegistryIndexCache {
             &self.files
         }
     }
-
-    /*
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
-        } else {
-            // we don't have the value cached
-            if self.path_exists() {
-                let count = self.files().iter().count();
-                self.number_of_files = Some(count);
-                count
-            } else {
-                0
-            }
-        }
-    }
-    */
 }

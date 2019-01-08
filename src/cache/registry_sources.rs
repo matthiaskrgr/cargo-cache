@@ -19,7 +19,6 @@ pub(crate) struct RegistrySourceCache {
     number_of_repos: Option<usize>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    // number_of_files: Option<usize>,
     repos_calculated: bool,
     checkout_folders: Vec<PathBuf>,
 }
@@ -30,7 +29,6 @@ impl RegistrySourceCache {
         Self {
             path,
             total_size: None,
-            // number_of_files: None,
             files_calculated: false,
             files: Vec::new(),
             repos_calculated: false,
@@ -142,33 +140,4 @@ impl RegistrySourceCache {
             &self.checkout_folders
         }
     }
-
-    /*
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_repos.is_some() {
-            self.number_of_repos.unwrap()
-        } else {
-            // we don't have the value cached
-            if self.path_exists() {
-                let count = self.files().len();
-                self.number_of_repos = Some(count);
-                count
-            } else {
-                0
-            }
-        }
-    }
-    */
-
-    /*
-    pub(crate) fn number_of_repos(&mut self) -> Option<usize> {
-        if self.number_of_repos.is_some() {
-            self.number_of_repos
-        } else {
-            let c = self.checkout_folders().iter().count();
-            self.number_of_repos = Some(c);
-            self.number_of_repos
-        }
-    }
-    */
 }

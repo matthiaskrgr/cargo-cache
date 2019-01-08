@@ -7,9 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-pub(crate) mod dircache;
-
 pub(crate) mod bin;
+pub(crate) mod dircache;
 pub(crate) mod git_checkouts;
 pub(crate) mod git_repos_bare;
 pub(crate) mod registry_cache;

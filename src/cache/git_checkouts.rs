@@ -19,7 +19,6 @@ pub(crate) struct GitCheckoutCache {
     number_of_checkouts: Option<usize>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    // number_of_files: Option<usize>,
     checkouts_calculated: bool,
     checkout_folders: Vec<PathBuf>,
 }
@@ -30,7 +29,6 @@ impl GitCheckoutCache {
         Self {
             path,
             total_size: None,
-            // number_of_files: None,
             files_calculated: false,
             files: Vec::new(),
             checkouts_calculated: false,
@@ -143,33 +141,4 @@ impl GitCheckoutCache {
             &self.checkout_folders
         }
     }
-
-    /*
-    pub(crate) fn number_of_checkouts(&mut self) -> Option<usize> {
-        if self.number_of_checkouts.is_some() {
-            self.number_of_checkouts
-        } else {
-            let c = self.checkout_folders().iter().count();
-            self.number_of_checkouts = Some(c);
-            self.number_of_checkouts
-        }
-    }
-    */
-
-    /*
-        pub(crate) fn number_of_files(&mut self) -> usize {
-            if self.number_of_checkouts.is_some() {
-                self.number_of_checkouts.unwrap()
-            } else {
-                // we don't have the value cached
-                if self.path_exists() {
-                    let count = self.files().len();
-                    self.number_of_checkouts = Some(count);
-                    count
-                } else {
-                    0
-                }
-            }
-        }
-    */
 }

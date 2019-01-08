@@ -25,7 +25,6 @@ impl RegistryCache {
         // calculate once and save, return as needed
         Self {
             path,
-            // number_of_files_recursively: None,
             total_size: None,
             number_of_files: None,
             files_calculated: false,
