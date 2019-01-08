@@ -80,7 +80,7 @@ impl GitCheckoutCache {
                 .par_iter()
                 .map(|f| {
                     fs::metadata(f)
-                        .unwrap_or_else(|_| panic!("Failed to read directory of file: '{:?}'", f))
+                        .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
                         .len()
                 })
                 .sum();

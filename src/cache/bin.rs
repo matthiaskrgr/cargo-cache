@@ -80,7 +80,7 @@ impl BinaryCache {
             &self.files
         } else {
             self.files = fs::read_dir(&self.path)
-                .unwrap_or_else(|_| panic!("Failed to read directory of file: '{:?}'", &self.path))
+                .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                 .map(|f| f.unwrap().path())
                 .collect::<Vec<PathBuf>>();
             self.files_calculated = true;
