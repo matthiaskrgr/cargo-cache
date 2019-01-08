@@ -62,7 +62,11 @@ impl BinaryCache {
             let total_size = self
                 .files()
                 .par_iter()
-                .map(|f| fs::metadata(f).unwrap().len())
+                .map(|f| {
+                    fs::metadata(f)
+                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
+                        .len()
+                })
                 .sum();
             self.total_size = Some(total_size);
             total_size
@@ -76,7 +80,7 @@ impl BinaryCache {
             &self.files
         } else {
             self.files = fs::read_dir(&self.path)
-                .unwrap()
+                .unwrap_or_else(|_| panic!("Failed to read directory of file: '{:?}'", &self.path))
                 .map(|f| f.unwrap().path())
                 .collect::<Vec<PathBuf>>();
             self.files_calculated = true;

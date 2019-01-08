@@ -104,7 +104,7 @@ impl GitRepoCache {
         } else {
             if self.path_exists() {
                 let mut crate_list = fs::read_dir(&self.path)
-                    .unwrap()
+                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
                     .collect::<Vec<PathBuf>>();
 

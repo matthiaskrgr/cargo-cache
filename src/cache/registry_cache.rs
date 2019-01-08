@@ -64,7 +64,11 @@ impl RegistryCache {
             let total_size = self
                 .files()
                 .par_iter()
-                .map(|f| fs::metadata(f).unwrap().len())
+                .map(|f| {
+                    fs::metadata(f)
+                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
+                        .len()
+                })
                 .sum();
             self.total_size = Some(total_size);
             total_size
@@ -81,14 +85,14 @@ impl RegistryCache {
                 let mut collection = Vec::new();
 
                 let crate_list = fs::read_dir(&self.path)
-                    .unwrap()
+                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
                     .collect::<Vec<PathBuf>>();
                 // need to take 2 levels into account
                 let mut both_levels_vec: Vec<PathBuf> = Vec::new();
                 for repo in crate_list {
                     for i in fs::read_dir(&repo)
-                        .unwrap()
+                        .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                         .map(|cratepath| cratepath.unwrap().path())
                     {
                         both_levels_vec.push(i);

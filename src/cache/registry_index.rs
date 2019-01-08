@@ -51,7 +51,11 @@ impl RegistryIndexCache {
             let total_size = self
                 .files()
                 .par_iter()
-                .map(|f| fs::metadata(f).unwrap().len())
+                .map(|f| {
+                    fs::metadata(f)
+                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
+                        .len()
+                })
                 .sum();
             self.total_size = Some(total_size);
             total_size
