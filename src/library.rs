@@ -74,13 +74,13 @@ impl CargoCachePaths {
         }
         // get the paths to the relevant directories
         let cargo_home = cargo_home_path;
-        let bin = cargo_home.join("bin/");
-        let registry = cargo_home.join("registry/");
-        let registry_index = registry.join("index/");
-        let reg_cache = registry.join("cache/");
-        let reg_src = registry.join("src/");
-        let git_repos_bare = cargo_home.join("git/db/");
-        let git_checkouts = cargo_home.join("git/checkouts/");
+        let bin = cargo_home.join("bin");
+        let registry = cargo_home.join("registry");
+        let registry_index = registry.join("index");
+        let reg_cache = registry.join("cache");
+        let reg_src = registry.join("src");
+        let git_repos_bare = cargo_home.join("git").join("db");
+        let git_checkouts = cargo_home.join("git").join("checkouts");
 
         Ok(Self {
             cargo_home,

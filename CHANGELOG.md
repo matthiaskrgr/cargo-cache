@@ -1,3 +1,7 @@
+## Git
+````
+Fix some paths being linuxish on windows
+````
 ## Version 0.1.2
 ````
 run cargo update
