@@ -116,14 +116,21 @@ impl RegistrySourceCache {
                 let mut collection = Vec::new();
 
                 let crate_list = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to read directory (crate list): '{:?}'", &self.path)
+                    })
                     .map(|cratepath| cratepath.unwrap().path())
                     .collect::<Vec<PathBuf>>();
                 // need to take 2 levels into account
                 let mut both_levels_vec: Vec<PathBuf> = Vec::new();
                 for repo in crate_list {
+                    if repo.is_file() {
+                        continue;
+                    }
                     for i in fs::read_dir(&repo)
-                        .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+                        .unwrap_or_else(|_| {
+                            panic!("Failed to read directory (repo): '{:?}'", &self.path)
+                        })
                         .map(|cratepath| cratepath.unwrap().path())
                     {
                         both_levels_vec.push(i);
