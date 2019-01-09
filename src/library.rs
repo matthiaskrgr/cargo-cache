@@ -72,19 +72,15 @@ impl CargoCachePaths {
             );
             return Err((ErrorKind::CargoHomeNotDirectory, msg));
         }
-
-        // path delimiter
-        let pd = if cfg!(windows) { "\\" } else { "/" };
-
         // get the paths to the relevant directories
         let cargo_home = cargo_home_path;
-        let bin = cargo_home.join("bin").join(pd);
-        let registry = cargo_home.join("registry").join(pd);
-        let registry_index = registry.join("index").join(pd);
-        let reg_cache = registry.join("cache").join(pd);
-        let reg_src = registry.join("src").join(pd);
-        let git_repos_bare = cargo_home.join("git").join(pd).join("db").join(pd);
-        let git_checkouts = cargo_home.join("git").join(pd).join("checkouts").join(pd);
+        let bin = cargo_home.join("bin/");
+        let registry = cargo_home.join("registry/");
+        let registry_index = registry.join("index/");
+        let reg_cache = registry.join("cache/");
+        let reg_src = registry.join("src/");
+        let git_repos_bare = cargo_home.join("git/db/");
+        let git_checkouts = cargo_home.join("git/checkouts/");
 
         Ok(Self {
             cargo_home,
