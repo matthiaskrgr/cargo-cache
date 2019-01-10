@@ -102,7 +102,8 @@ fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
 
 impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Cargo cache '{}/':\n\n", &self.root_path.display())?;
+        //@TODO readd delimiter? to end of path to indicate it is a directory
+        write!(f, "Cargo cache '{}':\n\n", &self.root_path.display())?;
 
         write!(
             f,
@@ -311,7 +312,7 @@ mod libtests {
 
         let output_is = format!("{}", dirSizes);
 
-        let output_should = "Cargo cache '/home/user/.cargo/':
+        let output_should = "Cargo cache '/home/user/.cargo':
 
 Total size:                             1.94 GB
 Size of 31 installed binaries:            121.21 KB
@@ -368,7 +369,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
 
         let output_is = format!("{}", dirSizes);
 
-        let output_should = "Cargo cache '/home/user/.cargo/':
+        let output_should = "Cargo cache '/home/user/.cargo':
 
 Total size:                             6.33 GB
 Size of 69 installed binaries:            640.16 MB
@@ -426,7 +427,7 @@ Size of 36 git repo checkouts:              3.92 GB\n";
 
         let output_is = format!("{}", dirSizes);
 
-        let output_should = "Cargo cache '/home/user/.cargo/':
+        let output_should = "Cargo cache '/home/user/.cargo':
 
 Total size:                             14.57 GB
 Size of 0 installed binaries:             0 B
@@ -484,7 +485,7 @@ Size of 0 git repo checkouts:               0 B\n";
 
         let output_is = format!("{}", &dirSizes);
 
-        let output_should = "Cargo cache '/home/user/.cargo/':
+        let output_should = "Cargo cache '/home/user/.cargo':
 
 Total size:                             0 B
 Size of 0 installed binaries:             0 B
