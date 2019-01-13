@@ -10,6 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::cache_trait::Cache;
 use rayon::iter::*;
 
 pub(crate) struct BinaryCache {
@@ -20,8 +21,8 @@ pub(crate) struct BinaryCache {
     files: Vec<PathBuf>,
 }
 
-impl BinaryCache {
-    pub(crate) fn new(path: PathBuf) -> Self {
+impl Cache for BinaryCache {
+    fn new(path: PathBuf) -> Self {
         // init fields lazily and only compute/save values as needed
         Self {
             path,
@@ -31,18 +32,18 @@ impl BinaryCache {
             files: Vec::new(),
         }
     }
-
-    pub(crate) fn invalidate(&mut self) {
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+    fn invalidate(&mut self) {
         self.number_of_files = None;
         self.total_size = None;
         self.files_calculated = false;
     }
+}
 
-    #[inline]
-    pub(crate) fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
+impl BinaryCache {
     pub(crate) fn number_of_files(&mut self) -> usize {
         if self.number_of_files.is_some() {
             self.number_of_files.unwrap()

@@ -7,15 +7,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-pub(crate) mod bin;
-pub(crate) mod cache_trait;
-pub(crate) mod dircache;
-pub(crate) mod git_checkouts;
-pub(crate) mod git_repos_bare;
-pub(crate) mod registry_cache;
-pub(crate) mod registry_index;
-pub(crate) mod registry_sources;
+//use std::fs;
+use std::path::PathBuf;
 
-// The idea of this module is to be a sort of cache
-// once a value is first asked for, we calculate the value, save it and return it
-// if queried again, simply return the saved value.
+pub(crate) trait Cache {
+    fn new(path: PathBuf) -> Self;
+
+    fn path_exists(&self) -> bool;
+
+    fn invalidate(&mut self);
+}

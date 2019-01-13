@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use crate::cache;
+use crate::cache::cache_trait::Cache;
 use crate::library::CargoCachePaths;
 
 pub(crate) struct DirCache {

@@ -11,6 +11,7 @@ use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
+use crate::cache::cache_trait::Cache;
 use rayon::iter::*;
 
 pub(crate) struct GitCheckoutCache {
@@ -23,8 +24,8 @@ pub(crate) struct GitCheckoutCache {
     checkout_folders: Vec<PathBuf>,
 }
 
-impl GitCheckoutCache {
-    pub(crate) fn new(path: PathBuf) -> Self {
+impl Cache for GitCheckoutCache {
+    fn new(path: PathBuf) -> Self {
         // lazy cache, compute only as needed and save
         Self {
             path,
@@ -36,19 +37,19 @@ impl GitCheckoutCache {
             number_of_checkouts: None,
         }
     }
-
-    pub(crate) fn invalidate(&mut self) {
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+    fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
         self.checkouts_calculated = false;
         self.number_of_checkouts = None;
     }
+}
 
-    #[inline]
-    pub(crate) fn path_exists(&mut self) -> bool {
-        self.path.exists()
-    }
-
+impl GitCheckoutCache {
     pub(crate) fn number_of_files_at_depth_2(&mut self) -> usize {
         let root_dir_depth = self.path.iter().count();
         if self.number_of_checkouts.is_some() {

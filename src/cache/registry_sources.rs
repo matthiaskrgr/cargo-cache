@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use crate::cache::cache_trait::Cache;
 use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
@@ -23,8 +24,8 @@ pub(crate) struct RegistrySourceCache {
     checkout_folders: Vec<PathBuf>,
 }
 
-impl RegistrySourceCache {
-    pub(crate) fn new(path: PathBuf) -> Self {
+impl Cache for RegistrySourceCache {
+    fn new(path: PathBuf) -> Self {
         // calculate only as needed and cache
         Self {
             path,
@@ -37,18 +38,19 @@ impl RegistrySourceCache {
         }
     }
 
-    pub(crate) fn invalidate(&mut self) {
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+    fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
         self.repos_calculated = false;
         self.number_of_repos = None;
     }
+}
 
-    #[inline]
-    pub(crate) fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
+impl RegistrySourceCache {
     pub(crate) fn number_of_files_at_depth_2(&mut self) -> usize {
         let root_dir_depth = self.path.iter().count();
         if self.number_of_repos.is_some() {

@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use crate::cache::cache_trait::Cache;
 use std::fs;
 use std::path::PathBuf;
 
@@ -20,8 +21,8 @@ pub(crate) struct RegistryCache {
     files: Vec<PathBuf>,
 }
 
-impl RegistryCache {
-    pub(crate) fn new(path: PathBuf) -> Self {
+impl Cache for RegistryCache {
+    fn new(path: PathBuf) -> Self {
         // calculate once and save, return as needed
         Self {
             path,
@@ -31,18 +32,18 @@ impl RegistryCache {
             files: Vec::new(),
         }
     }
-
-    pub(crate) fn invalidate(&mut self) {
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+    fn invalidate(&mut self) {
         self.total_size = None;
         self.number_of_files = None;
         self.files_calculated = false;
     }
+}
 
-    #[inline]
-    pub(crate) fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
+impl RegistryCache {
     pub(crate) fn number_of_files(&mut self) -> usize {
         if self.number_of_files.is_some() {
             self.number_of_files.unwrap()

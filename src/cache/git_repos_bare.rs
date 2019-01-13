@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use crate::cache::cache_trait::Cache;
 use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
@@ -24,8 +25,8 @@ pub(crate) struct GitRepoCache {
     bare_repos_folders: Vec<PathBuf>,
 }
 
-impl GitRepoCache {
-    pub(crate) fn new(path: PathBuf) -> Self {
+impl Cache for GitRepoCache {
+    fn new(path: PathBuf) -> Self {
         // calculate as needed
         Self {
             path,
@@ -39,19 +40,19 @@ impl GitRepoCache {
             number_of_repos: None,
         }
     }
-
-    pub(crate) fn invalidate(&mut self) {
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+    fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
         self.repos_calculated = false;
         self.number_of_repos = None;
     }
+}
 
-    #[inline]
-    pub(crate) fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
+impl GitRepoCache {
     pub(crate) fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
