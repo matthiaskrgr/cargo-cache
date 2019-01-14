@@ -35,8 +35,6 @@ impl DirCache {
         }
     }
 
-    //todo: split up into several structs that are accessed at the same time mutably
-
     pub(crate) fn invalidate(&mut self) {
         self.bin.invalidate();
         self.git_checkouts.invalidate();
@@ -48,13 +46,16 @@ impl DirCache {
 }
 
 pub(crate) trait Cache {
+    // creates a new cache object
     fn new(path: PathBuf) -> Self;
-
+    // checks if the path to the directory of an object exists
     fn path_exists(&self) -> bool;
-
+    // invalidates the cache
     fn invalidate(&mut self);
-
+    // total size of the cache
     fn total_size(&mut self) -> u64;
-
+    // list of files of the cache
     fn files(&mut self) -> &[PathBuf];
 }
+
+// todo: split up into several structs that are accessed at the same time mutably
