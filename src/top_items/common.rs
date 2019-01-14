@@ -9,12 +9,6 @@
 
 use std::path::PathBuf;
 
-#[derive(Debug, Clone)]
-pub(crate) struct FileDesc {
-    pub(crate) name: String,
-    pub(crate) size: u64,
-}
-
 pub(crate) fn dir_exists(path: &PathBuf) -> bool {
     // check if a directory exists and print an warning message if not
     if path.exists() {
