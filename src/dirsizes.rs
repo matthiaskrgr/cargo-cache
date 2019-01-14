@@ -9,6 +9,7 @@
 
 use std::fmt;
 
+use crate::cache::cache_trait::Cache;
 use crate::cache::dircache;
 use crate::library::*;
 

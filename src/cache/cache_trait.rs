@@ -16,4 +16,6 @@ pub(crate) trait Cache {
     fn path_exists(&self) -> bool;
 
     fn invalidate(&mut self);
+
+    fn total_size(&mut self) -> u64;
 }

@@ -40,20 +40,20 @@ impl Cache for GitRepoCache {
             number_of_repos: None,
         }
     }
+
     #[inline]
     fn path_exists(&self) -> bool {
         self.path.exists()
     }
+
     fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
         self.repos_calculated = false;
         self.number_of_repos = None;
     }
-}
 
-impl GitRepoCache {
-    pub(crate) fn total_size(&mut self) -> u64 {
+    fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
         } else if self.path.is_dir() {
@@ -70,7 +70,9 @@ impl GitRepoCache {
             0
         }
     }
+}
 
+impl GitRepoCache {
     pub(crate) fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files

@@ -32,31 +32,19 @@ impl Cache for BinaryCache {
             files: Vec::new(),
         }
     }
+
     #[inline]
     fn path_exists(&self) -> bool {
         self.path.exists()
     }
+
     fn invalidate(&mut self) {
         self.number_of_files = None;
         self.total_size = None;
         self.files_calculated = false;
     }
-}
 
-impl BinaryCache {
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
-        } else if self.path_exists() {
-            let count = self.files().len();
-            self.number_of_files = Some(count);
-            count
-        } else {
-            0
-        }
-    }
-
-    pub(crate) fn total_size(&mut self) -> u64 {
+    fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
         } else if self.path.is_dir() {
@@ -71,6 +59,20 @@ impl BinaryCache {
                 .sum();
             self.total_size = Some(total_size);
             total_size
+        } else {
+            0
+        }
+    }
+}
+
+impl BinaryCache {
+    pub(crate) fn number_of_files(&mut self) -> usize {
+        if self.number_of_files.is_some() {
+            self.number_of_files.unwrap()
+        } else if self.path_exists() {
+            let count = self.files().len();
+            self.number_of_files = Some(count);
+            count
         } else {
             0
         }

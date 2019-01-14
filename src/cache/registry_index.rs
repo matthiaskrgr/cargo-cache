@@ -31,18 +31,18 @@ impl Cache for RegistryIndexCache {
             files: Vec::new(),
         }
     }
+
     #[inline]
     fn path_exists(&self) -> bool {
         self.path.exists()
     }
+
     fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
     }
-}
 
-impl RegistryIndexCache {
-    pub(crate) fn total_size(&mut self) -> u64 {
+    fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
         } else if self.path.is_dir() {
@@ -63,7 +63,9 @@ impl RegistryIndexCache {
             0
         }
     }
+}
 
+impl RegistryIndexCache {
     pub(crate) fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files

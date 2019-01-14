@@ -37,15 +37,38 @@ impl Cache for GitCheckoutCache {
             number_of_checkouts: None,
         }
     }
+
     #[inline]
     fn path_exists(&self) -> bool {
         self.path.exists()
     }
+
     fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
         self.checkouts_calculated = false;
         self.number_of_checkouts = None;
+    }
+
+    fn total_size(&mut self) -> u64 {
+        if self.total_size.is_some() {
+            self.total_size.unwrap()
+        } else if self.path.is_dir() {
+            // get the size of all files in path dir
+            let total_size = self
+                .files()
+                .par_iter()
+                .map(|f| {
+                    fs::metadata(f)
+                        .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                        .len()
+                })
+                .sum();
+            self.total_size = Some(total_size);
+            total_size
+        } else {
+            0
+        }
     }
 }
 
@@ -64,27 +87,6 @@ impl GitCheckoutCache {
                 .count();
             self.number_of_checkouts = Some(count);
             count
-        } else {
-            0
-        }
-    }
-
-    pub(crate) fn total_size(&mut self) -> u64 {
-        if self.total_size.is_some() {
-            self.total_size.unwrap()
-        } else if self.path.is_dir() {
-            // get the size of all files in path dir
-            let total_size = self
-                .files()
-                .par_iter()
-                .map(|f| {
-                    fs::metadata(f)
-                        .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
-                        .len()
-                })
-                .sum();
-            self.total_size = Some(total_size);
-            total_size
         } else {
             0
         }
