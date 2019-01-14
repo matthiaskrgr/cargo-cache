@@ -83,6 +83,7 @@ fn main() {
         process::exit(0);
     }
 
+    // create cache
     let mut cache = DirCache::new(CargoCachePaths::default().unwrap());
 
     if config.is_present("top-cache-items") {

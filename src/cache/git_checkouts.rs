@@ -11,7 +11,7 @@ use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-use crate::cache::cache_trait::Cache;
+use crate::cache::dircache::Cache;
 use rayon::iter::*;
 
 pub(crate) struct GitCheckoutCache {

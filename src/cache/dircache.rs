@@ -7,8 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::path::PathBuf;
+
 use crate::cache;
-use crate::cache::cache_trait::Cache;
 use crate::library::CargoCachePaths;
 
 pub(crate) struct DirCache {
@@ -34,6 +35,8 @@ impl DirCache {
         }
     }
 
+    //todo: split up into several structs that are accessed at the same time mutably
+
     pub(crate) fn invalidate(&mut self) {
         self.bin.invalidate();
         self.git_checkouts.invalidate();
@@ -42,4 +45,16 @@ impl DirCache {
         self.registry_index.invalidate();
         self.registry_sources.invalidate();
     }
+}
+
+pub(crate) trait Cache {
+    fn new(path: PathBuf) -> Self;
+
+    fn path_exists(&self) -> bool;
+
+    fn invalidate(&mut self);
+
+    fn total_size(&mut self) -> u64;
+
+    fn files(&mut self) -> &[PathBuf];
 }

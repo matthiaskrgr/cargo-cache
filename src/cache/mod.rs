@@ -8,7 +8,6 @@
 // except according to those terms.
 
 pub(crate) mod bin;
-pub(crate) mod cache_trait;
 pub(crate) mod dircache;
 pub(crate) mod git_checkouts;
 pub(crate) mod git_repos_bare;

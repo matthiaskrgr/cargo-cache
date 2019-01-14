@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::cache_trait::Cache;
+use crate::cache::dircache::Cache;
 use std::fs;
 use std::path::PathBuf;
 

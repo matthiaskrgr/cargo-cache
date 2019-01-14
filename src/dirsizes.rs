@@ -9,8 +9,8 @@
 
 use std::fmt;
 
-use crate::cache::cache_trait::Cache;
 use crate::cache::dircache;
+use crate::cache::dircache::Cache;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
