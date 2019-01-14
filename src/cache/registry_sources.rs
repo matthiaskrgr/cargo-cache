@@ -71,6 +71,24 @@ impl Cache for RegistrySourceCache {
             0
         }
     }
+
+    fn files(&mut self) -> &[PathBuf] {
+        if self.files_calculated {
+            &self.files
+        } else {
+            if self.path_exists() {
+                let walkdir = WalkDir::new(self.path.display().to_string());
+                let v = walkdir
+                    .into_iter()
+                    .map(|d| d.unwrap().into_path())
+                    .collect::<Vec<PathBuf>>();
+                self.files = v;
+            } else {
+                self.files = Vec::new();
+            }
+            &self.files
+        }
+    }
 }
 
 impl RegistrySourceCache {
@@ -90,24 +108,6 @@ impl RegistrySourceCache {
             count
         } else {
             0
-        }
-    }
-
-    pub(crate) fn files(&mut self) -> &[PathBuf] {
-        if self.files_calculated {
-            &self.files
-        } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .collect::<Vec<PathBuf>>();
-                self.files = v;
-            } else {
-                self.files = Vec::new();
-            }
-            &self.files
         }
     }
 

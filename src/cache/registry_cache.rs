@@ -65,22 +65,8 @@ impl Cache for RegistryCache {
             0
         }
     }
-}
 
-impl RegistryCache {
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
-        } else if self.path_exists() {
-            let count = self.files().len();
-            self.number_of_files = Some(count);
-            count
-        } else {
-            0
-        }
-    }
-
-    pub(crate) fn files(&mut self) -> &[PathBuf] {
+    fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files
         } else {
@@ -117,6 +103,20 @@ impl RegistryCache {
                 self.files = Vec::new();
             }
             &self.files
+        }
+    }
+}
+
+impl RegistryCache {
+    pub(crate) fn number_of_files(&mut self) -> usize {
+        if self.number_of_files.is_some() {
+            self.number_of_files.unwrap()
+        } else if self.path_exists() {
+            let count = self.files().len();
+            self.number_of_files = Some(count);
+            count
+        } else {
+            0
         }
     }
 }

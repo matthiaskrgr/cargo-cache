@@ -13,7 +13,6 @@ use std::path::PathBuf;
 
 use crate::cache::cache_trait::Cache;
 use crate::cache::dircache::DirCache;
-
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};

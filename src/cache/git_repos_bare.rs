@@ -70,10 +70,8 @@ impl Cache for GitRepoCache {
             0
         }
     }
-}
 
-impl GitRepoCache {
-    pub(crate) fn files(&mut self) -> &[PathBuf] {
+    fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files
         } else {
@@ -91,7 +89,9 @@ impl GitRepoCache {
             &self.files
         }
     }
+}
 
+impl GitRepoCache {
     pub(crate) fn number_of_checkout_repos(&mut self) -> Option<usize> {
         if self.number_of_repos.is_some() {
             self.number_of_repos

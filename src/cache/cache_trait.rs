@@ -18,4 +18,6 @@ pub(crate) trait Cache {
     fn invalidate(&mut self);
 
     fn total_size(&mut self) -> u64;
+
+    fn files(&mut self) -> &[PathBuf];
 }

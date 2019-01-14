@@ -63,10 +63,8 @@ impl Cache for RegistryIndexCache {
             0
         }
     }
-}
 
-impl RegistryIndexCache {
-    pub(crate) fn files(&mut self) -> &[PathBuf] {
+    fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files
         } else {
