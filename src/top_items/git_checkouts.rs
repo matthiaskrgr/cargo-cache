@@ -74,7 +74,7 @@ impl FileDesc {
     } // fn new_from_git_checkouts()
 } // impl FileDesc
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Debug, Eq)]
 pub(crate) struct ChkInfo {
     name: String,
     size: u64,

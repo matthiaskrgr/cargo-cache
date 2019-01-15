@@ -17,7 +17,7 @@ use crate::cache::dircache::DirCache;
 use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Debug, Eq)]
 struct BinInfo {
     name: String,
     size: u64,

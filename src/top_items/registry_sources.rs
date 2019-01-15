@@ -65,7 +65,7 @@ impl FileDesc {
     } // fn new_from_reg_src()
 }
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Debug, Eq)]
 pub(crate) struct RgSrcInfo {
     name: String,
     size: u64,

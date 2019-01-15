@@ -50,7 +50,7 @@ impl FileDesc {
     } // fn new_from_reg_cache()
 } // impl FileDesc
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Debug, Eq)]
 pub(crate) struct RgchInfo {
     name: String,
     size: u64,

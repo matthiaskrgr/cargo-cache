@@ -14,7 +14,7 @@ use crate::cache::dircache::Cache;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct DirSizes<'a> {
     pub(crate) total_size: u64,                // total size of cargo root dir
     pub(crate) numb_bins: usize,               // number of binaries found

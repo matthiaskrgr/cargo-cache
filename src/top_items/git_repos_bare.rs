@@ -64,7 +64,7 @@ impl FileDesc {
     } // fn new_from_git_bare()
 }
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Debug, Eq)]
 pub(crate) struct RepoInfo {
     name: String,
     size: u64,
