@@ -7,9 +7,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::dircache::Cache;
 use std::fs;
 use std::path::PathBuf;
+
+use crate::cache::dircache::Cache;
 
 use rayon::iter::*;
 

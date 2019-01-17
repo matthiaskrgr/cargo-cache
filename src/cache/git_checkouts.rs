@@ -9,10 +9,11 @@
 
 use std::fs;
 use std::path::PathBuf;
-use walkdir::WalkDir;
 
 use crate::cache::dircache::Cache;
+
 use rayon::iter::*;
+use walkdir::WalkDir;
 
 pub(crate) struct GitCheckoutCache {
     path: PathBuf,

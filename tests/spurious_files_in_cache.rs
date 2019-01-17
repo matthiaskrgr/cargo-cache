@@ -10,11 +10,13 @@
 #[path = "../src/test_helpers.rs"]
 mod test_helpers;
 
-use crate::test_helpers::bin_path;
-use regex::Regex;
 use std::fs::{create_dir_all, File};
 use std::path::*;
 use std::process::Command;
+
+use crate::test_helpers::bin_path;
+
+use regex::Regex;
 use walkdir::WalkDir;
 
 #[test]

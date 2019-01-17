@@ -11,6 +11,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
+
 use rayon::iter::*;
 
 pub(crate) struct BinaryCache {

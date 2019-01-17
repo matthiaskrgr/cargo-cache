@@ -358,7 +358,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
         (((size_after as f64 / size_before as f64) * f64::from(100)) - f64::from(100)) as f32;
     // truncate to 2 decimal digits
     let percentage: f32 = ((perc * f32::from(100_i8)).trunc()) / (f32::from(100_u8));
-;
+
     if size_before == size_after {
         if dspl_sze_before {
             format!(

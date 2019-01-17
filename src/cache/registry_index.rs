@@ -7,12 +7,13 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::dircache::Cache;
 use std::fs;
 use std::path::PathBuf;
-use walkdir::WalkDir;
+
+use crate::cache::dircache::Cache;
 
 use rayon::iter::*;
+use walkdir::WalkDir;
 
 pub(crate) struct RegistryIndexCache {
     path: PathBuf,
