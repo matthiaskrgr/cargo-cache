@@ -59,7 +59,9 @@ travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 [profile.release]
 lto = true
 codegen-units = 1
+incremental = false
 
 [profile.bench]
 lto = true
 codegen-units = 1
+incremental = false
