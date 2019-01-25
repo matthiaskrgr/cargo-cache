@@ -12,7 +12,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::cache::dircache::DirCache;
+use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
@@ -120,9 +120,10 @@ impl PartialEq for RgSrcInfo {
 }
 
 // registry sources (tarballs)
-fn file_desc_list_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
-    cache
-        .registry_sources
+fn file_desc_list_from_path(
+    registry_sources_cache: &mut registry_sources::RegistrySourceCache,
+) -> Vec<FileDesc> {
+    registry_sources_cache
         .checkout_folders()
         .iter()
         .map(|path| FileDesc::new_from_reg_src(path))
@@ -268,7 +269,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
 pub(crate) fn registry_source_stats(
     path: &PathBuf,
     limit: u32,
-    mut cache: &mut DirCache,
+    mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -279,14 +280,13 @@ pub(crate) fn registry_source_stats(
     stdout.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        cache
-            .registry_sources
+        registry_sources_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut cache);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_sources_cache);
     let summary: Vec<RgSrcInfo> = stats_from_file_desc_list(file_descs);
     let string = reg_src_list_to_string(limit, summary);
     stdout.push_str(&string);

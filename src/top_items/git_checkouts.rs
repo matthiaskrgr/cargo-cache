@@ -7,12 +7,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use crate::cache::*;
 use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::cache::dircache::DirCache;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
@@ -131,10 +131,9 @@ impl PartialEq for ChkInfo {
 }
 
 #[inline]
-fn file_desc_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
+fn file_desc_from_path(git_checkouts_cache: &mut git_checkouts::GitCheckoutCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
-    cache
-        .git_checkouts
+    git_checkouts_cache
         .checkout_folders()
         .iter()
         .map(|path| FileDesc::new_from_git_checkouts(path))
@@ -279,7 +278,11 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
 }
 
 #[inline]
-pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
+pub(crate) fn git_checkouts_stats(
+    path: &PathBuf,
+    limit: u32,
+    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(path) {
@@ -289,14 +292,13 @@ pub(crate) fn git_checkouts_stats(path: &PathBuf, limit: u32, mut cache: &mut Di
     output.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        cache
-            .git_checkouts
+        checkouts_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
 
-    let collections_vec = file_desc_from_path(&mut cache);
+    let collections_vec = file_desc_from_path(&mut checkouts_cache);
     let summary: Vec<ChkInfo> = stats_from_file_desc_list(collections_vec);
 
     let tmp = chkout_list_to_string(limit, summary);

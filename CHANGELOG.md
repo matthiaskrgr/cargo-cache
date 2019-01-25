@@ -1,5 +1,6 @@
 ## Git
 ````
+Parallelize internal cache accesses resulting in reduced wall clock execution time
 Fix some paths being linuxish on windows
 ````
 ## Version 0.1.2

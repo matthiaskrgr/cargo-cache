@@ -12,9 +12,9 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::cache::dircache::DirCache;
-
+use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table};
+
 use humansize::{file_size_opts, FileSize};
 
 #[derive(Clone, Debug)]
@@ -108,9 +108,8 @@ impl PartialEq for RgchInfo {
 }
 
 // registry cache (extracted tarballs)
-fn file_desc_list_from_path(cache: &mut DirCache) -> Vec<FileDesc> {
-    cache
-        .registry_cache
+fn file_desc_list_from_path(registry_cache: &mut registry_cache::RegistryCache) -> Vec<FileDesc> {
+    registry_cache
         .files()
         .iter()
         .map(|path| FileDesc::new_from_reg_cache(path))
@@ -253,7 +252,11 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
 }
 
 // registry cache
-pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
+pub(crate) fn registry_cache_stats(
+    path: &PathBuf,
+    limit: u32,
+    mut registry_cache: &mut registry_cache::RegistryCache,
+) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(path) {
@@ -263,14 +266,13 @@ pub(crate) fn registry_cache_stats(path: &PathBuf, limit: u32, mut cache: &mut D
     stdout.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        cache
-            .registry_cache
+        registry_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut cache);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_cache);
     let summary: Vec<RgchInfo> = stats_from_file_desc_list(file_descs);
     let string = regcache_list_to_string(limit, summary);
     stdout.push_str(&string);

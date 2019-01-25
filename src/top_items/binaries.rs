@@ -12,7 +12,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::cache::dircache::DirCache;
+use crate::cache::*;
 
 use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
@@ -56,10 +56,9 @@ impl PartialEq for BinInfo {
 }
 
 #[inline] // only called in one place
-fn bininfo_list_from_path(cache: &mut DirCache) -> Vec<BinInfo> {
+fn bininfo_list_from_path(bin_cache: &mut bin::BinaryCache) -> Vec<BinInfo> {
     // returns unsorted!
-    cache
-        .bin
+    bin_cache
         .files()
         .iter()
         .map(|path| BinInfo::new(path))
@@ -88,7 +87,11 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
 }
 
 #[inline] // only called in one place
-pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache) -> String {
+pub(crate) fn binary_stats(
+    path: &PathBuf,
+    limit: u32,
+    mut bin_cache: &mut bin::BinaryCache,
+) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(path) {
@@ -98,14 +101,13 @@ pub(crate) fn binary_stats(path: &PathBuf, limit: u32, mut cache: &mut DirCache)
     output.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        cache
-            .bin
+        bin_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
 
-    let collections_vec = bininfo_list_from_path(&mut cache); // this is already sorted
+    let collections_vec = bininfo_list_from_path(&mut bin_cache); // this is already sorted
 
     let bininfo_string = bininfo_list_to_string(limit, collections_vec);
     output.push_str(&bininfo_string);

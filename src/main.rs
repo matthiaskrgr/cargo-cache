@@ -51,10 +51,11 @@ extern crate test; //hack
 
 use std::process;
 
+use crate::cache::dircache::Cache;
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
-use crate::cache::dircache::DirCache;
+use crate::cache::*;
 use crate::git::*;
 use crate::library::*;
 use crate::top_items_summary::*;
@@ -84,18 +85,47 @@ fn main() {
     }
 
     // create cache
-    let mut cache = DirCache::new(CargoCachePaths::default().unwrap());
+    //let mut cache = DirCache::new(CargoCachePaths::default().unwrap());
+
+    let p = CargoCachePaths::default().unwrap();
+
+    let mut bin_cache = bin::BinaryCache::new(p.bin_dir);
+    let mut checkouts_cache = git_checkouts::GitCheckoutCache::new(p.git_checkouts);
+    let mut bare_repos_cache = git_repos_bare::GitRepoCache::new(p.git_repos_bare);
+    let mut registry_cache = registry_cache::RegistryCache::new(p.registry_cache);
+    let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
+    let mut registry_sources_cache = registry_sources::RegistrySourceCache::new(p.registry_sources);
 
     if config.is_present("top-cache-items") {
         let limit =
             value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
         if limit > 0 {
-            println!("{}", get_top_crates(limit, &cargo_cache, &mut cache));
+            println!(
+                "{}",
+                get_top_crates(
+                    limit,
+                    &cargo_cache,
+                    &mut bin_cache,
+                    &mut checkouts_cache,
+                    &mut bare_repos_cache,
+                    &mut registry_cache,
+                    /* &mut registry_index_cache, */
+                    &mut registry_sources_cache,
+                )
+            );
         }
         process::exit(0);
     }
 
-    let dir_sizes = dirsizes::DirSizes::new(&mut cache, &cargo_cache);
+    let dir_sizes = dirsizes::DirSizes::new(
+        &mut bin_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_cache,
+        &mut registry_index_cache,
+        &mut registry_sources_cache,
+        &cargo_cache,
+    );
 
     if config.is_present("info") {
         println!("{}", get_info(&cargo_cache, &dir_sizes));
@@ -180,9 +210,24 @@ fn main() {
         let cache_size_old = dir_sizes.total_size;
 
         // and invalidate the cache
-        cache.invalidate();
+        bin_cache.invalidate();
+        checkouts_cache.invalidate();
+        bare_repos_cache.invalidate();
+        registry_cache.invalidate();
+        registry_index_cache.invalidate();
+        registry_sources_cache.invalidate();
+
         // and requery it to let it do its thing
-        let cache_size_new = dirsizes::DirSizes::new(&mut cache, &cargo_cache).total_size;
+        let cache_size_new = dirsizes::DirSizes::new(
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_cache,
+            &mut registry_index_cache,
+            &mut registry_sources_cache,
+            &cargo_cache,
+        )
+        .total_size;
 
         let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(

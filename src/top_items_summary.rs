@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::dircache::DirCache;
+use crate::cache::*;
 use crate::library::CargoCachePaths;
 use crate::top_items::binaries::*;
 use crate::top_items::git_checkouts::*;
@@ -15,18 +15,41 @@ use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
 
+#[allow(clippy::complexity)]
 pub(crate) fn get_top_crates(
     limit: u32,
     ccd: &CargoCachePaths,
-    mut cache: &mut DirCache,
+    mut bin_cache: &mut bin::BinaryCache,
+    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut registry_cache: &mut registry_cache::RegistryCache,
+    mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> String {
-    let binaries = binary_stats(&ccd.bin_dir, limit, &mut cache);
-
-    let reg_src = registry_source_stats(&ccd.registry_sources, limit, &mut cache);
-    let reg_cache = registry_cache_stats(&ccd.registry_cache, limit, &mut cache);
-
-    let bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut cache);
-    let repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, &mut cache);
+    let (((reg_src, reg_cache), (bare_repos, repo_checkouts)), binaries) = rayon::join(
+        || {
+            rayon::join(
+                || {
+                    rayon::join(
+                        || {
+                            registry_source_stats(
+                                &ccd.registry_sources,
+                                limit,
+                                &mut registry_sources_cache,
+                            )
+                        },
+                        || registry_cache_stats(&ccd.registry_cache, limit, &mut registry_cache),
+                    )
+                },
+                || {
+                    rayon::join(
+                        || git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut bare_repos_cache),
+                        || git_checkouts_stats(&ccd.git_checkouts, limit, &mut checkouts_cache),
+                    )
+                },
+            )
+        },
+        || binary_stats(&ccd.bin_dir, limit, &mut bin_cache),
+    );
 
     let mut output = String::with_capacity(
         binaries.len() + reg_src.len() + reg_cache.len() + bare_repos.len() + repo_checkouts.len(),
