@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 
-use rayon::iter::*;
+use rayon::prelude::*;
 
 pub(crate) struct RegistryCache {
     path: PathBuf,
@@ -96,7 +96,7 @@ impl Cache for RegistryCache {
                     }
                 }
                 collection.extend_from_slice(&both_levels_vec);
-                collection.sort();
+                collection.par_sort();
 
                 self.files_calculated = true;
                 self.files = collection;

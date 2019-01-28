@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 
-use rayon::iter::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 pub(crate) struct GitRepoCache {
@@ -114,7 +114,7 @@ impl GitRepoCache {
                     .map(|cratepath| cratepath.unwrap().path())
                     .collect::<Vec<PathBuf>>();
 
-                crate_list.sort();
+                crate_list.par_sort();
 
                 self.repos_calculated = true;
                 self.bare_repos_folders = crate_list;

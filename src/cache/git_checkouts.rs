@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 
-use rayon::iter::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 pub(crate) struct GitCheckoutCache {
@@ -135,7 +135,7 @@ impl GitCheckoutCache {
                     }
                 }
                 collection.extend_from_slice(&both_levels_vec);
-                collection.sort();
+                collection.par_sort();
 
                 self.checkouts_calculated = true;
                 self.checkout_folders = collection;
