@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
-use rayon::iter::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 #[derive(Clone, Debug)]
@@ -124,7 +124,7 @@ fn file_desc_list_from_path(
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> Vec<FileDesc> {
     registry_sources_cache
-        .checkout_folders()
+        .checkout_folders_sorted()
         .iter()
         .map(|path| FileDesc::new_from_reg_src(path))
         .collect::<Vec<_>>()
@@ -234,7 +234,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
     }
 
     // sort the RepoImfo Vec in reverse, biggest item first
-    collections_vec.sort();
+    collections_vec.par_sort();
     collections_vec.reverse();
 
     let mut table_matrix: Vec<Vec<String>> = Vec::new();

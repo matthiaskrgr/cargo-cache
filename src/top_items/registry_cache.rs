@@ -16,6 +16,7 @@ use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
+use rayon::prelude::*;
 
 #[derive(Clone, Debug)]
 struct FileDesc {
@@ -110,7 +111,7 @@ impl PartialEq for RgchInfo {
 // registry cache (extracted tarballs)
 fn file_desc_list_from_path(registry_cache: &mut registry_cache::RegistryCache) -> Vec<FileDesc> {
     registry_cache
-        .files()
+        .files_sorted()
         .iter()
         .map(|path| FileDesc::new_from_reg_cache(path))
         .collect::<Vec<_>>()
@@ -220,7 +221,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
     }
 
     // sort the RepoInfo Vec in reverse, biggest item first
-    collections_vec.sort();
+    collections_vec.par_sort();
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 

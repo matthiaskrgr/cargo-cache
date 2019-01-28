@@ -16,7 +16,7 @@ use crate::cache::dircache::Cache;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
-use rayon::iter::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 #[derive(Clone, Debug)]
@@ -134,7 +134,7 @@ impl PartialEq for ChkInfo {
 fn file_desc_from_path(git_checkouts_cache: &mut git_checkouts::GitCheckoutCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     git_checkouts_cache
-        .checkout_folders()
+        .checkout_folders_sorted()
         .iter()
         .map(|path| FileDesc::new_from_git_checkouts(path))
         .collect::<Vec<_>>()
@@ -246,7 +246,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
     }
 
     // sort the ChkInfo Vec in reverse
-    collections_vec.sort();
+    collections_vec.par_sort();
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 

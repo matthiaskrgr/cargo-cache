@@ -20,4 +20,6 @@ pub(crate) trait Cache {
     fn total_size(&mut self) -> u64;
     // list of files of the cache
     fn files(&mut self) -> &[PathBuf];
+    // list of files of the cache, sorted
+    fn files_sorted(&mut self) -> &[PathBuf];
 }

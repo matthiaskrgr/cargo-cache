@@ -90,6 +90,12 @@ impl Cache for GitRepoCache {
             &self.files
         }
     }
+
+    fn files_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.files(); // prime cache
+        self.files.sort();
+        &self.files()
+    }
 }
 
 impl GitRepoCache {
@@ -109,12 +115,10 @@ impl GitRepoCache {
             &self.bare_repos_folders
         } else {
             if self.path_exists() {
-                let mut crate_list = fs::read_dir(&self.path)
+                let crate_list = fs::read_dir(&self.path)
                     .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
                     .collect::<Vec<PathBuf>>();
-
-                crate_list.par_sort();
 
                 self.repos_calculated = true;
                 self.bare_repos_folders = crate_list;
@@ -123,6 +127,12 @@ impl GitRepoCache {
             }
             &self.bare_repos_folders
         }
+    }
+
+    pub(crate) fn bare_repo_folders_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.bare_repo_folders(); // prime cache
+        self.bare_repos_folders.sort();
+        &self.bare_repos_folders
     }
 
     /*

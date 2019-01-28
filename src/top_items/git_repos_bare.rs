@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
-use rayon::iter::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 #[derive(Clone, Debug)]
@@ -121,7 +121,7 @@ impl PartialEq for RepoInfo {
 fn file_desc_from_path(bare_repos_cache: &mut git_repos_bare::GitRepoCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     bare_repos_cache
-        .bare_repo_folders() // bad
+        .bare_repo_folders_sorted() // bad
         .iter()
         .map(|path| FileDesc::new_from_git_bare(path))
         .collect::<Vec<_>>()
@@ -231,7 +231,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
         return String::new();
     }
     // sort the RepoInfo Vec in reverse, biggest item first
-    collections_vec.sort();
+    collections_vec.par_sort();
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 

@@ -90,6 +90,12 @@ impl Cache for GitCheckoutCache {
             &self.files
         }
     }
+
+    fn files_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.files(); // prime cache
+        self.files.sort();
+        &self.files()
+    }
 }
 
 impl GitCheckoutCache {
@@ -135,7 +141,6 @@ impl GitCheckoutCache {
                     }
                 }
                 collection.extend_from_slice(&both_levels_vec);
-                collection.par_sort();
 
                 self.checkouts_calculated = true;
                 self.checkout_folders = collection;
@@ -144,5 +149,11 @@ impl GitCheckoutCache {
             }
             &self.checkout_folders
         }
+    }
+
+    pub(crate) fn checkout_folders_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.checkout_folders(); // prime cache
+        self.checkout_folders.sort();
+        &self.checkout_folders
     }
 }

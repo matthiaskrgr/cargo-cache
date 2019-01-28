@@ -78,6 +78,12 @@ impl Cache for BinaryCache {
             &self.files
         }
     }
+
+    fn files_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.files(); // prime cache
+        self.files.sort();
+        &self.files()
+    }
 }
 
 impl BinaryCache {

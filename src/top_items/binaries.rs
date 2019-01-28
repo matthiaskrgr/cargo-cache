@@ -13,9 +13,10 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
-
 use crate::top_items::common::*;
+
 use humansize::{file_size_opts, FileSize};
+use rayon::prelude::*;
 
 #[derive(Debug, Eq)]
 struct BinInfo {
@@ -71,7 +72,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
         return String::new();
     }
     // sort the BinInfo Vec in reverse
-    collections_vec.sort();
+    collections_vec.par_sort();
     collections_vec.reverse();
 
     let mut table_matrix: Vec<Vec<String>> = Vec::new();

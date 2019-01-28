@@ -96,7 +96,6 @@ impl Cache for RegistryCache {
                     }
                 }
                 collection.extend_from_slice(&both_levels_vec);
-                collection.par_sort();
 
                 self.files_calculated = true;
                 self.files = collection;
@@ -105,6 +104,12 @@ impl Cache for RegistryCache {
             }
             &self.files
         }
+    }
+
+    fn files_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.files(); // prime cache
+        self.files.sort();
+        &self.files()
     }
 }
 
