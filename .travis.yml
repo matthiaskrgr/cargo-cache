@@ -68,7 +68,10 @@ matrix:
       os: linux
       rust: nightly
       script:
-        - rustup component add clippy-preview --toolchain=nightly || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy || true && exit
+        - EXIT="false"
+        - rustup component add clippy-preview --toolchain=nightly || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy || EXIT="true"
+# don't fail the build if clippy fails to build
+        - if [[ $EXIT == "true" ]]; then exit; fi
         - cargo clippy --all-targets --all-features -- -D warnings
 
     - name: "cargo audit"
