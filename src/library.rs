@@ -472,10 +472,10 @@ pub(crate) fn remove_dir_via_cmdline(
     } // for word in inputs
     if terminate {
         // remove trailing whitespace
-        invalid_dirs.trim();
+        let inv_dirs = invalid_dirs.trim();
         return Err((
             ErrorKind::InvalidDeletableDir,
-            format!("Invalid deletable dir(s): {}", invalid_dirs),
+            format!("Invalid deletable dir(s): {}", inv_dirs),
         ));
     }
     // finally delete
