@@ -63,7 +63,7 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
         // move on to the next cell
     }
 
-    out.trim()
+    out.trim().to_string()
 }
 
 #[cfg(test)]
