@@ -60,11 +60,10 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
         let row = new_row.trim();
         out.push_str(&row);
         out.push_str("\n");
-        out.trim();
         // move on to the next cell
     }
 
-    out
+    out.trim()
 }
 
 #[cfg(test)]
