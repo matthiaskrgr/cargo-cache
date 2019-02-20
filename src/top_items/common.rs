@@ -57,13 +57,13 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
             // add space between each cell
             new_row.push_str(SEPARATOR);
         }
-        let row = new_row.trim();
+        let mut row = new_row.trim().to_string();
+        row.push_str("\n");
         out.push_str(&row);
-        out.push_str("\n");
         // move on to the next cell
     }
 
-    out.trim().to_string()
+    out.to_string()
 }
 
 #[cfg(test)]
