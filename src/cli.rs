@@ -12,7 +12,7 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rustc_tools_util::*;
 
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-	#[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
+    #[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
     let version = rustc_tools_util::get_version_info!()
         .to_string()
         .replacen("cargo-cache ", "", 1);
