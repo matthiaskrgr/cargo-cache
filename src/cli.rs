@@ -12,6 +12,7 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rustc_tools_util::*;
 
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
+	#[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
     let version = rustc_tools_util::get_version_info!()
         .to_string()
         .replacen("cargo-cache ", "", 1);
@@ -117,6 +118,7 @@ mod clitests {
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
+        #[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str("
 matthiaskrgr
@@ -150,6 +152,7 @@ OPTIONS:
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
+        #[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str("
 matthiaskrgr
