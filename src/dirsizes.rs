@@ -28,6 +28,7 @@ pub(crate) struct DirSizes<'a> {
     pub(crate) total_git_chk_size: u64,        // git checkout size
     pub(crate) total_reg_cache_size: u64,      // registry cache size
     pub(crate) total_reg_src_size: u64,        // registry sources size
+    pub(crate) total_reg_index_size: u64,      // registry index size
     pub(crate) numb_reg_cache_entries: usize,  // number of source archives
     pub(crate) numb_reg_src_checkouts: usize,  // number of source checkouts
     pub(crate) root_path: &'a std::path::PathBuf,
@@ -123,6 +124,7 @@ impl<'a> DirSizes<'a> {
             total_git_chk_size,        // git checkout size
             total_reg_cache_size,      // registry cache size
             total_reg_src_size,        // registry sources size
+            total_reg_index_size: reg_index_size, // registry index size
             numb_reg_cache_entries: total_reg_cache_entries, // number of source archives
             numb_reg_src_checkouts,    // number of source checkouts
             root_path,
@@ -191,6 +193,19 @@ impl<'a> fmt::Display for DirSizes<'a> {
                 "Size of registry: ",
                 &self
                     .total_reg_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            )
+        )?;
+
+        write!(
+            f,
+            "{}",
+            pad_strings(
+                2,
+                "Size of registry index: ",
+                &self
+                    .total_reg_index_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             )
@@ -318,6 +333,8 @@ mod libtests {
 
                 total_reg_src_size: reg_src.dir_size,
                 numb_reg_src_checkouts: reg_src.file_number as usize,
+
+                total_reg_index_size: reg_index.dir_size,
                 root_path: path,
             }
         }
@@ -372,6 +389,7 @@ mod libtests {
 Total size:                             1.94 GB
 Size of 31 installed binaries:            121.21 KB
 Size of registry:                         1.94 GB
+Size of registry index:                     23 B
 Size of 23445 crate archives:               89 B
 Size of 123909849 crate source checkouts:   1.94 GB
 Size of git db:                           156.20 KB
@@ -429,6 +447,7 @@ Size of 8 git repo checkouts:               34.98 KB\n";
 Total size:                             6.33 GB
 Size of 69 installed binaries:            640.16 MB
 Size of registry:                         1.46 GB
+Size of registry index:                     23 B
 Size of 3654 crate archives:                550.86 MB
 Size of 1615 crate source checkouts:        905.60 MB
 Size of git db:                           4.23 GB
@@ -487,6 +506,7 @@ Size of 36 git repo checkouts:              3.92 GB\n";
 Total size:                             14.57 GB
 Size of 0 installed binaries:             0 B
 Size of registry:                         14.57 GB
+Size of registry index:                     1.25 GB
 Size of 4 crate archives:                   13.04 GB
 Size of 4 crate source checkouts:           268.46 MB
 Size of git db:                           0 B
@@ -545,6 +565,7 @@ Size of 0 git repo checkouts:               0 B\n";
 Total size:                             0 B
 Size of 0 installed binaries:             0 B
 Size of registry:                         0 B
+Size of registry index:                     0 B
 Size of 0 crate archives:                   0 B
 Size of 0 crate source checkouts:           0 B
 Size of git db:                           0 B

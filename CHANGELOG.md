@@ -2,6 +2,7 @@
 ````
 Parallelize internal cache accesses resulting in reduced wall clock execution time
 Fix some paths being linuxish on windows
+Print size of the registry index (${CARGO_HOME}registry/index) in default view
 ````
 ## Version 0.1.2
 ````
