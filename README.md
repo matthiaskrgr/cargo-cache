@@ -20,14 +20,15 @@ or for the bleeding edge development version:
 ````
 Cargo cache '/home/matthias/.cargo':
 
-Total size:                             2.06 GB
-Size of 62 installed binaries:            722.49 MB
-Size of registry:                         950.39 MB
-Size of 3022 crate archives:                440.57 MB
-Size of 621 crate source checkouts:         445.13 MB
-Size of git db:                           387.48 MB
-Size of 95 bare git repos:                  377.87 MB
-Size of 4 git repo checkouts:               9.61 MB
+Total size:                             3.77 GB
+Size of 87 installed binaries:            558.30 MB
+Size of registry:                         1.97 GB
+Size of registry index:                     44.32 MB
+Size of 6639 crate archives:                1.24 GB
+Size of 1312 crate source checkouts:        688.91 MB
+Size of git db:                           1.24 GB
+Size of 172 bare git repos:                 1.03 GB
+Size of 13 git repo checkouts:              210.87 MB
 ````
 
 #### Usage:
@@ -102,26 +103,28 @@ cargo cache --autoclean
 
 Cargo cache '/home/matthias/.cargo/':
 
-Total size:                             9.61 GB
-Size of 84 installed binaries:            588.35 MB
-Size of registry:                         4.31 GB
-Size of 6136 crate archives:                1.18 GB
-Size of 3738 crate source checkouts:        3.11 GB
-Size of git db:                           4.72 GB
-Size of 172 bare git repos:                 918.98 MB
-Size of 138 git repo checkouts:             3.80 GB
+Total size:                             3.77 GB
+Size of 87 installed binaries:            558.30 MB
+Size of registry:                         1.97 GB
+Size of registry index:                     44.32 MB
+Size of 6639 crate archives:                1.24 GB
+Size of 1312 crate source checkouts:        688.91 MB
+Size of git db:                           1.24 GB
+Size of 172 bare git repos:                 1.03 GB
+Size of 13 git repo checkouts:              210.87 MB
 
-Size changed from 9.61 GB to 2.71 GB (-6.90 GB, -71.8%)
+Size changed from 3.77 GB to 2.87 GB (-899.78 MB, -23.87%)
 ````
 Checking the sizes after cleanup:
 ````
-Total size:                             2.78 GB
-Size of 84 installed binaries:            588.35 MB
-Size of registry:                         1.27 GB
-Size of 6136 crate archives:                1.18 GB
+Total size:                             2.87 GB
+Size of 87 installed binaries:            558.30 MB
+Size of registry:                         1.28 GB
+Size of registry index:                     44.32 MB
+Size of 6639 crate archives:                1.24 GB
 Size of 0 crate source checkouts:           0 B
-Size of git db:                           918.98 MB
-Size of 172 bare git repos:                 918.98 MB
+Size of git db:                           1.03 GB
+Size of 172 bare git repos:                 1.03 GB
 Size of 0 git repo checkouts:               0 B
 ````
 
