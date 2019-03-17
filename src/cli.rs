@@ -67,6 +67,12 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    // query subcommand to allow querying
+    let query = SubCommand::with_name("query");
+
+    // short q
+    let query_short = SubCommand::with_name("q");
+
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     let cache_subcmd = SubCommand::with_name("cache")
         .version(&*version)
@@ -82,6 +88,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .subcommand(query.clone()) // todo: don't clone
+        .subcommand(query_short.clone()) // todo: don't clone
         .setting(AppSettings::Hidden);
 
     App::new("cargo-cache")
@@ -90,6 +98,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .about("Manage cargo cache")
         .author("matthiaskrgr")
         .subcommand(cache_subcmd)
+        .subcommand(query)
+        .subcommand(query_short)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
