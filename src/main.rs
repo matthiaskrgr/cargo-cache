@@ -41,6 +41,7 @@ mod cli;
 mod dirsizes;
 mod git;
 mod library;
+mod query;
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
 mod top_items;
@@ -114,6 +115,11 @@ fn main() {
                 )
             );
         }
+        process::exit(0);
+    }
+
+    if config.is_present("query") || config.is_present("q") {
+        query::run_query();
         process::exit(0);
     }
 
