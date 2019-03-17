@@ -67,28 +67,29 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
+    let cache_subcmd = SubCommand::with_name("cache")
+        .version(&*version)
+        .bin_name("cargo-cache")
+        .about("Manage cargo cache")
+        .author("matthiaskrgr")
+        .arg(&list_dirs)
+        .arg(&remove_dir)
+        .arg(&gc_repos)
+        .arg(&info)
+        .arg(&keep_duplicate_crates)
+        .arg(&dry_run)
+        .arg(&autoclean)
+        .arg(&autoclean_expensive)
+        .arg(&list_top_cache_items)
+        .setting(AppSettings::Hidden);
+
     App::new("cargo-cache")
         .version(&*version)
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .subcommand(
-            SubCommand::with_name("cache")
-                .version(&*version)
-                .bin_name("cargo-cache")
-                .about("Manage cargo cache")
-                .author("matthiaskrgr")
-                .arg(&list_dirs)
-                .arg(&remove_dir)
-                .arg(&gc_repos)
-                .arg(&info)
-                .arg(&keep_duplicate_crates)
-                .arg(&dry_run)
-                .arg(&autoclean)
-                .arg(&autoclean_expensive)
-                .arg(&list_top_cache_items)
-                .setting(AppSettings::Hidden),
-        ) // subcommand
+        .subcommand(cache_subcmd)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
