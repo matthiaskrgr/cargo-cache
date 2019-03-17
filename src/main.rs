@@ -127,7 +127,15 @@ fn main() {
             config.subcommand_matches("q").expect("unwrap failed there")
         };
 
-        query::run_query(&query_config);
+        query::run_query(
+            &query_config,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_cache,
+            &mut registry_sources_cache,
+        );
 
         process::exit(0);
     }
