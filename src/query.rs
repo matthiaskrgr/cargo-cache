@@ -7,8 +7,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-pub(crate) fn run_query() {
-    println!("Query works!");
+use clap::ArgMatches;
+
+pub(crate) fn run_query(query_config: &ArgMatches<'_>) {
+    let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
+
+    println!("Query works!: '{}'", query);
 }
 
 // @TODO: make sure these work:

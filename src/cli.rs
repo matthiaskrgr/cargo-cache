@@ -68,10 +68,14 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .value_name("N");
 
     // query subcommand to allow querying
-    let query = SubCommand::with_name("query");
+    let query = SubCommand::with_name("query")
+        .about("run a query")
+        .arg(Arg::with_name("QUERY"));
 
     // short q
-    let query_short = SubCommand::with_name("q");
+    let query_short = SubCommand::with_name("q")
+        .about("run a query")
+        .arg(Arg::with_name("QUERY"));
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     let cache_subcmd = SubCommand::with_name("cache")

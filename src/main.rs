@@ -119,7 +119,16 @@ fn main() {
     }
 
     if config.is_present("query") || config.is_present("q") {
-        query::run_query();
+        let query_config = if config.is_present("query") {
+            config
+                .subcommand_matches("query")
+                .expect("unwrap failed here")
+        } else {
+            config.subcommand_matches("q").expect("unwrap failed there")
+        };
+
+        query::run_query(&query_config);
+
         process::exit(0);
     }
 
