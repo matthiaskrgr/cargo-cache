@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fs;
+use std::path::PathBuf;
+
 use crate::cache::dircache::Cache;
 use crate::cache::*;
 use crate::library::CargoCachePaths;
@@ -19,6 +22,38 @@ use crate::top_items::registry_sources::*;
 use clap::ArgMatches;
 use regex::Regex;
 
+#[derive(Debug)]
+struct file {
+    path: std::path::PathBuf,
+    name: std::string::String,
+    size: u64,
+}
+
+impl file {}
+
+fn binary_to_file(path: std::path::PathBuf) -> file {
+    file {
+        path: path.clone(),
+        name: path
+            .clone()
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or(String::new()),
+        size: fs::metadata(path.clone())
+            .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
+            .len(),
+    }
+}
+
+fn sort_files_by_name(v: &mut Vec<&file>) {
+    v.sort_by_key(|f| &f.name);
+}
+
+fn sort_files_by_size(v: &mut Vec<&file>) {
+    v.sort_by_key(|f| &f.size);
+}
 pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
     ccd: &CargoCachePaths,
@@ -34,10 +69,8 @@ pub(crate) fn run_query(
     let mut binary_files = bin_cache
         .files()
         .into_iter()
-        .map(|f| f.file_stem().unwrap())
-        .collect::<Vec<_>>(); // etc
-    binary_files.sort();
-    // query by file name etc
+        .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file sturct
+        .collect::<Vec<_>>();
 
     let re = match Regex::new(query) {
         Ok(re) => re,
@@ -47,12 +80,32 @@ pub(crate) fn run_query(
         }
     };
 
-    let matches = binary_files
+    let mut matches = binary_files
         .iter()
-        .filter(|f| re.is_match(f.to_str().unwrap()))
+        .filter(|f| re.is_match(f.name.as_str()))
         .collect::<Vec<_>>();
 
-    println!("Binaries sorted: {:?}", matches);
+    println!("Binaries original : {:?}", matches);
+
+    sort_files_by_name(&mut matches);
+
+    println!(
+        "Binaries sorted by name : {:?}",
+        matches
+            .clone()
+            .into_iter()
+            .map(|f| &f.name)
+            .collect::<Vec<_>>()
+    );
+    sort_files_by_size(&mut matches);
+    println!(
+        "Binaries sorted by size : {:?}",
+        matches
+            .clone()
+            .into_iter()
+            .map(|f| &f.name)
+            .collect::<Vec<_>>()
+    );
 }
 
 // @TODO: make sure these work:
