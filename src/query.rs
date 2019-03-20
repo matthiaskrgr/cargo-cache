@@ -63,23 +63,7 @@ pub(crate) fn run_query(
     mut registry_cache: &mut registry_cache::RegistryCache,
     mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
-    enum SortBy {
-        Name, // default
-        Size,
-        Err,
-    }
-
-    let sorting: SortBy;
-    if query_config.is_present("name") {
-        sorting = SortBy::Name;
-    } else if query_config.is_present("size") {
-        sorting = SortBy::Size;
-    } else if query_config.is_present("name") && query_config.is_present("size") {
-        sorting = SortBy::Err;
-        panic!("query config 'name' and 'size' both present, this should not happen!");
-    } else {
-        unreachable!();
-    }
+    let sorting = query_config.value_of("sort");
 
     println!("Query works!");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
@@ -106,7 +90,7 @@ pub(crate) fn run_query(
     println!("Binaries original : {:?}", matches);
 
     match sorting {
-        SortBy::Name => {
+        Some("name") => {
             sort_files_by_name(&mut matches);
             println!(
                 "Binaries sorted by name : {:?}",
@@ -118,7 +102,7 @@ pub(crate) fn run_query(
             );
         }
 
-        SortBy::Size => {
+        Some("size") => {
             sort_files_by_size(&mut matches);
             println!(
                 "Binaries sorted by size : {:?}",
@@ -129,14 +113,13 @@ pub(crate) fn run_query(
                     .collect::<Vec<_>>()
             );
         }
-        SortBy::Err => {
-            unreachable!();
+        Some(&_) => {
+            panic!("????");
+        }
+        None => {
+            println!("Binaries original : {:?}", matches);
         }
     }
-
-
-
-
 }
 
 // @TODO: make sure these work:
