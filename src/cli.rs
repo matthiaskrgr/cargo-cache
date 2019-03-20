@@ -76,17 +76,24 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .possible_values(&["size", "name"]);
 
+    let human_readable = Arg::with_name("hr")
+        .short("h")
+        .long("human-readable")
+        .help("print sizes in human readable format");
+
     // query subcommand to allow querying
     let query = SubCommand::with_name("query")
         .about("run a query")
         .arg(Arg::with_name("QUERY"))
-        .arg(&query_order);
+        .arg(&query_order)
+        .arg(&human_readable);
 
     // short q
     let query_short = SubCommand::with_name("q")
         .about("run a query")
         .arg(Arg::with_name("QUERY"))
-        .arg(&query_order);
+        .arg(&query_order)
+        .arg(&human_readable);
 
     // </query>
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally

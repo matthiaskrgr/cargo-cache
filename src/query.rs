@@ -20,6 +20,7 @@ use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
 
 use clap::ArgMatches;
+use humansize::{file_size_opts, FileSize};
 use regex::Regex;
 
 #[derive(Debug)]
@@ -64,6 +65,7 @@ pub(crate) fn run_query(
 ) {
     let sorting = query_config.value_of("sort");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
+    let hr_size = query_config.is_present("hr");
 
     // make the regex
     let re = match Regex::new(query) {
@@ -83,24 +85,42 @@ pub(crate) fn run_query(
 
     let mut matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
 
-    if  matches.is_empty() {
-            println!("No matches found!");
-            return;
+    if matches.is_empty() {
+        println!("No matches found!");
+        return;
     }
+
+    let humansize_opts = file_size_opts::FileSizeOpts {
+        allow_negative: true,
+        ..file_size_opts::DECIMAL
+    };
 
     match sorting {
         Some("name") => {
             sort_files_by_name(&mut matches);
             println!("Binaries sorted by name:");
-            matches.iter().for_each(|b| println!("{}: {}", b.name, b.size));
-
+            matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
         }
 
         Some("size") => {
             sort_files_by_size(&mut matches);
             println!("Binaries sorted by size:");
-            matches.iter().for_each(|b| println!("{}: {}", b.name, b.size));
 
+            matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
         }
         Some(&_) => {
             panic!("????");
