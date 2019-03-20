@@ -29,8 +29,6 @@ struct file {
     size: u64,
 }
 
-impl file {}
-
 fn binary_to_file(path: std::path::PathBuf) -> file {
     file {
         path: path.clone(),
@@ -54,6 +52,7 @@ fn sort_files_by_name(v: &mut Vec<&file>) {
 fn sort_files_by_size(v: &mut Vec<&file>) {
     v.sort_by_key(|f| &f.size);
 }
+
 pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
     ccd: &CargoCachePaths,
@@ -64,16 +63,9 @@ pub(crate) fn run_query(
     mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
     let sorting = query_config.value_of("sort");
-
-    println!("Query works!");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
 
-    let mut binary_files = bin_cache
-        .files()
-        .into_iter()
-        .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file sturct
-        .collect::<Vec<_>>();
-
+    // make the regex
     let re = match Regex::new(query) {
         Ok(re) => re,
         Err(e) => {
@@ -82,12 +74,21 @@ pub(crate) fn run_query(
         }
     };
 
-    let mut matches = binary_files
+    let mut binary_files: Vec<_> = bin_cache
+        .files()
         .iter()
-        .filter(|f| re.is_match(f.name.as_str()))
+        .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file struct
+        .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    println!("Binaries original : {:?}", matches);
+    let mut matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
+
+    if  matches.is_empty() {
+            println!("No matches found!");
+            return;
+    }
+
+    // println!("Binaries original : {:?}", matches);
 
     match sorting {
         Some("name") => {
