@@ -88,37 +88,25 @@ pub(crate) fn run_query(
             return;
     }
 
-    // println!("Binaries original : {:?}", matches);
-
     match sorting {
         Some("name") => {
             sort_files_by_name(&mut matches);
-            println!(
-                "Binaries sorted by name : {:?}",
-                matches
-                    .clone()
-                    .into_iter()
-                    .map(|f| &f.name)
-                    .collect::<Vec<_>>()
-            );
+            println!("Binaries sorted by name:");
+            matches.iter().for_each(|b| println!("{}: {}", b.name, b.size));
+
         }
 
         Some("size") => {
             sort_files_by_size(&mut matches);
-            println!(
-                "Binaries sorted by size : {:?}",
-                matches
-                    .clone()
-                    .into_iter()
-                    .map(|f| &f.name)
-                    .collect::<Vec<_>>()
-            );
+            println!("Binaries sorted by size:");
+            matches.iter().for_each(|b| println!("{}: {}", b.name, b.size));
+
         }
         Some(&_) => {
             panic!("????");
         }
         None => {
-            println!("Binaries original : {:?}", matches);
+            // println!("Binaries original : {:?}", matches);
         }
     }
 }
