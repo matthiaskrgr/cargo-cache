@@ -67,16 +67,35 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    // <query>
+
+    let query_sort_by_name = Arg::with_name("name")
+        .short("n")
+        .long("name")
+        .help("Sort query by name")
+        .conflicts_with("size");
+
+    let query_sort_by_size = Arg::with_name("size")
+        .short("s")
+        .long("size")
+        .help("Sort query by size")
+        .conflicts_with("name");
+
     // query subcommand to allow querying
     let query = SubCommand::with_name("query")
         .about("run a query")
-        .arg(Arg::with_name("QUERY"));
+        .arg(Arg::with_name("QUERY"))
+        .arg(&query_sort_by_name)
+        .arg(&query_sort_by_size);
 
     // short q
     let query_short = SubCommand::with_name("q")
         .about("run a query")
-        .arg(Arg::with_name("QUERY"));
+        .arg(Arg::with_name("QUERY"))
+        .arg(&query_sort_by_name)
+        .arg(&query_sort_by_size);
 
+    // </query>
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     let cache_subcmd = SubCommand::with_name("cache")
         .version(&*version)

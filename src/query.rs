@@ -63,6 +63,24 @@ pub(crate) fn run_query(
     mut registry_cache: &mut registry_cache::RegistryCache,
     mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
+    enum SortBy {
+        Name, // default
+        Size,
+        Err,
+    }
+
+    let sorting: SortBy;
+    if query_config.is_present("name") {
+        sorting = SortBy::Name;
+    } else if query_config.is_present("size") {
+        sorting = SortBy::Size;
+    } else if query_config.is_present("name") && query_config.is_present("size") {
+        sorting = SortBy::Err;
+        panic!("query config 'name' and 'size' both present, this should not happen!");
+    } else {
+        unreachable!();
+    }
+
     println!("Query works!");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
 
@@ -87,25 +105,38 @@ pub(crate) fn run_query(
 
     println!("Binaries original : {:?}", matches);
 
-    sort_files_by_name(&mut matches);
+    match sorting {
+        SortBy::Name => {
+            sort_files_by_name(&mut matches);
+            println!(
+                "Binaries sorted by name : {:?}",
+                matches
+                    .clone()
+                    .into_iter()
+                    .map(|f| &f.name)
+                    .collect::<Vec<_>>()
+            );
+        }
 
-    println!(
-        "Binaries sorted by name : {:?}",
-        matches
-            .clone()
-            .into_iter()
-            .map(|f| &f.name)
-            .collect::<Vec<_>>()
-    );
-    sort_files_by_size(&mut matches);
-    println!(
-        "Binaries sorted by size : {:?}",
-        matches
-            .clone()
-            .into_iter()
-            .map(|f| &f.name)
-            .collect::<Vec<_>>()
-    );
+        SortBy::Size => {
+            sort_files_by_size(&mut matches);
+            println!(
+                "Binaries sorted by size : {:?}",
+                matches
+                    .clone()
+                    .into_iter()
+                    .map(|f| &f.name)
+                    .collect::<Vec<_>>()
+            );
+        }
+        SortBy::Err => {
+            unreachable!();
+        }
+    }
+
+
+
+
 }
 
 // @TODO: make sure these work:
