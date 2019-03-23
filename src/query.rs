@@ -21,7 +21,10 @@ use crate::top_items::registry_sources::*;
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
+use rayon::prelude::*;
+
 use regex::Regex;
+use walkdir::WalkDir;
 
 #[derive(Debug)]
 struct file {
@@ -43,6 +46,32 @@ fn binary_to_file(path: std::path::PathBuf) -> file {
         size: fs::metadata(path.clone())
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len(),
+    }
+}
+
+fn git_checkout_to_file(path: std::path::PathBuf) -> file {
+    file {
+        path: path.clone(),
+        name: path
+            .clone()
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or(String::new()),
+
+        size: WalkDir::new(path.clone().display().to_string())
+            .into_iter()
+            .map(|d| d.unwrap().into_path())
+            .filter(|f| f.exists())
+            .collect::<Vec<PathBuf>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .len()
+            })
+            .sum(),
     }
 }
 
@@ -82,13 +111,16 @@ pub(crate) fn run_query(
         .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file struct
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
+    let mut binary_matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
 
-    let mut matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
+    let mut git_checkout_files: Vec<_> = checkouts_cache
+        .files()
+        .iter()
+        .map(|path| git_checkout_to_file(path.to_path_buf()))
+        .filter(|f| re.is_match(f.name.as_str())) // filter by regex
+        .collect::<Vec<_>>();
 
-    if matches.is_empty() {
-        println!("No matches found!");
-        return;
-    }
+    let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
 
     let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
@@ -97,9 +129,22 @@ pub(crate) fn run_query(
 
     match sorting {
         Some("name") => {
-            sort_files_by_name(&mut matches);
+            // executables
+            sort_files_by_name(&mut binary_matches);
             println!("Binaries sorted by name:");
-            matches.iter().for_each(|b| {
+            binary_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            // git checkouts
+            sort_files_by_name(&mut git_checkout_matches);
+            println!("Git checkouts sorted by name:");
+            git_checkout_matches.iter().for_each(|b| {
                 let size = if hr_size {
                     b.size.file_size(&humansize_opts).unwrap().to_string()
                 } else {
@@ -110,10 +155,23 @@ pub(crate) fn run_query(
         }
 
         Some("size") => {
-            sort_files_by_size(&mut matches);
+            // executables
+            sort_files_by_size(&mut binary_matches);
             println!("Binaries sorted by size:");
 
-            matches.iter().for_each(|b| {
+            binary_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            // git checkouts
+            sort_files_by_size(&mut git_checkout_matches);
+            println!("Git checkouts sorted by size:");
+            git_checkout_matches.iter().for_each(|b| {
                 let size = if hr_size {
                     b.size.file_size(&humansize_opts).unwrap().to_string()
                 } else {
@@ -122,11 +180,14 @@ pub(crate) fn run_query(
                 println!("{}: {}", b.name, size)
             });
         }
+
         Some(&_) => {
             panic!("????");
         }
+
         None => {
             // println!("Binaries original : {:?}", matches);
+            println!("None");
         }
     }
 }
