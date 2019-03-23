@@ -34,7 +34,7 @@ struct File {
     size: u64,
 }
 
-fn binary_to_file(path: std::path::PathBuf) -> File {
+fn binary_to_file(path: &std::path::PathBuf) -> File {
     File {
         path: path.clone(),
         name: path
@@ -44,14 +44,14 @@ fn binary_to_file(path: std::path::PathBuf) -> File {
             .unwrap()
             .to_os_string()
             .into_string()
-            .unwrap_or(String::new()),
+            .unwrap_or_default(),
         size: fs::metadata(path.clone())
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len(),
     }
 }
 
-fn git_checkout_to_file(path: std::path::PathBuf) -> File {
+fn git_checkout_to_file(path: &std::path::PathBuf) -> File {
     File {
         path: path.clone(),
         name: path
@@ -60,7 +60,7 @@ fn git_checkout_to_file(path: std::path::PathBuf) -> File {
             .unwrap()
             .to_os_string()
             .into_string()
-            .unwrap_or(String::new()),
+            .unwrap_or_default(),
 
         size: WalkDir::new(path.display().to_string())
             .into_iter()
@@ -77,7 +77,7 @@ fn git_checkout_to_file(path: std::path::PathBuf) -> File {
     }
 }
 
-fn bare_repo_to_file(path: std::path::PathBuf) -> File {
+fn bare_repo_to_file(path: &std::path::PathBuf) -> File {
     File {
         path: path.clone(),
         name: path
@@ -86,7 +86,7 @@ fn bare_repo_to_file(path: std::path::PathBuf) -> File {
             .unwrap()
             .to_os_string()
             .into_string()
-            .unwrap_or(String::new()),
+            .unwrap_or_default(),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
@@ -135,7 +135,7 @@ pub(crate) fn run_query(
     let binary_files: Vec<_> = bin_cache
         .files()
         .iter()
-        .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file struct
+        .map(|path| binary_to_file(&path.to_path_buf())) // convert the path into a file struct
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut binary_matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
@@ -143,7 +143,7 @@ pub(crate) fn run_query(
     let git_checkout_files: Vec<_> = checkouts_cache
         .files()
         .iter()
-        .map(|path| git_checkout_to_file(path.to_path_buf()))
+        .map(|path| git_checkout_to_file(&path.to_path_buf()))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
@@ -152,7 +152,7 @@ pub(crate) fn run_query(
     let bare_repos_files: Vec<_> = bare_repos_cache
         .files()
         .iter()
-        .map(|path| bare_repo_to_file(path.to_path_buf()))
+        .map(|path| bare_repo_to_file(&path.to_path_buf()))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut bare_repos_matches: Vec<_> = bare_repos_files.iter().collect::<Vec<_>>();
