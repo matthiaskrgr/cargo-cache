@@ -13,12 +13,13 @@ use std::path::PathBuf;
 use crate::cache::dircache::Cache;
 use crate::cache::*;
 use crate::library::CargoCachePaths;
+/*
 use crate::top_items::binaries::*;
 use crate::top_items::git_checkouts::*;
 use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_cache::*;
 use crate::top_items::registry_sources::*;
-
+*/
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
@@ -27,17 +28,18 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 #[derive(Debug)]
-struct file {
+struct File {
     path: std::path::PathBuf,
     name: std::string::String,
     size: u64,
 }
 
-fn binary_to_file(path: std::path::PathBuf) -> file {
-    file {
+fn binary_to_file(path: std::path::PathBuf) -> File {
+    File {
         path: path.clone(),
         name: path
             .clone()
+
             .file_stem()
             .unwrap()
             .to_os_string()
@@ -49,8 +51,8 @@ fn binary_to_file(path: std::path::PathBuf) -> file {
     }
 }
 
-fn git_checkout_to_file(path: std::path::PathBuf) -> file {
-    file {
+fn git_checkout_to_file(path: std::path::PathBuf) -> File {
+    File {
         path: path.clone(),
         name: path
             .clone()
@@ -60,7 +62,7 @@ fn git_checkout_to_file(path: std::path::PathBuf) -> file {
             .into_string()
             .unwrap_or(String::new()),
 
-        size: WalkDir::new(path.clone().display().to_string())
+        size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
             .filter(|f| f.exists())
@@ -75,11 +77,36 @@ fn git_checkout_to_file(path: std::path::PathBuf) -> file {
     }
 }
 
-fn sort_files_by_name(v: &mut Vec<&file>) {
+fn bare_repo_to_file(path: std::path::PathBuf) -> File {
+    File {
+        path: path.clone(),
+        name: path
+
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or(String::new()),
+        size: WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|d| d.unwrap().into_path())
+            .filter(|f| f.exists())
+            .collect::<Vec<PathBuf>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .len()
+            })
+            .sum(),
+    }
+}
+
+fn sort_files_by_name(v: &mut Vec<&File>) {
     v.sort_by_key(|f| &f.name);
 }
 
-fn sort_files_by_size(v: &mut Vec<&file>) {
+fn sort_files_by_size(v: &mut Vec<&File>) {
     v.sort_by_key(|f| &f.size);
 }
 
@@ -105,7 +132,7 @@ pub(crate) fn run_query(
         }
     };
 
-    let mut binary_files: Vec<_> = bin_cache
+    let binary_files: Vec<_> = bin_cache
         .files()
         .iter()
         .map(|path| binary_to_file(path.to_path_buf())) // convert the path into a file struct
@@ -113,14 +140,27 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
     let mut binary_matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
 
-    let mut git_checkout_files: Vec<_> = checkouts_cache
+    let git_checkout_files: Vec<_> = checkouts_cache
         .files()
         .iter()
         .map(|path| git_checkout_to_file(path.to_path_buf()))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-
     let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
+
+
+    let bare_repos_files: Vec<_> = bare_repos_cache
+        .files()
+        .iter()
+        .map(|path| bare_repo_to_file(path.to_path_buf()))
+        .filter(|f| re.is_match(f.name.as_str())) // filter by regex
+        .collect::<Vec<_>>();
+    let mut bare_repos_matches: Vec<_> = bare_repos_files.iter().collect::<Vec<_>>();
+
+
+
+
+
 
     let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
@@ -134,7 +174,7 @@ pub(crate) fn run_query(
             println!("Binaries sorted by name:");
             binary_matches.iter().for_each(|b| {
                 let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                    b.size.file_size(&humansize_opts).unwrap()
                 } else {
                     b.size.to_string()
                 };
@@ -146,7 +186,20 @@ pub(crate) fn run_query(
             println!("Git checkouts sorted by name:");
             git_checkout_matches.iter().for_each(|b| {
                 let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            // bare git repos
+
+            sort_files_by_name(&mut bare_repos_matches);
+            println!("Bare git repos sorted by name:");
+            bare_repos_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
                 } else {
                     b.size.to_string()
                 };
@@ -161,7 +214,7 @@ pub(crate) fn run_query(
 
             binary_matches.iter().for_each(|b| {
                 let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                    b.size.file_size(&humansize_opts).unwrap()
                 } else {
                     b.size.to_string()
                 };
@@ -173,7 +226,20 @@ pub(crate) fn run_query(
             println!("Git checkouts sorted by size:");
             git_checkout_matches.iter().for_each(|b| {
                 let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap().to_string()
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            //bare repos matches
+
+            sort_files_by_size(&mut bare_repos_matches);
+            println!("Bare git repos sorted by size:");
+            bare_repos_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
                 } else {
                     b.size.to_string()
                 };
