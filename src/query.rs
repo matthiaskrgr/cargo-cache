@@ -39,7 +39,6 @@ fn binary_to_file(path: &std::path::PathBuf) -> File {
         path: path.clone(),
         name: path
             .clone()
-
             .file_stem()
             .unwrap()
             .to_os_string()
@@ -61,7 +60,6 @@ fn git_checkout_to_file(path: &std::path::PathBuf) -> File {
             .to_os_string()
             .into_string()
             .unwrap_or_default(),
-
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
@@ -81,7 +79,31 @@ fn bare_repo_to_file(path: &std::path::PathBuf) -> File {
     File {
         path: path.clone(),
         name: path
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or_default(),
+        size: WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|d| d.unwrap().into_path())
+            .filter(|f| f.exists())
+            .collect::<Vec<PathBuf>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .len()
+            })
+            .sum(),
+    }
+}
 
+fn registry_cache_to_file(path: &std::path::PathBuf) -> File {
+    File {
+        // todo: sum up the versions
+        path: path.clone(),
+        name: path
             .file_stem()
             .unwrap()
             .to_os_string()
@@ -112,12 +134,12 @@ fn sort_files_by_size(v: &mut Vec<&File>) {
 
 pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
-    ccd: &CargoCachePaths,
-    mut bin_cache: &mut bin::BinaryCache,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    mut registry_cache: &mut registry_cache::RegistryCache,
-    mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
+    _ccd: &CargoCachePaths,
+    bin_cache: &mut bin::BinaryCache,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    registry_cache: &mut registry_cache::RegistryCache,
+    registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
     let sorting = query_config.value_of("sort");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
@@ -148,7 +170,6 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
     let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
 
-
     let bare_repos_files: Vec<_> = bare_repos_cache
         .files()
         .iter()
@@ -157,10 +178,13 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
     let mut bare_repos_matches: Vec<_> = bare_repos_files.iter().collect::<Vec<_>>();
 
-
-
-
-
+    let registry_cache_files: Vec<_> = registry_cache
+        .files()
+        .iter()
+        .map(|path| registry_cache_to_file(&path.to_path_buf()))
+        .filter(|f| re.is_match(f.name.as_str())) // filter by regex
+        .collect::<Vec<_>>();
+    let mut registry_cache_matches: Vec<_> = registry_cache_files.iter().collect::<Vec<_>>();
 
     let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
@@ -205,6 +229,19 @@ pub(crate) fn run_query(
                 };
                 println!("{}: {}", b.name, size)
             });
+
+            // registry cache
+
+            sort_files_by_name(&mut registry_cache_matches);
+            println!("Registry cache sorted by name:");
+            registry_cache_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
         }
 
         Some("size") => {
@@ -238,6 +275,18 @@ pub(crate) fn run_query(
             sort_files_by_size(&mut bare_repos_matches);
             println!("Bare git repos sorted by size:");
             bare_repos_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            // registry cache
+            sort_files_by_size(&mut registry_cache_matches);
+            println!("Registry cache sorted by size:");
+            registry_cache_matches.iter().for_each(|b| {
                 let size = if hr_size {
                     b.size.file_size(&humansize_opts).unwrap()
                 } else {
