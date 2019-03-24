@@ -124,6 +124,31 @@ fn registry_cache_to_file(path: &std::path::PathBuf) -> File {
     }
 }
 
+fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File {
+    File {
+        // todo: sum up the versions
+        path: path.clone(),
+        name: path
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or_default(),
+        size: WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|d| d.unwrap().into_path())
+            .filter(|f| f.exists())
+            .collect::<Vec<PathBuf>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .len()
+            })
+            .sum(),
+    }
+}
+
 fn sort_files_by_name(v: &mut Vec<&File>) {
     v.sort_by_key(|f| &f.name);
 }
@@ -186,6 +211,15 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
     let mut registry_cache_matches: Vec<_> = registry_cache_files.iter().collect::<Vec<_>>();
 
+    let registry_source_cache_files: Vec<_> = registry_sources_cache
+        .files()
+        .iter()
+        .map(|path| registry_source_cache_to_file(&path.to_path_buf()))
+        .filter(|f| re.is_match(f.name.as_str())) // filter by regex
+        .collect::<Vec<_>>();
+    let mut registry_source_cache_matches: Vec<_> =
+        registry_source_cache_files.iter().collect::<Vec<_>>();
+
     let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
         ..file_size_opts::DECIMAL
@@ -242,6 +276,18 @@ pub(crate) fn run_query(
                 };
                 println!("{}: {}", b.name, size)
             });
+
+            // registry source
+            sort_files_by_name(&mut registry_source_cache_matches);
+            println!("Registry cache sorted by name:");
+            registry_source_cache_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
         }
 
         Some("size") => {
@@ -287,6 +333,18 @@ pub(crate) fn run_query(
             sort_files_by_size(&mut registry_cache_matches);
             println!("Registry cache sorted by size:");
             registry_cache_matches.iter().for_each(|b| {
+                let size = if hr_size {
+                    b.size.file_size(&humansize_opts).unwrap()
+                } else {
+                    b.size.to_string()
+                };
+                println!("{}: {}", b.name, size)
+            });
+
+            // registry source
+            sort_files_by_size(&mut registry_source_cache_matches);
+            println!("Registry source cache sorted by size:");
+            registry_source_cache_matches.iter().for_each(|b| {
                 let size = if hr_size {
                     b.size.file_size(&humansize_opts).unwrap()
                 } else {
