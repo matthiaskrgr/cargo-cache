@@ -226,7 +226,8 @@ pub(crate) fn run_query(
     };
 
     match sorting {
-        Some("name") => {
+        // make "name" the default
+        Some("name") | None => {
             // executables
             sort_files_by_name(&mut binary_matches);
             println!("Binaries sorted by name:");
@@ -356,12 +357,13 @@ pub(crate) fn run_query(
 
         Some(&_) => {
             panic!("????");
-        }
+        } /*
+           None => {
 
-        None => {
-            // println!("Binaries original : {:?}", matches);
-            println!("None");
-        }
+              // println!("Binaries original : {:?}", matches);
+              println!("None");
+          }
+          */
     }
 }
 
