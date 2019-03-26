@@ -374,8 +374,33 @@ pub(crate) fn run_query(
     println!("{}", trimmed);
 }
 
-// @TODO: make sure these work:
-// cargo cache q
-// cargo cache query
-// cargo-cache q
-// cargo-cache query
+#[cfg(test)]
+mod query_tests {
+    use crate::test_helpers::bin_path;
+    use std::process::Command;
+
+    #[test]
+    fn query_subcmd_long() {
+        let query_cmd = Command::new(bin_path()).arg("query").output();
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+    }
+
+    #[test]
+    fn query_subcmd_short() {
+        let query_cmd = Command::new(bin_path()).arg("q").output();
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+    }
+
+
+    #[test]
+    fn query_subcmd_hyphen_long() {
+        let query_cmd = Command::new(bin_path()).arg("cache-query").output();
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+    }
+
+    #[test]
+    fn query_subcmd_hyphen_short() {
+        let query_cmd = Command::new(bin_path()).arg("cache-q").output();
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+    }
+}
