@@ -366,14 +366,8 @@ pub(crate) fn run_query(
         }
 
         Some(&_) => {
-            panic!("????");
-        } /*
-           None => {
-
-              // println!("Binaries original : {:?}", matches);
-              println!("None");
-          }
-          */
+            unreachable!();
+        }
     }
 
     let trimmed = output.trim();
