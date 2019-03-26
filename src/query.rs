@@ -376,7 +376,8 @@ pub(crate) fn run_query(
           */
     }
 
-    println!("{}", output);
+    let trimmed = output.trim();
+    println!("{}", trimmed);
 }
 
 // @TODO: make sure these work:
