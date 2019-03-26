@@ -159,7 +159,6 @@ fn sort_files_by_size(v: &mut Vec<&File>) {
 
 pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
-    _ccd: &CargoCachePaths,
     bin_cache: &mut bin::BinaryCache,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
