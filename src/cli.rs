@@ -158,7 +158,7 @@ mod clitests {
 matthiaskrgr
 Manage cargo cache\n
 USAGE:
-    cargo [FLAGS] [OPTIONS]\n
+    cargo [FLAGS] [OPTIONS] [SUBCOMMAND]\n
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
@@ -172,7 +172,11 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n");
+    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
+SUBCOMMANDS:
+    help     Prints this message or the help of the given subcommand(s)
+    q        run a query
+    query    run a query\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -192,7 +196,7 @@ OPTIONS:
 matthiaskrgr
 Manage cargo cache\n
 USAGE:
-    cargo cache [FLAGS] [OPTIONS]\n
+    cargo cache [FLAGS] [OPTIONS] [SUBCOMMAND]\n
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
@@ -206,7 +210,11 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
                                          sources,registry-crate-cache,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n");
+    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
+SUBCOMMANDS:
+    help     Prints this message or the help of the given subcommand(s)
+    q        run a query
+    query    run a query\n");
 
         assert_eq!(help_desired, help_real);
     }
