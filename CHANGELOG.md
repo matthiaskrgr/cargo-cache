@@ -3,6 +3,14 @@
 Parallelize internal cache accesses resulting in reduced wall clock execution time
 Fix some paths being linuxish on windows
 Print size of the registry index (${CARGO_HOME}registry/index) in default view
+Add "query" subcommand (run "cargo cache query" or short "cargo cache q"
+	Pass a parameter which will be interpreted as regex to only display sizes of
+	items that match.
+	For example "cargo cache query serde_derive" will print the sizes of all findings and
+	their sizes of this crate inside the subdirectories of the cache.
+	You can get human readable sizes via --human-readable and sort by size/name (alphabetically)
+	via --sort-by $option
+	Check out cargo cache q --help for more details
 ````
 ## Version 0.1.2
 ````
