@@ -12,14 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
-use crate::library::CargoCachePaths;
-/*
-use crate::top_items::binaries::*;
-use crate::top_items::git_checkouts::*;
-use crate::top_items::git_repos_bare::*;
-use crate::top_items::registry_cache::*;
-use crate::top_items::registry_sources::*;
-*/
+
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
