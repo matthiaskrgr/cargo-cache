@@ -219,6 +219,43 @@ SUBCOMMANDS:
         assert_eq!(help_desired, help_real);
     }
 
+    #[test]
+    fn run_help_query() {
+        let ccq_help = Command::new(bin_path())
+            .arg("cache")
+            .arg("query")
+            .arg("--help")
+            .output();
+        assert!(
+            ccq_help.is_ok(),
+            "cargo-cache query --help failed: '{:?}'",
+            ccq_help
+        );
+        let help_real = String::from_utf8_lossy(&ccq_help.unwrap().stdout).into_owned();
+
+        #[allow(clippy::redundant_closure)] // fixed on next rustc_tool_utils update
+        let mut help_desired = String::new();
+        help_desired.push_str(
+            "cargo-cache-query 
+run a query
+
+USAGE:
+    cargo cache query [FLAGS] [OPTIONS] [QUERY]
+
+FLAGS:
+        --help              Prints help information
+    -h, --human-readable    print sizes in human readable format
+    -V, --version           Prints version information
+
+OPTIONS:
+    -s, --sort-by <sort>    sort files alphabetically or by file size [possible values: size, name]
+
+ARGS:
+    <QUERY>    \n",
+        );
+
+        assert_eq!(help_desired, help_real);
+    }
 }
 
 #[cfg(all(test, feature = "bench"))]
