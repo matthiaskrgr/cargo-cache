@@ -21,56 +21,30 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 #[derive(Debug)]
-struct File {
-    path: std::path::PathBuf,
+struct File<'a> {
+    path: &'a std::path::PathBuf,
     name: std::string::String,
     size: u64,
 }
 
-fn binary_to_file(path: &std::path::PathBuf) -> File {
+fn binary_to_file<'a>(path: &'a std::path::PathBuf) -> File<'_> {
     File {
-        path: path.clone(),
+        path: &path,
         name: path
-            .clone()
             .file_stem()
             .unwrap()
             .to_os_string()
             .into_string()
             .unwrap_or_default(),
-        size: fs::metadata(path.clone())
+        size: fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len(),
     }
 }
 
-fn git_checkout_to_file(path: &std::path::PathBuf) -> File {
+fn git_checkout_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
-        path: path.clone(),
-        name: path
-            .clone()
-            .file_stem()
-            .unwrap()
-            .to_os_string()
-            .into_string()
-            .unwrap_or_default(),
-        size: WalkDir::new(path.display().to_string())
-            .into_iter()
-            .map(|d| d.unwrap().into_path())
-            .filter(|f| f.exists())
-            .collect::<Vec<PathBuf>>()
-            .par_iter()
-            .map(|f| {
-                fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
-                    .len()
-            })
-            .sum(),
-    }
-}
-
-fn bare_repo_to_file(path: &std::path::PathBuf) -> File {
-    File {
-        path: path.clone(),
+        path: &path,
         name: path
             .file_stem()
             .unwrap()
@@ -92,10 +66,9 @@ fn bare_repo_to_file(path: &std::path::PathBuf) -> File {
     }
 }
 
-fn registry_cache_to_file(path: &std::path::PathBuf) -> File {
+fn bare_repo_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
-        // todo: sum up the versions
-        path: path.clone(),
+        path: &path,
         name: path
             .file_stem()
             .unwrap()
@@ -117,10 +90,10 @@ fn registry_cache_to_file(path: &std::path::PathBuf) -> File {
     }
 }
 
-fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File {
+fn registry_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
-        path: path.clone(),
+        path: &path,
         name: path
             .file_stem()
             .unwrap()
@@ -142,11 +115,36 @@ fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File {
     }
 }
 
-fn sort_files_by_name(v: &mut Vec<&File>) {
+fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
+    File {
+        // todo: sum up the versions
+        path: &path,
+        name: path
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap_or_default(),
+        size: WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|d| d.unwrap().into_path())
+            .filter(|f| f.exists())
+            .collect::<Vec<PathBuf>>()
+            .par_iter()
+            .map(|f| {
+                fs::metadata(f)
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .len()
+            })
+            .sum(),
+    }
+}
+
+fn sort_files_by_name(v: &mut Vec<&File<'_>>) {
     v.sort_by_key(|f| &f.name);
 }
 
-fn sort_files_by_size(v: &mut Vec<&File>) {
+fn sort_files_by_size(v: &mut Vec<&File<'_>>) {
     v.sort_by_key(|f| &f.size);
 }
 
@@ -176,7 +174,7 @@ pub(crate) fn run_query(
     let binary_files: Vec<_> = bin_cache
         .files()
         .iter()
-        .map(|path| binary_to_file(&path.to_path_buf())) // convert the path into a file struct
+        .map(|path| binary_to_file(&path)) // convert the path into a file struct
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut binary_matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
@@ -184,7 +182,7 @@ pub(crate) fn run_query(
     let git_checkout_files: Vec<_> = checkouts_cache
         .files()
         .iter()
-        .map(|path| git_checkout_to_file(&path.to_path_buf()))
+        .map(|path| git_checkout_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
@@ -192,7 +190,7 @@ pub(crate) fn run_query(
     let bare_repos_files: Vec<_> = bare_repos_cache
         .files()
         .iter()
-        .map(|path| bare_repo_to_file(&path.to_path_buf()))
+        .map(|path| bare_repo_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut bare_repos_matches: Vec<_> = bare_repos_files.iter().collect::<Vec<_>>();
@@ -200,7 +198,7 @@ pub(crate) fn run_query(
     let registry_cache_files: Vec<_> = registry_cache
         .files()
         .iter()
-        .map(|path| registry_cache_to_file(&path.to_path_buf()))
+        .map(|path| registry_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut registry_cache_matches: Vec<_> = registry_cache_files.iter().collect::<Vec<_>>();
@@ -208,7 +206,7 @@ pub(crate) fn run_query(
     let registry_source_cache_files: Vec<_> = registry_sources_cache
         .files()
         .iter()
-        .map(|path| registry_source_cache_to_file(&path.to_path_buf()))
+        .map(|path| registry_source_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
     let mut registry_source_cache_matches: Vec<_> =
