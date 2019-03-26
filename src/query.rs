@@ -223,130 +223,146 @@ pub(crate) fn run_query(
         // make "name" the default
         Some("name") | None => {
             // executables
-            sort_files_by_name(&mut binary_matches);
-            output.push_str("Binaries sorted by name:\n");
-            binary_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !binary_matches.is_empty() {
+                sort_files_by_name(&mut binary_matches);
+                output.push_str("Binaries sorted by name:\n");
+                binary_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             // git checkouts
-            sort_files_by_name(&mut git_checkout_matches);
-            output.push_str("\nGit checkouts sorted by name:\n");
-            git_checkout_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
-
+            if !git_checkout_matches.is_empty() {
+                sort_files_by_name(&mut git_checkout_matches);
+                output.push_str("\nGit checkouts sorted by name:\n");
+                git_checkout_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
             // bare git repos
-
-            sort_files_by_name(&mut bare_repos_matches);
-            output.push_str("\nBare git repos sorted by name:\n");
-            bare_repos_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !bare_repos_matches.is_empty() {
+                sort_files_by_name(&mut bare_repos_matches);
+                output.push_str("\nBare git repos sorted by name:\n");
+                bare_repos_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             // registry cache
-
-            sort_files_by_name(&mut registry_cache_matches);
-            output.push_str("\nRegistry cache sorted by name:\n");
-            registry_cache_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !registry_cache_matches.is_empty() {
+                sort_files_by_name(&mut registry_cache_matches);
+                output.push_str("\nRegistry cache sorted by name:\n");
+                registry_cache_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             // registry source
-            sort_files_by_name(&mut registry_source_cache_matches);
-            output.push_str("\nRegistry source cache sorted by name:\n");
-            registry_source_cache_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !registry_source_cache_matches.is_empty() {
+                sort_files_by_name(&mut registry_source_cache_matches);
+                output.push_str("\nRegistry source cache sorted by name:\n");
+                registry_source_cache_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
         }
 
         Some("size") => {
             // executables
-            sort_files_by_size(&mut binary_matches);
-            output.push_str("\nBinaries sorted by size:\n");
+            if !binary_matches.is_empty() {
+                sort_files_by_size(&mut binary_matches);
+                output.push_str("\nBinaries sorted by size:\n");
 
-            binary_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                println!("\t{}: {}", b.name, size)
-            });
+                binary_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    println!("\t{}: {}", b.name, size)
+                });
+            }
 
             // git checkouts
-            sort_files_by_size(&mut git_checkout_matches);
-            output.push_str("\nGit checkouts sorted by size:\n");
-            git_checkout_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !git_checkout_matches.is_empty() {
+                sort_files_by_size(&mut git_checkout_matches);
+                output.push_str("\nGit checkouts sorted by size:\n");
+                git_checkout_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             //bare repos matches
-
-            sort_files_by_size(&mut bare_repos_matches);
-            output.push_str("\nBare git repos sorted by size:\n");
-            bare_repos_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !bare_repos_matches.is_empty() {
+                sort_files_by_size(&mut bare_repos_matches);
+                output.push_str("\nBare git repos sorted by size:\n");
+                bare_repos_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             // registry cache
-            sort_files_by_size(&mut registry_cache_matches);
-            output.push_str("\nRegistry cache sorted by size:\n");
-            registry_cache_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !registry_cache_matches.is_empty() {
+                sort_files_by_size(&mut registry_cache_matches);
+                output.push_str("\nRegistry cache sorted by size:\n");
+                registry_cache_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
 
             // registry source
-            sort_files_by_size(&mut registry_source_cache_matches);
-            output.push_str("\nRegistry source cache sorted by size:\n");
-            registry_source_cache_matches.iter().for_each(|b| {
-                let size = if hr_size {
-                    b.size.file_size(&humansize_opts).unwrap()
-                } else {
-                    b.size.to_string()
-                };
-                output.push_str(&format!("\t{}: {}\n", b.name, size));
-            });
+            if !registry_source_cache_matches.is_empty() {
+                sort_files_by_size(&mut registry_source_cache_matches);
+                output.push_str("\nRegistry source cache sorted by size:\n");
+                registry_source_cache_matches.iter().for_each(|b| {
+                    let size = if hr_size {
+                        b.size.file_size(&humansize_opts).unwrap()
+                    } else {
+                        b.size.to_string()
+                    };
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                });
+            }
         }
 
         Some(&_) => {
