@@ -382,25 +382,40 @@ mod query_tests {
     #[test]
     fn query_subcmd_long() {
         let query_cmd = Command::new(bin_path()).arg("query").output();
-        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+        assert!(
+            query_cmd.is_ok(),
+            "cargo-cache query failed: '{:?}'",
+            query_cmd
+        );
     }
 
     #[test]
     fn query_subcmd_short() {
         let query_cmd = Command::new(bin_path()).arg("q").output();
-        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+        assert!(
+            query_cmd.is_ok(),
+            "cargo-cache query failed: '{:?}'",
+            query_cmd
+        );
     }
-
 
     #[test]
     fn query_subcmd_hyphen_long() {
         let query_cmd = Command::new(bin_path()).arg("cache-query").output();
-        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+        assert!(
+            query_cmd.is_ok(),
+            "cargo-cache query failed: '{:?}'",
+            query_cmd
+        );
     }
 
     #[test]
     fn query_subcmd_hyphen_short() {
         let query_cmd = Command::new(bin_path()).arg("cache-q").output();
-        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
+        assert!(
+            query_cmd.is_ok(),
+            "cargo-cache query failed: '{:?}'",
+            query_cmd
+        );
     }
 }
