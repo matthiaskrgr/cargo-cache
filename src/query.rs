@@ -124,12 +124,12 @@ fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn sort_files_by_name(v: &mut Vec<&File<'_>>) {
-    v.sort_by_key(|f| &f.name);
+fn sort_files_by_name(v: &mut Vec<File<'_>>) {
+    v.sort_by_key(|f| f.name.clone() /* @TODO: don't */);
 }
 
-fn sort_files_by_size(v: &mut Vec<&File<'_>>) {
-    v.sort_by_key(|f| &f.size);
+fn sort_files_by_size(v: &mut Vec<File<'_>>) {
+    v.sort_by_key(|f| f.size);
 }
 
 pub(crate) fn run_query(
@@ -155,46 +155,40 @@ pub(crate) fn run_query(
         }
     };
 
-    let binary_files: Vec<_> = bin_cache
+    let mut binary_matches: Vec<File<'_>> = bin_cache
         .files()
         .iter()
         .map(|path| binary_to_file(&path)) // convert the path into a file struct
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-    let mut binary_matches = binary_files.iter().collect::<Vec<_>>(); // why is this needed?
 
-    let git_checkout_files: Vec<_> = checkouts_cache
+    let mut git_checkout_matches: Vec<_> = checkouts_cache
         .files()
         .iter()
         .map(|path| git_checkout_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-    let mut git_checkout_matches: Vec<_> = git_checkout_files.iter().collect::<Vec<_>>();
 
-    let bare_repos_files: Vec<_> = bare_repos_cache
+    let mut bare_repos_matches: Vec<_> = bare_repos_cache
         .files()
         .iter()
         .map(|path| bare_repo_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-    let mut bare_repos_matches: Vec<_> = bare_repos_files.iter().collect::<Vec<_>>();
 
-    let registry_cache_files: Vec<_> = registry_cache
+    let mut registry_cache_matches: Vec<_> = registry_cache
         .files()
         .iter()
         .map(|path| registry_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-    let mut registry_cache_matches: Vec<_> = registry_cache_files.iter().collect::<Vec<_>>();
 
-    let registry_source_cache_files: Vec<_> = registry_sources_cache
+    let mut registry_source_cache_matches: Vec<_> = registry_sources_cache
         .files()
         .iter()
         .map(|path| registry_source_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
-    let mut registry_source_cache_matches: Vec<_> =
-        registry_source_cache_files.iter().collect::<Vec<_>>();
 
     let humansize_opts = file_size_opts::FileSizeOpts {
         allow_negative: true,
