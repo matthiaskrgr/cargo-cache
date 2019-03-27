@@ -129,6 +129,7 @@ fn main() {
 
         query::run_query(
             &query_config,
+            &cargo_cache,
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
