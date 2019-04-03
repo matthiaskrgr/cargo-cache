@@ -12,6 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
+use crate::library::CargoCachePaths;
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
@@ -164,14 +165,14 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
 
     let mut git_checkout_matches: Vec<_> = checkouts_cache
-        .files()
+        .checkout_folders()
         .iter()
         .map(|path| git_checkout_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
     let mut bare_repos_matches: Vec<_> = bare_repos_cache
-        .files()
+        .bare_repo_folders()
         .iter()
         .map(|path| bare_repo_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
@@ -185,7 +186,7 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
 
     let mut registry_source_cache_matches: Vec<_> = registry_sources_cache
-        .files()
+        .checkout_folders()
         .iter()
         .map(|path| registry_source_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
