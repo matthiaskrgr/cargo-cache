@@ -12,7 +12,6 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
-use crate::library::CargoCachePaths;
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
@@ -135,7 +134,6 @@ fn sort_files_by_size(v: &mut Vec<File<'_>>) {
 
 pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
-    _ccd: &CargoCachePaths,
     bin_cache: &mut bin::BinaryCache,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
