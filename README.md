@@ -43,7 +43,7 @@ FLAGS:
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
     -i, --info                   Print information on found cache directories
-    -L, --list-dirs              List all found directory paths
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory

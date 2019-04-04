@@ -17,7 +17,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .replacen("cargo-cache ", "", 1);
 
     let list_dirs = Arg::with_name("list-dirs")
-        .short("L")
+        .short("l")
         .long("list-dirs")
         .help("List all found directory paths");
 
@@ -164,7 +164,7 @@ FLAGS:
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
     -i, --info                   Print information on found cache directories
-    -L, --list-dirs              List all found directory paths
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
@@ -201,7 +201,7 @@ FLAGS:
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
     -i, --info                   Print information on found cache directories
-    -L, --list-dirs              List all found directory paths
+    -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
