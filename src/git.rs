@@ -97,7 +97,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
 #[allow(clippy::module_name_repetitions)]
 pub(crate) fn git_gc_everything(
     git_repos_bare_dir: &PathBuf,
-    registry_cache_dir: &PathBuf,
+    registry_pkg_cache_dir: &PathBuf,
     dry_run: bool,
 ) {
     // gc repos and registries inside cargo cache
@@ -163,7 +163,7 @@ pub(crate) fn git_gc_everything(
     total_size_after += repos_after;
 
     println!("\nRecompressing registries. Please be patient...");
-    let mut repo_index = registry_cache_dir.clone();
+    let mut repo_index = registry_pkg_cache_dir.clone();
     // cd "../index"
     repo_index.pop();
     repo_index.push("index");

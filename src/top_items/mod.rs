@@ -11,5 +11,5 @@ pub(crate) mod binaries;
 pub(crate) mod common;
 pub(crate) mod git_checkouts;
 pub(crate) mod git_repos_bare;
-pub(crate) mod registry_cache;
+pub(crate) mod registry_pkg_cache;
 pub(crate) mod registry_sources;

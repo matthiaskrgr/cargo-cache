@@ -93,7 +93,7 @@ fn main() {
     let mut bin_cache = bin::BinaryCache::new(p.bin_dir);
     let mut checkouts_cache = git_checkouts::GitCheckoutCache::new(p.git_checkouts);
     let mut bare_repos_cache = git_repos_bare::GitRepoCache::new(p.git_repos_bare);
-    let mut registry_cache = registry_cache::RegistryCache::new(p.registry_cache);
+    let mut registry_pkg_cache = registry_pkg_cache::RegistryCache::new(p.registry_pkg_cache);
     let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
     let mut registry_sources_cache = registry_sources::RegistrySourceCache::new(p.registry_sources);
 
@@ -109,7 +109,7 @@ fn main() {
                     &mut bin_cache,
                     &mut checkouts_cache,
                     &mut bare_repos_cache,
-                    &mut registry_cache,
+                    &mut registry_pkg_cache,
                     /* &mut registry_index_cache, */
                     &mut registry_sources_cache,
                 )
@@ -132,7 +132,7 @@ fn main() {
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
-            &mut registry_cache,
+            &mut registry_pkg_cache,
             &mut registry_sources_cache,
         );
 
@@ -143,7 +143,7 @@ fn main() {
         &mut bin_cache,
         &mut checkouts_cache,
         &mut bare_repos_cache,
-        &mut registry_cache,
+        &mut registry_pkg_cache,
         &mut registry_index_cache,
         &mut registry_sources_cache,
         &cargo_cache,
@@ -172,7 +172,7 @@ fn main() {
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         git_gc_everything(
             &cargo_cache.git_repos_bare,
-            &cargo_cache.registry_cache,
+            &cargo_cache.registry_pkg_cache,
             config.is_present("dry-run"),
         );
         size_changed = true;
@@ -209,7 +209,7 @@ fn main() {
         match rm_old_crates(
             limit,
             config.is_present("dry-run"),
-            &cargo_cache.registry_cache,
+            &cargo_cache.registry_pkg_cache,
             &mut size_changed,
         ) {
             Ok(()) => {}
@@ -235,7 +235,7 @@ fn main() {
         bin_cache.invalidate();
         checkouts_cache.invalidate();
         bare_repos_cache.invalidate();
-        registry_cache.invalidate();
+        registry_pkg_cache.invalidate();
         registry_index_cache.invalidate();
         registry_sources_cache.invalidate();
 
@@ -244,7 +244,7 @@ fn main() {
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
-            &mut registry_cache,
+            &mut registry_pkg_cache,
             &mut registry_index_cache,
             &mut registry_sources_cache,
             &cargo_cache,

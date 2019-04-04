@@ -84,7 +84,7 @@ fn bare_repo_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn registry_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn registry_pkg_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
         path: &path,
@@ -137,7 +137,7 @@ pub(crate) fn run_query(
     bin_cache: &mut bin::BinaryCache,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    registry_cache: &mut registry_cache::RegistryCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
     let sorting = query_config.value_of("sort");
@@ -176,10 +176,10 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    let mut registry_cache_matches: Vec<_> = registry_cache
+    let mut registry_pkg_cache_matches: Vec<_> = registry_pkg_cache
         .files()
         .iter()
-        .map(|path| registry_cache_to_file(&path))
+        .map(|path| registry_pkg_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
@@ -240,10 +240,10 @@ pub(crate) fn run_query(
             }
 
             // registry cache
-            if !registry_cache_matches.is_empty() {
-                sort_files_by_name(&mut registry_cache_matches);
+            if !registry_pkg_cache_matches.is_empty() {
+                sort_files_by_name(&mut registry_pkg_cache_matches);
                 output.push_str("\nRegistry cache sorted by name:\n");
-                registry_cache_matches.iter().for_each(|b| {
+                registry_pkg_cache_matches.iter().for_each(|b| {
                     let size = if hr_size {
                         b.size.file_size(&humansize_opts).unwrap()
                     } else {
@@ -313,10 +313,10 @@ pub(crate) fn run_query(
             }
 
             // registry cache
-            if !registry_cache_matches.is_empty() {
-                sort_files_by_size(&mut registry_cache_matches);
+            if !registry_pkg_cache_matches.is_empty() {
+                sort_files_by_size(&mut registry_pkg_cache_matches);
                 output.push_str("\nRegistry cache sorted by size:\n");
-                registry_cache_matches.iter().for_each(|b| {
+                registry_pkg_cache_matches.iter().for_each(|b| {
                     let size = if hr_size {
                         b.size.file_size(&humansize_opts).unwrap()
                     } else {

@@ -109,8 +109,8 @@ impl PartialEq for RgchInfo {
 }
 
 // registry cache (extracted tarballs)
-fn file_desc_list_from_path(registry_cache: &mut registry_cache::RegistryCache) -> Vec<FileDesc> {
-    registry_cache
+fn file_desc_list_from_path(registry_pkg_cache: &mut registry_pkg_cache::RegistryCache) -> Vec<FileDesc> {
+    registry_pkg_cache
         .files_sorted()
         .iter()
         .map(|path| FileDesc::new_from_reg_cache(path))
@@ -253,10 +253,10 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
 }
 
 // registry cache
-pub(crate) fn registry_cache_stats(
+pub(crate) fn registry_pkg_cache_stats(
     path: &PathBuf,
     limit: u32,
-    mut registry_cache: &mut registry_cache::RegistryCache,
+    mut registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
 ) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -267,13 +267,13 @@ pub(crate) fn registry_cache_stats(
     stdout.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        registry_cache
+        registry_pkg_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_cache);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_pkg_cache);
     let summary: Vec<RgchInfo> = stats_from_file_desc_list(file_descs);
     let string = regcache_list_to_string(limit, summary);
     stdout.push_str(&string);
@@ -282,7 +282,7 @@ pub(crate) fn registry_cache_stats(
 }
 
 #[cfg(test)]
-mod top_crates_registry_cache {
+mod top_crates_registry_pkg_cache {
     use super::*;
     use pretty_assertions::assert_eq;
 

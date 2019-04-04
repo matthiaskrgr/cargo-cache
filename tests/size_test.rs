@@ -38,12 +38,12 @@ fn build_and_check_size_test() {
         "fake cargo home was not created!"
     );
     // make sure the size of the registry matches and we have 4 entries
-    let mut registry_cache_path = PathBuf::from(&fchp);
-    registry_cache_path.push("registry");
-    registry_cache_path.push("cache");
-    assert!(registry_cache_path.is_dir(), "no registry cache found");
+    let mut registry_pkg_cache_path = PathBuf::from(&fchp);
+    registry_pkg_cache_path.push("registry");
+    registry_pkg_cache_path.push("cache");
+    assert!(registry_pkg_cache_path.is_dir(), "no registry cache found");
 
-    let mut filenames = WalkDir::new(registry_cache_path)
+    let mut filenames = WalkDir::new(registry_pkg_cache_path)
         .min_depth(2)
         .into_iter()
         .map(|dir| dir.unwrap().path().file_name().unwrap().to_owned())

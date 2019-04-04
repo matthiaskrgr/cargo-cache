@@ -30,7 +30,7 @@ pub(crate) struct CargoCachePaths {
     pub(crate) cargo_home: PathBuf,
     pub(crate) bin_dir: PathBuf,
     pub(crate) registry: PathBuf,
-    pub(crate) registry_cache: PathBuf,
+    pub(crate) registry_pkg_cache: PathBuf,
     pub(crate) registry_sources: PathBuf,
     pub(crate) registry_index: PathBuf,
     pub(crate) git_repos_bare: PathBuf,
@@ -87,7 +87,7 @@ impl CargoCachePaths {
             bin_dir: bin,
             registry,
             registry_index,
-            registry_cache: reg_cache,
+            registry_pkg_cache: reg_cache,
             registry_sources: reg_src,
             git_repos_bare,
             git_checkouts,
@@ -116,7 +116,7 @@ impl std::fmt::Display for CargoCachePaths {
         writeln!(
             f,
             "crate source archives:      {}",
-            &self.registry_cache.display()
+            &self.registry_pkg_cache.display()
         )?;
         writeln!(
             f,
@@ -299,7 +299,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("Found registry crate source cache:\n");
     strn.push_str(&format!(
         "\t\t\t'{}', size: {}\n",
-        &c.registry_cache.display(),
+        &c.registry_pkg_cache.display(),
         s.total_reg_cache_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
@@ -489,7 +489,7 @@ pub(crate) fn remove_dir_via_cmdline(
         rm(&ccd.registry_sources, dry_run, size_changed)?
     }
     if rm_registry_crate_cache {
-        rm(&ccd.registry_cache, dry_run, size_changed)?
+        rm(&ccd.registry_pkg_cache, dry_run, size_changed)?
     }
     Ok(())
 }
@@ -566,7 +566,7 @@ mod libtests {
                 bin_dir: bin,
                 registry,
                 registry_index,
-                registry_cache: reg_cache,
+                registry_pkg_cache: reg_cache,
                 registry_sources: reg_src,
                 git_repos_bare,
                 git_checkouts,
@@ -631,7 +631,7 @@ mod libtests {
         );
 
         assert_path_end(
-            &ccp.registry_cache,
+            &ccp.registry_pkg_cache,
             &["cargo_home_cargo_cache_paths", "registry", "cache"],
         );
 

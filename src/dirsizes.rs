@@ -39,7 +39,7 @@ impl<'a> DirSizes<'a> {
         bin_cache: &mut bin::BinaryCache,
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,
         bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-        registry_cache: &mut registry_cache::RegistryCache,
+        registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
         registry_index_cache: &mut registry_index::RegistryIndexCache,
         registry_sources_cache: &mut registry_sources::RegistrySourceCache,
         ccd: &'a CargoCachePaths,
@@ -89,8 +89,8 @@ impl<'a> DirSizes<'a> {
                         rayon::join(
                             || {
                                 (
-                                    registry_cache.total_size(),
-                                    registry_cache.number_of_files(),
+                                    registry_pkg_cache.total_size(),
+                                    registry_pkg_cache.number_of_files(),
                                 )
                             },
                             || {
