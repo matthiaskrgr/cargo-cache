@@ -37,7 +37,13 @@ pub(crate) fn get_top_crates(
                                 &mut registry_sources_cache,
                             )
                         },
-                        || registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, &mut registry_pkg_cache),
+                        || {
+                            registry_pkg_cache_stats(
+                                &ccd.registry_pkg_cache,
+                                limit,
+                                &mut registry_pkg_cache,
+                            )
+                        },
                     )
                 },
                 || {

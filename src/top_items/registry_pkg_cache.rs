@@ -109,7 +109,9 @@ impl PartialEq for RgchInfo {
 }
 
 // registry cache (extracted tarballs)
-fn file_desc_list_from_path(registry_pkg_cache: &mut registry_pkg_cache::RegistryCache) -> Vec<FileDesc> {
+fn file_desc_list_from_path(
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+) -> Vec<FileDesc> {
     registry_pkg_cache
         .files_sorted()
         .iter()
