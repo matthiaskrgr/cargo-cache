@@ -11,6 +11,7 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;
 
+#[allow(clippy::too_many_lines)]
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let version = rustc_tools_util::get_version_info!()
         .to_string()
@@ -67,7 +68,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .value_name("N");
 
     // <query>
-
     let query_order = Arg::with_name("sort")
         .short("s")
         .long("sort-by")
@@ -93,8 +93,18 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(Arg::with_name("QUERY"))
         .arg(&query_order)
         .arg(&human_readable);
-
     // </query>
+
+    //<local>
+
+    // subcommand
+    let local =
+        SubCommand::with_name("local").about("check local build cache (target) of a rust project");
+
+    let local_short =
+        SubCommand::with_name("l").about("check local build cache (target) of a rust project");
+    //</local>
+
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     let cache_subcmd = SubCommand::with_name("cache")
         .version(&*version)
@@ -112,6 +122,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .subcommand(query.clone()) // todo: don't clone
         .subcommand(query_short.clone()) // todo: don't clone
+        .subcommand(local.clone()) // don't clone
+        .subcommand(local_short.clone()) // don't clone
         .setting(AppSettings::Hidden);
 
     App::new("cargo-cache")
@@ -122,6 +134,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(cache_subcmd)
         .subcommand(query)
         .subcommand(query_short)
+        .subcommand(local)
+        .subcommand(local_short)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -173,6 +187,8 @@ OPTIONS:
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
+    l        check local build cache (target) of a rust project
+    local    check local build cache (target) of a rust project
     q        run a query
     query    run a query\n");
 
@@ -210,6 +226,8 @@ OPTIONS:
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
+    l        check local build cache (target) of a rust project
+    local    check local build cache (target) of a rust project
     q        run a query
     query    run a query\n");
 

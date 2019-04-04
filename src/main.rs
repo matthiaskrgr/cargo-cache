@@ -41,6 +41,7 @@ mod cli;
 mod dirsizes;
 mod git;
 mod library;
+mod local;
 mod query;
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
@@ -97,6 +98,7 @@ fn main() {
     let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
     let mut registry_sources_cache = registry_sources::RegistrySourceCache::new(p.registry_sources);
 
+    // @TODO: use match instead of multiple if(config)s
     if config.is_present("top-cache-items") {
         let limit =
             value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
@@ -135,6 +137,20 @@ fn main() {
             &mut registry_pkg_cache,
             &mut registry_sources_cache,
         );
+
+        process::exit(0);
+    }
+
+    if config.is_present("local") || config.is_present("l") {
+        let local_config = if config.is_present("local") {
+            config
+                .subcommand_matches("local")
+                .expect("unwrap failed here")
+        } else {
+            config.subcommand_matches("l").expect("unwrap failed there")
+        };
+
+        local::local_run(&local_config);
 
         process::exit(0);
     }
