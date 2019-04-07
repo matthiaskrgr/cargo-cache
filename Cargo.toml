@@ -16,7 +16,7 @@ bench = [] # run benchmarks
 
 [dependencies]
 # https://github.com/kbknapp/clap-rs
-clap = "2.33.0" # cmdline arg parsing
+clap = "2.32.0" # cmdline arg parsing
 
 # https://github.com/BurntSushi/walkdir
 walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
