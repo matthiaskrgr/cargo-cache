@@ -132,7 +132,7 @@ impl<'a> DirSizes<'a> {
     }
 }
 
-fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
+pub(crate) fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
     // max line width
     const MAX_WIDTH: i64 = 40;
 

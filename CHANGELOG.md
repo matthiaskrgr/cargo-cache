@@ -13,6 +13,8 @@ Add "query" subcommand (run "cargo cache query" or short "cargo cache q"
 	Check out cargo cache q --help for more details
 Revert "rename -l (--list-dirs) to -L."
 	short form of --list-dirs is -l again.
+Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
+	sizes of a target/ dir of a package
 ````
 ## Version 0.1.2
 ````
