@@ -16,8 +16,14 @@ Revert "rename -l (--list-dirs) to -L."
 	short form of --list-dirs is -l again.
 Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
 	sizes of a target/ dir of a built package
+Update dependencies:
+	cargo: 0.32.0 -> 0.34.0
+	clap: 2.32.0 -> 2.33.0
+	regex: 1.1.0 -> 1.1.5
+	pretty_assertions: 0.5.1 -> 0.6.1
+	cargo_metadata: new
 ````
-## Version 0.1.2
+## Version 0.1.2 (01f6952)
 ````
 run cargo update
 don't assume that we know if a folder will only contain directories or files, add some checks.
@@ -33,12 +39,12 @@ dependencies: update rustc_tools_util from 0.1.0 to 0.1.1
 	fixes #28 (strange version info output when installed from crates.io)
 ````
 
-## Version 0.1.1
+## Version 0.1.1 (3d50deb)
 ````
 add readme key to Cargo.toml
 add crates.io shield to readme
 ````
-## Version 0.1.0
+## Version 0.1.0 (2ec7647)
 ````
 Initial release on crates.io
 ````
