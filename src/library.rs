@@ -530,8 +530,14 @@ pub(crate) fn remove_file(
     }
 }
 
-pub(crate) fn pad_strings(indent_lvl: u16, max_line_width: u16, beginning: &str, end: &str) -> String {
+pub(crate) fn pad_strings(
+    indent_lvl: u16,
+    max_line_width: u16,
+    beginning: &str,
+    end: &str,
+) -> String {
     let left: u16 = max_line_width + (indent_lvl * 2);
+    #[allow(clippy::cast_possible_truncation)] // very unlikely
     let right: u16 = beginning.len() as u16;
     let len_padding = left - right;
     assert!(
@@ -787,6 +793,28 @@ mod libtests {
         // should be empty now
         let last = iter.next();
         assert!(!last.is_some(), "found another directory?!: '{:?}'", last);
+    }
+
+    #[allow(non_snake_case)]
+    #[test]
+    fn test_pad_strings() {
+        let s1 = pad_strings(1, 4, "hello", "world");
+        assert_eq!(s1, "hello world\n");
+
+        let s2 = pad_strings(2, 4, "hello", "world");
+        assert_eq!(s2, "hello   world\n");
+
+        let s3 = pad_strings(1, 6, "hello", "world");
+        assert_eq!(s3, "hello   world\n");
+
+        let s4 = pad_strings(1, 7, "hello", "world");
+        assert_eq!(s4, "hello    world\n");
+
+        let s5 = pad_strings(2, 6, "hello", "world");
+        assert_eq!(s5, "hello     world\n");
+
+        let s6 = pad_strings(2, 10, "hello", "world");
+        assert_eq!(s6, "hello         world\n");
     }
 
 }
