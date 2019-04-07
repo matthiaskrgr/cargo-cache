@@ -11,6 +11,7 @@ use std::fmt;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
+use crate::library;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
@@ -132,31 +133,6 @@ impl<'a> DirSizes<'a> {
     }
 }
 
-pub(crate) fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
-    // max line width
-    const MAX_WIDTH: i64 = 40;
-
-    let left = MAX_WIDTH + (indent_lvl * 2);
-    let right = beginning.len() as i64;
-    let len_padding = left - right;
-    assert!(
-        len_padding > 0,
-        format!(
-            "len_padding is negative: '{} - {} = {}' ",
-            left, right, len_padding
-        )
-    );
-
-    let mut formatted_line = beginning.to_string();
-
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-    // I tried mittigating via previous assert()
-    formatted_line.push_str(&" ".repeat(len_padding as usize));
-    formatted_line.push_str(end);
-    formatted_line.push_str("\n");
-    formatted_line
-}
-
 impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
         //@TODO readd delimiter? to end of path to indicate it is a directory
@@ -165,7 +141,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 0,
                 "Total size: ",
                 &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
@@ -175,7 +151,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 1,
                 &format!("Size of {} installed binaries: ", self.numb_bins),
                 &self
@@ -188,7 +164,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 1,
                 "Size of registry: ",
                 &self
@@ -201,7 +177,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 2,
                 "Size of registry index: ",
                 &self
@@ -214,7 +190,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 2,
                 &format!("Size of {} crate archives: ", self.numb_reg_cache_entries),
                 &self
@@ -227,7 +203,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 2,
                 &format!(
                     "Size of {} crate source checkouts: ",
@@ -243,7 +219,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 1,
                 "Size of git db: ",
                 &self
@@ -256,7 +232,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 2,
                 &format!(
                     "Size of {} bare git repos: ",
@@ -272,7 +248,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            pad_strings(
+            library::pad_strings(
                 2,
                 &format!("Size of {} git repo checkouts: ", self.numb_git_checkouts),
                 &self

@@ -17,8 +17,8 @@ use cargo_metadata::{CargoOpt, MetadataCommand};
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 
-use crate::dirsizes::pad_strings;
 use crate::library;
+use crate::library::pad_strings;
 
 fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
     #[allow(clippy::filter_map)]

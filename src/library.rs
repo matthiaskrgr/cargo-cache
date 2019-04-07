@@ -530,6 +530,31 @@ pub(crate) fn remove_file(
     }
 }
 
+pub(crate) fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
+    // max line width
+    const MAX_WIDTH: i64 = 40;
+
+    let left = MAX_WIDTH + (indent_lvl * 2);
+    let right = beginning.len() as i64;
+    let len_padding = left - right;
+    assert!(
+        len_padding > 0,
+        format!(
+            "len_padding is negative: '{} - {} = {}' ",
+            left, right, len_padding
+        )
+    );
+
+    let mut formatted_line = beginning.to_string();
+
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    // I tried mittigating via previous assert()
+    formatted_line.push_str(&" ".repeat(len_padding as usize));
+    formatted_line.push_str(end);
+    formatted_line.push_str("\n");
+    formatted_line
+}
+
 #[cfg(test)]
 mod libtests {
     use super::*;
