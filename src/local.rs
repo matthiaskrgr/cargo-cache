@@ -97,7 +97,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     output.push_str(&pad_strings(0, 15, "Total size: ", size_hr.as_str()));
 
-    let p = target_dir;
+    let p = &target_dir;
     let td_debug = p.clone().join("debug");
     let td_rls = p.clone().join("rls");
     let td_release = p.clone().join("release");
@@ -141,6 +141,37 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
             15,
             "package: ",
             &size_package.file_size(file_size_opts::DECIMAL).unwrap(),
+        ));
+    }
+
+    // other: do some extra magic
+    // get immediate subdirs
+    #[allow(clippy::filter_map)] // @TODO fixme
+    // look what else we have in the current target directory and sum it up
+    let size_other: u64 = std::fs::read_dir(&target_dir)
+        .unwrap()
+        .filter(Result::is_ok)
+        .map(|x| x.unwrap().path())
+        // skip these, since we already printed them
+        .filter(|f| {
+            !(f.starts_with(&td_debug)
+                || f.starts_with(&td_release)
+                || f.starts_with(&td_rls)
+                || f.starts_with(&td_package))
+        })
+        .map(|f| {
+            std::fs::metadata(&f)
+                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &f.display()))
+                .len()
+        })
+        .sum();
+
+    if size_other > 0 {
+        output.push_str(&pad_strings(
+            1,
+            15,
+            "other: ",
+            &size_other.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
