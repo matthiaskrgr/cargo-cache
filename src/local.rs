@@ -93,9 +93,9 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
         return;
     }
 
-    output.push_str(&format!("Target dir: {}\n", target_dir.display()));
+    output.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
 
-    output.push_str(&format!("Total Size Size: {}\n", size_hr));
+    output.push_str(&pad_strings(0, 15, "Total size: ", size_hr.as_str()));
 
     let p = target_dir;
     let td_debug = p.clone().join("debug");
@@ -107,8 +107,8 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     if size_debug > 0 {
         output.push_str(&pad_strings(
-            0,
-            10,
+            1,
+            15,
             "debug: ",
             &size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -116,25 +116,31 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     let size_rls = library::cumulative_dir_size(&td_rls).dir_size;
     if size_rls > 0 {
-        output.push_str(&format!(
-            "rls: {}\n",
-            size_rls.file_size(file_size_opts::DECIMAL).unwrap()
+        output.push_str(&pad_strings(
+            1,
+            15,
+            "rls: ",
+            &size_rls.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
     let size_release = library::cumulative_dir_size(&td_release).dir_size;
     if size_release > 0 {
-        output.push_str(&format!(
-            "release: {}\n",
-            size_release.file_size(file_size_opts::DECIMAL).unwrap()
+        output.push_str(&pad_strings(
+            1,
+            15,
+            "release: ",
+            &size_release.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
     let size_package = library::cumulative_dir_size(&td_package).dir_size;
     if size_package > 0 {
-        output.push_str(&format!(
-            "package: {}",
-            size_package.file_size(file_size_opts::DECIMAL).unwrap()
+        output.push_str(&pad_strings(
+            1,
+            15,
+            "package: ",
+            &size_package.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
