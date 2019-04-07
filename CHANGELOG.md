@@ -11,6 +11,7 @@ Add "query" subcommand (run "cargo cache query" or short "cargo cache q"
 	You can get human readable sizes via --human-readable and sort by size/name (alphabetically)
 	via --sort-by $option
 	Check out cargo cache q --help for more details
+Add crates.rs badge to readme
 Revert "rename -l (--list-dirs) to -L."
 	short form of --list-dirs is -l again.
 Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
