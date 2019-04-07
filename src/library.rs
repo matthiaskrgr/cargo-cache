@@ -530,12 +530,9 @@ pub(crate) fn remove_file(
     }
 }
 
-pub(crate) fn pad_strings(indent_lvl: i64, beginning: &str, end: &str) -> String {
-    // max line width
-    const MAX_WIDTH: i64 = 40;
-
-    let left = MAX_WIDTH + (indent_lvl * 2);
-    let right = beginning.len() as i64;
+pub(crate) fn pad_strings(indent_lvl: u16, max_line_width: u16, beginning: &str, end: &str) -> String {
+    let left: u16 = max_line_width + (indent_lvl * 2);
+    let right: u16 = beginning.len() as u16;
     let len_padding = left - right;
     assert!(
         len_padding > 0,

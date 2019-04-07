@@ -143,6 +143,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 0,
+                40,
                 "Total size: ",
                 &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
             )
@@ -153,6 +154,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 1,
+                40,
                 &format!("Size of {} installed binaries: ", self.numb_bins),
                 &self
                     .total_bin_size
@@ -166,6 +168,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 1,
+                40,
                 "Size of registry: ",
                 &self
                     .total_reg_size
@@ -179,6 +182,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 2,
+                40,
                 "Size of registry index: ",
                 &self
                     .total_reg_index_size
@@ -192,6 +196,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 2,
+                40,
                 &format!("Size of {} crate archives: ", self.numb_reg_cache_entries),
                 &self
                     .total_reg_cache_size
@@ -205,6 +210,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 2,
+                40,
                 &format!(
                     "Size of {} crate source checkouts: ",
                     self.numb_reg_src_checkouts
@@ -221,6 +227,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 1,
+                40,
                 "Size of git db: ",
                 &self
                     .total_git_db_size
@@ -234,6 +241,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 2,
+                40,
                 &format!(
                     "Size of {} bare git repos: ",
                     self.numb_git_repos_bare_repos
@@ -250,6 +258,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 2,
+                40,
                 &format!("Size of {} git repo checkouts: ", self.numb_git_checkouts),
                 &self
                     .total_git_chk_size

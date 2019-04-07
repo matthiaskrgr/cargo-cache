@@ -108,6 +108,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_debug > 0 {
         output.push_str(&pad_strings(
             0,
+            10,
             "debug: ",
             &size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
