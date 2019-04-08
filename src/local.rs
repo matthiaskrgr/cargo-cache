@@ -22,6 +22,7 @@ use crate::library;
 use crate::library::pad_strings;
 
 fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
+    // check if the "Cargo.toml" manifest can be seen in the current directory
     #[allow(clippy::filter_map)]
     read_dir(&path)
         .unwrap()
@@ -31,6 +32,7 @@ fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
 }
 
 fn get_manifest() -> PathBuf {
+    // find the closest manifest (Cargo.toml)
     let mut cwd = match env::current_dir() {
         Ok(cwd) => cwd,
         Err(e) => {
@@ -64,10 +66,10 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     // get the metadata
     let metadata = MetadataCommand::new()
-        .manifest_path(manifest)
+        .manifest_path(&manifest)
         .features(CargoOpt::AllFeatures)
         .exec()
-        .unwrap(); // @TODO error handling
+        .unwrap_or_else(|_| panic!("Failed to parse manifest: '{}'", &manifest.display()));
 
     let target_dir = metadata.target_directory;
 
@@ -147,13 +149,13 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     // other: do some extra magic
     // get immediate subdirs
-    #[allow(clippy::filter_map)] // @TODO fixme
-    #[allow(clippy::map_flatten)] // @TODO fixme
+
     // look what else we have in the current target directory and sum it up
+    #[allow(clippy::filter_map)]
     let size_other: u64 = std::fs::read_dir(&target_dir)
         .unwrap()
-        .filter(Result::is_ok)
-        .map(|x| x.unwrap().path())
+        .filter_map(Result::ok)
+        .map(|x| x.path())
         // skip these, since we already printed them
         .filter(|f| {
             !(f.starts_with(&td_debug)
@@ -161,15 +163,13 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
                 || f.starts_with(&td_rls)
                 || f.starts_with(&td_package))
         })
-        // for the other directories, crawl them recursively and get the sizes
-        .map(|f| {
+        // for the other directories, crawl them recursively and flatten the walkdir items
+        .flat_map(|f| {
             WalkDir::new(f.display().to_string())
                 .into_iter()
                 .skip(1)
                 .map(|d| d.unwrap().into_path())
         })
-        // flatten everything into one iterator
-        .flatten()
         .filter(|f| f.exists())
         .map(|f| {
             std::fs::metadata(&f)
