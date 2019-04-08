@@ -16,6 +16,7 @@ use std::process;
 use cargo_metadata::{CargoOpt, MetadataCommand};
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
+use walkdir::WalkDir;
 
 use crate::library;
 use crate::library::pad_strings;
@@ -147,6 +148,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     // other: do some extra magic
     // get immediate subdirs
     #[allow(clippy::filter_map)] // @TODO fixme
+    #[allow(clippy::map_flatten)] // @TODO fixme
     // look what else we have in the current target directory and sum it up
     let size_other: u64 = std::fs::read_dir(&target_dir)
         .unwrap()
@@ -159,6 +161,16 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
                 || f.starts_with(&td_rls)
                 || f.starts_with(&td_package))
         })
+        // for the other directories, crawl them recursively and get the sizes
+        .map(|f| {
+            WalkDir::new(f.display().to_string())
+                .into_iter()
+                .skip(1)
+                .map(|d| d.unwrap().into_path())
+        })
+        // flatten everything into one iterator
+        .flatten()
+        .filter(|f| f.exists())
         .map(|f| {
             std::fs::metadata(&f)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &f.display()))
