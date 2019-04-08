@@ -27,7 +27,7 @@ fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
         .unwrap()
         .filter(Result::is_ok)
         .map(|d| d.unwrap().path())
-        .find(|f| f.file_name().is_some() && f.file_name().unwrap() == OsStr::new("Cargo.toml"))
+        .find(|f| f.file_name() == Some(OsStr::new("Cargo.toml")))
 }
 
 fn get_manifest() -> PathBuf {
