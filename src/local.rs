@@ -48,9 +48,9 @@ fn get_manifest() -> PathBuf {
             manifest = mf;
             break;
         } else {
-            let root_reached = !cwd.pop();
+            let fs_root_reached = !cwd.pop();
 
-            if root_reached {
+            if fs_root_reached {
                 eprintln!("Did not find manifest!");
                 std::process::exit(123);
             }
