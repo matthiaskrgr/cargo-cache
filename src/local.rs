@@ -104,10 +104,10 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     let td_debug = p.clone().join("debug");
     let td_rls = p.clone().join("rls");
     let td_release = p.clone().join("release");
-    let td_package = p.join("package");
+    let td_package = p.clone().join("package");
+    let td_doc = p.join("doc");
 
     let size_debug = library::cumulative_dir_size(&td_debug).dir_size;
-
     if size_debug > 0 {
         output.push_str(&pad_strings(
             1,
@@ -147,6 +147,16 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
         ));
     }
 
+    let size_doc = library::cumulative_dir_size(&td_doc).dir_size;
+    if size_doc > 0 {
+        output.push_str(&pad_strings(
+            1,
+            15,
+            "doc: ",
+            &size_doc.file_size(file_size_opts::DECIMAL).unwrap(),
+        ));
+    }
+
     // For everything else ("other") that is inside the target dir, we need to do some extra work
     // to find out how big it is.
     // Get the immediate subdirs of the target/ dir, skip the known ones (rls, package, debug, release)
@@ -161,7 +171,8 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
             !(f.starts_with(&td_debug)
                 || f.starts_with(&td_release)
                 || f.starts_with(&td_rls)
-                || f.starts_with(&td_package))
+                || f.starts_with(&td_package)
+                || f.starts_with(&td_doc))
         })
         // for the other directories, crawl them recursively and flatten the walkdir items
         .flat_map(|f| {
