@@ -17,7 +17,7 @@ Revert "rename -l (--list-dirs) to -L."
 Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
 	sizes of a target/ dir of a built package
 Update dependencies:
-	cargo: 0.32.0 -> 0.34.0
+	cargo: 0.32.0 -> 0.35.0
 	clap: 2.32.0 -> 2.33.0
 	regex: 1.1.0 -> 1.1.5
 	pretty_assertions: 0.5.1 -> 0.6.1
