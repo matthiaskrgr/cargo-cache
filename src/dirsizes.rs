@@ -135,7 +135,6 @@ impl<'a> DirSizes<'a> {
 
 impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
-        //@TODO readd delimiter? to end of path to indicate it is a directory
         write!(f, "Cargo cache '{}':\n\n", &self.root_path.display())?;
 
         write!(

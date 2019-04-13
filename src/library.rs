@@ -148,17 +148,13 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     }
 
     // traverse recursively and sum filesizes, parallelized by rayon
-
-    // @TODO I would like to get rid of the vector here but not sure how to convert
-    // WalkDir iterator into rayon par_iter
-
     let walkdir_start = dir.display().to_string();
 
     let dir_size = WalkDir::new(&walkdir_start)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
         .filter(|f| f.exists()) // avoid broken symlinks
-        .collect::<Vec<_>>()
+        .collect::<Vec<_>>() // @TODO perhaps WalkDir will impl ParallelIterator one day
         .par_iter()
         .map(|f| {
             fs::metadata(f)
@@ -626,7 +622,7 @@ mod libtests {
     fn test_CargoCachePaths_paths() {
         // get cargo target dir
         let mut target_dir = std::env::current_dir().unwrap();
-        // @TODO take $CARGO_TARGET_DIR into account
+        // note: this may fail if CARGO_TARGET_DIR is set
         target_dir.push("target");
         let mut cargo_home = target_dir;
         cargo_home.push("cargo_home_cargo_cache_paths");

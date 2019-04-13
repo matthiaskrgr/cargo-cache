@@ -87,8 +87,6 @@ fn main() {
     }
 
     // create cache
-    //let mut cache = DirCache::new(CargoCachePaths::default().unwrap());
-
     let p = CargoCachePaths::default().unwrap();
 
     let mut bin_cache = bin::BinaryCache::new(p.bin_dir);
@@ -98,7 +96,6 @@ fn main() {
     let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
     let mut registry_sources_cache = registry_sources::RegistrySourceCache::new(p.registry_sources);
 
-    // @TODO: use match instead of multiple if(config)s
     if config.is_present("top-cache-items") {
         let limit =
             value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
@@ -118,9 +115,7 @@ fn main() {
             );
         }
         process::exit(0);
-    }
-
-    if config.is_present("query") || config.is_present("q") {
+    } else if config.is_present("query") || config.is_present("q") {
         let query_config = if config.is_present("query") {
             config
                 .subcommand_matches("query")
@@ -139,9 +134,7 @@ fn main() {
         );
 
         process::exit(0);
-    }
-
-    if config.is_present("local") || config.is_present("l") {
+    } else if config.is_present("local") || config.is_present("l") {
         let local_config = if config.is_present("local") {
             config
                 .subcommand_matches("local")
