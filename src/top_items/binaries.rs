@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -18,7 +17,7 @@ use crate::top_items::common::*;
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 struct BinInfo {
     name: String,
     size: u64,
@@ -38,24 +37,6 @@ impl BinInfo {
     }
 }
 
-impl PartialOrd for BinInfo {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for BinInfo {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.size.cmp(&other.size)
-    }
-}
-
-impl PartialEq for BinInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.size == other.size
-    }
-}
-
 #[inline] // only called in one place
 fn bininfo_list_from_path(bin_cache: &mut bin::BinaryCache) -> Vec<BinInfo> {
     // returns unsorted!
@@ -72,7 +53,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
         return String::new();
     }
     // sort the BinInfo Vec in reverse
-    collections_vec.par_sort();
+    collections_vec.par_sort_by_key(|b| b.size);
     collections_vec.reverse();
 
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
@@ -198,7 +179,7 @@ mod bininfo_struct {
         };
 
         let mut v = vec![bi_a, bi_b, bi_c];
-        v.sort();
+        v.sort_by_key(|b| b.size);
         let mut order_string = String::new();
         for bi in v {
             order_string.push_str(&format!("{:?}", bi));
@@ -232,7 +213,7 @@ mod bininfo_struct {
         };
 
         let mut v = vec![bi_a, bi_b, bi_c];
-        v.sort();
+        v.par_sort_by_key(|b| b.size);
         let mut order_string = String::new();
         for bi in v {
             order_string.push_str(&format!("{:?}", bi));

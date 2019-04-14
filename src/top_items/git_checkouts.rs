@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use crate::cache::*;
-use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -74,7 +73,7 @@ impl FileDesc {
     } // fn new_from_git_checkouts()
 } // impl FileDesc
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 pub(crate) struct ChkInfo {
     name: String,
     size: u64,
@@ -109,24 +108,6 @@ impl ChkInfo {
             counter,
             total_size,
         }
-    }
-}
-
-impl PartialOrd for ChkInfo {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for ChkInfo {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.total_size.cmp(&other.total_size)
-    }
-}
-
-impl PartialEq for ChkInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.total_size == other.total_size
     }
 }
 
@@ -246,7 +227,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
     }
 
     // sort the ChkInfo Vec in reverse
-    collections_vec.par_sort();
+    collections_vec.par_sort_by_key(|gc| gc.total_size);
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 

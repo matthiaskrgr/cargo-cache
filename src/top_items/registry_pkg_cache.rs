@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -51,7 +50,7 @@ impl FileDesc {
     } // fn new_from_reg_cache()
 } // impl FileDesc
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 pub(crate) struct RgchInfo {
     name: String,
     size: u64,
@@ -87,24 +86,6 @@ impl RgchInfo {
             counter,
             total_size,
         }
-    }
-}
-
-impl PartialOrd for RgchInfo {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for RgchInfo {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.total_size.cmp(&other.total_size)
-    }
-}
-
-impl PartialEq for RgchInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.total_size == other.total_size
     }
 }
 
@@ -223,7 +204,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
     }
 
     // sort the RepoInfo Vec in reverse, biggest item first
-    collections_vec.par_sort();
+    collections_vec.par_sort_by_key(|rpc| rpc.total_size);
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 

@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -65,7 +64,7 @@ impl FileDesc {
     } // fn new_from_reg_src()
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 pub(crate) struct RgSrcInfo {
     name: String,
     size: u64,
@@ -100,22 +99,6 @@ impl RgSrcInfo {
             counter,
             total_size,
         }
-    }
-}
-
-impl PartialOrd for RgSrcInfo {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-impl Ord for RgSrcInfo {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.total_size.cmp(&other.total_size)
-    }
-}
-impl PartialEq for RgSrcInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.total_size == other.total_size
     }
 }
 
@@ -234,7 +217,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
     }
 
     // sort the RepoImfo Vec in reverse, biggest item first
-    collections_vec.par_sort();
+    collections_vec.par_sort_by_key(|rs| rs.total_size);
     collections_vec.reverse();
 
     let mut table_matrix: Vec<Vec<String>> = Vec::new();

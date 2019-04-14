@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::cmp::Ordering;
 use std::fs;
 use std::path::PathBuf;
 
@@ -64,7 +63,7 @@ impl FileDesc {
     } // fn new_from_git_bare()
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug)]
 pub(crate) struct RepoInfo {
     name: String,
     size: u64,
@@ -97,24 +96,6 @@ impl RepoInfo {
             counter,
             total_size,
         }
-    }
-}
-
-impl PartialOrd for RepoInfo {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for RepoInfo {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.total_size.cmp(&other.total_size)
-    }
-}
-
-impl PartialEq for RepoInfo {
-    fn eq(&self, other: &Self) -> bool {
-        self.total_size == other.total_size
     }
 }
 
@@ -231,7 +212,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
         return String::new();
     }
     // sort the RepoInfo Vec in reverse, biggest item first
-    collections_vec.par_sort();
+    collections_vec.par_sort_by_key(|grb| grb.total_size);
     collections_vec.reverse();
     let mut table_matrix: Vec<Vec<String>> = Vec::new();
 
