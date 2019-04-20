@@ -192,13 +192,13 @@ fn main() {
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
             if dir.is_dir() {
-                remove_file(
+                let _ = remove_file(
                     &dir,
                     config.is_present("dry-run"),
                     &mut size_changed,
                     None,
                     None,
-                )
+                );
             }
         }
     }

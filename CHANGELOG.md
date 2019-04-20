@@ -17,6 +17,7 @@ Revert "rename -l (--list-dirs) to -L."
 Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
 	sizes of a target/ dir of a built package
 Make --remove-dir accept "registry-index" for clearing out the registry index
+Make --dry-run print a summary of how much space would be freed
 Update dependencies:
 	cargo: 0.32.0 -> 0.35.0
 	clap: 2.32.0 -> 2.33.0

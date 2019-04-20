@@ -391,12 +391,13 @@ pub(crate) fn remove_dir_via_cmdline(
         dir: &PathBuf,
         dry_run: bool,
         size_changed: &mut bool,
-    ) -> Result<(), (ErrorKind, String)> {
+    ) -> Result<(u64), (ErrorKind, String)> {
         // remove a specified subdirectory from cargo cache
         let msg = Some(format!("removing: '{}'", dir.display()));
-        remove_file(&dir, dry_run, size_changed, msg, None);
+        let size = remove_file(&dir, dry_run, size_changed, msg, None);
+        // @TODO: use cache instead of recalculating
 
-        Ok(())
+        Ok(size)
     }
 
     let input = if let Some(value) = directory {
@@ -480,22 +481,37 @@ pub(crate) fn remove_dir_via_cmdline(
             format!("Invalid deletable dir(s): {}", inv_dirs),
         ));
     }
+
+    let mut size_removed: u64 = 0;
+
+    if dry_run {
+        println!(); // newline
+    }
+
     // finally delete
     if rm_git_checkouts {
-        rm(&ccd.git_checkouts, dry_run, size_changed)?
+        size_removed += rm(&ccd.git_checkouts, dry_run, size_changed)?;
     }
     if rm_git_repos {
-        rm(&ccd.git_repos_bare, dry_run, size_changed)?
+        size_removed += rm(&ccd.git_repos_bare, dry_run, size_changed)?
     }
     if rm_registry_sources {
-        rm(&ccd.registry_sources, dry_run, size_changed)?
+        size_removed += rm(&ccd.registry_sources, dry_run, size_changed)?
     }
     if rm_registry_crate_cache {
-        rm(&ccd.registry_pkg_cache, dry_run, size_changed)?
+        size_removed += rm(&ccd.registry_pkg_cache, dry_run, size_changed)?
     }
     if rm_registry_index {
-        rm(&ccd.registry_index, dry_run, size_changed)?
+        size_removed += rm(&ccd.registry_index, dry_run, size_changed)?
     }
+
+    if dry_run {
+        println!(
+            "dry-run: would remove in total: {}",
+            size_removed.file_size(file_size_opts::DECIMAL).unwrap()
+        );
+    }
+
     Ok(())
 }
 
@@ -505,14 +521,17 @@ pub(crate) fn remove_file(
     size_changed: &mut bool,
     deletion_msg: Option<String>,
     dry_run_msg: Option<String>,
-) {
+) -> u64 {
+    let mut size: u64 = 0;
     if dry_run {
         if let Some(dr_msg) = dry_run_msg {
             println!("{}", dr_msg)
         } else {
-            println!("dry-run: would remove: '{}'", path.display());
+            size = cumulative_dir_size(path).dir_size;
+            let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
+            println!("dry-run: would remove: '{}' ({})", path.display(), size_hr);
         }
-        return;
+        return size;
     }
     // print deletion message if we have one
     if let Some(msg) = deletion_msg {
@@ -533,6 +552,7 @@ pub(crate) fn remove_file(
     } else {
         *size_changed = true;
     }
+    size
 }
 
 pub(crate) fn pad_strings(
