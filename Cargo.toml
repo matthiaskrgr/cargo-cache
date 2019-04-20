@@ -40,7 +40,7 @@ rayon = "1.0.3" # parallelize iterators
 rustc_tools_util = "0.1.1" # git version information
 
 # https://github.com/rust-lang/regex
-regex = "1.1.5" # use regex for matching
+regex = "1.1.6" # use regex for matching
 
 [dev-dependencies]
 # https://github.com/colin-kiegel/rust-pretty-assertions
