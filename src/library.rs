@@ -415,6 +415,7 @@ pub(crate) fn remove_dir_via_cmdline(
         "git-repos",
         "registry-sources",
         "registry-crate-cache",
+        "registry-index",
         "registry",
         "all",
     ];
@@ -424,6 +425,7 @@ pub(crate) fn remove_dir_via_cmdline(
     let mut rm_git_checkouts = false;
     let mut rm_registry_sources = false;
     let mut rm_registry_crate_cache = false;
+    let mut rm_registry_index = false;
 
     // validate input
     let mut invalid_dirs = String::new();
@@ -439,6 +441,7 @@ pub(crate) fn remove_dir_via_cmdline(
                     rm_git_checkouts = true;
                     rm_registry_sources = true;
                     rm_registry_crate_cache = true;
+                    rm_registry_index = true;
                     // we clean the entire cache anyway,
                     // no need to look further, break out of loop
                     break; // for word in inputs
@@ -449,6 +452,9 @@ pub(crate) fn remove_dir_via_cmdline(
                 }
                 "registry-sources" => {
                     rm_registry_sources = true;
+                }
+                "registry-index" => {
+                    rm_registry_index = true;
                 }
                 "git-repos" => {
                     rm_git_checkouts = true;
@@ -486,6 +492,9 @@ pub(crate) fn remove_dir_via_cmdline(
     }
     if rm_registry_crate_cache {
         rm(&ccd.registry_pkg_cache, dry_run, size_changed)?
+    }
+    if rm_registry_index {
+        rm(&ccd.registry_index, dry_run, size_changed)?
     }
     Ok(())
 }

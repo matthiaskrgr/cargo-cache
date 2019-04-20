@@ -23,7 +23,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .help("List all found directory paths");
 
     let remove_dir = Arg::with_name("remove-dir").short("r").long("remove-dir")
-        .help("Remove directories, accepted values: git-db,git-repos,registry-sources,registry-crate-cache,registry,all")
+        .help("Remove directories, accepted values: git-db,git-repos,\nregistry-sources,registry-crate-cache,registry-index,registry,all")
         .takes_value(true)
         .value_name("dir1,dir2,dir3");
 
@@ -182,8 +182,8 @@ FLAGS:
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
-                                         sources,registry-crate-cache,registry,all
+    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,
+                                         registry-sources,registry-crate-cache,registry-index,registry,all
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
@@ -221,8 +221,8 @@ FLAGS:
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,registry-
-                                         sources,registry-crate-cache,registry,all
+    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,
+                                         registry-sources,registry-crate-cache,registry-index,registry,all
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help     Prints this message or the help of the given subcommand(s)
