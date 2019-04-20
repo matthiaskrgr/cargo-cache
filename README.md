@@ -7,7 +7,7 @@
 
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
-##### Key Features:
+#### Key Features:
 * check the size of the cargo cache and its components
 * do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
 * clean up everything (cargo will re-download as needed)
@@ -24,8 +24,8 @@ or for the bleeding edge development version:
 
 ```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
 
-If you encounter problems while building `cargo`, check out the [instructions
-at the cargo repo](https://github.com/rust-lang/cargo#compiling-from-source)
+If you encounter problems while building `cargo`, please check out the [instructions
+at the cargo repo](https://github.com/rust-lang/cargo#compiling-from-source).
 
 #### Sample output:
 ````
