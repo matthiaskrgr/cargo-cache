@@ -43,6 +43,7 @@ mod git;
 mod library;
 mod local;
 mod query;
+mod remove;
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
 mod top_items;
@@ -60,6 +61,7 @@ use humansize::{file_size_opts, FileSize};
 use crate::cache::*;
 use crate::git::*;
 use crate::library::*;
+use crate::remove::*;
 use crate::top_items_summary::*;
 
 fn main() {
