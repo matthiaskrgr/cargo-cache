@@ -7,16 +7,15 @@
 
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
-Key Features:
-    * check the size of the cargo cache and its components
-    * do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
-    * clean up everything (cargo will re-download as needed)
-    * dry-run to see what would be removed
-    * recompress git repos
-    * Search cache via regex queries
-    * print crates that take the most space
-
-`stable`, `beta` and `nightly` channels are supported.
+##### Key Features:
+* check the size of the cargo cache and its components
+* do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
+* clean up everything (cargo will re-download as needed)
+* dry-run to see what would be removed
+* recompress git repos
+* search cache via regex queries
+* print crates that take the most space
+* runs on `stable`, `beta` and `nightly` channel
 
 #### Installation:
 ```cargo install cargo-cache```
