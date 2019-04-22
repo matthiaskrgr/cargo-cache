@@ -174,6 +174,11 @@ fn main() {
             config.is_present("dry-run"),
             &cargo_cache,
             &mut size_changed,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_index_cache,
+            &mut registry_pkg_cache,
+            &mut registry_sources_cache,
         ) {
             eprintln!("{}", msg);
             process::exit(1);
@@ -194,10 +199,11 @@ fn main() {
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
             if dir.is_dir() {
-                let _ = remove_file(
+                remove_file(
                     &dir,
                     config.is_present("dry-run"),
                     &mut size_changed,
+                    None,
                     None,
                     None,
                 );

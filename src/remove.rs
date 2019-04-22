@@ -10,6 +10,8 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::cache::dircache::Cache;
+use crate::cache::*;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
@@ -63,7 +65,14 @@ pub(crate) fn rm_old_crates(
                     pkgver,
                     pkgpath.display()
                 );
-                remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg));
+                remove_file(
+                    &pkgpath,
+                    dry_run,
+                    size_changed,
+                    None,
+                    Some(dryrun_msg),
+                    None,
+                );
 
                 continue;
             }
@@ -85,7 +94,14 @@ pub(crate) fn rm_old_crates(
                         pkgver,
                         pkgpath.display()
                     );
-                    remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg));
+                    remove_file(
+                        &pkgpath,
+                        dry_run,
+                        size_changed,
+                        None,
+                        Some(dryrun_msg),
+                        None,
+                    );
                 }
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
@@ -101,23 +117,37 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_dir_via_cmdline(
     directory: Option<&str>,
     dry_run: bool,
     ccd: &CargoCachePaths,
     size_changed: &mut bool,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    registry_index_cache: &mut registry_index::RegistryIndexCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+    registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> Result<(), (ErrorKind, String)> {
+    // @TODO the passing of the cache is really a mess here... :(
     fn rm(
         dir: &PathBuf,
         dry_run: bool,
         size_changed: &mut bool,
-    ) -> Result<(u64), (ErrorKind, String)> {
+        total_size_from_cache: Option<u64>,
+    ) -> Result<(), (ErrorKind, String)> {
         // remove a specified subdirectory from cargo cache
         let msg = Some(format!("removing: '{}'", dir.display()));
-        let size = remove_file(&dir, dry_run, size_changed, msg, None);
-        // @TODO: use cache instead of recalculating
 
-        Ok(size)
+        remove_file(
+            &dir,
+            dry_run,
+            size_changed,
+            msg,
+            None,
+            total_size_from_cache,
+        );
+        Ok(())
     }
 
     let input = if let Some(value) = directory {
@@ -210,19 +240,33 @@ pub(crate) fn remove_dir_via_cmdline(
 
     // finally delete
     if rm_git_checkouts {
-        size_removed += rm(&ccd.git_checkouts, dry_run, size_changed)?;
+        let size = checkouts_cache.total_size();
+        size_removed += size;
+        rm(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
     }
+
     if rm_git_repos {
-        size_removed += rm(&ccd.git_repos_bare, dry_run, size_changed)?
+        let size = bare_repos_cache.total_size();
+        size_removed += size;
+        rm(&ccd.git_repos_bare, dry_run, size_changed, Some(size))?
     }
+
     if rm_registry_sources {
-        size_removed += rm(&ccd.registry_sources, dry_run, size_changed)?
+        let size = registry_sources_cache.total_size();
+        size_removed += size;
+        rm(&ccd.registry_sources, dry_run, size_changed, Some(size))?
     }
+
     if rm_registry_crate_cache {
-        size_removed += rm(&ccd.registry_pkg_cache, dry_run, size_changed)?
+        let size = registry_pkg_cache.total_size();
+        size_removed += size;
+        rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?
     }
+
     if rm_registry_index {
-        size_removed += rm(&ccd.registry_index, dry_run, size_changed)?
+        let size = registry_index_cache.total_size();
+        size_removed += size;
+        rm(&ccd.registry_index, dry_run, size_changed, Some(size))?
     }
 
     if dry_run {
@@ -241,36 +285,36 @@ pub(crate) fn remove_file(
     size_changed: &mut bool,
     deletion_msg: Option<String>,
     dry_run_msg: Option<String>,
-) -> u64 {
-    let mut size: u64 = 0;
+    total_size_from_cache: Option<u64>,
+) {
     if dry_run {
         if let Some(dr_msg) = dry_run_msg {
             println!("{}", dr_msg)
-        } else {
-            size = cumulative_dir_size(path).dir_size;
+        } else if let Some(size) = total_size_from_cache {
             let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
             println!("dry-run: would remove: '{}' ({})", path.display(), size_hr);
+        } else {
+            println!("dry-run: would remove: '{}'", path.display());
         }
-        return size;
-    }
-    // print deletion message if we have one
-    if let Some(msg) = deletion_msg {
-        println!("{}", msg);
-    }
-
-    if path.is_file() && fs::remove_file(&path).is_err() {
-        eprintln!("Warning: failed to remove file \"{}\".", path.display());
     } else {
-        *size_changed = true;
-    }
+        // print deletion message if we have one
+        if let Some(msg) = deletion_msg {
+            println!("{}", msg);
+        }
 
-    if path.is_dir() && fs::remove_dir_all(&path).is_err() {
-        eprintln!(
-            "Warning: failed to recursively remove directory \"{}\".",
-            path.display()
-        );
-    } else {
-        *size_changed = true;
+        if path.is_file() && fs::remove_file(&path).is_err() {
+            eprintln!("Warning: failed to remove file \"{}\".", path.display());
+        } else {
+            *size_changed = true;
+        }
+
+        if path.is_dir() && fs::remove_dir_all(&path).is_err() {
+            eprintln!(
+                "Warning: failed to recursively remove directory \"{}\".",
+                path.display()
+            );
+        } else {
+            *size_changed = true;
+        }
     }
-    size
 }
