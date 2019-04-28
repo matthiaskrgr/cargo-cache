@@ -40,7 +40,7 @@ mod cache;
 mod cli;
 mod dirsizes;
 mod git;
-pub mod library; // contains dummy function for test
+mod library;
 mod local;
 mod query;
 mod remove;
