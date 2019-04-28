@@ -56,14 +56,6 @@ path = "src/main.rs"
 test = true
 bench = true
 
-# needed for test to depend on cargo-cache
-[lib]
-name = "cargo_cache"
-path = "src/library.rs"
-test = false
-bench = false
-edition = '2018'
-
 [badges]
 travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
