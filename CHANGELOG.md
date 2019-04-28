@@ -20,12 +20,13 @@ Make --remove-dir accept "registry-index" for clearing out the registry index
 Make --dry-run print a summary of how much space would be freed
 Use "home" crate instead of "cargo" to get the CARGO_HOME value.
 	This gets rid of a lot of dependencies and speeds up the build
-
 Update dependencies:
+	cargo: removed
 	clap: 2.32.0 -> 2.33.0
 	regex: 1.1.0 -> 1.1.6
 	pretty_assertions: 0.5.1 -> 0.6.1
 	cargo_metadata: new
+	home: new
 ````
 ## Version 0.1.2 (01f6952)
 ````
