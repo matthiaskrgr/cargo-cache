@@ -52,12 +52,10 @@ fn CARGO_HOME_subdirs_are_known() {
         "fake cargo home was not created!"
     );
 
-    /*
-    for i in  WalkDir::new(cargo_home).max_depth(3);  {
-        println!("{:?}", i);
-    } */
-
-    let wd = WalkDir::new(cargo_home).max_depth(3);
+    WalkDir::new(cargo_home)
+        .max_depth(3)
+        .into_iter()
+        .for_each(|x| println!("{:?}", x));
 
     /*
     Ok(DirEntry("target/cargo_home_subdirs_known_CARGO_HOME"))
@@ -72,6 +70,7 @@ fn CARGO_HOME_subdirs_are_known() {
     Ok(DirEntry("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com-1ecc6299db9ec823"))
     */
 
+    let wd = WalkDir::new(cargo_home).max_depth(3);
     let mut wd_iter = wd.into_iter();
     assert!(wd_iter
         .next()
