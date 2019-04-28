@@ -15,39 +15,39 @@ edition = "2018"
 bench = [] # run benchmarks
 
 [dependencies]
-# https://github.com/kbknapp/clap-rs
-clap = "2.33.0" # cmdline arg parsing
-
-# https://github.com/BurntSushi/walkdir
-walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
-
-# https://github.com/LeopoldArkham/humansize
-humansize = "1.1.0" # convert digits of bytes to human readable size
-
-# https://github.com/brson/home
-home = "0.3.4" # get CARGO_HOME
-
 # https://github.com/oli-obk/cargo_metadata
 cargo_metadata = "0.7.4" # get crate package name
+
+# https://github.com/kbknapp/clap-rs
+clap = "2.33.0" # cmdline arg parsing
 
 # https://github.com/alexcrichton/git2-rs
 git2 = "0.8.0" # check if repo is git repo
 
+# https://github.com/brson/home
+home = "0.3.4" # get CARGO_HOME
+
+# https://github.com/LeopoldArkham/humansize
+humansize = "1.1.0" # convert digits of bytes to human readable size
+
 # https://github.com/rayon-rs/rayon
 rayon = "1.0.3" # parallelize iterators
 
-# https://github.com/rust-lang/rust-clippy
-rustc_tools_util = "0.1.1" # git version information
-
 # https://github.com/rust-lang/regex
 regex = "1.1.6" # use regex for matching
+
+# https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
+rustc_tools_util = "0.1.1" # git version information
+
+# https://github.com/BurntSushi/walkdir
+walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
 
 [dev-dependencies]
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "0.6.1" # colored diff assertions
 
 [build-dependencies]
-# https://github.com/rust-lang/rust-clippy
+# https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = "0.1.1" # git version information
 
 [[bin]]
