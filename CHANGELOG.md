@@ -18,8 +18,10 @@ Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
 	sizes of a target/ dir of a built package
 Make --remove-dir accept "registry-index" for clearing out the registry index
 Make --dry-run print a summary of how much space would be freed
+Use "home" crate instead of "cargo" to get the CARGO_HOME value.
+	This gets rid of a lot of dependencies and speeds up the build
+
 Update dependencies:
-	cargo: 0.32.0 -> 0.35.0
 	clap: 2.32.0 -> 2.33.0
 	regex: 1.1.0 -> 1.1.6
 	pretty_assertions: 0.5.1 -> 0.6.1

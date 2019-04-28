@@ -54,16 +54,16 @@ pub(crate) enum ErrorKind {
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
     pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
-        let cargo_cfg = if let Ok(cargo_cfg) = cargo::util::config::Config::default() {
-            cargo_cfg
+        let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
+            cargo_home
         } else {
             return Err((
                 ErrorKind::CargoFailedGetConfig,
-                "Failed to get cargo config!".to_string(),
+                "Failed to get cargo_home!".to_string(),
             ));
         };
 
-        let cargo_home_path = cargo_cfg.home().clone().into_path_unlocked();
+        let cargo_home_path = cargo_home;
 
         if !cargo_home_path.is_dir() {
             let msg = format!(

@@ -24,8 +24,8 @@ walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
 # https://github.com/LeopoldArkham/humansize
 humansize = "1.1.0" # convert digits of bytes to human readable size
 
-# https://github.com/rust/cargo
-cargo = "0.35.0" # get CARGO_HOME
+# https://github.com/brson/home
+home = "0.3.4" # get CARGO_HOME
 
 # https://github.com/oli-obk/cargo_metadata
 cargo_metadata = "0.7.4" # get crate package name
