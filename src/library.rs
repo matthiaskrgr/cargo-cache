@@ -322,6 +322,11 @@ pub(crate) fn pad_strings(
     formatted_line
 }
 
+pub fn dummy_function() {
+    // purpose of this function is solely so that we can depend on it in the
+    // cargo_home_cargo_cache_paths test.
+}
+
 #[cfg(test)]
 mod libtests {
     use super::*;
