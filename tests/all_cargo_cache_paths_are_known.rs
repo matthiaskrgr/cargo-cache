@@ -13,6 +13,7 @@ mod test_helpers;
 use std::path::PathBuf;
 use std::process::Command;
 
+use path_slash::{PathBufExt, PathExt};
 use walkdir::WalkDir;
 
 #[allow(non_snake_case)]
@@ -78,7 +79,7 @@ fn CARGO_HOME_subdirs_are_known() {
     let walkdir = WalkDir::new(cargo_home).max_depth(3);
     let mut x = walkdir
         .into_iter()
-        .map(|x| x.unwrap().path().display().to_string())
+        .map(|x| x.unwrap().path().to_slash_lossy())
         .collect::<Vec<_>>();
 
     x.sort();
