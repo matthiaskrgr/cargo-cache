@@ -81,35 +81,22 @@ fn CARGO_HOME_subdirs_are_known() {
     x.iter().for_each(|x| println!("{:?}", x));
     let mut x = x.into_iter();
 
-    assert!(
-        x.next()
-            .unwrap()
-            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"),
-        "{:?}",
-        x
-    );
-
-    assert!(
-        x.next()
-            .unwrap()
-            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"),
-        "{:?}",
-        x
-    );
-
-    assert!(
-        x.next()
-            .unwrap()
-            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"),
-        "{:?}",
-        x
-    );
-
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"),);
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"),);
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"),);
     assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"));
-
     assert!(x
         .next()
         .unwrap()
@@ -118,7 +105,6 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/.cargo-lock-git"));
-
     assert!(x
         .next()
         .unwrap()
@@ -127,7 +113,6 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/cargo-cache-"));
-
     assert!(x
         .next()
         .unwrap()
@@ -136,22 +121,18 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-"));
-
     assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry"));
-
     assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache"));
-
     assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache/github.com-"));
-
     assert!(x
         .next()
         .unwrap()
@@ -160,12 +141,10 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com"));
-
     assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src"));
-
     assert!(x
         .next()
         .unwrap()
