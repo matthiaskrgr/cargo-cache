@@ -43,6 +43,9 @@ rustc_tools_util = "0.1.1" # git version information
 walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
 
 [dev-dependencies]
+# https://github.com/rhysd/path-slash
+path-slash = "0.1.1" # normalize windows paths
+
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "0.6.1" # colored diff assertions
 
