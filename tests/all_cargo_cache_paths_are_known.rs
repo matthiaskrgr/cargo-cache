@@ -81,20 +81,29 @@ fn CARGO_HOME_subdirs_are_known() {
     x.iter().for_each(|x| println!("{:?}", x));
     let mut x = x.into_iter();
 
-    assert!(x
-        .next()
-        .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"), "{:?}", x);
+    assert!(
+        x.next()
+            .unwrap()
+            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"),
+        "{:?}",
+        x
+    );
 
-    assert!(x
-        .next()
-        .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"), "{:?}", x);
+    assert!(
+        x.next()
+            .unwrap()
+            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"),
+        "{:?}",
+        x
+    );
 
-    assert!(x
-        .next()
-        .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"), "{:?}", x);
+    assert!(
+        x.next()
+            .unwrap()
+            .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"),
+        "{:?}",
+        x
+    );
 
     assert!(x
         .next()
