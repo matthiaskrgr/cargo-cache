@@ -52,11 +52,11 @@ fn CARGO_HOME_subdirs_are_known() {
         "fake cargo home was not created!"
     );
 
-    WalkDir::new(cargo_home)
+    /*WalkDir::new(cargo_home)
         .max_depth(3)
         .into_iter()
         .for_each(|x| println!("{:?}", x));
-
+    */
     /*
     Ok(DirEntry("target/cargo_home_subdirs_known_CARGO_HOME"))
     Ok(DirEntry("target/cargo_home_subdirs_known_CARGO_HOME/git"))
@@ -70,152 +70,96 @@ fn CARGO_HOME_subdirs_are_known() {
     Ok(DirEntry("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com-1ecc6299db9ec823"))
     */
 
-    let wd = WalkDir::new(cargo_home).max_depth(3);
-    let mut wd_iter = wd.into_iter();
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/.cargo-lock-git"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/cargo-cache-"));
+    let walkdir = WalkDir::new(cargo_home).max_depth(3);
+    let mut x = walkdir
+        .into_iter()
+        .map(|x| x.unwrap().path().display().to_string())
+        .collect::<Vec<_>>();
 
-    assert!(wd_iter
+    x.sort();
+    x.iter().for_each(|x| println!("{:?}", x));
+    let mut x = x.into_iter();
+
+    assert!(x
         .next()
         .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/"));
+
+    assert!(x
+        .next()
         .unwrap()
-        .path()
-        .display()
-        .to_string()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"));
 
-    assert!(wd_iter
+    assert!(x
         .next()
         .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index"));
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com"));
-
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache"));
-
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache/github.com-"));
-
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src"));
-
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src/github.com"));
-
-    assert!(wd_iter
-        .next()
-        .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"));
 
-    assert!(wd_iter
+    assert!(x
         .next()
         .unwrap()
-        .unwrap()
-        .path()
-        .display()
-        .to_string()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"));
 
-    assert!(wd_iter.next().is_none()); // end reached
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git"));
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/.cargo-lock-git"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts"));
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/cargo-cache-"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db"));
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache/github.com-"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index"));
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src"));
+
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src/github.com"));
+
+    assert!(x.next().is_none()); // end reached
 }
