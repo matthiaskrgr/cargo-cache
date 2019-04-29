@@ -83,82 +83,99 @@ fn CARGO_HOME_subdirs_are_known() {
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git"));
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/.cargo-lock-git"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts"));
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/cargo-cache-"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db"));
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/cache/github.com-"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index"));
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src"));
 
     assert!(x
         .next()
         .unwrap()
+        .replace(r#"\\"#, "/")
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src/github.com"));
 
     assert!(x.next().is_none()); // end reached
