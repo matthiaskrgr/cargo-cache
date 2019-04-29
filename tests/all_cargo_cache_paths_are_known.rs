@@ -84,17 +84,17 @@ fn CARGO_HOME_subdirs_are_known() {
     assert!(x
         .next()
         .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/"));
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME"), "{:?}", x);
 
     assert!(x
         .next()
         .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"));
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"), "{:?}", x);
 
     assert!(x
         .next()
         .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"));
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin"), "{:?}", x);
 
     assert!(x
         .next()
