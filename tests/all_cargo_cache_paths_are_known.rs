@@ -13,17 +13,12 @@ mod test_helpers;
 use std::path::PathBuf;
 use std::process::Command;
 
-use path_slash::{PathBufExt, PathExt};
+use path_slash::PathExt;
 use walkdir::WalkDir;
 
 #[allow(non_snake_case)]
 #[test]
 fn CARGO_HOME_subdirs_are_known() {
-    if cfg!(windows) {
-        // @FIXME
-        return;
-    }
-
     // this tests makes cargo create a new CARGO_HOME and makes sure that the paths that are found
     // are known by cargo cache
     let cargo_home = "target/cargo_home_subdirs_known_CARGO_HOME/";
