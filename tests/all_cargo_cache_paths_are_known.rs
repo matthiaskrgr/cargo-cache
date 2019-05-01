@@ -149,6 +149,6 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src/github.com"));
-
-    assert!(x.next().is_none()); // end reached
+    let last = x.next(); // should have reached the end
+    assert!(last.is_none(), format!("last iterator item is not none: {:?}", last));
 }
