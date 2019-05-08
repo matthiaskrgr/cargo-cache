@@ -85,7 +85,10 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
         }
 
         let repo_size_after = cumulative_dir_size(path).dir_size;
-        println!("{}", size_diff_format(repo_size_before, repo_size_after, false));
+        println!(
+            "{}",
+            size_diff_format(repo_size_before, repo_size_after, false)
+        );
 
         Ok((repo_size_before, repo_size_after))
     }
@@ -113,8 +116,10 @@ pub(crate) fn git_gc_everything(
         let mut size_sum_before: u64 = 0;
         let mut size_sum_after: u64 = 0;
 
-        let mut git_repos: Vec<_> =
-            fs::read_dir(&path).unwrap().map(|x| x.unwrap().path()).collect();
+        let mut git_repos: Vec<_> = fs::read_dir(&path)
+            .unwrap()
+            .map(|x| x.unwrap().path())
+            .collect();
         // sort git repos in alphabetical order
         git_repos.sort();
 
@@ -169,7 +174,9 @@ pub(crate) fn git_gc_everything(
 
     println!(
         "\nCompressed {} to {}",
-        total_size_before.file_size(file_size_opts::DECIMAL).unwrap(),
+        total_size_before
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap(),
         size_diff_format(total_size_before, total_size_after, false)
     );
 }
@@ -184,12 +191,20 @@ mod gittest {
     #[test]
     fn test_gc_repo() {
         // create a fake git repo in the target dir
-        let git_init =
-            Command::new("git").arg("init").arg("gitrepo").current_dir("target").output();
-        assert!(git_init.is_ok(), "git_init did not succeed: '{:?}'", git_init);
+        let git_init = Command::new("git")
+            .arg("init")
+            .arg("gitrepo")
+            .current_dir("target")
+            .output();
+        assert!(
+            git_init.is_ok(),
+            "git_init did not succeed: '{:?}'",
+            git_init
+        );
         // create a file and add some text
         let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
-        file.write_all(b"Hello hello hello this is a test \n hello \n hello").unwrap();
+        file.write_all(b"Hello hello hello this is a test \n hello \n hello")
+            .unwrap();
         let git_add = Command::new("git")
             .arg("add")
             .arg("testfile.txt")
@@ -202,7 +217,11 @@ mod gittest {
             .arg("commit msg")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_commit.is_ok(), "git commit did not succeed: '{:?}'", git_commit);
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
         // create another commit
         let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
         file.write_all(
@@ -223,7 +242,11 @@ mod gittest {
             .arg("another commit msg")
             .current_dir("target/gitrepo/")
             .output();
-        assert!(git_commit.is_ok(), "git commit did not succeed: '{:?}'", git_commit);
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
 
         let (dryrun_before, dryrun_after) =
             match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
@@ -239,7 +262,10 @@ mod gittest {
                 Ok((x, y)) => (x, y),
                 _ => (0, 0),
             };
-        assert!(!before > after, format!("git gc is funky: before: {}  after: {}", before, after));
+        assert!(
+            !before > after,
+            format!("git gc is funky: before: {}  after: {}", before, after)
+        );
     }
 
 }

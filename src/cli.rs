@@ -13,7 +13,9 @@ use rustc_tools_util::*;
 
 #[allow(clippy::too_many_lines)]
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-    let version = rustc_tools_util::get_version_info!().to_string().replacen("cargo-cache ", "", 1);
+    let version = rustc_tools_util::get_version_info!()
+        .to_string()
+        .replacen("cargo-cache ", "", 1);
 
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")
@@ -156,7 +158,11 @@ mod clitests {
     #[test]
     fn run_help() {
         let cc_help = Command::new(bin_path()).arg("--help").output();
-        assert!(cc_help.is_ok(), "cargo-cache --help failed: '{:?}'", cc_help);
+        assert!(
+            cc_help.is_ok(),
+            "cargo-cache --help failed: '{:?}'",
+            cc_help
+        );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
@@ -191,7 +197,11 @@ SUBCOMMANDS:
     #[test]
     fn run_help_subcommand() {
         let cc_help = Command::new(bin_path()).arg("cache").arg("--help").output();
-        assert!(cc_help.is_ok(), "cargo-cache --help failed: '{:?}'", cc_help);
+        assert!(
+            cc_help.is_ok(),
+            "cargo-cache --help failed: '{:?}'",
+            cc_help
+        );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
 
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
@@ -226,8 +236,16 @@ SUBCOMMANDS:
 
     #[test]
     fn run_help_query() {
-        let ccq_help = Command::new(bin_path()).arg("cache").arg("query").arg("--help").output();
-        assert!(ccq_help.is_ok(), "cargo-cache query --help failed: '{:?}'", ccq_help);
+        let ccq_help = Command::new(bin_path())
+            .arg("cache")
+            .arg("query")
+            .arg("--help")
+            .output();
+        assert!(
+            ccq_help.is_ok(),
+            "cargo-cache query --help failed: '{:?}'",
+            ccq_help
+        );
         let help_real = String::from_utf8_lossy(&ccq_help.unwrap().stdout).into_owned();
 
         let mut help_desired = String::new();

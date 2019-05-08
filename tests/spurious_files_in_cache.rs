@@ -34,7 +34,10 @@ fn build_and_check_size_test() {
         .output();
     // make sure the build succeeded
     assert!(status.is_ok(), "build of dummy crate did not succeed");
-    assert!(PathBuf::from(&fchp).is_dir(), "fake cargo home was not created!");
+    assert!(
+        PathBuf::from(&fchp).is_dir(),
+        "fake cargo home was not created!"
+    );
     // add some files here and there
     File::create("target/spurious_files_test/file1.txt").unwrap();
     File::create("target/spurious_files_test/file2").unwrap();

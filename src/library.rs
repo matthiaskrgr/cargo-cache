@@ -57,7 +57,10 @@ impl CargoCachePaths {
         let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
             cargo_home
         } else {
-            return Err((ErrorKind::CargoFailedGetConfig, "Failed to get cargo_home!".to_string()));
+            return Err((
+                ErrorKind::CargoFailedGetConfig,
+                "Failed to get cargo_home!".to_string(),
+            ));
         };
 
         let cargo_home_path = cargo_home;
@@ -94,14 +97,42 @@ impl CargoCachePaths {
 
 impl std::fmt::Display for CargoCachePaths {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "\ncargo home:                 {}", &self.cargo_home.display())?;
+        writeln!(
+            f,
+            "\ncargo home:                 {}",
+            &self.cargo_home.display()
+        )?;
         writeln!(f, "binaries directory:         {}", &self.bin_dir.display())?;
-        writeln!(f, "registry directory:         {}", &self.registry.display())?;
-        writeln!(f, "registry index:             {}", &self.registry_index.display())?;
-        writeln!(f, "crate source archives:      {}", &self.registry_pkg_cache.display())?;
-        writeln!(f, "unpacked crate sources:     {}", &self.registry_sources.display())?;
-        writeln!(f, "bare git repos:             {}", &self.git_repos_bare.display())?;
-        writeln!(f, "git repo checkouts:         {}", &self.git_checkouts.display())?;
+        writeln!(
+            f,
+            "registry directory:         {}",
+            &self.registry.display()
+        )?;
+        writeln!(
+            f,
+            "registry index:             {}",
+            &self.registry_index.display()
+        )?;
+        writeln!(
+            f,
+            "crate source archives:      {}",
+            &self.registry_pkg_cache.display()
+        )?;
+        writeln!(
+            f,
+            "unpacked crate sources:     {}",
+            &self.registry_sources.display()
+        )?;
+        writeln!(
+            f,
+            "bare git repos:             {}",
+            &self.git_repos_bare.display()
+        )?;
+        writeln!(
+            f,
+            "git repo checkouts:         {}",
+            &self.git_checkouts.display()
+        )?;
 
         Ok(())
     }
@@ -110,7 +141,10 @@ impl std::fmt::Display for CargoCachePaths {
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
-        return DirInfo { dir_size: 0, file_number: 0 };
+        return DirInfo {
+            dir_size: 0,
+            file_number: 0,
+        };
     }
 
     // traverse recursively and sum filesizes, parallelized by rayon
@@ -133,12 +167,19 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // files in the current directory, limit search depth
 
     let file_number = if walkdir_start.contains("registry") {
-        WalkDir::new(&walkdir_start).max_depth(2).min_depth(2).into_iter().count()
+        WalkDir::new(&walkdir_start)
+            .max_depth(2)
+            .min_depth(2)
+            .into_iter()
+            .count()
     } else {
         fs::read_dir(&dir).unwrap().count()
     } as u64;
 
-    DirInfo { dir_size, file_number }
+    DirInfo {
+        dir_size,
+        file_number,
+    }
 }
 
 pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
@@ -168,14 +209,18 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str(&format!(
         "\t\t\t'{}', size: {}\n",
         &c.registry_pkg_cache.display(),
-        s.total_reg_cache_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_reg_cache_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str("\t\t\tNote: removed crate sources will be redownloaded if necessary\n");
     strn.push_str("Found registry unpacked sources\n");
     strn.push_str(&format!(
         "\t\t\t'{}', size: {}\n",
         &c.registry_sources.display(),
-        s.total_reg_src_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_reg_src_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).\n");
 
@@ -183,14 +228,18 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str(&format!(
         "\t\t\t'{}', size: {}\n",
         &c.git_repos_bare.display(),
-        s.total_git_repos_bare_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_git_repos_bare_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str("\t\t\tNote: removed git repositories will be recloned if necessary\n");
     strn.push_str("Found git repo checkouts:\n");
     strn.push_str(&format!(
         "\t\t\t'{}', size: {}\n",
         &c.git_checkouts.display(),
-        s.total_git_chk_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_git_chk_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str(
         "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if necessary (no net access needed, if repos are up-to-date).\n"
@@ -203,8 +252,10 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
     let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
-    let humansize_opts =
-        file_size_opts::FileSizeOpts { allow_negative: true, ..file_size_opts::DECIMAL };
+    let humansize_opts = file_size_opts::FileSizeOpts {
+        allow_negative: true,
+        ..file_size_opts::DECIMAL
+    };
     let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
     let size_before_human_readabel = size_before.file_size(file_size_opts::DECIMAL).unwrap();
     // calculate change in percentage
@@ -219,7 +270,10 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
 
     if size_before == size_after {
         if dspl_sze_before {
-            format!("{} => {}", size_before_human_readabel, size_after_human_readable)
+            format!(
+                "{} => {}",
+                size_before_human_readabel, size_after_human_readable
+            )
         } else {
             size_after_human_readable
         }
@@ -252,7 +306,10 @@ pub(crate) fn pad_strings(
     let len_padding = left - right;
     assert!(
         len_padding > 0,
-        format!("len_padding is negative: '{} - {} = {}' ", left, right, len_padding)
+        format!(
+            "len_padding is negative: '{} - {} = {}' ",
+            left, right, len_padding
+        )
     );
 
     let mut formatted_line = beginning.to_string();
@@ -278,7 +335,10 @@ mod libtests {
     impl CargoCachePaths {
         pub(crate) fn new(dir: PathBuf) -> Result<Self, (ErrorKind, String)> {
             if !dir.is_dir() {
-                let msg = format!("Error, no cargo home path directory '{}' found.", dir.display());
+                let msg = format!(
+                    "Error, no cargo home path directory '{}' found.",
+                    dir.display()
+                );
                 return Err((ErrorKind::CargoHomeNotDirectory, msg));
             }
 
@@ -309,7 +369,10 @@ mod libtests {
     #[allow(non_snake_case)]
     #[test]
     fn test_DirInfo() {
-        let x = DirInfo { dir_size: 10, file_number: 20 };
+        let x = DirInfo {
+            dir_size: 10,
+            file_number: 20,
+        };
         assert_eq!(x.dir_size, 10);
         assert_eq!(x.file_number, 20);
     }
@@ -333,7 +396,10 @@ mod libtests {
         cargo_home.push("cargo_home_cargo_cache_paths");
         // make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert_path_end(&cargo_home, &["cargo-cache", "target", "cargo_home_cargo_cache_paths"]);
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_cargo_cache_paths"],
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -366,9 +432,15 @@ mod libtests {
             &["cargo_home_cargo_cache_paths", "registry", "src"],
         );
 
-        assert_path_end(&ccp.git_repos_bare, &["cargo_home_cargo_cache_paths", "git", "db"]);
+        assert_path_end(
+            &ccp.git_repos_bare,
+            &["cargo_home_cargo_cache_paths", "git", "db"],
+        );
 
-        assert_path_end(&ccp.git_checkouts, &["cargo_home_cargo_cache_paths", "git", "checkouts"]);
+        assert_path_end(
+            &ccp.git_checkouts,
+            &["cargo_home_cargo_cache_paths", "git", "checkouts"],
+        );
     }
 
     #[allow(non_snake_case)]
@@ -385,7 +457,11 @@ mod libtests {
         let CH_string = format!("{}", cargo_home.display());
         assert_path_end(
             &cargo_home,
-            &["cargo-cache", "target", "cargo_home_cargo_cache_paths_print"],
+            &[
+                "cargo-cache",
+                "target",
+                "cargo_home_cargo_cache_paths_print",
+            ],
         );
 
         // create the directory
@@ -524,7 +600,10 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_new");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert_path_end(&cargo_home, &["cargo-cache", "target", "cargo_home_bench_new"]);
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_bench_new"],
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {
@@ -550,7 +629,10 @@ mod benchmarks {
         cargo_home.push("cargo_home_bench_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());
-        assert_path_end(&cargo_home, &["cargo-cache", "target", "cargo_home_bench_print"]);
+        assert_path_end(
+            &cargo_home,
+            &["cargo-cache", "target", "cargo_home_bench_print"],
+        );
 
         // create the directory
         if !std::path::PathBuf::from(&CH_string).is_dir() {

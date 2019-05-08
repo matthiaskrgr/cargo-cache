@@ -25,8 +25,9 @@ fn run_tests() {
 #[allow(non_snake_case)]
 fn CARGO_HOME_is_nonexisting_dir() {
     // CARGO_HOME points to a directory that does not exist
-    let cargo_cache =
-        Command::new(bin_path()).env("CARGO_HOME", "./xyxyxxxyyyxxyxyxqwertywasd").output();
+    let cargo_cache = Command::new(bin_path())
+        .env("CARGO_HOME", "./xyxyxxxyyyxxyxyxqwertywasd")
+        .output();
     // make sure we failed
     let cmd = cargo_cache.unwrap();
     assert!(!cmd.status.success(), "no bad exit status!");

@@ -40,7 +40,11 @@ impl BinInfo {
 #[inline] // only called in one place
 fn bininfo_list_from_path(bin_cache: &mut bin::BinaryCache) -> Vec<BinInfo> {
     // returns unsorted!
-    bin_cache.files().iter().map(|path| BinInfo::new(path)).collect::<Vec<BinInfo>>()
+    bin_cache
+        .files()
+        .iter()
+        .map(|path| BinInfo::new(path))
+        .collect::<Vec<BinInfo>>()
 }
 
 #[inline] // only called in one place
@@ -79,7 +83,10 @@ pub(crate) fn binary_stats(
     output.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        bin_cache.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+        bin_cache
+            .total_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
 
     let collections_vec = bininfo_list_from_path(&mut bin_cache); // this is already sorted
@@ -97,52 +104,79 @@ mod bininfo_struct {
 
     #[test]
     fn bininfo_new() {
-        let bi = BinInfo { name: String::from("abc"), size: 123 };
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 123,
+        };
         assert_eq!(bi.name, String::from("abc"));
         assert_eq!(bi.size, 123);
     }
 
     #[test]
     fn bininfo_new_name_dot() {
-        let bi = BinInfo { name: String::from("ab.cd"), size: 1234 };
+        let bi = BinInfo {
+            name: String::from("ab.cd"),
+            size: 1234,
+        };
         assert_eq!(bi.name, String::from("ab.cd"));
         assert_eq!(bi.size, 1234);
     }
 
     #[test]
     fn bininfo_new_cargo_cache() {
-        let bi = BinInfo { name: String::from("cargo-cache"), size: 1337 };
+        let bi = BinInfo {
+            name: String::from("cargo-cache"),
+            size: 1337,
+        };
         assert_eq!(bi.name, String::from("cargo-cache"));
         assert_eq!(bi.size, 1337);
     }
 
     #[test]
     fn bininfo_new_cargo_cache_exe() {
-        let bi = BinInfo { name: String::from("cargo-cache.exe"), size: 1337 };
+        let bi = BinInfo {
+            name: String::from("cargo-cache.exe"),
+            size: 1337,
+        };
         assert_eq!(bi.name, String::from("cargo-cache.exe"));
         assert_eq!(bi.size, 1337);
     }
 
     #[test]
     fn bininfo_size_str_small_size() {
-        let bi = BinInfo { name: String::from("abc"), size: 123 };
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 123,
+        };
         let size = bi.size_string();
         assert_eq!(size, "123 B");
     }
 
     #[test]
     fn bininfo_size_str_large_size() {
-        let bi = BinInfo { name: String::from("abc"), size: 1_234_567_890 };
+        let bi = BinInfo {
+            name: String::from("abc"),
+            size: 1_234_567_890,
+        };
         let size = bi.size_string();
         assert_eq!(size, "1.23 GB");
     }
 
     #[test]
     fn bininfo_sort() {
-        let bi_a = BinInfo { name: String::from("a"), size: 5 };
+        let bi_a = BinInfo {
+            name: String::from("a"),
+            size: 5,
+        };
 
-        let bi_b = BinInfo { name: String::from("b"), size: 3 };
-        let bi_c = BinInfo { name: String::from("c"), size: 10 };
+        let bi_b = BinInfo {
+            name: String::from("b"),
+            size: 3,
+        };
+        let bi_c = BinInfo {
+            name: String::from("c"),
+            size: 10,
+        };
 
         let mut v = vec![bi_a, bi_b, bi_c];
         v.sort_by_key(|b| b.size);
@@ -164,10 +198,19 @@ mod bininfo_struct {
 
     #[test]
     fn bininfo_sort_stable() {
-        let bi_a = BinInfo { name: String::from("a"), size: 5 };
+        let bi_a = BinInfo {
+            name: String::from("a"),
+            size: 5,
+        };
 
-        let bi_b = BinInfo { name: String::from("b"), size: 5 };
-        let bi_c = BinInfo { name: String::from("c"), size: 5 };
+        let bi_b = BinInfo {
+            name: String::from("b"),
+            size: 5,
+        };
+        let bi_c = BinInfo {
+            name: String::from("c"),
+            size: 5,
+        };
 
         let mut v = vec![bi_a, bi_b, bi_c];
         v.par_sort_by_key(|b| b.size);
@@ -205,7 +248,10 @@ mod top_crates_binaries {
 
     #[test]
     fn stats_from_file_desc_one() {
-        let bi = BinInfo { name: "cargo-cache".to_string(), size: 1 };
+        let bi = BinInfo {
+            name: "cargo-cache".to_string(),
+            size: 1,
+        };
         let list: Vec<BinInfo> = vec![bi];
         let stats: String = bininfo_list_to_string(1, list);
         let wanted = String::from("Name        Size\ncargo-cache 1 B\n");
@@ -214,8 +260,14 @@ mod top_crates_binaries {
 
     #[test]
     fn stats_from_file_desc_two() {
-        let bi1 = BinInfo { name: "crate-A".to_string(), size: 1 };
-        let bi2 = BinInfo { name: "crate-B".to_string(), size: 2 };
+        let bi1 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let bi2 = BinInfo {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
         let wanted = String::from("Name    Size\ncrate-B 2 B\ncrate-A 1 B\n");
@@ -224,11 +276,26 @@ mod top_crates_binaries {
 
     #[test]
     fn stats_from_file_desc_multiple() {
-        let bi1 = BinInfo { name: "crate-A".to_string(), size: 1 };
-        let bi2 = BinInfo { name: "crate-B".to_string(), size: 2 };
-        let bi3 = BinInfo { name: "crate-C".to_string(), size: 10 };
-        let bi4 = BinInfo { name: "crate-D".to_string(), size: 6 };
-        let bi5 = BinInfo { name: "crate-E".to_string(), size: 4 };
+        let bi1 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let bi2 = BinInfo {
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let bi3 = BinInfo {
+            name: "crate-C".to_string(),
+            size: 10,
+        };
+        let bi4 = BinInfo {
+            name: "crate-D".to_string(),
+            size: 6,
+        };
+        let bi5 = BinInfo {
+            name: "crate-E".to_string(),
+            size: 4,
+        };
         let list: Vec<BinInfo> = vec![bi1, bi2, bi3, bi4, bi5];
         let stats: String = bininfo_list_to_string(10, list);
         let mut wanted = String::new();
@@ -249,8 +316,14 @@ mod top_crates_binaries {
     // maybe add an assert?
     #[test]
     fn stats_from_file_desc_same_name_2_one() {
-        let bi1 = BinInfo { name: "crate-A".to_string(), size: 3 };
-        let bi2 = BinInfo { name: "crate-A".to_string(), size: 3 };
+        let bi1 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let bi2 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
 
         let list: Vec<BinInfo> = vec![bi1, bi2];
         let stats: String = bininfo_list_to_string(2, list);
@@ -263,14 +336,28 @@ mod top_crates_binaries {
 
     #[test]
     fn stats_from_file_desc_same_name_3_one() {
-        let bi1 = BinInfo { name: "crate-A".to_string(), size: 3 };
-        let bi2 = BinInfo { name: "crate-A".to_string(), size: 3 };
-        let bi3 = BinInfo { name: "crate-A".to_string(), size: 3 };
+        let bi1 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let bi2 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let bi3 = BinInfo {
+            name: "crate-A".to_string(),
+            size: 3,
+        };
 
         let list: Vec<BinInfo> = vec![bi1, bi2, bi3];
         let stats: String = bininfo_list_to_string(4, list);
         let mut wanted = String::new();
-        for i in &["Name    Size\n", "crate-A 3 B\n", "crate-A 3 B\n", "crate-A 3 B\n"] {
+        for i in &[
+            "Name    Size\n",
+            "crate-A 3 B\n",
+            "crate-A 3 B\n",
+            "crate-A 3 B\n",
+        ] {
             wanted.push_str(i);
         }
         assert_eq!(stats, wanted);

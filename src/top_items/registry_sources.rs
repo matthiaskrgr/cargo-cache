@@ -56,7 +56,11 @@ impl FileDesc {
             })
             .sum();
 
-        Self { name, size, path: path.into() }
+        Self {
+            name,
+            size,
+            path: path.into(),
+        }
     } // fn new_from_reg_src()
 }
 
@@ -81,10 +85,20 @@ impl RgSrcInfo {
             v.pop();
             name = v.join("-");
         } else {
-            name = path.file_name().unwrap().to_os_string().into_string().unwrap();
+            name = path
+                .file_name()
+                .unwrap()
+                .to_os_string()
+                .into_string()
+                .unwrap();
             size = 0;
         }
-        Self { name, size, counter, total_size }
+        Self {
+            name,
+            size,
+            counter,
+            total_size,
+        }
     }
 }
 
@@ -114,7 +128,10 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
     // iterate over the files
     let mut iter = file_descs.into_iter();
 
-    let mut state = Pair { current: None, previous: None };
+    let mut state = Pair {
+        current: None,
+        previous: None,
+    };
 
     // start looping
     state.previous = state.current;
@@ -123,12 +140,18 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
     // loop until .previous and .current are None which means we are at the end
     while state.previous.is_some() || state.current.is_some() {
         match &state {
-            Pair { current: None, previous: None } => {
+            Pair {
+                current: None,
+                previous: None,
+            } => {
                 // we reached the end of the queue
                 unreachable!("dead code triggered: while loop condition did not hold inside match");
             }
 
-            Pair { current: Some(current), previous: None } => {
+            Pair {
+                current: Some(current),
+                previous: None,
+            } => {
                 // this should always be first line ever
                 //@TODO assert that its empty
                 // compute line but don't save it
@@ -139,7 +162,10 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                 regcacheinfo = RgSrcInfo::new(&current.path, counter, total_size);
             }
 
-            Pair { current: Some(current), previous: Some(previous) } => {
+            Pair {
+                current: Some(current),
+                previous: Some(previous),
+            } => {
                 if current.name == previous.name {
                     // update line but don't save it
                     // @todo assert that regcacheinfo is not empty
@@ -164,7 +190,10 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                 }
             }
 
-            Pair { current: None, previous: Some(_previous) } => {
+            Pair {
+                current: None,
+                previous: Some(_previous),
+            } => {
                 // save old line
                 // todo assert that regcacheinfo is not empty
                 out.push(regcacheinfo);
@@ -205,9 +234,17 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
             .file_size(file_size_opts::DECIMAL)
             .unwrap();
 
-        let total_size = regsrc.total_size.file_size(file_size_opts::DECIMAL).unwrap();
+        let total_size = regsrc
+            .total_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap();
 
-        table_matrix.push(vec![regsrc.name, regsrc.counter.to_string(), average_size, total_size]);
+        table_matrix.push(vec![
+            regsrc.name,
+            regsrc.counter.to_string(),
+            average_size,
+            total_size,
+        ]);
     }
     format_table(&table_matrix)
 }
@@ -226,7 +263,10 @@ pub(crate) fn registry_source_stats(
     stdout.push_str(&format!(
         "\nSummary of: {} ({} total)\n",
         path.display(),
-        registry_sources_cache.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+        registry_sources_cache
+            .total_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
 
     let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_sources_cache);
@@ -272,7 +312,11 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_one() {
-        let fd = FileDesc { path: PathBuf::from("crateA"), name: "crateA".to_string(), size: 1 };
+        let fd = FileDesc {
+            path: PathBuf::from("crateA"),
+            name: "crateA".to_string(),
+            size: 1,
+        };
         let list_fd: Vec<FileDesc> = vec![fd];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(1, list_cb);
@@ -282,8 +326,16 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_two() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 1 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 2 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 2,
+        };
         let list_fd: Vec<FileDesc> = vec![fd1, fd2];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
         let is: String = reg_src_list_to_string(3, list_cb);
@@ -301,12 +353,31 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_multiple() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 1 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 2 };
-        let fd3 =
-            FileDesc { path: PathBuf::from("crate-C"), name: "crate-C".to_string(), size: 10 };
-        let fd4 = FileDesc { path: PathBuf::from("crate-D"), name: "crate-D".to_string(), size: 6 };
-        let fd5 = FileDesc { path: PathBuf::from("crate-E"), name: "crate-E".to_string(), size: 4 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 1,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd3 = FileDesc {
+            path: PathBuf::from("crate-C"),
+            name: "crate-C".to_string(),
+            size: 10,
+        };
+        let fd4 = FileDesc {
+            path: PathBuf::from("crate-D"),
+            name: "crate-D".to_string(),
+            size: 6,
+        };
+        let fd5 = FileDesc {
+            path: PathBuf::from("crate-E"),
+            name: "crate-E".to_string(),
+            size: 4,
+        };
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
 
@@ -328,8 +399,16 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_same_name_2_one() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 3 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 3 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 3,
+        };
 
         let list_fd: Vec<FileDesc> = vec![fd1, fd2];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
@@ -341,9 +420,21 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_same_name_3_one() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 3 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 3 };
-        let fd3 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 3 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 3,
+        };
+        let fd3 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 3,
+        };
 
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3];
 
@@ -356,10 +447,21 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_same_name_3_one_2() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 2 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 4 };
-        let fd3 =
-            FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 12 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 12,
+        };
 
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
@@ -370,19 +472,49 @@ mod top_crates_registry_sources {
 
     #[test]
     fn stats_from_file_desc_multi() {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 2 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 4 };
-        let fd3 =
-            FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 12 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 12,
+        };
 
-        let fd4 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 2 };
-        let fd5 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 8 };
+        let fd4 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 8,
+        };
 
-        let fd6 = FileDesc { path: PathBuf::from("crate-C"), name: "crate-C".to_string(), size: 0 };
-        let fd7 =
-            FileDesc { path: PathBuf::from("crate-C"), name: "crate-C".to_string(), size: 100 };
+        let fd6 = FileDesc {
+            path: PathBuf::from("crate-C"),
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            path: PathBuf::from("crate-C"),
+            name: "crate-C".to_string(),
+            size: 100,
+        };
 
-        let fd8 = FileDesc { path: PathBuf::from("crate-D"), name: "crate-D".to_string(), size: 1 };
+        let fd8 = FileDesc {
+            path: PathBuf::from("crate-D"),
+            name: "crate-D".to_string(),
+            size: 1,
+        };
 
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
         let list_cb: Vec<RgSrcInfo> = stats_from_file_desc_list(list_fd);
@@ -410,19 +542,49 @@ mod benchmarks {
 
     #[bench]
     fn bench_few(b: &mut Bencher) {
-        let fd1 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 2 };
-        let fd2 = FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 4 };
-        let fd3 =
-            FileDesc { path: PathBuf::from("crate-A"), name: "crate-A".to_string(), size: 12 };
+        let fd1 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 2,
+        };
+        let fd2 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 4,
+        };
+        let fd3 = FileDesc {
+            path: PathBuf::from("crate-A"),
+            name: "crate-A".to_string(),
+            size: 12,
+        };
 
-        let fd4 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 2 };
-        let fd5 = FileDesc { path: PathBuf::from("crate-B"), name: "crate-B".to_string(), size: 8 };
+        let fd4 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 2,
+        };
+        let fd5 = FileDesc {
+            path: PathBuf::from("crate-B"),
+            name: "crate-B".to_string(),
+            size: 8,
+        };
 
-        let fd6 = FileDesc { path: PathBuf::from("crate-C"), name: "crate-C".to_string(), size: 0 };
-        let fd7 =
-            FileDesc { path: PathBuf::from("crate-C"), name: "crate-C".to_string(), size: 100 };
+        let fd6 = FileDesc {
+            path: PathBuf::from("crate-C"),
+            name: "crate-C".to_string(),
+            size: 0,
+        };
+        let fd7 = FileDesc {
+            path: PathBuf::from("crate-C"),
+            name: "crate-C".to_string(),
+            size: 100,
+        };
 
-        let fd8 = FileDesc { path: PathBuf::from("crate-D"), name: "crate-D".to_string(), size: 1 };
+        let fd8 = FileDesc {
+            path: PathBuf::from("crate-D"),
+            name: "crate-D".to_string(),
+            size: 1,
+        };
 
         let list_fd: Vec<FileDesc> = vec![fd1, fd2, fd3, fd4, fd5, fd6, fd7, fd8];
 
