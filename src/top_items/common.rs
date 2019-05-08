@@ -117,21 +117,9 @@ mod format_table_tests {
     fn matrix() {
         // cargo test matrix -- --nocapture
         let v = vec![
-            vec![
-                String::from("wasdwasdwasd"),
-                String::from("word"),
-                String::from("word"),
-            ],
-            vec![
-                String::from("oh"),
-                String::from("why"),
-                String::from("this"),
-            ],
-            vec![
-                String::from("AAAAAA"),
-                String::from(""),
-                String::from("I don't get it"),
-            ],
+            vec![String::from("wasdwasdwasd"), String::from("word"), String::from("word")],
+            vec![String::from("oh"), String::from("why"), String::from("this")],
+            vec![String::from("AAAAAA"), String::from(""), String::from("I don't get it")],
         ];
         let t = format_table(&v);
         let output = String::from(

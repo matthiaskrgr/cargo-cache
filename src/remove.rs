@@ -65,14 +65,7 @@ pub(crate) fn rm_old_crates(
                     pkgver,
                     pkgpath.display()
                 );
-                remove_file(
-                    &pkgpath,
-                    dry_run,
-                    size_changed,
-                    None,
-                    Some(dryrun_msg),
-                    None,
-                );
+                remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg), None);
 
                 continue;
             }
@@ -94,14 +87,7 @@ pub(crate) fn rm_old_crates(
                         pkgver,
                         pkgpath.display()
                     );
-                    remove_file(
-                        &pkgpath,
-                        dry_run,
-                        size_changed,
-                        None,
-                        Some(dryrun_msg),
-                        None,
-                    );
+                    remove_file(&pkgpath, dry_run, size_changed, None, Some(dryrun_msg), None);
                 }
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
@@ -139,14 +125,7 @@ pub(crate) fn remove_dir_via_cmdline(
         // remove a specified subdirectory from cargo cache
         let msg = Some(format!("removing: '{}'", dir.display()));
 
-        remove_file(
-            &dir,
-            dry_run,
-            size_changed,
-            msg,
-            None,
-            total_size_from_cache,
-        );
+        remove_file(&dir, dry_run, size_changed, msg, None, total_size_from_cache);
         Ok(())
     }
 
@@ -309,10 +288,7 @@ pub(crate) fn remove_file(
         }
 
         if path.is_dir() && fs::remove_dir_all(&path).is_err() {
-            eprintln!(
-                "Warning: failed to recursively remove directory \"{}\".",
-                path.display()
-            );
+            eprintln!("Warning: failed to recursively remove directory \"{}\".", path.display());
         } else {
             *size_changed = true;
         }

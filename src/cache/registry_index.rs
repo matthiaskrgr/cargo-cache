@@ -25,12 +25,7 @@ pub(crate) struct RegistryIndexCache {
 impl Cache for RegistryIndexCache {
     fn new(path: PathBuf) -> Self {
         // calculate and return as needed
-        Self {
-            path,
-            total_size: None,
-            files_calculated: false,
-            files: Vec::new(),
-        }
+        Self { path, total_size: None, files_calculated: false, files: Vec::new() }
     }
 
     #[inline]
@@ -71,10 +66,8 @@ impl Cache for RegistryIndexCache {
         } else {
             if self.path_exists() {
                 let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .collect::<Vec<PathBuf>>();
+                let v =
+                    walkdir.into_iter().map(|d| d.unwrap().into_path()).collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
                 self.files = Vec::new();

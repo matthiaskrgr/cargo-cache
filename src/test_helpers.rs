@@ -19,11 +19,8 @@ pub(crate) fn bin_path() -> String {
         "target/release/cargo-cache"
     };
 
-    let path_debug = if cfg!(windows) {
-        "target\\debug\\cargo-cache.exe"
-    } else {
-        "target/debug/cargo-cache"
-    };
+    let path_debug =
+        if cfg!(windows) { "target\\debug\\cargo-cache.exe" } else { "target/debug/cargo-cache" };
 
     if PathBuf::from(path_release).is_file() {
         String::from(path_release)

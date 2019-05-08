@@ -29,11 +29,7 @@ struct File<'a> {
 
 #[inline]
 fn path_to_name(path: &std::path::PathBuf) -> String {
-    path.file_stem()
-        .unwrap()
-        .to_os_string()
-        .into_string()
-        .unwrap_or_default()
+    path.file_stem().unwrap().to_os_string().into_string().unwrap_or_default()
 }
 
 fn binary_to_file(path: &std::path::PathBuf) -> File<'_> {
@@ -190,10 +186,8 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    let humansize_opts = file_size_opts::FileSizeOpts {
-        allow_negative: true,
-        ..file_size_opts::DECIMAL
-    };
+    let humansize_opts =
+        file_size_opts::FileSizeOpts { allow_negative: true, ..file_size_opts::DECIMAL };
 
     match sorting {
         // make "name" the default
@@ -358,40 +352,24 @@ mod query_tests {
     #[test]
     fn query_subcmd_long() {
         let query_cmd = Command::new(bin_path()).arg("query").output();
-        assert!(
-            query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
-        );
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
     }
 
     #[test]
     fn query_subcmd_short() {
         let query_cmd = Command::new(bin_path()).arg("q").output();
-        assert!(
-            query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
-        );
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
     }
 
     #[test]
     fn query_subcmd_hyphen_long() {
         let query_cmd = Command::new(bin_path()).arg("cache-query").output();
-        assert!(
-            query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
-        );
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
     }
 
     #[test]
     fn query_subcmd_hyphen_short() {
         let query_cmd = Command::new(bin_path()).arg("cache-q").output();
-        assert!(
-            query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
-        );
+        assert!(query_cmd.is_ok(), "cargo-cache query failed: '{:?}'", query_cmd);
     }
 }

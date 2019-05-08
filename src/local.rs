@@ -82,11 +82,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     output.push_str(&format!(
         "Project {:?}\n",
-        metadata
-            .workspace_root
-            .into_os_string()
-            .into_string()
-            .unwrap()
+        metadata.workspace_root.into_os_string().into_string().unwrap()
     ));
 
     // Do we actually have a target dir?

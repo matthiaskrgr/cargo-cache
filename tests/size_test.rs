@@ -33,10 +33,7 @@ fn build_and_check_size_test() {
         .output();
     // make sure the build succeeded
     assert!(status.is_ok(), "build of dummy crate did not succeed");
-    assert!(
-        PathBuf::from(&fchp).is_dir(),
-        "fake cargo home was not created!"
-    );
+    assert!(PathBuf::from(&fchp).is_dir(), "fake cargo home was not created!");
     // make sure the size of the registry matches and we have 4 entries
     let mut registry_pkg_cache_path = PathBuf::from(&fchp);
     registry_pkg_cache_path.push("registry");

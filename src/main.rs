@@ -119,9 +119,7 @@ fn main() {
         process::exit(0);
     } else if config.is_present("query") || config.is_present("q") {
         let query_config = if config.is_present("query") {
-            config
-                .subcommand_matches("query")
-                .expect("unwrap failed here")
+            config.subcommand_matches("query").expect("unwrap failed here")
         } else {
             config.subcommand_matches("q").expect("unwrap failed there")
         };
@@ -138,9 +136,7 @@ fn main() {
         process::exit(0);
     } else if config.is_present("local") || config.is_present("l") {
         let local_config = if config.is_present("local") {
-            config
-                .subcommand_matches("local")
-                .expect("unwrap failed here")
+            config.subcommand_matches("local").expect("unwrap failed here")
         } else {
             config.subcommand_matches("l").expect("unwrap failed there")
         };
@@ -233,10 +229,7 @@ fn main() {
             Err((error_kind, path)) => {
                 match error_kind {
                     ErrorKind::MalformedPackageName => {
-                        panic!(format!(
-                            "Error: can't parse package string: '{}'",
-                            &path.display()
-                        ));
+                        panic!(format!("Error: can't parse package string: '{}'", &path.display()));
                     }
                     _ => unreachable!(),
                 };
