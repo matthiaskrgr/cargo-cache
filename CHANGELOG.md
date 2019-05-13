@@ -1,4 +1,6 @@
-## Version 0.2.0
+## Git
+
+## Version 0.2.0 (eada74c)
 ````
 Parallelize internal cache accesses resulting in reduced wall clock execution time
 Fix some paths being linuxish on windows
