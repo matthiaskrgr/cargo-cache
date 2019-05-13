@@ -1,8 +1,8 @@
-## Git
+## Version 0.2.0
 ````
 Parallelize internal cache accesses resulting in reduced wall clock execution time
 Fix some paths being linuxish on windows
-Print size of the registry index (${CARGO_HOME}registry/index) in default view
+Print size of the registry index (${CARGO_HOME}/registry/index) in default view
 Add "query" subcommand (run "cargo cache query" or short "cargo cache q"
 	Pass a parameter which will be interpreted as regex to only display sizes of
 	items that match.
@@ -11,15 +11,15 @@ Add "query" subcommand (run "cargo cache query" or short "cargo cache q"
 	You can get human readable sizes via --human-readable and sort by size/name (alphabetically)
 	via --sort-by $option
 	Check out cargo cache q --help for more details
-Add crates.rs badge to readme
+Add libs.rs badge to readme
 Revert "rename -l (--list-dirs) to -L."
 	short form of --list-dirs is -l again.
 Add "local" subcommand ("cargo cache local" or "cargo cache l") which displays
-	sizes of a target/ dir of a built package
+	sizes of a target/ dir of a built crate
 Make --remove-dir accept "registry-index" for clearing out the registry index
 Make --dry-run print a summary of how much space would be freed
-Use "home" crate instead of "cargo" to get the CARGO_HOME value.
-	This gets rid of a lot of dependencies and speeds up the build
+Use "home" crate instead of "cargo" to get the ${CARGO_HOME} value.
+	This gets rid of a lot of dependencies and speeds up the build.
 Update dependencies:
 	cargo: removed
 	clap: 2.32.0 -> 2.33.0
