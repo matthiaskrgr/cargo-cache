@@ -64,6 +64,7 @@ use crate::library::*;
 use crate::remove::*;
 use crate::top_items_summary::*;
 
+#[allow(clippy::cognitive_complexity)]
 fn main() {
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
@@ -183,6 +184,11 @@ fn main() {
             eprintln!("{}", msg);
             process::exit(1);
         }
+    }
+
+    if config.is_present("fsck-repos") {
+        git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache);
+        std::process::exit(0);
     }
 
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {

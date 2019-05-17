@@ -1,5 +1,7 @@
 ## Git
-
+````
+Add --fsck flag to run git fsck on the cache repos (cargo cache --fsck / -f)
+````
 ## Version 0.2.0 (eada74c)
 ````
 Parallelize internal cache accesses resulting in reduced wall clock execution time

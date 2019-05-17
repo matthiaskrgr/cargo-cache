@@ -181,6 +181,98 @@ pub(crate) fn git_gc_everything(
     );
 }
 
+fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
+    // get name of the repo (last item of path)
+    let repo_name = match path.iter().last() {
+        Some(name) => name.to_os_string().into_string().unwrap(),
+        None => "<unknown>".to_string(),
+    };
+    debug_assert_ne!(repo_name, "<unknown>", "unknown repo name: '{:?}'", &path);
+
+    print!("Fscking '{}': ", &repo_name);
+    // if something went wrong and this is not actually a directory, return an error
+    if !path.is_dir() {
+        return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
+    }
+
+    let repo = match git2::Repository::open(&path) {
+        Ok(repo) => repo,
+        Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
+    };
+    let repo_path = repo.path();
+
+    if let Err(e) = Command::new("git")
+        .arg("fsck")
+        .arg("--no-progress")
+        .arg("--strict")
+        .current_dir(repo_path)
+        .output()
+    {
+        return Err((ErrorKind::GitFsckFailed, format!("{:?}", e)));
+    }
+    Ok(())
+}
+
+#[allow(clippy::module_name_repetitions)]
+pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cache_dir: &PathBuf) {
+    // gc repos and registries inside cargo cache
+
+    fn fsck_subdirs(path: &PathBuf) {
+        if path.is_file() {
+            panic!(
+                "fsck_subdirs() tried to fsck file instead of directory: '{}'",
+                path.display()
+            );
+        } else if !path.is_dir() {
+            return;
+        }
+
+        let mut git_repos: Vec<_> = fs::read_dir(&path)
+            .unwrap()
+            .map(|x| x.unwrap().path())
+            .collect();
+        // sort git repos in alphabetical order
+        git_repos.sort();
+
+        for repo in git_repos {
+            let repostr = repo.display();
+            // compress
+            match fsck_repo(&repo) {
+                // run gc
+                Ok(_) => {}
+                Err((errorkind, msg)) => match errorkind {
+                    ErrorKind::GitFsckFailed => {
+                        println!("Warning, git fsck failed, skipping '{}'", repostr);
+                        println!("git error: '{}'", msg);
+                        continue;
+                    }
+                    ErrorKind::GitRepoDirNotFound => {
+                        println!("Git repo not found: '{}'", msg);
+                        continue;
+                    }
+                    ErrorKind::GitRepoNotOpened => {
+                        println!("Failed to parse git repo: '{}'", msg);
+                        continue;
+                    }
+                    _ => unreachable!(),
+                },
+            };
+        }
+    } // fn fsck_subdirs
+
+    println!("\nFscking repositories. Please be patient...");
+    // fsck git repos of crates
+    fsck_subdirs(git_repos_bare_dir);
+
+    println!("\nFscking registries. Please be patient...");
+    let mut repo_index = registry_pkg_cache_dir.clone();
+    // cd "../index"
+    repo_index.pop();
+    repo_index.push("index");
+    // fsck registries
+    fsck_subdirs(&repo_index);
+}
+
 #[cfg(test)]
 mod gittest {
     use super::*;
@@ -193,7 +285,7 @@ mod gittest {
         // create a fake git repo in the target dir
         let git_init = Command::new("git")
             .arg("init")
-            .arg("gitrepo")
+            .arg("gitrepo_gc")
             .current_dir("target")
             .output();
         assert!(
@@ -202,20 +294,20 @@ mod gittest {
             git_init
         );
         // create a file and add some text
-        let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
+        let mut file = File::create("target/gitrepo_gc/testfile.txt").unwrap();
         file.write_all(b"Hello hello hello this is a test \n hello \n hello")
             .unwrap();
         let git_add = Command::new("git")
             .arg("add")
             .arg("testfile.txt")
-            .current_dir("target/gitrepo/")
+            .current_dir("target/gitrepo_gc/")
             .output();
         assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
         let git_commit = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("commit msg")
-            .current_dir("target/gitrepo/")
+            .current_dir("target/gitrepo_gc/")
             .output();
         assert!(
             git_commit.is_ok(),
@@ -223,7 +315,7 @@ mod gittest {
             git_commit
         );
         // create another commit
-        let mut file = File::create("target/gitrepo/testfile.txt").unwrap();
+        let mut file = File::create("target/gitrepo_gc/testfile.txt").unwrap();
         file.write_all(
             b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
         \n this is some more text\n
@@ -233,14 +325,14 @@ mod gittest {
         let git_add = Command::new("git")
             .arg("add")
             .arg("testfile.txt")
-            .current_dir("target/gitrepo/")
+            .current_dir("target/gitrepo_gc/")
             .output();
         assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
         let git_commit = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("another commit msg")
-            .current_dir("target/gitrepo/")
+            .current_dir("target/gitrepo_gc/")
             .output();
         assert!(
             git_commit.is_ok(),
@@ -248,24 +340,92 @@ mod gittest {
             git_commit
         );
 
-        let (dryrun_before, dryrun_after) =
-            match gc_repo(&PathBuf::from("target/gitrepo/"), true /* dry run */) {
-                Ok((x, y)) => (x, y),
-                _ => (0, 0),
-            };
+        let (dryrun_before, dryrun_after) = match gc_repo(
+            &PathBuf::from("target/gitrepo_gc/"),
+            true, /* dry run */
+        ) {
+            Ok((x, y)) => (x, y),
+            _ => (0, 0),
+        };
         // dryrun should not change sizes!
         assert_eq!(dryrun_before, 0);
         assert_eq!(dryrun_after, 0);
 
-        let (before, after) =
-            match gc_repo(&PathBuf::from("target/gitrepo/"), false /* dry run */) {
-                Ok((x, y)) => (x, y),
-                _ => (0, 0),
-            };
+        let (before, after) = match gc_repo(
+            &PathBuf::from("target/gitrepo_gc/"),
+            false, /* dry run */
+        ) {
+            Ok((x, y)) => (x, y),
+            _ => (0, 0),
+        };
         assert!(
             !before > after,
             format!("git gc is funky: before: {}  after: {}", before, after)
         );
+    }
+
+    #[test]
+    fn test_fsck_repo() {
+        // create a fake git repo in the target dir
+        let git_init = Command::new("git")
+            .arg("init")
+            .arg("gitrepo_fsck")
+            .current_dir("target")
+            .output();
+        assert!(
+            git_init.is_ok(),
+            "git_init did not succeed: '{:?}'",
+            git_init
+        );
+        // create a file and add some text
+        let mut file = File::create("target/gitrepo_fsck/testfile.txt").unwrap();
+        file.write_all(b"Hello hello hello this is a test \n hello \n hello")
+            .unwrap();
+        let git_add = Command::new("git")
+            .arg("add")
+            .arg("testfile.txt")
+            .current_dir("target/gitrepo_fsck/")
+            .output();
+        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
+        let git_commit = Command::new("git")
+            .arg("commit")
+            .arg("-m")
+            .arg("commit msg")
+            .current_dir("target/gitrepo_fsck/")
+            .output();
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
+        // create another commit
+        let mut file = File::create("target/gitrepo_fsck/testfile.txt").unwrap();
+        file.write_all(
+            b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
+        \n this is some more text\n
+        lorem ipsum",
+        )
+        .unwrap();
+        let git_add = Command::new("git")
+            .arg("add")
+            .arg("testfile.txt")
+            .current_dir("target/gitrepo_fsck/")
+            .output();
+        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
+        let git_commit = Command::new("git")
+            .arg("commit")
+            .arg("-m")
+            .arg("another commit msg")
+            .current_dir("target/gitrepo_fsck/")
+            .output();
+        assert!(
+            git_commit.is_ok(),
+            "git commit did not succeed: '{:?}'",
+            git_commit
+        );
+
+        let res = fsck_repo(&PathBuf::from("target/gitrepo_fsck/"));
+        assert!(res.is_ok(), format!("Failed to fsck git repo: {:?}", res));
     }
 
 }

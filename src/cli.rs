@@ -32,6 +32,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .long("gc")
         .help("Recompress git repositories (may take some time)");
 
+    let fsck_repos = Arg::with_name("fsck-repos")
+        .short("f")
+        .long("fsck")
+        .help("Fsck git repositories");
+
     let info = Arg::with_name("info")
         .short("i")
         .long("info")
@@ -96,7 +101,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     // </query>
 
     //<local>
-
     // subcommand
     let local =
         SubCommand::with_name("local").about("check local build cache (target) of a rust project");
@@ -118,6 +122,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
+        .arg(&fsck_repos)
         .arg(&info)
         .arg(&keep_duplicate_crates)
         .arg(&dry_run)
@@ -139,6 +144,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
+        .arg(&fsck_repos)
         .arg(&info)
         .arg(&keep_duplicate_crates)
         .arg(&dry_run)
@@ -175,6 +181,7 @@ FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
     -d, --dry-run                Don't remove anything, just pretend
+    -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
     -i, --info                   Print information on found cache directories
@@ -214,6 +221,7 @@ FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
     -d, --dry-run                Don't remove anything, just pretend
+    -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
     -i, --info                   Print information on found cache directories
