@@ -189,7 +189,8 @@ fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
     };
     debug_assert_ne!(repo_name, "<unknown>", "unknown repo name: '{:?}'", &path);
 
-    print!("Fscking '{}': ", &repo_name);
+    println!("Fscking '{}'", &repo_name);
+
     // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
         return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
