@@ -1,5 +1,6 @@
 ## Git
 ````
+Fix version numbers registry source cache findings of query subcmd being cut off (#41)
 Fix wrong order of lines in "query" subcmd when --sort-by size is passed (#42)
 Add --fsck flag to run git fsck on the cache repos (cargo cache --fsck / -f)
 Updated dependencies:

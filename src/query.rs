@@ -28,8 +28,17 @@ struct File<'a> {
 }
 
 #[inline]
-fn path_to_name(path: &std::path::PathBuf) -> String {
+fn path_to_name_stemmed(path: &std::path::PathBuf) -> String {
     path.file_stem()
+        .unwrap()
+        .to_os_string()
+        .into_string()
+        .unwrap_or_default()
+}
+
+#[inline]
+fn path_to_name_unstemmed(path: &std::path::PathBuf) -> String {
+    path.file_name()
         .unwrap()
         .to_os_string()
         .into_string()
@@ -39,7 +48,7 @@ fn path_to_name(path: &std::path::PathBuf) -> String {
 fn binary_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         path: &path,
-        name: path_to_name(path),
+        name: path_to_name_unstemmed(path),
         size: fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len(),
@@ -49,7 +58,7 @@ fn binary_to_file(path: &std::path::PathBuf) -> File<'_> {
 fn git_checkout_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         path: &path,
-        name: path_to_name(path),
+        name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
@@ -68,7 +77,7 @@ fn git_checkout_to_file(path: &std::path::PathBuf) -> File<'_> {
 fn bare_repo_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         path: &path,
-        name: path_to_name(path),
+        name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
@@ -88,7 +97,7 @@ fn registry_pkg_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
         path: &path,
-        name: path_to_name(path),
+        name: path_to_name_stemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
@@ -108,7 +117,7 @@ fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
         path: &path,
-        name: path_to_name(path),
+        name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
             .map(|d| d.unwrap().into_path())
