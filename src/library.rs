@@ -157,9 +157,12 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
         .filter(|f| f.exists()) // avoid broken symlinks
         .collect::<Vec<_>>() // @TODO perhaps WalkDir will impl ParallelIterator one day
         .par_iter()
+        .filter(|f| f.exists()) // check if the file still exists. Since collecting and processing a
+        // path, some time may have passed and if we have a "cargo build" operation
+        // running in the directory, a temporary file may be gone already and failing to unwrap() (#43)
         .map(|f| {
             fs::metadata(f)
-                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &dir.display()))
+                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &f.display()))
                 .len()
         })
         .sum();

@@ -1,6 +1,11 @@
 ## Git
 ````
-Fix version numbers registry source cache findings of query subcmd being cut off (#41)
+Fix crash when calling "cargo cache local" on a target dir that was actively used by a cargo process.
+	I was collecting files, filtering out nonexisting paths and then (in parallel) requesting metadata on 
+	the files but sometimes it happened that temporary files were deleted by cargo between the collection of
+	available paths and a rayon job asking for the metadata leading fs::metadata() to fail unwrapping as the
+	file was already gone.
+	Mitigate by only asking for metadata if the file still exists right before doing so. (#43).
 Fix wrong order of lines in "query" subcmd when --sort-by size is passed (#42)
 Add --fsck flag to run git fsck on the cache repos (cargo cache --fsck / -f)
 Updated dependencies:
