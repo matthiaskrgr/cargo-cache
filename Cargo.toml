@@ -16,7 +16,7 @@ bench = [] # run benchmarks
 
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
-cargo_metadata = "0.7.4" # get crate package name
+cargo_metadata = "0.8.0" # get crate package name
 
 # https://github.com/kbknapp/clap-rs
 clap = "2.33.0" # cmdline arg parsing
@@ -37,7 +37,7 @@ rayon = "1.0.3" # parallelize iterators
 regex = "1.1.6" # use regex for matching
 
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
-rustc_tools_util = "0.1.1" # git version information
+rustc_tools_util = "0.2.0" # git version information
 
 # https://github.com/BurntSushi/walkdir
 walkdir = "2.2.7" # walk content of directory/CARGO_HOME recursively
@@ -51,7 +51,7 @@ pretty_assertions = "0.6.1" # colored diff assertions
 
 [build-dependencies]
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
-rustc_tools_util = "0.1.1" # git version information
+rustc_tools_util = "0.2.0" # git version information
 
 [[bin]]
 name = "cargo-cache"

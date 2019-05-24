@@ -1,6 +1,9 @@
 ## Git
 ````
 Add --fsck flag to run git fsck on the cache repos (cargo cache --fsck / -f)
+Updated dependencies:
+	cargo-metadata: 0.7.4 -> 0.8.0
+	rustc_tools_util: 0.1.1-> 0.2.0
 ````
 ## Version 0.2.0 (eada74c)
 ````
