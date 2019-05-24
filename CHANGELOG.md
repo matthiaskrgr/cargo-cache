@@ -1,5 +1,6 @@
 ## Git
 ````
+Fix wrong order of lines in "query" subcmd when --sort-by size is passed (#42)
 Add --fsck flag to run git fsck on the cache repos (cargo cache --fsck / -f)
 Updated dependencies:
 	cargo-metadata: 0.7.4 -> 0.8.0

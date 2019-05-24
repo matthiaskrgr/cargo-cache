@@ -273,14 +273,13 @@ pub(crate) fn run_query(
             if !binary_matches.is_empty() {
                 sort_files_by_size(&mut binary_matches);
                 output.push_str("\nBinaries sorted by size:\n");
-
                 binary_matches.iter().for_each(|b| {
                     let size = if hr_size {
                         b.size.file_size(&humansize_opts).unwrap()
                     } else {
                         b.size.to_string()
                     };
-                    println!("\t{}: {}", b.name, size)
+                    output.push_str(&format!("\t{}: {}\n", b.name, size));
                 });
             }
 
