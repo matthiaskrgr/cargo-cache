@@ -24,9 +24,6 @@ or for the bleeding edge development version:
 
 ```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
 
-If you encounter problems while building `cargo`, please check out the [instructions
-at the cargo repo](https://github.com/rust-lang/cargo#compiling-from-source).
-
 #### Sample output:
 ````
 Cargo cache '/home/matthias/.cargo':
