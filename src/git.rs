@@ -202,15 +202,23 @@ fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
     };
     let repo_path = repo.path();
 
-    if let Err(e) = Command::new("git")
+    let cmd = Command::new("git")
         .arg("fsck")
         .arg("--no-progress")
         .arg("--strict")
         .current_dir(repo_path)
-        .output()
-    {
-        return Err((ErrorKind::GitFsckFailed, format!("{:?}", e)));
+        .output();
+
+    if cmd.is_err() {
+        return Err((ErrorKind::GitFsckFailed, format!("{:?}", cmd.unwrap())));
     }
+
+    let stderr = String::from_utf8_lossy(&cmd.unwrap().stderr).to_string();
+
+    if stderr.contains("error: ") {
+        return Err((ErrorKind::GitFsckErrored, stderr));
+    }
+
     Ok(())
 }
 
@@ -242,6 +250,10 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
                 // run gc
                 Ok(_) => {}
                 Err((errorkind, msg)) => match errorkind {
+                    ErrorKind::GitFsckErrored => {
+                        println!("Fsck found errors in {}", repostr);
+                        println!("{}", msg);
+                    }
                     ErrorKind::GitFsckFailed => {
                         println!("Warning, git fsck failed, skipping '{}'", repostr);
                         println!("git error: '{}'", msg);

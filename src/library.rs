@@ -44,6 +44,7 @@ pub(crate) enum ErrorKind {
     GitGCFailed,
     GitPackRefsFailed,
     GitReflogFailed,
+    GitFsckErrored,
     GitFsckFailed,
     MalformedPackageName,
     CargoFailedGetConfig,
