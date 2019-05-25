@@ -1,4 +1,8 @@
-## Version 0.2.1
+## Git
+````
+
+````
+## Version 0.2.1 (319bee6)
 ````
 Fix version numbers registry source cache findings of query subcmd being cut off (#41)
 Fix crash when calling "cargo cache local" on a target dir that was actively used by a cargo process.
