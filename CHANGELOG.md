@@ -1,6 +1,7 @@
 ## Git
 ````
-
+Updated dependencies:
+	git2: 0.8.0 -> 0.9.0
 ````
 ## Version 0.2.1 (319bee6)
 ````
