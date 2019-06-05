@@ -41,7 +41,7 @@ fn get_manifest() -> PathBuf {
         }
     };
 
-    let mut manifest;
+    let manifest;
 
     loop {
         if let Some(mf) = seeing_manifest(&cwd) {
