@@ -355,7 +355,9 @@ pub(crate) fn run_query(
     }
 
     let trimmed = output.trim();
-    println!("{}", trimmed);
+    if !trimmed.is_empty() {
+        println!("{}", trimmed);
+    }
 }
 
 #[cfg(test)]
