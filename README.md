@@ -8,7 +8,7 @@
 Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 
 #### Key Features:
-* check the size of the cargo cache and its components
+* check the size of the cargo cache and its components (cmd: `cargo cache`)
 * do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
 * clean up everything (cargo will re-download as needed)
 * dry-run to see what would be removed
@@ -24,7 +24,8 @@ or for the bleeding edge development version:
 
 ```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
 
-#### Sample output:
+#### Default output (`cargo cache`):
+This only calculates the sizes and does not touch anything:
 ````
 Cargo cache '/home/matthias/.cargo':
 
