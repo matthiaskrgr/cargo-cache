@@ -1,5 +1,6 @@
 ## Git
 ````
+--info: make more detailed, add registry index
 query: don't print empty line if no matches were found
 Updated dependencies:
 	git2: 0.8.0 -> 0.9.0

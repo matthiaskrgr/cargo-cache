@@ -188,67 +188,110 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
 }
 
 pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
-    let mut strn = String::with_capacity(1020);
-    strn.push_str("Found CARGO_HOME / cargo cache base dir\n");
+    let mut strn = String::with_capacity(1500);
+
+    if let Ok(cache_path) = std::env::var("CARGO_HOME") {
+        strn.push_str(&format!(
+            "${{CARGO_HOME}} env var set to '{}', using that!\n",
+            cache_path
+        ));
+    } else {
+        strn.push_str(&format!(
+            "Default cache dir found: '{}', using that!\n",
+            c.cargo_home.display()
+        ));
+    };
+
+    strn.push_str("\n");
+
     strn.push_str(&format!(
-        "\t\t\t'{}' of size: {}\n",
-        &c.cargo_home.display(),
+        "Total cache size: {}\n\n",
         s.total_size.file_size(file_size_opts::DECIMAL).unwrap()
     ));
 
-    strn.push_str(&format!("Found {} binaries installed in\n", s.numb_bins));
+    strn.push_str(&c.bin_dir.display().to_string());
+    strn.push_str("\n");
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.bin_dir.display(),
+        "\t{} binaries installed in binary directory, total size: {}\n",
+        s.numb_bins,
         s.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
     ));
-    strn.push_str("\t\t\tNote: use 'cargo uninstall' to remove binaries, if needed.\n");
+    strn.push_str("\tThese are the binaries installed via 'cargo install'.\n");
+    strn.push_str("\tUse 'cargo uninstall' to remove binaries if needed.\n");
+    strn.push_str("\n");
 
-    strn.push_str("Found registry base dir:\n");
+    strn.push_str(&c.registry.display().to_string());
+    strn.push_str("\n");
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.registry.display(),
+        "\tRegistry root dir, size: {}\n",
         s.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
     ));
-    strn.push_str("Found registry crate source cache:\n");
+    strn.push_str("\tCrate registries are stored here.\n");
+    strn.push_str("\n");
+
+    strn.push_str(&c.registry_index.display().to_string());
+    strn.push_str("\n");
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.registry_pkg_cache.display(),
+        "\tRegistry index, size: {}\n",
+        s.total_reg_index_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
+    ));
+    strn.push_str("\tA git repo holding information on what crates are available.\n");
+    strn.push_str("\tWill be recloned as needed.\n");
+
+    strn.push_str("\n");
+
+    // source archives are extracted here, will be reextracted from the downloaded source if removed
+    strn.push_str(&c.registry_pkg_cache.display().to_string());
+    strn.push_str("\n");
+    strn.push_str(&format!(
+        "\tCrate source package archive, size: {}\n",
         s.total_reg_cache_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
-    strn.push_str("\t\t\tNote: removed crate sources will be redownloaded if necessary\n");
-    strn.push_str("Found registry unpacked sources\n");
+
+    strn.push_str("\tCrates source packages of the registries are downloaded into this folder.\n");
+    strn.push_str("\tThey will be redownloaded as needed.\n");
+    strn.push_str("\n");
+
+    strn.push_str(&c.registry_sources.display().to_string());
+    strn.push_str("\n");
+
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.registry_sources.display(),
+        "\tCrate sources, size: {}\n",
         s.total_reg_src_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
-    strn.push_str("\t\t\tNote: removed unpacked sources will be reextracted from local cache (no net access needed).\n");
+    strn.push_str("\tSource archives are extracted into this dir.\n");
+    strn.push_str("\tThey will be reextracted from the package archive as needed.\n");
+    strn.push_str("\n");
 
-    strn.push_str("Found git repo database:\n");
+    strn.push_str(&c.git_repos_bare.display().to_string());
+    strn.push_str("\n");
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.git_repos_bare.display(),
+        "\tGit database, size: {}\n",
         s.total_git_repos_bare_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
-    strn.push_str("\t\t\tNote: removed git repositories will be recloned if necessary\n");
-    strn.push_str("Found git repo checkouts:\n");
+    strn.push_str("\tBare repos of git dependencies are stored here.\n");
+    strn.push_str("\tRemoved git repositories will be recloned as needed.\n");
+    strn.push_str("\n");
+
+    strn.push_str(&c.git_checkouts.display().to_string());
+    strn.push_str("\n");
     strn.push_str(&format!(
-        "\t\t\t'{}', size: {}\n",
-        &c.git_checkouts.display(),
+        "\tGit repo checkouts, size: {}\n",
         s.total_git_chk_size
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
-    strn.push_str(
-        "\t\t\tNote: removed git checkouts will be rechecked-out from repo database if necessary (no net access needed, if repos are up-to-date).\n"
-    );
+    strn.push_str("\tSpecific commits of the bare repos will be checked out into here.\n");
+    strn.push_str("\tGit checkouts will be rechecked-out from repo database as needed.");
+    //println!("{}", strn.len());
     strn
 }
 
