@@ -41,7 +41,9 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .short("i")
         .long("info")
         .conflicts_with("list-dirs")
-        .help("Print information on found cache directories");
+        .help(
+            "Print information cache directories, what they are for and what can be savely deleted",
+        );
 
     let keep_duplicate_crates = Arg::with_name("keep-duplicate-crates")
         .short("k")
@@ -184,7 +186,7 @@ FLAGS:
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information on found cache directories
+    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
@@ -224,7 +226,7 @@ FLAGS:
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information on found cache directories
+    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:

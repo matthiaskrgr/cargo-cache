@@ -39,6 +39,8 @@ Size of git db:                           1.24 GB
 Size of 172 bare git repos:                 1.03 GB
 Size of 13 git repo checkouts:              210.87 MB
 ````
+To learn more about what the directories are for and what can be savely deleted, check `--info`.
+
 
 #### Usage:
 ````
@@ -50,7 +52,7 @@ FLAGS:
     -d, --dry-run                Don't remove anything, just pretend
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information on found cache directories
+    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information
 OPTIONS:
