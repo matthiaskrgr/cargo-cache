@@ -15,7 +15,7 @@ Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
 * recompress git repos
 * search cache via regex queries
 * print crates that take the most space
-* runs on `stable`, `beta` and `nightly` channel
+* builds and runs on `stable`, `beta` and `nightly` channel
 
 #### Installation:
 ```cargo install cargo-cache```
