@@ -35,14 +35,14 @@ fn alternative_registry_works() {
     //  std::fs::File::create(&cargo_config_file_path).expect("failed to create cargo_config_file in cargo home");
 
     // clone the crates io index
-    if !PathBuf::from("target/my-registry").exists() {
-        println!("cloning registry index into target/my-registry");
+    if !PathBuf::from("target/my-index").exists() {
+        println!("cloning registry index into target/my-index");
         let git_clone_cmd = Command::new("git")
             .arg("clone")
             .arg("https://github.com/rust-lang/crates.io-index")
             //.arg("--depth=5")
             .arg("--quiet")
-            .arg("my-registry")
+            .arg("my-index")
             .current_dir("target/")
             .output();
         // located at target/my-index
@@ -50,11 +50,19 @@ fn alternative_registry_works() {
         let stderr = String::from_utf8_lossy(&status.stderr).to_string();
         let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
+        if !stderr.is_empty() {
+            println!("error while git cloning");
+            println!("stderr:\n{:?}", stderr);
+            println!("stdout:\n{:?}", stdout);
+            println!("status: {:?}", status);
+            panic!("error while git cloning")
+        }
+
         println!("ERR {:?}", stderr);
         println!("OUT {:?}", stdout);
     }
 
-    let my_registry_path = PathBuf::from("target/my-registry");
+    let my_registry_path = PathBuf::from("target/my-index");
     let my_registry_path_absolute =
         std::fs::canonicalize(&my_registry_path).expect("could not canonicalize path");
 
@@ -76,6 +84,7 @@ my-index = {{ index = \"file://{}\" }}\n",
     if !project_path.exists() {
         let cargo_new_cmd = Command::new("cargo")
             .arg("new")
+            .arg("--quiet")
             .arg(project_path.display().to_string())
             .output();
 
@@ -83,6 +92,13 @@ my-index = {{ index = \"file://{}\" }}\n",
         let stderr = String::from_utf8_lossy(&status.stderr).to_string();
         let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
+        if !stderr.is_empty() {
+            println!("error while git cloning");
+            println!("stderr:\n{:?}", stderr);
+            println!("stdout:\n{:?}", stdout);
+            println!("status: {:?}", status);
+            panic!("error while cargo new dummy crate");
+        }
         println!("ERR {:?}", stderr);
         println!("OUT {:?}", stdout);
     }
@@ -103,7 +119,7 @@ my-index = {{ index = \"file://{}\" }}\n",
 rayon = { version = \"1\", registry = \"my-index\" }\n",
         );
         for line in additionl_cargo_toml_text.lines() {
-            let _ = writeln!(file, "{}", line).unwrap();
+            writeln!(file, "{}", line).unwrap();
         }
     }
 
@@ -111,12 +127,35 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
     let mut testcrate_path = cargo_toml.clone();
     let _ = testcrate_path.pop();
 
+    println!(
+        "cargo home path: {:?}",
+        std::fs::canonicalize(cargo_home_path.clone())
+    );
     let build_cmd = Command::new("cargo")
         .arg("check")
         .current_dir(&testcrate_path)
-        .env("CARGO_HOME", cargo_home_path)
-        .output();
-    println!("{:?}", build_cmd);
+        .env(
+            "CARGO_HOME",
+            std::fs::canonicalize(cargo_home_path.clone()).unwrap(),
+        )
+        .output()
+        .unwrap();
+
+    let status = build_cmd.status;
+    let stderr = String::from_utf8_lossy(&build_cmd.stderr).to_string();
+    let stdout = String::from_utf8_lossy(&build_cmd.stdout).to_string();
+
+    // @TODO handle all  command::new() calls that way!
+    if !build_cmd.status.success() {
+        println!("error while cargo building test crate");
+        println!("stderr:\n{:?}", stderr);
+        println!("stdout:\n{:?}", stdout);
+        println!("status: {:?}", status);
+        panic!("error while building test crate");
+    }
+
+    println!("ERR {:?}", stderr);
+    println!("OUT {:?}", stdout);
 
     return;
 }
