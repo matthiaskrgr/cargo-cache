@@ -2,6 +2,7 @@
 ````
 --info: make more detailed, add registry index
 query: don't print empty line if no matches were found
+build git2 dependency without default features
 Updated dependencies:
 	git2: 0.8.0 -> 0.9.0
 ````

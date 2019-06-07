@@ -22,7 +22,7 @@ cargo_metadata = "0.8.0" # get crate package name
 clap = "2.33.0" # cmdline arg parsing
 
 # https://github.com/alexcrichton/git2-rs
-git2 = "0.9.0" # check if repo is git repo
+git2 = { version = "0.9.0", default-features = false } # check if repo is git repo
 
 # https://github.com/brson/home
 home = "0.3.4" # get CARGO_HOME
