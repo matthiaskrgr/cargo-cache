@@ -10,6 +10,8 @@
 #[path = "../src/test_helpers.rs"]
 mod test_helpers;
 
+use std::fs::OpenOptions;
+use std::io::prelude::*;
 use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
@@ -70,5 +72,40 @@ my-registry = {{ index = \"{}\" }}\n",
 
     config_file.write_all(config_text.as_bytes()).unwrap();
 
+    let project_path = std::path::PathBuf::from("target/test_crate/");
+    println!("creating dummy project dir: {:?}", project_path);
+    if !project_path.exists() {
+        let cargo_new_cmd = Command::new("cargo")
+            .arg("new")
+            .arg(project_path.display().to_string())
+            .output();
+
+        let status = cargo_new_cmd.unwrap();
+        let stderr = String::from_utf8_lossy(&status.stderr).to_string();
+        let stdout = String::from_utf8_lossy(&status.stdout).to_string();
+
+        println!("ERR {:?}", stderr);
+        println!("OUT {:?}", stdout);
+    }
+    // next:
+    // cargo new  test_project, add regex (from crates io) and something from the custom registry to the index
+
+    let cargo_toml = std::path::PathBuf::from("target/test_crate/Cargo.toml");
+
+    let _ = std::fs::File::open(&cargo_toml).unwrap();
+    let mut file = OpenOptions::new().append(true).open(&cargo_toml).unwrap();
+
+    if !std::fs::read_to_string(&cargo_toml)
+        .unwrap()
+        .contains("regex")
+    {
+        let additionl_cargo_toml_text = String::from(
+            "regex = \"*\"
+rayon = { version = \"1\", registry = \"my-index\" }\n",
+        );
+        for line in additionl_cargo_toml_text.lines() {
+            let _ = writeln!(file, "{}", line).unwrap();
+        }
+    }
     return;
 }
