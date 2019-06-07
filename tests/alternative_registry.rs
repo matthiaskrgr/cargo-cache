@@ -12,7 +12,6 @@ mod test_helpers;
 
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -36,14 +35,14 @@ fn alternative_registry_works() {
     //  std::fs::File::create(&cargo_config_file_path).expect("failed to create cargo_config_file in cargo home");
 
     // clone the crates io index
-    if !PathBuf::from("target/my-index").exists() {
-        println!("cloning registry index into target/my-index");
+    if !PathBuf::from("target/my-registry").exists() {
+        println!("cloning registry index into target/my-registry");
         let git_clone_cmd = Command::new("git")
             .arg("clone")
             .arg("https://github.com/rust-lang/crates.io-index")
-            .arg("--depth=1")
+            //.arg("--depth=5")
             .arg("--quiet")
-            .arg("my-index")
+            .arg("my-registry")
             .current_dir("target/")
             .output();
         // located at target/my-index
@@ -55,7 +54,7 @@ fn alternative_registry_works() {
         println!("OUT {:?}", stdout);
     }
 
-    let my_registry_path = PathBuf::from("target/my-index");
+    let my_registry_path = PathBuf::from("target/my-registry");
     let my_registry_path_absolute =
         std::fs::canonicalize(&my_registry_path).expect("could not canonicalize path");
 
@@ -64,7 +63,7 @@ fn alternative_registry_works() {
 
     let config_text: &str = &format!(
         "[registries]
-my-registry = {{ index = \"{}\" }}\n",
+my-index = {{ index = \"file://{}\" }}\n",
         my_registry_path_absolute.display()
     );
 
@@ -107,5 +106,17 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
             let _ = writeln!(file, "{}", line).unwrap();
         }
     }
+
+    // build the crate
+    let mut testcrate_path = cargo_toml.clone();
+    let _ = testcrate_path.pop();
+
+    let build_cmd = Command::new("cargo")
+        .arg("check")
+        .current_dir(&testcrate_path)
+        .env("CARGO_HOME", cargo_home_path)
+        .output();
+    println!("{:?}", build_cmd);
+
     return;
 }
