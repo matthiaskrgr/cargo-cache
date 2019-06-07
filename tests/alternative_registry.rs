@@ -14,8 +14,8 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
 
-use path_slash::PathExt;
-use walkdir::WalkDir;
+//use path_slash::PathExt;
+//use walkdir::WalkDir;
 
 #[allow(non_snake_case)]
 #[test]
