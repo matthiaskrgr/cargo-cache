@@ -25,6 +25,7 @@ fn alternative_registry_works() {
     // create a CARGO_HOME with a config file
 
     let cargo_home = "target/alt_registries_CARGO_HOME/";
+    std::fs::create_dir_all(cargo_home).unwrap();
     let cargo_home_path = PathBuf::from(&cargo_home);
     let mut cargo_config_file_path = cargo_home_path.clone(); // target/alt_registries_CARGO_HOME/config
     cargo_config_file_path.push("config");
@@ -33,27 +34,30 @@ fn alternative_registry_works() {
     //  std::fs::File::create(&cargo_config_file_path).expect("failed to create cargo_config_file in cargo home");
 
     // clone the crates io index
-    println!("cloning registry index into target/my-index");
-    let git_clone_cmd = Command::new("git")
-        .arg("clone")
-        .arg("https://github.com/rust-lang/crates.io-index")
-        .arg("--depth=1")
-        .arg("--quiet")
-        .arg("my-index")
-        .current_dir("target/")
-        .output();
-    // located at target/my-index
-    let status = git_clone_cmd.unwrap();
-    let stderr = String::from_utf8_lossy(&status.stderr).to_string();
-    let stdout = String::from_utf8_lossy(&status.stdout).to_string();
+    if !PathBuf::from("target/my-index").exists() {
+        println!("cloning registry index into target/my-index");
+        let git_clone_cmd = Command::new("git")
+            .arg("clone")
+            .arg("https://github.com/rust-lang/crates.io-index")
+            .arg("--depth=1")
+            .arg("--quiet")
+            .arg("my-index")
+            .current_dir("target/")
+            .output();
+        // located at target/my-index
+        let status = git_clone_cmd.unwrap();
+        let stderr = String::from_utf8_lossy(&status.stderr).to_string();
+        let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+        println!("ERR {:?}", stderr);
+        println!("OUT {:?}", stdout);
+    }
 
     let my_registry_path = PathBuf::from("target/my-index");
     let my_registry_path_absolute =
         std::fs::canonicalize(&my_registry_path).expect("could not canonicalize path");
 
+    // write the ${CARGO_HOME}/config with info on where to find the alt registry
     let mut config_file = std::fs::File::create(&cargo_config_file_path).unwrap();
 
     let config_text: &str = &format!(
