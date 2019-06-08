@@ -197,14 +197,14 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
 
     desired_output.push_str(
         "Total size:          .*MB
-Size of .* installed binaries:  .*B
+Size of 0 installed binaries: * 0 B
 Size of registry:           .*MB
 Size of registry index:       .*MB
-Size of .* crate archives:       .*MB
-Size of .* crate source checkouts:  .*MB
-Size of git db:              .*B
-Size of .* bare git repos:   .*B
-Size of .* git repo checkouts:  .*B",
+Size of .. crate archives:       .*MB
+Size of .. crate source checkouts:  .*MB
+Size of git db:             * 0 B
+Size of .* bare git repos:  * 0 B
+Size of .* git repo checkouts: * 0 B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();
