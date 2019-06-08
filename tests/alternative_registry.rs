@@ -16,7 +16,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use crate::test_helpers::bin_path;
-//use regex::Regex;
+use regex::Regex;
 
 #[allow(non_snake_case)]
 #[test]
@@ -178,6 +178,43 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
 
     println!("{}", stdout);
     // @TODO, check via regex if the output is what we expect
+
+    let mut desired_output = String::from("Cargo cache .*target.*alt_registries_CARGO_HOME.*\n\n");
+
+    /*
+    Cargo cache '/home/matthias/vcs/github/cargo-cache/target/alt_registries_CARGO_HOME':
+
+    Total size:                             218.89 MB
+    Size of 0 installed binaries:             0 B
+    Size of registry:                         218.89 MB
+    Size of registry index:                     211.24 MB
+    Size of 22 crate archives:                  1.39 MB
+    Size of 22 crate source checkouts:          6.25 MB
+    Size of git db:                           0 B
+    Size of 0 bare git repos:                   0 B
+    Size of 0 git repo checkouts:               0 B
+    */
+
+    desired_output.push_str(
+        "Total size:          .*MB
+Size of .* installed binaries:  .*B
+Size of registry:           .*MB
+Size of registry index:       .*MB
+Size of .* crate archives:       .*MB
+Size of .* crate source checkouts:  .*MB
+Size of git db:              .*B
+Size of .* bare git repos:   .*B
+Size of .* git repo checkouts:  .*B",
+    );
+
+    let regex = Regex::new(&desired_output).unwrap();
+
+    assert!(
+        regex.clone().is_match(&stdout),
+        "regex: {:?}, cc_output: {}",
+        regex,
+        stdout
+    );
 
     return;
 }
