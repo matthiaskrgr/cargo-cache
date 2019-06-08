@@ -15,8 +15,8 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
 
-//use path_slash::PathExt;
-//use walkdir::WalkDir;
+use crate::test_helpers::bin_path;
+//use regex::Regex;
 
 #[allow(non_snake_case)]
 #[test]
@@ -156,6 +156,28 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
 
     println!("ERR {:?}", stderr);
     println!("OUT {:?}", stdout);
+
+    // run cargo cache
+    let cargo_cache_cmd = Command::new(bin_path())
+        .env(
+            "CARGO_HOME",
+            std::fs::canonicalize(cargo_home_path.clone()).unwrap(),
+        )
+        .output()
+        .unwrap();
+
+    if !cargo_cache_cmd.status.success() {
+        println!("error running cargo-cache on alt reg $CARGO_HOME");
+        println!("stderr:\n{:?}", stderr);
+        println!("stdout:\n{:?}", stdout);
+        println!("status: {:?}", status);
+        panic!("error while running cargo-home with alt regs");
+    }
+
+    let stdout = String::from_utf8_lossy(&cargo_cache_cmd.stdout).to_string();
+
+    println!("{}", stdout);
+    // @TODO, check via regex if the output is what we expect
 
     return;
 }
