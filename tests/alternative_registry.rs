@@ -93,8 +93,7 @@ fn alternative_registry_works() {
     let index_path_absolute = {
         let cwd = std::env::current_dir().unwrap();
         let mut path: PathBuf = cwd;
-        path.push("target");
-        path.push("my-index");
+        path.push(&my_registry_path);
         path
     };
     // I don't know how to make this pass on windows
@@ -112,9 +111,6 @@ fn alternative_registry_works() {
           invalid escape character in string: `C` at line 2\n"
     */
     // no idea what's the problem here, help would be appreciated
-
-    let absolute_path = std::env::current_dir().unwrap();
-    let path = absolute_path.join("target/my-index".split('/').collect::<PathBuf>());
 
     // make it take this path on travis ci
     let index_path: String = if cfg!(windows) && (std::env::var("TRAVIS") == Ok("true".to_string()))
@@ -134,12 +130,21 @@ my-index = {{ index = '{}' }}\n",
     );
 
     println!("DEBUG: config text:\n{}\n", config_text);
-    // cleanup: got until this point
-    cfg_file_handle.write_all(config_text.as_bytes()).unwrap();
+    // write the content into the config file
+    cfg_file_handle
+        .write_all(config_text.as_bytes())
+        .expect("failed to fill cargo home config file");
 
-    let project_path = "target/test_crate".split('/').collect::<PathBuf>();;
-    println!("creating dummy project dir: {:?}", project_path);
+    // the path where we try to build a test crate
+    let project_path = {
+        let mut path = PathBuf::from("target");
+        path.push("test_crate");
+        path
+    };
+
+    println!("DEBUG: creating dummy crate: '{:?}'", project_path);
     if !project_path.exists() {
+        // @TODO cleanup
         let cargo_new_cmd = Command::new("cargo")
             .arg("new")
             .arg("--quiet")
@@ -161,29 +166,33 @@ my-index = {{ index = '{}' }}\n",
         println!("OUT {:?}", stdout);
     }
 
-    let cargo_toml = "target/test_crate/Cargo.toml"
-        .split('/')
-        .collect::<PathBuf>();
+    let crate_toml = {
+        let mut path = PathBuf::from("target");
+        path.push("test_crate");
+        path.push("Cargo.toml");
+        path
+    };
 
-    let mut file = OpenOptions::new().append(true).open(&cargo_toml).unwrap();
+    // open the file
+    let mut file = OpenOptions::new().append(true).open(&crate_toml).unwrap();
 
-    if !std::fs::read_to_string(&cargo_toml)
-        .unwrap()
-        .contains("regex")
-    {
+    let crate_toml_content = std::fs::read_to_string(&crate_toml).unwrap();
+
+    // only run this if we have not yet edited the toml
+    if !crate_toml_content.contains("regex") {
+        // add additional dependencies to the file, one from crates.io and one from our custom registry
         let additionl_cargo_toml_text = String::from(
-            "regex = \"*\"
-rayon = { version = \"1\", registry = \"my-index\" }\n",
+            r#"regex = "*"
+rayon = { version = "1", registry = "my-index" }
+"#,
         );
         for line in additionl_cargo_toml_text.lines() {
             writeln!(file, "{}", line).unwrap();
         }
     }
+    // cleanup: got here
 
     // build the crate
-    let mut testcrate_path = cargo_toml.clone();
-    let _ = testcrate_path.pop();
-
     let absolute_path = std::env::current_dir().unwrap();
     let cargo_h_path = absolute_path
         .join("target")
@@ -192,7 +201,7 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
     println!("cargo home path: {:?}", cargo_h_path);
     let build_cmd = Command::new("cargo")
         .arg("check")
-        .current_dir(&testcrate_path)
+        .current_dir(&project_path)
         .env("CARGO_HOME", cargo_h_path.display().to_string())
         .output()
         .unwrap();
