@@ -248,27 +248,27 @@ rayon = { version = "1", registry = "my-index" }
     /*
     Cargo cache '/home/matthias/vcs/github/cargo-cache/target/alt_registries_CARGO_HOME':
 
-    Total size:                             218.89 MB
-    Size of 0 installed binaries:             0 B
-    Size of registry:                         218.89 MB
-    Size of registry index:                     211.24 MB
-    Size of 22 crate archives:                  1.39 MB
-    Size of 22 crate source checkouts:          6.25 MB
-    Size of git db:                           0 B
-    Size of 0 bare git repos:                   0 B
-    Size of 0 git repo checkouts:               0 B
-    */
+    Total:                              219.45 MB
+      0 installed binaries:                  0  B
+      Registry:                         219.45 MB
+        Registry index:                 211.80 MB
+        22 crate archives:                1.39 MB
+        22 crate source checkouts:        6.25 MB
+      Git db:                                0  B
+        0 bare git repos:                    0  B
+        0 git repo checkouts:                0  B
+        */
 
     desired_output.push_str(
-        "Total size:          .*MB
-Size of 0 installed binaries: * 0 B
-Size of registry:           .*MB
-Size of registry index:       .*MB
-Size of .. crate archives:       .*MB
-Size of .. crate source checkouts:  .*MB
-Size of git db:             * 0 B
-Size of .* bare git repos:  * 0 B
-Size of .* git repo checkouts: * 0 B",
+        "Total:                              .* MB
+  0 installed binaries:                  0  B
+  Registry:                         .* MB
+    Registry index:                 .* MB
+    .. crate archives:                .* MB
+    .. crate source checkouts:        .* MB
+  Git db:                                0  B
+    0 bare git repos:                    0  B
+    0 git repo checkouts:                0  B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();

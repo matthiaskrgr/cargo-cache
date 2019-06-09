@@ -71,28 +71,29 @@ fn build_and_check_size_test() {
     let mut desired_output = String::from("Cargo cache .*fake_cargo_home.*:\n\n");
 
     /*
-    Cargo cache '...cargo-cache/target/fake_cargo_home/':
+        Cargo cache '...cargo-cache/target/fake_cargo_home/':
 
-    Total size:                             21.96 MB
-    Size of 0 installed binaries:             0 B
-    Size of registry:                         21.96 MB
-    Size of 4 crate archives:                   407.74 KB
-    Size of 4 crate source checkouts:           2.04 MB
-    Size of git db:                           0 B
-    Size of 0 bare git repos:                   0 B
-    Size of 0 git repo checkouts:               0 B
-    */
+    Total:                              103.68 MB
+      0 installed binaries:                  0  B
+      Registry:                         103.68 MB
+        Registry index:                 101.23 MB
+        4 crate archives:               407.74 KB
+        4 crate source checkouts:         2.04 MB
+      Git db:                                0  B
+        0 bare git repos:                    0  B
+        0 git repo checkouts:                0  B
+        */
 
     desired_output.push_str(
-        "Total size:          .*MB
-Size of .* installed binaries:  .*B
-Size of registry:           .*MB
-Size of registry index:       .*MB
-Size of .* crate archives:       .*KB
-Size of .* crate source checkouts:  .*MB
-Size of git db:              .*B
-Size of .* bare git repos:   .*B
-Size of .* git repo checkouts:  .*B",
+        "Total:                         .* MB
+  0 installed binaries:             .*  B
+  Registry:                         .* MB
+    Registry index:                 .* MB
+   .. crate archives:               .* KB
+   .. crate source checkouts:       .* MB
+  Git db:                           .* 0  B
+    0 bare git repos:               .* 0  B
+    0 git repo checkouts:           .* 0  B",
     );
 
     let regex = Regex::new(&desired_output);

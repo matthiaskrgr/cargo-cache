@@ -142,8 +142,8 @@ impl<'a> fmt::Display for DirSizes<'a> {
             "{}",
             library::pad_strings(
                 0,
-                40,
-                "Total size: ",
+                45,
+                "Total: ",
                 &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
             )
         )?;
@@ -152,9 +152,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                1,
-                40,
-                &format!("Size of {} installed binaries: ", self.numb_bins),
+                0,
+                45,
+                &format!("  {} installed binaries: ", self.numb_bins),
                 &self
                     .total_bin_size
                     .file_size(file_size_opts::DECIMAL)
@@ -166,9 +166,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                1,
-                40,
-                "Size of registry: ",
+                0,
+                45,
+                "  Registry: ",
                 &self
                     .total_reg_size
                     .file_size(file_size_opts::DECIMAL)
@@ -180,9 +180,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                2,
-                40,
-                "Size of registry index: ",
+                0,
+                45,
+                "    Registry index: ",
                 &self
                     .total_reg_index_size
                     .file_size(file_size_opts::DECIMAL)
@@ -194,9 +194,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                2,
-                40,
-                &format!("Size of {} crate archives: ", self.numb_reg_cache_entries),
+                0,
+                45,
+                &format!("    {} crate archives: ", self.numb_reg_cache_entries),
                 &self
                     .total_reg_cache_size
                     .file_size(file_size_opts::DECIMAL)
@@ -208,10 +208,10 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                2,
-                40,
+                0,
+                45,
                 &format!(
-                    "Size of {} crate source checkouts: ",
+                    "    {} crate source checkouts: ",
                     self.numb_reg_src_checkouts
                 ),
                 &self
@@ -225,9 +225,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                1,
-                40,
-                "Size of git db: ",
+                0,
+                45,
+                "  Git db: ",
                 &self
                     .total_git_db_size
                     .file_size(file_size_opts::DECIMAL)
@@ -239,12 +239,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                2,
-                40,
-                &format!(
-                    "Size of {} bare git repos: ",
-                    self.numb_git_repos_bare_repos
-                ),
+                0,
+                45,
+                &format!("    {} bare git repos: ", self.numb_git_repos_bare_repos),
                 &self
                     .total_git_repos_bare_size
                     .file_size(file_size_opts::DECIMAL)
@@ -256,9 +253,9 @@ impl<'a> fmt::Display for DirSizes<'a> {
             f,
             "{}",
             library::pad_strings(
-                2,
-                40,
-                &format!("Size of {} git repo checkouts: ", self.numb_git_checkouts),
+                0,
+                45,
+                &format!("    {} git repo checkouts: ", self.numb_git_checkouts),
                 &self
                     .total_git_chk_size
                     .file_size(file_size_opts::DECIMAL)
@@ -370,15 +367,15 @@ mod libtests {
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total size:                             1.94 GB
-Size of 31 installed binaries:            121.21 KB
-Size of registry:                         1.94 GB
-Size of registry index:                     23 B
-Size of 23445 crate archives:               89 B
-Size of 123909849 crate source checkouts:   1.94 GB
-Size of git db:                           156.20 KB
-Size of 37 bare git repos:                  121.21 KB
-Size of 8 git repo checkouts:               34.98 KB\n";
+Total:                                1.94 GB
+  31 installed binaries:            121.21 KB
+  Registry:                           1.94 GB
+    Registry index:                     23  B
+    23445 crate archives:               89  B
+    123909849 crate source checkouts: 1.94 GB
+  Git db:                           156.20 KB
+    37 bare git repos:              121.21 KB
+    8 git repo checkouts:            34.98 KB\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -428,15 +425,15 @@ Size of 8 git repo checkouts:               34.98 KB\n";
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total size:                             6.33 GB
-Size of 69 installed binaries:            640.16 MB
-Size of registry:                         1.46 GB
-Size of registry index:                     23 B
-Size of 3654 crate archives:                550.86 MB
-Size of 1615 crate source checkouts:        905.60 MB
-Size of git db:                           4.23 GB
-Size of 123 bare git repos:                 309.61 MB
-Size of 36 git repo checkouts:              3.92 GB\n";
+Total:                                6.33 GB
+  69 installed binaries:            640.16 MB
+  Registry:                           1.46 GB
+    Registry index:                     23  B
+    3654 crate archives:            550.86 MB
+    1615 crate source checkouts:    905.60 MB
+  Git db:                             4.23 GB
+    123 bare git repos:             309.61 MB
+    36 git repo checkouts:            3.92 GB\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -487,15 +484,15 @@ Size of 36 git repo checkouts:              3.92 GB\n";
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total size:                             14.57 GB
-Size of 0 installed binaries:             0 B
-Size of registry:                         14.57 GB
-Size of registry index:                     1.25 GB
-Size of 4 crate archives:                   13.04 GB
-Size of 4 crate source checkouts:           268.46 MB
-Size of git db:                           0 B
-Size of 0 bare git repos:                   0 B
-Size of 0 git repo checkouts:               0 B\n";
+Total:                               14.57 GB
+  0 installed binaries:                  0  B
+  Registry:                          14.57 GB
+    Registry index:                   1.25 GB
+    4 crate archives:                13.04 GB
+    4 crate source checkouts:       268.46 MB
+  Git db:                                0  B
+    0 bare git repos:                    0  B
+    0 git repo checkouts:                0  B\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -546,15 +543,15 @@ Size of 0 git repo checkouts:               0 B\n";
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total size:                             0 B
-Size of 0 installed binaries:             0 B
-Size of registry:                         0 B
-Size of registry index:                     0 B
-Size of 0 crate archives:                   0 B
-Size of 0 crate source checkouts:           0 B
-Size of git db:                           0 B
-Size of 0 bare git repos:                   0 B
-Size of 0 git repo checkouts:               0 B\n";
+Total:                                   0  B
+  0 installed binaries:                  0  B
+  Registry:                              0  B
+    Registry index:                      0  B
+    0 crate archives:                    0  B
+    0 crate source checkouts:            0  B
+  Git db:                                0  B
+    0 bare git repos:                    0  B
+    0 git repo checkouts:                0  B\n";
 
         assert_eq!(output_is, output_should);
     }

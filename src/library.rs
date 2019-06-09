@@ -348,6 +348,13 @@ pub(crate) fn pad_strings(
     beginning: &str,
     end: &str,
 ) -> String {
+    // hack: add some nicer padding so that "0  B" and "1 MB" aligns
+    let end = if end.ends_with(" B") {
+        end.replace(" B", "  B") // FIXME use regex
+    } else {
+        end.into()
+    };
+
     let left: u16 = max_line_width + (indent_lvl * 2);
     #[allow(clippy::cast_possible_truncation)] // very unlikely
     let right: u16 = beginning.len() as u16;
@@ -364,8 +371,8 @@ pub(crate) fn pad_strings(
 
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     // I tried mittigating via previous assert()
-    formatted_line.push_str(&" ".repeat(len_padding as usize));
-    formatted_line.push_str(end);
+    formatted_line.push_str(&" ".repeat(len_padding as usize - end.len()));
+    formatted_line.push_str(&end);
     formatted_line.push_str("\n");
     formatted_line
 }
@@ -610,22 +617,22 @@ mod libtests {
     #[allow(non_snake_case)]
     #[test]
     fn test_pad_strings() {
-        let s1 = pad_strings(1, 4, "hello", "world");
+        let s1 = pad_strings(1, 9, "hello", "world");
         assert_eq!(s1, "hello world\n");
 
-        let s2 = pad_strings(2, 4, "hello", "world");
+        let s2 = pad_strings(2, 9, "hello", "world");
         assert_eq!(s2, "hello   world\n");
 
-        let s3 = pad_strings(1, 6, "hello", "world");
+        let s3 = pad_strings(1, 11, "hello", "world");
         assert_eq!(s3, "hello   world\n");
 
-        let s4 = pad_strings(1, 7, "hello", "world");
+        let s4 = pad_strings(1, 12, "hello", "world");
         assert_eq!(s4, "hello    world\n");
 
-        let s5 = pad_strings(2, 6, "hello", "world");
-        assert_eq!(s5, "hello     world\n");
+        let s5 = pad_strings(2, 13, "hello", "world");
+        assert_eq!(s5, "hello       world\n");
 
-        let s6 = pad_strings(2, 10, "hello", "world");
+        let s6 = pad_strings(2, 15, "hello", "world");
         assert_eq!(s6, "hello         world\n");
     }
 
