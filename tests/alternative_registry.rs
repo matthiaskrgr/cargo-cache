@@ -24,12 +24,14 @@ fn alternative_registry_works() {
     // make sure alternative registries work
 
     // first create a $CARGO_HOME with a config file
-    let cargo_home_path_str: &str = "target/alt_registries_CARGO_HOME/";
-    std::fs::create_dir_all(cargo_home_path_str)
-        .expect("Failed to create 'alt_registries_CARGO_HOME' dir");
+    let cargo_home_path = {
+        let mut path = PathBuf::from("target");
+        path.push("alt_registries_CARGO_HOME");
+        path
+    };
 
-    // we need to create the path like this because on windows target/alt... might not work
-    let cargo_home_path = cargo_home_path_str.split('/').collect::<PathBuf>();
+    std::fs::create_dir_all(&cargo_home_path)
+        .expect("Failed to create 'alt_registries_CARGO_HOME' dir");
 
     // get the path to the config file inside the $CARGO_HOME: target/alt_registries_CARGO_HOME/config
     let cargo_config_file_path: PathBuf = {
@@ -167,8 +169,7 @@ my-index = {{ index = '{}' }}\n",
     }
 
     let crate_toml = {
-        let mut path = PathBuf::from("target");
-        path.push("test_crate");
+        let mut path = project_path.clone();
         path.push("Cargo.toml");
         path
     };
@@ -190,19 +191,20 @@ rayon = { version = "1", registry = "my-index" }
             writeln!(file, "{}", line).unwrap();
         }
     }
-    // cleanup: got here
 
-    // build the crate
-    let absolute_path = std::env::current_dir().unwrap();
-    let cargo_h_path = absolute_path
-        .join("target")
-        .join("alt_registries_CARGO_HOME");
+    // get the absolute path to our cargo_home
+    let cargo_home_path_absolute: PathBuf = {
+        let mut path: PathBuf = std::env::current_dir().unwrap();
+        path.push(cargo_home_path);
+        path
+    };
 
-    println!("cargo home path: {:?}", cargo_h_path);
+    // run the build comand to force cargo to use the alternative registry
+    // and fill the cargo_home with the alternative registry
     let build_cmd = Command::new("cargo")
         .arg("check")
         .current_dir(&project_path)
-        .env("CARGO_HOME", cargo_h_path.display().to_string())
+        .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
         .output()
         .unwrap();
 
@@ -222,9 +224,9 @@ rayon = { version = "1", registry = "my-index" }
     println!("ERR {:?}", stderr);
     println!("OUT {:?}", stdout);
 
-    // run cargo cache
+    // run cargo cache on the new cargo_home
     let cargo_cache_cmd = Command::new(bin_path())
-        .env("CARGO_HOME", cargo_h_path.display().to_string())
+        .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
         .output()
         .unwrap();
 
@@ -238,7 +240,7 @@ rayon = { version = "1", registry = "my-index" }
 
     let stdout = String::from_utf8_lossy(&cargo_cache_cmd.stdout).to_string();
 
-    println!("{}", stdout);
+    println!("DEBUG: cargo-cache output:\n\n{}", stdout);
     // check if the output is what we expect
 
     let mut desired_output = String::from("Cargo cache .*target.*alt_registries_CARGO_HOME.*\n\n");
