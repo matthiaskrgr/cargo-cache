@@ -23,33 +23,44 @@ use regex::Regex;
 fn alternative_registry_works() {
     // make sure alternative registries work
 
-    // create a CARGO_HOME with a config file
+    // first create a $CARGO_HOME with a config file
+    let cargo_home_path_str: &str = "target/alt_registries_CARGO_HOME/";
+    std::fs::create_dir_all(cargo_home_path_str)
+        .expect("Failed to create 'alt_registries_CARGO_HOME' dir");
 
-    let cargo_home = "target/alt_registries_CARGO_HOME/";
-    std::fs::create_dir_all(cargo_home).unwrap();
-    let cargo_home_path = cargo_home.split('/').collect::<PathBuf>();
-    let mut cargo_config_file_path = cargo_home_path.clone(); // target/alt_registries_CARGO_HOME/config
-    cargo_config_file_path.push("config");
-    println!("cargo config file path: {:?}", cargo_config_file_path);
-    // create the config file
-    //  std::fs::File::create(&cargo_config_file_path).expect("failed to create cargo_config_file in cargo home");
+    // we need to create the path like this because on windows target/alt... might not work
+    let cargo_home_path = cargo_home_path_str.split('/').collect::<PathBuf>();
 
-    // clone the crates io index
-    if !String::from("target/my-index")
-        .split('/')
-        .collect::<PathBuf>()
-        .exists()
-    {
-        println!("cloning registry index into target/my-index");
+    // get the path to the config file inside the $CARGO_HOME: target/alt_registries_CARGO_HOME/config
+    let cargo_config_file_path: PathBuf = {
+        let mut path = cargo_home_path.clone();
+        path.push("config");
+        path
+    };
+
+    println!(
+        "DEBUG: cargo config file path: '{:?}'",
+        cargo_config_file_path
+    );
+
+    let registry_index: PathBuf = {
+        let mut path = PathBuf::from("target");
+        path.push("my-index");
+        path
+    };
+
+    // clone the crates io index into "target/my-index"
+    if !registry_index.exists() {
+        // @TODO: clean up
+        println!("DEBUG: cloning registry index into target/my-index");
         let git_clone_cmd = Command::new("git")
             .arg("clone")
             .arg("https://github.com/rust-lang/crates.io-index")
-            //.arg("--depth=5")
             .arg("--quiet")
             .arg("my-index")
-            .current_dir("target/")
+            .current_dir("target")
             .output();
-        // located at target/my-index
+
         let status = git_clone_cmd.unwrap();
         let stderr = String::from_utf8_lossy(&status.stderr).to_string();
         let stdout = String::from_utf8_lossy(&status.stdout).to_string();
@@ -66,40 +77,65 @@ fn alternative_registry_works() {
         println!("OUT {:?}", stdout);
     }
 
-    let my_registry_path = "target/my-index".split('/').collect::<PathBuf>();
-    let _my_registry_path_absolute =
-        std::fs::canonicalize(&my_registry_path).expect("could not canonicalize path");
+    // path where the alternative registry is located
+    let my_registry_path = {
+        let mut path = PathBuf::from("target");
+        path.push("my-index");
+        path
+    };
 
-    // write the ${CARGO_HOME}/config with info on where to find the alt registry
-    let mut config_file = std::fs::File::create(&cargo_config_file_path).unwrap();
+    // next we need to set up the alternative registry inside the ${CARGO_HOME}/config
 
-    // on windows, there will be an extended length path here
-    // \\\\?\\C:\\Users\\travis\\build\\matthiaskrgr\\cargo-cache\\target\\alt_registries_CARGO_HOME\\config
-    // but the "?" causes a parsing error:
-    // "error: could not load Cargo configuration\n\nCaused by:\n  could not parse TOML configuration in `\\\\?\\C:\\Users\\travis\\build\\matthiaskrgr\\cargo-cache\\target\\alt_registries_CARGO_HOME\\config`\n\nCaused by:\n  could not parse input as TOML\n\nCaused by:\n  invalid escape character in string: `C` at line 2\n"
+    let mut cfg_file_handle = std::fs::File::create(&cargo_config_file_path)
+        .expect("failed to create cargo home config file!");
+
+    // we need an absolute path to my-index
+    let index_path_absolute = {
+        let cwd = std::env::current_dir().unwrap();
+        let mut path: PathBuf = cwd;
+        path.push("target");
+        path.push("my-index");
+        path
+    };
+    // I don't know how to make this pass on windows
+    // use a hack for travis-ci
+    // I always got a parsing error on travis:
+    /*
+    "error: could not load Cargo configuration
+
+    Caused by:
+      could not parse TOML configuration in `\\\\?\\C:\\Users\\travis\\build\\matthiaskrgr\\cargo-cache\\target\\alt_registries_CARGO_HOME\\config`
+
+      Caused by:
+        could not parse input as TOML
+        Caused by:
+          invalid escape character in string: `C` at line 2\n"
+    */
+    // no idea what's the problem here, help would be appreciated
+
     let absolute_path = std::env::current_dir().unwrap();
     let path = absolute_path.join("target/my-index".split('/').collect::<PathBuf>());
 
-    let index_path: String = if cfg!(windows) {
-        /*     let mut s = String::from("file:///");
-        s.push_str(&path.display().to_string());
-        s*/
+    // make it take this path on travis ci
+    let index_path: String = if cfg!(windows) && (std::env::var("TRAVIS") == Ok("true".to_string()))
+    {
         String::from("file://C:/Users/travis/build/matthiaskrgr/cargo-cache/target/my-index")
     } else {
         let mut s = String::from("file://");
-        s.push_str(&path.display().to_string());
+        s.push_str(&index_path_absolute.display().to_string());
         s
     };
 
+    // this is the content of the cargo home config
     let config_text: &str = &format!(
         "[registries]
 my-index = {{ index = '{}' }}\n",
         index_path
     );
 
-    println!("config text:\n\n{}\n\n", config_text);
-
-    config_file.write_all(config_text.as_bytes()).unwrap();
+    println!("DEBUG: config text:\n{}\n", config_text);
+    // cleanup: got until this point
+    cfg_file_handle.write_all(config_text.as_bytes()).unwrap();
 
     let project_path = "target/test_crate".split('/').collect::<PathBuf>();;
     println!("creating dummy project dir: {:?}", project_path);
