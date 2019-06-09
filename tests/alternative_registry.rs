@@ -21,18 +21,13 @@ use regex::Regex;
 #[allow(non_snake_case)]
 #[test]
 fn alternative_registry_works() {
-    // the test is not working on windows unfortunately (see comments)
-    if cfg!(windows) {
-        return; // @FIXME
-    }
-
     // make sure alternative registries work
 
     // create a CARGO_HOME with a config file
 
     let cargo_home = "target/alt_registries_CARGO_HOME/";
     std::fs::create_dir_all(cargo_home).unwrap();
-    let cargo_home_path = PathBuf::from(&cargo_home);
+    let cargo_home_path = cargo_home.split('/').collect::<PathBuf>();
     let mut cargo_config_file_path = cargo_home_path.clone(); // target/alt_registries_CARGO_HOME/config
     cargo_config_file_path.push("config");
     println!("cargo config file path: {:?}", cargo_config_file_path);
@@ -40,7 +35,11 @@ fn alternative_registry_works() {
     //  std::fs::File::create(&cargo_config_file_path).expect("failed to create cargo_config_file in cargo home");
 
     // clone the crates io index
-    if !PathBuf::from("target/my-index").exists() {
+    if !String::from("target/my-index")
+        .split('/')
+        .collect::<PathBuf>()
+        .exists()
+    {
         println!("cloning registry index into target/my-index");
         let git_clone_cmd = Command::new("git")
             .arg("clone")
@@ -67,8 +66,8 @@ fn alternative_registry_works() {
         println!("OUT {:?}", stdout);
     }
 
-    let my_registry_path = PathBuf::from("target/my-index");
-    let my_registry_path_absolute =
+    let my_registry_path = "target/my-index".split('/').collect::<PathBuf>();
+    let _my_registry_path_absolute =
         std::fs::canonicalize(&my_registry_path).expect("could not canonicalize path");
 
     // write the ${CARGO_HOME}/config with info on where to find the alt registry
@@ -76,17 +75,33 @@ fn alternative_registry_works() {
 
     // on windows, there will be an extended length path here
     // \\\\?\\C:\\Users\\travis\\build\\matthiaskrgr\\cargo-cache\\target\\alt_registries_CARGO_HOME\\config
+    // but the "?" causes a parsing error:
+    // "error: could not load Cargo configuration\n\nCaused by:\n  could not parse TOML configuration in `\\\\?\\C:\\Users\\travis\\build\\matthiaskrgr\\cargo-cache\\target\\alt_registries_CARGO_HOME\\config`\n\nCaused by:\n  could not parse input as TOML\n\nCaused by:\n  invalid escape character in string: `C` at line 2\n"
+    let absolute_path = std::env::current_dir().unwrap();
+    let path = absolute_path.join("target/my-index".split('/').collect::<PathBuf>());
+
+    let index_path: String = if cfg!(windows) {
+        /*     let mut s = String::from("file:///");
+        s.push_str(&path.display().to_string());
+        s*/
+        String::from("file://C:/Users/travis/build/matthiaskrgr/cargo-cache/target/my-index")
+    } else {
+        let mut s = String::from("file://");
+        s.push_str(&path.display().to_string());
+        s
+    };
+
     let config_text: &str = &format!(
         "[registries]
-my-index = {{ index = \"file://{}\" }}\n",
-        my_registry_path_absolute.display()
+my-index = {{ index = '{}' }}\n",
+        index_path
     );
 
     println!("config text:\n\n{}\n\n", config_text);
 
     config_file.write_all(config_text.as_bytes()).unwrap();
 
-    let project_path = std::path::PathBuf::from("target/test_crate/");
+    let project_path = "target/test_crate".split('/').collect::<PathBuf>();;
     println!("creating dummy project dir: {:?}", project_path);
     if !project_path.exists() {
         let cargo_new_cmd = Command::new("cargo")
@@ -110,7 +125,9 @@ my-index = {{ index = \"file://{}\" }}\n",
         println!("OUT {:?}", stdout);
     }
 
-    let cargo_toml = std::path::PathBuf::from("target/test_crate/Cargo.toml");
+    let cargo_toml = "target/test_crate/Cargo.toml"
+        .split('/')
+        .collect::<PathBuf>();
 
     let mut file = OpenOptions::new().append(true).open(&cargo_toml).unwrap();
 
@@ -131,17 +148,16 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
     let mut testcrate_path = cargo_toml.clone();
     let _ = testcrate_path.pop();
 
-    println!(
-        "cargo home path: {:?}",
-        std::fs::canonicalize(cargo_home_path.clone())
-    );
+    let absolute_path = std::env::current_dir().unwrap();
+    let cargo_h_path = absolute_path
+        .join("target")
+        .join("alt_registries_CARGO_HOME");
+
+    println!("cargo home path: {:?}", cargo_h_path);
     let build_cmd = Command::new("cargo")
         .arg("check")
         .current_dir(&testcrate_path)
-        .env(
-            "CARGO_HOME",
-            std::fs::canonicalize(cargo_home_path.clone()).unwrap(),
-        )
+        .env("CARGO_HOME", cargo_h_path.display().to_string())
         .output()
         .unwrap();
 
@@ -163,10 +179,7 @@ rayon = { version = \"1\", registry = \"my-index\" }\n",
 
     // run cargo cache
     let cargo_cache_cmd = Command::new(bin_path())
-        .env(
-            "CARGO_HOME",
-            std::fs::canonicalize(cargo_home_path.clone()).unwrap(),
-        )
+        .env("CARGO_HOME", cargo_h_path.display().to_string())
         .output()
         .unwrap();
 
