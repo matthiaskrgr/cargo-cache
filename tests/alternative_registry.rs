@@ -67,12 +67,12 @@ fn alternative_registry_works() {
         let stderr = String::from_utf8_lossy(&status.stderr).to_string();
         let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-        if !stderr.is_empty() {
+        if !status.status.success() {
             println!("error while git cloning");
             println!("stderr:\n{:?}", stderr);
             println!("stdout:\n{:?}", stdout);
             println!("status: {:?}", status);
-            panic!("error while git cloning")
+            panic!("error while git cloning");
         }
 
         println!("ERR {:?}", stderr);
@@ -157,8 +157,8 @@ my-index = {{ index = '{}' }}\n",
         let stderr = String::from_utf8_lossy(&status.stderr).to_string();
         let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-        if !stderr.is_empty() {
-            println!("error while git cloning");
+        if !status.status.success() {
+            println!("error while running 'cargo new'");
             println!("stderr:\n{:?}", stderr);
             println!("stdout:\n{:?}", stdout);
             println!("status: {:?}", status);
