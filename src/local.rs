@@ -98,7 +98,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
 
     output.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
 
-    output.push_str(&pad_strings(0, 15, "Total size: ", size_hr.as_str()));
+    output.push_str(&pad_strings(0, 27, "Total size: ", size_hr.as_str()));
 
     let p = &target_dir;
     let td_debug = p.clone().join("debug");
@@ -111,7 +111,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_debug > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "debug: ",
             &size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -121,7 +121,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_rls > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "rls: ",
             &size_rls.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -131,7 +131,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_release > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "release: ",
             &size_release.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -141,7 +141,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_package > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "package: ",
             &size_package.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -151,7 +151,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_doc > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "doc: ",
             &size_doc.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
@@ -192,7 +192,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     if size_other > 0 {
         output.push_str(&pad_strings(
             1,
-            15,
+            25,
             "other: ",
             &size_other.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
