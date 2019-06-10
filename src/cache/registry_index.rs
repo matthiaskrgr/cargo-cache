@@ -113,7 +113,7 @@ impl RegistryIndexCache {
                             .to_os_string()
                             .into_string()
                             .unwrap()
-                            .contains("-")
+                            .contains('-')
                 })
                 .count() as u64;
             self.number_of_indices = Some(number);
