@@ -17,15 +17,16 @@ to
 Total:                                4.21 GB
   102 installed binaries:           920.95 MB
   Registry:                           2.25 GB
-    Registry index:                 226.98 MB
+    2 registry indices              226.98 MB
     4411 crate archives:            684.28 MB
     2399 crate source checkouts:      1.34 GB
   Git db:                             1.04 GB
     113 bare git repos:             993.72 MB
     7 git repo checkouts:            51.05 MB
 
-(#44)
+(#44 / #36)
 
+print the number of registry indices
 --info: make more detailed, add registry index
 query: don't print empty line if no matches were found
 build git2 dependency without default features

@@ -20,6 +20,7 @@ pub(crate) struct RegistryIndexCache {
     total_size: Option<u64>,
     files_calculated: bool,
     files: Vec<PathBuf>,
+    number_of_indices: Option<u64>,
 }
 
 impl Cache for RegistryIndexCache {
@@ -30,6 +31,7 @@ impl Cache for RegistryIndexCache {
             total_size: None,
             files_calculated: false,
             files: Vec::new(),
+            number_of_indices: None,
         }
     }
 
@@ -87,5 +89,35 @@ impl Cache for RegistryIndexCache {
         let _ = self.files(); // prime cache
         self.files.sort();
         &self.files()
+    }
+}
+
+impl RegistryIndexCache {
+    pub(crate) fn number_of_indices(&mut self) -> u64 {
+        if self.number_of_indices.is_some() {
+            self.number_of_indices.unwrap()
+        } else {
+            if !self.path_exists() {
+                self.number_of_indices = Some(0);
+                return 0;
+            }
+
+            let number = std::fs::read_dir(&self.path)
+                .unwrap()
+                // try to filter out FPs in  spurious_files_in_cache test
+                .map(|p| p.unwrap().path())
+                .filter(|p| {
+                    p.is_dir()
+                        && p.file_name()
+                            .unwrap()
+                            .to_os_string()
+                            .into_string()
+                            .unwrap()
+                            .contains("-")
+                })
+                .count() as u64;
+            self.number_of_indices = Some(number);
+            number
+        }
     }
 }
