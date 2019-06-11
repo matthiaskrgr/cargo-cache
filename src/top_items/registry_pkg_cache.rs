@@ -11,7 +11,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::cache::*;
+use crate::cache::registry_pkg_cache;
 use crate::top_items::common::{dir_exists, format_table};
 
 use humansize::{file_size_opts, FileSize};
@@ -581,7 +581,7 @@ mod benchmarks {
             let list_cb: Vec<RgchInfo> = stats_from_file_desc_list(list_fd);
             let is: String = regcache_list_to_string(5, list_cb);
 
-            black_box(is);
+            let _ = black_box(is);
         });
     }
 

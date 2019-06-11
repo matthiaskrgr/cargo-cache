@@ -588,7 +588,7 @@ mod benchmarks {
             let list_cb: Vec<RepoInfo> = stats_from_file_desc_list(list_fd);
             let is: String = chkout_list_to_string(5, list_cb);
 
-            black_box(is);
+            let _ = black_box(is);
         });
     }
 

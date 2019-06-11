@@ -625,7 +625,7 @@ mod benchmarks {
 
         b.iter(|| {
             let x = format!("{}", dir_sizes);
-            black_box(x);
+            let _ = black_box(x);
         });
     }
 

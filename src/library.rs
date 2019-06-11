@@ -700,7 +700,7 @@ mod benchmarks {
         #[allow(unused_must_use)]
         b.iter(|| {
             let x = ccp.to_string();
-            black_box(x);
+            let _ = black_box(x);
         });
     }
 
