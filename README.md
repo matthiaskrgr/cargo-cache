@@ -5,7 +5,7 @@
 [![Latest Version](https://img.shields.io/crates/v/cargo-cache.svg)](https://crates.io/crates/cargo-cache)
 [![libs.rs](https://img.shields.io/badge/libs.rs-gray.svg)](https://lib.rs/crates/cargo-cache)
 
-Display information on the cargo cache `~/.cargo/`. Optional cache pruning.
+Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional cache pruning.
 
 #### Key Features:
 * check the size of the cargo cache and its components (cmd: `cargo cache`)
@@ -39,7 +39,7 @@ Total:                                4.22 GB
     113 bare git repos:             993.72 MB
     9 git repo checkouts:            55.48 MB
 ````
-To learn more about what the directories are for and what can be savely deleted, check `--info`.
+To learn more about the subdirectories inside the cargo home and what can be savely deleted, check `--info`.
 
 
 #### Usage:
@@ -62,7 +62,7 @@ OPTIONS:
     -t, --top-cache-items <N>            List the top N items taking most space in the cache
 ````
 
-#### Show the largest items in the cache:
+#### Show the largest items in the cargo home:
 ````
 cargo cache --top-cache-items 5
 
@@ -139,12 +139,17 @@ Total:                                2.83 GB
     0 git repo checkouts:                0  B
 ````
 
+The crate also works if you override the default location of the cargo home via
+the $CARGO_HOME env var!
+
 #### License:
 
 Copyright 2017-2019 Matthias Krüger
 
+````
 Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 option. All files in the project carrying such notice may not be
 copied, modified, or distributed except according to those terms.
+````
