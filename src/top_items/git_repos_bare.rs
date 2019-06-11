@@ -31,8 +31,8 @@ fn name_from_pb(path: &PathBuf) -> String {
     let filename = path.file_name().unwrap().to_str().unwrap().to_string();
     // filename: yaml-rust-07c50cf5815b3a80
     let mut crate_name = filename.split('-').collect::<Vec<&str>>();
-    crate_name.pop(); // remove the last item
-                      // crate_name: [yaml rust]
+    let _ = crate_name.pop(); // remove the last item
+                              // crate_name: [yaml rust]
     crate_name.join("-")
 }
 
@@ -80,7 +80,7 @@ impl RepoInfo {
             let name_tmp = path.file_name().unwrap().to_str().unwrap().to_string();
             // remove the hash from the path (mdbook-e6b52d90d4246c70 => mdbook)
             let mut tmp_name = name_tmp.split('-').collect::<Vec<_>>();
-            tmp_name.pop(); // remove the hash
+            let _ = tmp_name.pop(); // remove the hash
             name = tmp_name.join("-"); // rejoin with "-"
             size = fs::metadata(&path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))

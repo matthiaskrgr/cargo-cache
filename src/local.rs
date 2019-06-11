@@ -162,7 +162,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     // Get the immediate subdirs of the target/ dir, skip the known ones (rls, package, debug, release)
     // and look how big the remaining stuff is
     #[allow(clippy::filter_map)] // meh
-    let size_other: u64 = std::fs::read_dir(&target_dir)
+    let size_other: u64 = read_dir(&target_dir)
         .unwrap()
         .filter_map(Result::ok)
         .map(|x| x.path())

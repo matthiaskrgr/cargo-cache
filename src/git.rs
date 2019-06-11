@@ -165,7 +165,7 @@ pub(crate) fn git_gc_everything(
     println!("\nRecompressing registries. Please be patient...");
     let mut repo_index = registry_pkg_cache_dir.clone();
     // cd "../index"
-    repo_index.pop();
+    let _ = repo_index.pop();
     repo_index.push("index");
     // gc registries
     let (regs_before, regs_after) = gc_subdirs(&repo_index, dry_run);
@@ -280,7 +280,7 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
     println!("\nFscking registries. Please be patient...");
     let mut repo_index = registry_pkg_cache_dir.clone();
     // cd "../index"
-    repo_index.pop();
+    let _ = repo_index.pop();
     repo_index.push("index");
     // fsck registries
     fsck_subdirs(&repo_index);

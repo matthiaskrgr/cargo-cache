@@ -30,8 +30,8 @@ fn name_from_pb(path: &PathBuf) -> String {
     let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
     // last_item: xz2-0.1.4.crate
     let mut v = last_item.split('-').collect::<Vec<_>>();
-    v.pop(); // remove everything after last "-"
-             // xz2
+    let _ = v.pop(); // remove everything after last "-"
+                     // xz2
     v.join("-") // rejoin remaining elements with "-"
 }
 
@@ -68,7 +68,7 @@ impl RgchInfo {
                 .len();
             let n = path.file_name().unwrap().to_str().unwrap().to_string();
             let mut v = n.split('-').collect::<Vec<_>>();
-            v.pop();
+            let _ = v.pop();
             name = v.join("-");
         } else {
             name = path

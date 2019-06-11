@@ -92,10 +92,10 @@ impl ChkInfo {
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
             let mut p = path.clone();
-            p.pop();
+            let _ = p.pop();
             let name_tmp = p.file_name().unwrap().to_str().unwrap().to_string();
             let mut tmp = name_tmp.split('-').collect::<Vec<_>>();
-            tmp.pop();
+            let _ = tmp.pop();
             name = tmp.join("-");
         } else {
             let name_tmp = path.file_name().unwrap().to_str().unwrap().to_string();

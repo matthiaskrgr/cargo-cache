@@ -11,7 +11,6 @@ use std::fmt;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
-use crate::library;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
@@ -142,7 +141,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 "Total: ",
@@ -153,7 +152,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 &format!("  {} installed binaries: ", self.numb_bins),
@@ -167,7 +166,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 "  Registry: ",
@@ -183,7 +182,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             write!(
                 f,
                 "{}",
-                library::pad_strings(
+                pad_strings(
                     0,
                     45,
                     "    Registry index: ",
@@ -197,7 +196,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             write!(
                 f,
                 "{}",
-                library::pad_strings(
+                pad_strings(
                     0,
                     45,
                     &format!("    {} registry indices: ", &self.total_reg_index_num),
@@ -212,7 +211,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 &format!("    {} crate archives: ", self.numb_reg_cache_entries),
@@ -226,7 +225,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 &format!(
@@ -243,7 +242,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 "  Git db: ",
@@ -257,7 +256,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 &format!("    {} bare git repos: ", self.numb_git_repos_bare_repos),
@@ -271,7 +270,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         write!(
             f,
             "{}",
-            library::pad_strings(
+            pad_strings(
                 0,
                 45,
                 &format!("    {} git repo checkouts: ", self.numb_git_checkouts),

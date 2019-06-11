@@ -18,6 +18,8 @@
     trivial_numeric_casts,
     unreachable_pub,
     unused,
+    unused_qualifications,
+    unused_results,
     rust_2018_idioms
 )]
 // enable additional clippy warnings

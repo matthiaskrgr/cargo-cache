@@ -22,13 +22,13 @@ use walkdir::WalkDir;
 
 #[derive(Debug)]
 struct File<'a> {
-    path: &'a std::path::PathBuf,
-    name: std::string::String,
+    path: &'a PathBuf,
+    name: String,
     size: u64,
 }
 
 #[inline]
-fn path_to_name_stemmed(path: &std::path::PathBuf) -> String {
+fn path_to_name_stemmed(path: &PathBuf) -> String {
     path.file_stem()
         .unwrap()
         .to_os_string()
@@ -37,7 +37,7 @@ fn path_to_name_stemmed(path: &std::path::PathBuf) -> String {
 }
 
 #[inline]
-fn path_to_name_unstemmed(path: &std::path::PathBuf) -> String {
+fn path_to_name_unstemmed(path: &PathBuf) -> String {
     path.file_name()
         .unwrap()
         .to_os_string()
@@ -45,7 +45,7 @@ fn path_to_name_unstemmed(path: &std::path::PathBuf) -> String {
         .unwrap_or_default()
 }
 
-fn binary_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn binary_to_file(path: &PathBuf) -> File<'_> {
     File {
         path: &path,
         name: path_to_name_unstemmed(path),
@@ -55,7 +55,7 @@ fn binary_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn git_checkout_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn git_checkout_to_file(path: &PathBuf) -> File<'_> {
     File {
         path: &path,
         name: path_to_name_unstemmed(path),
@@ -74,7 +74,7 @@ fn git_checkout_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn bare_repo_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn bare_repo_to_file(path: &PathBuf) -> File<'_> {
     File {
         path: &path,
         name: path_to_name_unstemmed(path),
@@ -93,7 +93,7 @@ fn bare_repo_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn registry_pkg_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn registry_pkg_cache_to_file(path: &PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
         path: &path,
@@ -113,7 +113,7 @@ fn registry_pkg_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
     }
 }
 
-fn registry_source_cache_to_file(path: &std::path::PathBuf) -> File<'_> {
+fn registry_source_cache_to_file(path: &PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
         path: &path,
