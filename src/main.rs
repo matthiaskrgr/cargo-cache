@@ -74,6 +74,12 @@ fn main() {
     // we need this in case we call "cargo-cache" binary directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
 
+    // handle hidden "version" subcommand
+    if config.is_present("version") {
+        println!("{}", cli::get_version());
+        process::exit(0);
+    }
+
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 

@@ -11,11 +11,15 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;
 
+pub(crate) fn get_version() -> String {
+    rustc_tools_util::get_version_info!()
+        .to_string()
+        .replacen("cargo-cache ", "", 1)
+}
+
 #[allow(clippy::too_many_lines)]
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
-    let version = rustc_tools_util::get_version_info!()
-        .to_string()
-        .replacen("cargo-cache ", "", 1);
+    let version_string = get_version();
 
     let list_dirs = Arg::with_name("list-dirs")
         .short("l")
@@ -111,9 +115,12 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         SubCommand::with_name("l").about("check local build cache (target) of a rust project");
     //</local>
 
+    // subcommand (version, which is hidden)
+    let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
+
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     let cache_subcmd = SubCommand::with_name("cache")
-        .version(&*version)
+        .version(&*version_string)
         .bin_name("cargo-cache")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
@@ -121,6 +128,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(query_short.clone()) // todo: don't clone
         .subcommand(local.clone()) // don't clone
         .subcommand(local_short.clone()) // don't clone
+        .subcommand(version_subcmd.clone()) // don't clone
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -134,7 +142,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .setting(AppSettings::Hidden);
 
     App::new("cargo-cache")
-        .version(&*version)
+        .version(&*version_string)
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
@@ -143,6 +151,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(query_short)
         .subcommand(local)
         .subcommand(local_short)
+        .subcommand(version_subcmd)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
