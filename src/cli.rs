@@ -289,6 +289,42 @@ ARGS:
 
         assert_eq!(help_desired, help_real);
     }
+
+    #[test]
+    fn all_versions_are_equal() {
+        let v1 = Command::new(bin_path()).arg("-V").output().unwrap().stdout;
+        let v2 = Command::new(bin_path())
+            .arg("cache")
+            .arg("-V")
+            .output()
+            .unwrap()
+            .stdout;
+        let v3 = Command::new(bin_path())
+            .arg("--version")
+            .output()
+            .unwrap()
+            .stdout;
+        let v4 = Command::new(bin_path())
+            .arg("version")
+            .output()
+            .unwrap()
+            .stdout;
+
+        let v1_s = String::from_utf8_lossy(&v1).into_owned();
+        let v2_s = String::from_utf8_lossy(&v2).into_owned();
+        let v3_s = String::from_utf8_lossy(&v3).into_owned();
+        let v4_s = String::from_utf8_lossy(&v4).into_owned();
+
+        assert!(
+            v1_s == v2_s && v2_s == v3_s && v3_s == v4_s,
+            "version outputs do not match!\n v1 {}\nv2 {}\nv3 {}\nv4 {}",
+            v1_s,
+            v2_s,
+            v3_s,
+            v4_s
+        );
+    }
+
 }
 
 #[cfg(all(test, feature = "bench"))]

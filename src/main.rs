@@ -76,7 +76,7 @@ fn main() {
 
     // handle hidden "version" subcommand
     if config.is_present("version") {
-        println!("{}", cli::get_version());
+        println!("cargo-cache {}", cli::get_version());
         process::exit(0);
     }
 
