@@ -239,6 +239,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
     ]);
 
     for chkout in collections_vec.into_iter().take(limit as usize) {
+        #[allow(clippy::integer_division)]
         let average_size = (chkout.total_size / u64::from(chkout.counter))
             .file_size(file_size_opts::DECIMAL)
             .unwrap();

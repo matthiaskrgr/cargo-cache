@@ -216,6 +216,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
     ]);
 
     for regcache in collections_vec.into_iter().take(limit as usize) {
+        #[allow(clippy::integer_division)]
         let average_size = (regcache.total_size / u64::from(regcache.counter))
             .file_size(file_size_opts::DECIMAL)
             .unwrap();

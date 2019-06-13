@@ -231,6 +231,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
     ]);
 
     for regsrc in collections_vec.into_iter().take(limit as usize) {
+        #[allow(clippy::integer_division)]
         let average_size = (regsrc.total_size / u64::from(regsrc.counter))
             .file_size(file_size_opts::DECIMAL)
             .unwrap();

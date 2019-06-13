@@ -224,6 +224,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
     ]);
 
     for repoinfo in collections_vec.into_iter().take(limit as usize) {
+        #[allow(clippy::integer_division)]
         let average_size = (repoinfo.total_size / u64::from(repoinfo.counter))
             .file_size(file_size_opts::DECIMAL)
             .unwrap();
