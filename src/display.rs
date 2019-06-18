@@ -23,7 +23,7 @@ impl TableLine {
     }
 }
 
-pub(crate) fn format_table_2(min_padding_middle: usize, lines: &[TableLine]) -> String {
+pub(crate) fn format_2_row_table(min_padding_middle: usize, lines: &[TableLine]) -> String {
     let total_entries = lines.len();
 
     // get the length of the longest elements

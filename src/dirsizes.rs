@@ -207,7 +207,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
             ),
         ];
 
-        let table_string = format_table_2(2, &lines);
+        let table_string = format_2_row_table(2, &lines);
 
         write!(f, "{}", table_string)?;
 
