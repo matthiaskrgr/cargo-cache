@@ -377,7 +377,6 @@ pub(crate) fn pad_strings(
     formatted_line
 }
 
-
 #[cfg(test)]
 mod libtests {
     use super::*;
