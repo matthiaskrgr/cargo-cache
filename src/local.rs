@@ -61,6 +61,8 @@ fn get_manifest() -> PathBuf {
 }
 
 pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
+    const MIN_PADDING: usize = 6; // for the final formatting of the table
+
     // find the closest manifest, traverse up if neccesary
     let manifest = get_manifest();
 
@@ -101,11 +103,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     }
     output.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
 
-    lines.push(TableLine::new(
-        0,
-        "Total Size: ".to_string(),
-        size_hr,
-    ));
+    lines.push(TableLine::new(0, "Total Size: ".to_string(), size_hr));
 
     let p = &target_dir; // path
     let target_dir_debug = p.clone().join("debug");
@@ -199,7 +197,6 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
         ));
     }
 
-    const MIN_PADDING: usize = 6;
     output.push_str(&format_2_row_table(MIN_PADDING, &lines));
 
     println!("{}", output);

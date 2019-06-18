@@ -342,41 +342,6 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     }
 }
 
-pub(crate) fn pad_strings(
-    indent_lvl: u16,
-    max_line_width: u16,
-    beginning: &str,
-    end: &str,
-) -> String {
-    // hack: add some nicer padding so that "0  B" and "1 MB" aligns
-    let end = if end.ends_with(" B") {
-        end.replace(" B", "  B") // FIXME use regex
-    } else {
-        end.into()
-    };
-
-    let left: u16 = max_line_width + (indent_lvl * 2);
-    #[allow(clippy::cast_possible_truncation)] // very unlikely
-    let right: u16 = beginning.len() as u16;
-    let len_padding = left - right;
-    assert!(
-        len_padding > 0,
-        format!(
-            "len_padding is negative: '{} - {} = {}' ",
-            left, right, len_padding
-        )
-    );
-
-    let mut formatted_line = beginning.to_string();
-
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-    // I tried mittigating via previous assert()
-    formatted_line.push_str(&" ".repeat(len_padding as usize - end.len()));
-    formatted_line.push_str(&end);
-    formatted_line.push_str("\n");
-    formatted_line
-}
-
 #[cfg(test)]
 mod libtests {
     use super::*;
@@ -612,28 +577,6 @@ mod libtests {
         // should be empty now
         let last = iter.next();
         assert!(!last.is_some(), "found another directory?!: '{:?}'", last);
-    }
-
-    #[allow(non_snake_case)]
-    #[test]
-    fn test_pad_strings() {
-        let s1 = pad_strings(1, 9, "hello", "world");
-        assert_eq!(s1, "hello world\n");
-
-        let s2 = pad_strings(2, 9, "hello", "world");
-        assert_eq!(s2, "hello   world\n");
-
-        let s3 = pad_strings(1, 11, "hello", "world");
-        assert_eq!(s3, "hello   world\n");
-
-        let s4 = pad_strings(1, 12, "hello", "world");
-        assert_eq!(s4, "hello    world\n");
-
-        let s5 = pad_strings(2, 13, "hello", "world");
-        assert_eq!(s5, "hello       world\n");
-
-        let s6 = pad_strings(2, 15, "hello", "world");
-        assert_eq!(s6, "hello         world\n");
     }
 
 }
