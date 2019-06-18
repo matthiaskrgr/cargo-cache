@@ -13,6 +13,16 @@ pub(crate) struct TableLine<'a> {
     right_column: &'a str,
 }
 
+impl<'a> TableLine<'a> {
+    fn new(indent_front: usize, left_column: &'a str, right_column: &'a str) -> Self {
+        TableLine {
+            indent_front,
+            left_column,
+            right_column,
+        }
+    }
+}
+
 pub(crate) fn format_table_2(min_padding_middle: usize, lines: &[&TableLine]) -> String {
     let total_entries = lines.len();
 
