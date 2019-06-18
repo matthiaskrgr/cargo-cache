@@ -11,6 +11,7 @@ use std::fmt;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
+use crate::display::*;
 use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
@@ -138,148 +139,78 @@ impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Cargo cache '{}':\n\n", &self.root_path.display())?;
 
-        write!(
-            f,
-            "{}",
-            pad_strings(
+        let lines = vec![
+            TableLine::new(
                 0,
-                45,
-                "Total: ",
-                &self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                &format!("  {} installed binaries: ", self.numb_bins),
-                &self
-                    .total_bin_size
+                "Total: ".to_string(),
+                self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+            ),
+            TableLine::new(
+                1,
+                format!("{} installed binaries: ", self.numb_bins),
+                self.total_bin_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                "  Registry: ",
-                &self
-                    .total_reg_size
+            ),
+            TableLine::new(
+                1,
+                "Registry: ".to_string(),
+                self.total_reg_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        // how many indices do we have?
-        if self.total_reg_index_num == 1 {
-            write!(
-                f,
-                "{}",
-                pad_strings(
-                    0,
-                    45,
-                    "    Registry index: ",
-                    &self
-                        .total_reg_index_size
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap(),
-                )
-            )?;
-        } else {
-            write!(
-                f,
-                "{}",
-                pad_strings(
-                    0,
-                    45,
-                    &format!("    {} registry indices: ", &self.total_reg_index_num),
-                    &self
-                        .total_reg_index_size
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap(),
-                )
-            )?;
-        }
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                &format!("    {} crate archives: ", self.numb_reg_cache_entries),
-                &self
-                    .total_reg_cache_size
+            ),
+            TableLine::new(
+                2,
+                // check how many indices there are
+                match self.total_reg_index_num {
+                    1 => String::from("Registry index: "),
+                    _ => format!("{} registry indices: ", &self.total_reg_index_num),
+                },
+                self.total_reg_index_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                &format!(
-                    "    {} crate source checkouts: ",
-                    self.numb_reg_src_checkouts
-                ),
-                &self
-                    .total_reg_src_size
+            ),
+            TableLine::new(
+                2,
+                format!("{} crate archives: ", self.numb_reg_cache_entries),
+                self.total_reg_cache_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                "  Git db: ",
-                &self
-                    .total_git_db_size
+            ),
+            TableLine::new(
+                2,
+                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts),
+                self.total_reg_src_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                &format!("    {} bare git repos: ", self.numb_git_repos_bare_repos),
-                &self
-                    .total_git_repos_bare_size
+            ),
+            TableLine::new(
+                1,
+                "Git db: ".to_string(),
+                self.total_git_db_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
-
-        write!(
-            f,
-            "{}",
-            pad_strings(
-                0,
-                45,
-                &format!("    {} git repo checkouts: ", self.numb_git_checkouts),
-                &self
-                    .total_git_chk_size
+            ),
+            TableLine::new(
+                2,
+                format!("{} bare git repos: ", self.numb_git_repos_bare_repos),
+                self.total_git_repos_bare_size
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
-            )
-        )?;
+            ),
+            TableLine::new(
+                2,
+                format!("{} git repo checkouts: ", self.numb_git_checkouts),
+                self.total_git_chk_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+        ];
+
+        let table_string = format_table_2(2, &lines);
+
+        write!(f, "{}", table_string)?;
+
         Ok(())
     }
 }

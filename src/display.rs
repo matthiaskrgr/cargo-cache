@@ -7,15 +7,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-pub(crate) struct TableLine<'a> {
+pub(crate) struct TableLine {
     indent_front: usize,
-    left_column: &'a str,
-    right_column: &'a str,
+    left_column: String,
+    right_column: String,
 }
 
-impl<'a> TableLine<'a> {
-    fn new(indent_front: usize, left_column: &'a str, right_column: &'a str) -> Self {
-        TableLine {
+impl TableLine {
+    pub(crate) fn new(indent_front: usize, left_column: String, right_column: String) -> Self {
+        Self {
             indent_front,
             left_column,
             right_column,
@@ -23,7 +23,7 @@ impl<'a> TableLine<'a> {
     }
 }
 
-pub(crate) fn format_table_2(min_padding_middle: usize, lines: &[&TableLine]) -> String {
+pub(crate) fn format_table_2(min_padding_middle: usize, lines: &[TableLine]) -> String {
     let total_entries = lines.len();
 
     // get the length of the longest elements
@@ -60,16 +60,15 @@ pub(crate) fn format_table_2(min_padding_middle: usize, lines: &[&TableLine]) ->
         let indent_front_len = line.indent_front * 2;
         table.push_str(&" ".repeat(indent_front_len));
         // the right column
-        table.push_str(line.left_column);
+        table.push_str(&line.left_column);
         //  max len -(padding + left_column + right_column )   == the amount of spaces needed here
         let spaces = line_length
             - (indent_front_len
                 + line.left_column.len()
                 + min_padding_middle
-                + line.right_column.len())
-            - 1; // -1: the final "\n" we will insert at the end
+                + line.right_column.len());
         table.push_str(&" ".repeat(min_padding_middle + spaces));
-        table.push_str(line.right_column);
+        table.push_str(&line.right_column);
         table.push_str("\n");
     }
 
