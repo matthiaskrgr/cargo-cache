@@ -41,6 +41,7 @@
 mod cache;
 mod cli;
 mod dirsizes;
+mod display;
 mod git;
 mod library;
 mod local;
