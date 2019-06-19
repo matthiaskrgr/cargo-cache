@@ -85,15 +85,15 @@ fn build_and_check_size_test() {
         */
 
     desired_output.push_str(
-        "Total:                         .* MB
-  0 installed binaries:             .*  B
-  Registry:                         .* MB
-    Registry index:                 .* MB
-   .. crate archives:               .* KB
-   .. crate source checkouts:       .* MB
-  Git db:                           .* 0  B
-    0 bare git repos:               .* 0  B
-    0 git repo checkouts:           .* 0  B",
+        "Total:                     .* MB
+  0 installed binaries:         .*  B
+  Registry:                     .* MB
+    Registry index:             .* MB
+   .. crate archives:           .* KB
+   .. crate source checkouts:   .* MB
+  Git db:                       .* 0  B
+    0 bare git repos:           .* 0  B
+    0 git repo checkouts:       .* 0  B",
     );
 
     let regex = Regex::new(&desired_output);
