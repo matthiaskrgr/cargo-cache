@@ -317,15 +317,15 @@ mod libtests {
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total:                                1.94 GB
-  31 installed binaries:            121.21 KB
-  Registry:                           1.94 GB
-    Registry index:                     23  B
-    23445 crate archives:               89  B
-    123909849 crate source checkouts: 1.94 GB
-  Git db:                           156.20 KB
-    37 bare git repos:              121.21 KB
-    8 git repo checkouts:            34.98 KB\n";
+Total:                                    1.94 GB
+  31 installed binaries:                121.21 KB
+  Registry:                               1.94 GB
+    Registry index:                         23  B
+    23445 crate archives:                   89  B
+    123909849 crate source checkouts:     1.94 GB
+  Git db:                               156.20 KB
+    37 bare git repos:                  121.21 KB
+    8 git repo checkouts:                34.98 KB\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -375,15 +375,15 @@ Total:                                1.94 GB
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total:                                6.33 GB
-  69 installed binaries:            640.16 MB
-  Registry:                           1.46 GB
-    Registry index:                     23  B
-    3654 crate archives:            550.86 MB
-    1615 crate source checkouts:    905.60 MB
-  Git db:                             4.23 GB
-    123 bare git repos:             309.61 MB
-    36 git repo checkouts:            3.92 GB\n";
+Total:                               6.33 GB
+  69 installed binaries:           640.16 MB
+  Registry:                          1.46 GB
+    Registry index:                    23  B
+    3654 crate archives:           550.86 MB
+    1615 crate source checkouts:   905.60 MB
+  Git db:                            4.23 GB
+    123 bare git repos:            309.61 MB
+    36 git repo checkouts:           3.92 GB\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -434,15 +434,15 @@ Total:                                6.33 GB
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total:                               14.57 GB
-  0 installed binaries:                  0  B
-  Registry:                          14.57 GB
-    Registry index:                   1.25 GB
-    4 crate archives:                13.04 GB
-    4 crate source checkouts:       268.46 MB
-  Git db:                                0  B
-    0 bare git repos:                    0  B
-    0 git repo checkouts:                0  B\n";
+Total:                           14.57 GB
+  0 installed binaries:              0  B
+  Registry:                      14.57 GB
+    Registry index:               1.25 GB
+    4 crate archives:            13.04 GB
+    4 crate source checkouts:   268.46 MB
+  Git db:                            0  B
+    0 bare git repos:                0  B
+    0 git repo checkouts:            0  B\n";
 
         assert_eq!(output_is, output_should);
     }
@@ -493,15 +493,15 @@ Total:                               14.57 GB
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
-Total:                                   0  B
-  0 installed binaries:                  0  B
-  Registry:                              0  B
-    Registry index:                      0  B
-    0 crate archives:                    0  B
-    0 crate source checkouts:            0  B
-  Git db:                                0  B
-    0 bare git repos:                    0  B
-    0 git repo checkouts:                0  B\n";
+Total:                          0  B
+  0 installed binaries:         0  B
+  Registry:                     0  B
+    Registry index:             0  B
+    0 crate archives:           0  B
+    0 crate source checkouts:   0  B
+  Git db:                       0  B
+    0 bare git repos:           0  B
+    0 git repo checkouts:       0  B\n";
 
         assert_eq!(output_is, output_should);
     }

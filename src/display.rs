@@ -15,6 +15,11 @@ pub(crate) struct TableLine {
 
 impl TableLine {
     pub(crate) fn new(indent_front: usize, left_column: String, right_column: String) -> Self {
+        let mut right_column = right_column;
+        if right_column.ends_with(" B") {
+            right_column = right_column.replace(" B", "  B"); // align with "x xB"
+        }
+
         Self {
             indent_front,
             left_column,
