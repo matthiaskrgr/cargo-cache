@@ -260,15 +260,15 @@ rayon = { version = "1", registry = "my-index" }
         */
 
     desired_output.push_str(
-        "Total:                              .* MB
-  0 installed binaries:                  0  B
-  Registry:                        .* MB
-    2 registry indices:            .* MB
-    .. crate archives:             .* MB
-    .. crate source checkouts:     .* MB
-  Git db:                                0  B
-    0 bare git repos:                    0  B
-    0 git repo checkouts:                0  B",
+        "Total:                .* MB
+  0 installed binaries:               0  B
+  Registry:                    .* MB
+    2 registry indices:        .* MB
+    .. crate archives:         .* MB
+    .. crate source checkouts: .* MB
+  Git db:                             0  B
+    0 bare git repos:                 0  B
+    0 git repo checkouts:             0  B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();
