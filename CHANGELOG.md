@@ -26,12 +26,15 @@ Total:                                4.21 GB
 
 (#44 / #36)
 
-print the number of registry indices
+print the number of registry indices (if > 0)
 --info: make more detailed, add registry index
 query: don't print empty line if no matches were found
 build git2 dependency without default features
 Updated dependencies:
-	git2: 0.8.0 -> 0.9.0
+	git2: 0.8.0 -> 0.9.1
+	rayon: 1.0.3 -> 1.1.0
+	regex 1.1.6 -> 1.1.7
+	walkdir: 2.2.7 -> 2.2.8
 ````
 ## Version 0.2.1 (319bee6)
 ````
