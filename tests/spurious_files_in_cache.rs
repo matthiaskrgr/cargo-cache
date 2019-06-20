@@ -35,6 +35,10 @@ fn spurious_files_in_cache_test() {
     // make sure the build succeeded
     assert!(status.is_ok(), "build of dummy crate did not succeed");
     assert!(
+        status.unwrap().status.success(),
+        "exit status of dummy crate build != 0"
+    );
+    assert!(
         PathBuf::from(&fchp).is_dir(),
         "fake cargo home was not created!"
     );

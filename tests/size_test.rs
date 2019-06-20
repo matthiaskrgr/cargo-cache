@@ -34,6 +34,10 @@ fn build_and_check_size_test() {
     // make sure the build succeeded
     assert!(status.is_ok(), "build of dummy crate did not succeed");
     assert!(
+        status.unwrap().status.success(),
+        "build failed of dummy crate, exit status =! 0"
+    );
+    assert!(
         PathBuf::from(&fchp).is_dir(),
         "fake cargo home was not created!"
     );
