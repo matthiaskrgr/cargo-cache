@@ -15,6 +15,13 @@ pub(crate) struct Pair<T> {
     pub(crate) previous: Option<T>,
 }
 
+#[derive(Clone, Debug)]
+pub(crate) struct FileDesc {
+    pub(crate) path: PathBuf,
+    pub(crate) name: String,
+    pub(crate) size: u64,
+}
+
 pub(crate) fn dir_exists(path: &PathBuf) -> bool {
     // check if a directory exists and print an warning message if not
     if path.exists() {

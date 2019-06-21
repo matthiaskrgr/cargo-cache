@@ -12,17 +12,10 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::registry_pkg_cache;
-use crate::top_items::common::{dir_exists, format_table, Pair};
+use crate::top_items::common::{dir_exists, format_table, FileDesc, Pair};
 
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
-
-#[derive(Clone, Debug)]
-struct FileDesc {
-    path: PathBuf,
-    name: String,
-    size: u64,
-}
 
 #[inline]
 fn name_from_pb(path: &PathBuf) -> String {
