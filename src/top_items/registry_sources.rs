@@ -150,7 +150,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                 previous: None,
             } => {
                 // this should always be first line ever
-                //@TODO assert that its empty
                 // compute line but don't save it
                 let current_size = &current.size;
                 total_size += current_size;
@@ -165,7 +164,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    // @todo assert that regcacheinfo is not empty
                     let current_size = &current.size;
                     total_size += current_size;
                     counter += 1;
@@ -173,7 +171,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                     regcacheinfo = RgSrcInfo::new(&current.path, counter, total_size);
                 } else if current.name != previous.name {
                     // save old line
-                    // todo assert that regcacheinfo is not empty
                     out.push(regcacheinfo);
                     // reset counters
                     counter = 0;
@@ -192,7 +189,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgSrcInfo> {
                 previous: Some(_previous),
             } => {
                 // save old line
-                // todo assert that regcacheinfo is not empty
                 out.push(regcacheinfo);
                 regcacheinfo = RgSrcInfo::new(&PathBuf::from("ERROR 2/err2"), 0, 0);
 

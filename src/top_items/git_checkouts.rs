@@ -157,7 +157,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
                 previous: None,
             } => {
                 // this should always be first line ever
-                // @TODO assert that  chkinfo is empty
                 // compute line but don't save it
                 let current_size = &current.size;
                 total_size += current_size;
@@ -172,7 +171,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    // @TODO assert that chkinfo is not empty
                     let current_size = &current.size;
                     total_size += current_size;
                     counter += 1;
@@ -180,7 +178,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
                     chkinfo = ChkInfo::new(&current.path, counter, total_size);
                 } else if current.name != previous.name {
                     // save old line
-                    // @TODO assert that dbg_line is not empty
                     out.push(chkinfo);
                     // reset counters
                     counter = 0;
@@ -199,7 +196,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
                 previous: Some(_previous),
             } => {
                 // save old line
-                // @TODO assert that ChkInfo is not empty
                 out.push(chkinfo);
                 chkinfo = ChkInfo::new(&PathBuf::from("ERROR 2/err2"), 0, 0); // uninit
 

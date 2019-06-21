@@ -143,7 +143,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RepoInfo> {
                 previous: None,
             } => {
                 // this should always be first line ever
-                // @TODO(assert that repoinfo is empty)
                 // compute line but don't save it
                 let current_size = &current.size;
                 total_size += current_size;
@@ -158,7 +157,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RepoInfo> {
             } => {
                 if current.name == previous.name {
                     // update line but don't save it
-                    // @TODO(assert that repoinfo is not empty)
 
                     let current_size = &current.size;
                     total_size += current_size;
@@ -186,7 +184,6 @@ fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RepoInfo> {
                 previous: Some(_previous),
             } => {
                 // save old line
-                // @TODO assert that repoinfo is not empty
                 out.push(repoinfo);
                 repoinfo = RepoInfo::new(&PathBuf::from("ERROR 2/err2"), 0, 0);
                 // reset counters
