@@ -40,11 +40,11 @@
 )]
 mod cache;
 mod cli;
+mod commands;
 mod dirsizes;
 mod display;
 mod git;
 mod library;
-mod commands;
 mod remove;
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
@@ -60,8 +60,8 @@ use crate::cache::dircache::Cache;
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 
-use crate::commands::{query, local};
 use crate::cache::*;
+use crate::commands::{local, query};
 use crate::git::*;
 use crate::library::*;
 use crate::remove::*;
