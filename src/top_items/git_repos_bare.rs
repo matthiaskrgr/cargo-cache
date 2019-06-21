@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::*;
-use crate::top_items::common::{dir_exists, format_table};
+use crate::top_items::common::{dir_exists, format_table, Pair};
 
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
@@ -109,10 +109,6 @@ fn file_desc_from_path(bare_repos_cache: &mut git_repos_bare::GitRepoCache) -> V
 }
 
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RepoInfo> {
-    struct Pair {
-        current: Option<FileDesc>,
-        previous: Option<FileDesc>,
-    }
     // take our list of file information and calculate the actual stats
     let mut out: Vec<RepoInfo> = Vec::new();
     let mut repoinfo: RepoInfo = RepoInfo::new(&PathBuf::from("ERROR 1/err1"), 0, 0);

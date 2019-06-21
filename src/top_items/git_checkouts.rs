@@ -12,7 +12,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
-use crate::top_items::common::{dir_exists, format_table};
+use crate::top_items::common::{dir_exists, format_table, Pair};
 
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
@@ -123,10 +123,6 @@ fn file_desc_from_path(git_checkouts_cache: &mut git_checkouts::GitCheckoutCache
 
 #[inline]
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<ChkInfo> {
-    struct Pair {
-        current: Option<FileDesc>,
-        previous: Option<FileDesc>,
-    }
     // take our list of file information and calculate the actual stats
     let mut out: Vec<ChkInfo> = Vec::new();
     let mut chkinfo: ChkInfo = ChkInfo::new(&PathBuf::from("ERROR 1/err1"), 0, 0);

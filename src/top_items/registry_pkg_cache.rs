@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::Cache;
 use crate::cache::registry_pkg_cache;
-use crate::top_items::common::{dir_exists, format_table};
+use crate::top_items::common::{dir_exists, format_table, Pair};
 
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
@@ -101,10 +101,6 @@ fn file_desc_list_from_path(
 }
 
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgchInfo> {
-    struct Pair {
-        current: Option<FileDesc>,
-        previous: Option<FileDesc>,
-    }
     // take our list of file information and calculate the actual stats
 
     let mut out: Vec<RgchInfo> = Vec::new();
