@@ -124,11 +124,12 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .bin_name("cargo-cache")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .subcommand(query.clone()) // todo: don't clone
-        .subcommand(query_short.clone()) // todo: don't clone
-        .subcommand(local.clone()) // don't clone
-        .subcommand(local_short.clone()) // don't clone
-        .subcommand(version_subcmd.clone()) // don't clone
+        // todo: remove all these clones once clap allows it
+        .subcommand(query.clone())
+        .subcommand(query_short.clone())
+        .subcommand(local.clone())
+        .subcommand(local_short.clone())
+        .subcommand(version_subcmd.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
