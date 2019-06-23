@@ -78,6 +78,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    let debug = Arg::with_name("debug")
+        .long("debug")
+        .help("print some debug stats")
+        .hidden(true);
+
     // <query>
     let query_order = Arg::with_name("sort")
         .short("s")
@@ -140,6 +145,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&debug)
         .setting(AppSettings::Hidden);
 
     App::new("cargo-cache")
@@ -163,6 +169,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&debug)
         .get_matches()
 }
 

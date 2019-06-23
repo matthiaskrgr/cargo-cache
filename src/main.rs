@@ -55,10 +55,12 @@ mod top_items_summary;
 extern crate test; //hack
 
 use std::process;
+use std::time::SystemTime;
 
 use crate::cache::dircache::Cache;
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
+use walkdir::WalkDir;
 
 use crate::cache::*;
 use crate::commands::{local, query};
@@ -80,6 +82,15 @@ fn main() {
         println!("cargo-cache {}", cli::get_version());
         process::exit(0);
     }
+
+    let debug_mode: bool = config.is_present("debug");
+
+    // if we are in "debug" mode, get the current time
+    let time_started = if debug_mode {
+        Some(SystemTime::now())
+    } else {
+        None
+    };
 
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
@@ -289,5 +300,23 @@ fn main() {
             size_old_human_readable,
             size_diff_format(cache_size_old, cache_size_new, false)
         );
+    }
+
+    if debug_mode {
+        println!("\ndebug:");
+
+        let time_elasped = time_started.unwrap().elapsed().unwrap();
+
+        let cache_root = CargoCachePaths::default().unwrap().cargo_home;
+
+        let wd = WalkDir::new(cache_root.display().to_string());
+        let file_count = wd.into_iter().count();
+        let time_as_milis = time_elasped.as_millis();
+        let time_as_nanos = time_elasped.as_nanos();
+        println!("processed {} files in {} ms", file_count, time_as_milis);
+        let files_per_ms = file_count as u128 / time_as_milis;
+        let ns_per_file = time_as_nanos / file_count as u128;
+        println!("{} files per ms", files_per_ms);
+        println!("{} ns per file", ns_per_file);
     }
 }
