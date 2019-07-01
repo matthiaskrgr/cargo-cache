@@ -110,9 +110,9 @@ impl RegistryIndexCache {
                     p.is_dir()
                         && p.file_name()
                             .unwrap()
-                            .to_os_string()
-                            .into_string()
+                            .to_str()
                             .unwrap()
+                            .to_string()
                             .contains('-')
                 })
                 .count() as u64;

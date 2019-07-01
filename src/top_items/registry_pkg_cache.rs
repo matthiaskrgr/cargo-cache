@@ -64,12 +64,8 @@ impl RgchInfo {
             let _ = v.pop();
             name = v.join("-");
         } else {
-            name = path
-                .file_name()
-                .unwrap()
-                .to_os_string()
-                .into_string()
-                .unwrap();
+            name = path.file_name().unwrap().to_str().unwrap().to_string();
+
             size = 0;
         }
 

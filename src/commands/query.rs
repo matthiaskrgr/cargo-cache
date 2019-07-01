@@ -31,18 +31,18 @@ struct File<'a> {
 fn path_to_name_stemmed(path: &PathBuf) -> String {
     path.file_stem()
         .unwrap()
-        .to_os_string()
-        .into_string()
+        .to_str()
         .unwrap_or_default()
+        .to_string()
 }
 
 #[inline]
 fn path_to_name_unstemmed(path: &PathBuf) -> String {
     path.file_name()
         .unwrap()
-        .to_os_string()
-        .into_string()
+        .to_str()
         .unwrap_or_default()
+        .to_string()
 }
 
 fn binary_to_file(path: &PathBuf) -> File<'_> {

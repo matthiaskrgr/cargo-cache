@@ -19,7 +19,7 @@ use crate::library::*;
 fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
-        Some(name) => name.to_os_string().into_string().unwrap(),
+        Some(name) => name.to_str().unwrap().to_string(),
         None => "<unknown>".to_string(),
     };
     debug_assert_ne!(repo_name, "<unknown>", "unknown repo name: '{:?}'", &path);
@@ -184,7 +184,7 @@ pub(crate) fn git_gc_everything(
 fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
-        Some(name) => name.to_os_string().into_string().unwrap(),
+        Some(name) => name.to_str().unwrap().to_string(),
         None => "<unknown>".to_string(),
     };
     debug_assert_ne!(repo_name, "<unknown>", "unknown repo name: '{:?}'", &path);
