@@ -20,7 +20,30 @@ pub(crate) struct RegistryIndexCache {
     total_size: Option<u64>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    number_of_indices: Option<u64>,
+    //   number_of_indices: Option<u64>,
+}
+
+/// takes the base directory where registry indices are stored in the cargo cache
+/// and returns a vector of `RegistryIndexCache`s
+pub(crate) fn get_registry_indices(path: &PathBuf) -> Vec<RegistryIndexCache> {
+    // earch directory represents a registry index
+    let dirs = std::fs::read_dir(&path)
+        .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
+    // mape the dirs to RegistryIndexCaches and return them as vector
+    #[allow(clippy::filter_map)]
+    dirs.map(|direntry| direntry.unwrap().path())
+        .filter(|p| {
+            p.is_dir()
+                && p.file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_string()
+                    .contains('-')
+        })
+        //.inspect(|p| println!("p: {:?}", p))
+        .map(RegistryIndexCache::new)
+        .collect::<Vec<RegistryIndexCache>>()
 }
 
 impl Cache for RegistryIndexCache {
@@ -31,7 +54,6 @@ impl Cache for RegistryIndexCache {
             total_size: None,
             files_calculated: false,
             files: Vec::new(),
-            number_of_indices: None,
         }
     }
 
@@ -89,35 +111,5 @@ impl Cache for RegistryIndexCache {
         let _ = self.files(); // prime cache
         self.files.sort();
         &self.files()
-    }
-}
-
-impl RegistryIndexCache {
-    pub(crate) fn number_of_indices(&mut self) -> u64 {
-        if self.number_of_indices.is_some() {
-            self.number_of_indices.unwrap()
-        } else {
-            if !self.path_exists() {
-                self.number_of_indices = Some(0);
-                return 0;
-            }
-
-            let number = std::fs::read_dir(&self.path)
-                .unwrap()
-                // try to filter out FPs in  spurious_files_in_cache test
-                .map(|p| p.unwrap().path())
-                .filter(|p| {
-                    p.is_dir()
-                        && p.file_name()
-                            .unwrap()
-                            .to_str()
-                            .unwrap()
-                            .to_string()
-                            .contains('-')
-                })
-                .count() as u64;
-            self.number_of_indices = Some(number);
-            number
-        }
     }
 }

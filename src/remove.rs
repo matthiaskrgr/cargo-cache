@@ -125,7 +125,7 @@ pub(crate) fn remove_dir_via_cmdline(
     size_changed: &mut bool,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    registry_index_cache: &mut registry_index::RegistryIndexCache,
+    registry_index_caches: &mut Vec<registry_index::RegistryIndexCache>,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> Result<(), (ErrorKind, String)> {
@@ -264,9 +264,19 @@ pub(crate) fn remove_dir_via_cmdline(
     }
 
     if rm_registry_index {
-        let size = registry_index_cache.total_size();
-        size_removed += size;
-        rm(&ccd.registry_index, dry_run, size_changed, Some(size))?
+        // sum the sizes of the separate indices
+        let size_of_all_indices: u64 = registry_index_caches
+            .iter_mut()
+            .fold(0_u64, |sum, cache| sum + cache.total_size());
+
+        size_removed += size_of_all_indices;
+        // @TODO only remove specified index
+        rm(
+            &ccd.registry_index,
+            dry_run,
+            size_changed,
+            Some(size_of_all_indices),
+        )?
     }
 
     if dry_run {

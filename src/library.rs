@@ -17,7 +17,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
@@ -25,7 +25,7 @@ pub(crate) struct DirInfo {
     pub(crate) file_number: u64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct CargoCachePaths {
     pub(crate) cargo_home: PathBuf,
     pub(crate) bin_dir: PathBuf,

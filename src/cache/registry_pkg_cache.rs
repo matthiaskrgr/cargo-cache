@@ -74,15 +74,13 @@ impl Cache for RegistryCache {
             if self.path_exists() {
                 let mut collection = Vec::new();
 
-                let crate_list = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| {
-                        panic!("Failed to read directory (crate list): '{:?}'", &self.path)
-                    })
-                    .map(|cratepath| cratepath.unwrap().path())
-                    .collect::<Vec<PathBuf>>();
                 // need to take 2 levels into account
-                let mut both_levels_vec: Vec<PathBuf> = Vec::new();
-                for repo in crate_list.iter().filter(|repo| repo.is_dir()) {
+                let mut both_levels_vec: Vec<PathBuf> = Vec::new(); // @FIXME
+                for repo in std::fs::read_dir(&self.path)
+                    .unwrap()
+                    .map(|p| p.unwrap().path())
+                    .filter(|repo| repo.is_dir())
+                {
                     for i in fs::read_dir(&repo)
                         .unwrap_or_else(|_| {
                             panic!("Failed to read directory (repo): '{:?}'", &self.path)

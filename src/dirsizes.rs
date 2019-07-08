@@ -42,7 +42,7 @@ impl<'a> DirSizes<'a> {
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,
         bare_repos_cache: &mut git_repos_bare::GitRepoCache,
         registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
-        registry_index_cache: &mut registry_index::RegistryIndexCache,
+        registry_index_caches: &mut Vec<registry_index::RegistryIndexCache>,
         registry_sources_cache: &mut registry_sources::RegistrySourceCache,
         ccd: &'a CargoCachePaths,
     ) -> Self {
@@ -65,7 +65,11 @@ impl<'a> DirSizes<'a> {
         ) = rayon::join(
             || {
                 rayon::join(
-                    || registry_index_cache.total_size(),
+                    || {
+                        registry_index_caches
+                            .iter_mut()
+                            .fold(0_u64, |sum, cache| sum + cache.total_size())
+                    },
                     || {
                         rayon::join(
                             || (bin_cache.total_size(), bin_cache.number_of_files()),
@@ -115,21 +119,21 @@ impl<'a> DirSizes<'a> {
 
         let total_size = total_reg_size + total_git_db_size + total_bin_size;
         Self {
-            total_size,                           // total size of cargo root dir
-            numb_bins,                            // number of binaries found
-            total_bin_size,                       // total size of binaries found
-            total_reg_size,                       // registry size
-            total_git_db_size,                    // size of bare repos and checkouts combined
-            total_git_repos_bare_size,            // git db size
-            numb_git_repos_bare_repos,            // number of cloned repos
-            numb_git_checkouts,                   // number of checked out repos
-            total_git_chk_size,                   // git checkout size
-            total_reg_cache_size,                 // registry cache size
-            total_reg_src_size,                   // registry sources size
+            total_size,                                              // total size of cargo root dir
+            numb_bins,                                               // number of binaries found
+            total_bin_size,                                          // total size of binaries found
+            total_reg_size,                                          // registry size
+            total_git_db_size,         // size of bare repos and checkouts combined
+            total_git_repos_bare_size, // git db size
+            numb_git_repos_bare_repos, // number of cloned repos
+            numb_git_checkouts,        // number of checked out repos
+            total_git_chk_size,        // git checkout size
+            total_reg_cache_size,      // registry cache size
+            total_reg_src_size,        // registry sources size
             total_reg_index_size: reg_index_size, // registry index size
-            total_reg_index_num: registry_index_cache.number_of_indices(), // number of indices //@TODO parallelize like the rest
-            numb_reg_cache_entries: total_reg_cache_entries, // number of source archives
-            numb_reg_src_checkouts,                          // number of source checkouts
+            total_reg_index_num: registry_index_caches.len() as u64, // number  of indices //@TODO parallelize like the rest
+            numb_reg_cache_entries: total_reg_cache_entries,         // number of source archives
+            numb_reg_src_checkouts,                                  // number of source checkouts
             root_path,
         }
     }
