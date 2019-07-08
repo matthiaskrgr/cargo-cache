@@ -23,3 +23,16 @@ pub(crate) trait Cache {
     // list of files of the cache, sorted
     fn files_sorted(&mut self) -> &[PathBuf];
 }
+
+/// get the name of a cache directory from a path.
+/// if the full path is bla/github.com-1ecc6299db9ec823, we return github.com
+pub(crate) fn get_cache_name(path: &PathBuf) -> String {
+    // save only the last path element bla/github.com-1ecc6299db9ec823 -> github.com-1ecc6299db9ec823
+    let file_name = path.file_name();
+    let last = file_name.unwrap().to_str().unwrap().to_string();
+    let mut v = last.split('-').collect::<Vec<_>>();
+    // remove the hash
+    let _ = v.pop();
+    // recombine as String
+    v.join("-")
+}

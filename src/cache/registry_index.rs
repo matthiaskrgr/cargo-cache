@@ -10,10 +10,224 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::Cache;
+use crate::cache::dircache::{get_cache_name, Cache};
 
 use rayon::iter::*;
 use walkdir::WalkDir;
+
+/// describes a single index of a crate registry index
+pub(crate) struct RegistryIndex {
+    /// the name of the index
+    name: String,
+    /// the path of the root dir of the index, this is uniqe
+    path: PathBuf,
+    /// total size of the index, computed on-demand
+    size: Option<u64>,
+    /// number of files of the cache
+    number_of_files: Option<usize>,
+    /// flag to check if we have already calculated the files
+    files_calculated: bool, // TODO: make this Option<Vec<PathBuf>>
+    /// list of files contained in the index
+    files: Vec<PathBuf>,
+}
+
+impl RegistryIndex {
+    /// create a new empty `RegistryIndex`
+    fn new(path: PathBuf) -> Self {
+        RegistryIndex {
+            name: get_cache_name(&path),
+            path,
+            size: None,
+            number_of_files: None,
+            files_calculated: false,
+            files: vec![],
+        }
+    }
+
+    /// check if the path is still present
+    #[inline]
+    fn path_exists(&self) -> bool {
+        self.path.exists()
+    }
+
+    /// invalidate the cache
+    #[inline]
+    fn invalidate(&mut self) {
+        self.size = None;
+        self.files_calculated = false;
+        self.number_of_files = None;
+        self.files = vec![];
+    }
+
+    fn total_size(&mut self) -> u64 {
+        match self.size {
+            Some(size) => size,
+            None => {
+                if self.path.is_dir() {
+                    // get the size of all files in path https://news.ycombinator.com/https://news.ycombinator.com/dir
+                    let total_size = self
+                        .files()
+                        .par_iter()
+                        .filter(|f| f.is_file())
+                        .map(|f| {
+                            fs::metadata(f)
+                                .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
+                                .len()
+                        })
+                        .sum();
+                    self.size = Some(total_size);
+                    total_size
+                } else {
+                    0
+                }
+            }
+        }
+    }
+
+    // return a slice of files belonging to this cache
+    fn files(&mut self) -> &[PathBuf] {
+        if self.files_calculated {
+            &self.files
+        } else {
+            if self.path_exists() {
+                let walkdir = WalkDir::new(self.path.display().to_string());
+                let vec = walkdir
+                    .into_iter()
+                    .map(|direntry| direntry.unwrap().into_path())
+                    .collect::<Vec<PathBuf>>();
+
+                self.number_of_files = Some(vec.len());
+
+                self.files = vec;
+                self.files_calculated = true;
+            } else {
+                self.files = Vec::new();
+                self.number_of_files = Some(0);
+            }
+            &self.files
+        }
+    }
+
+    fn number_of_files(&mut self) -> usize {
+        match self.number_of_files {
+            Some(number) => number,
+            None => {
+                // prime the cache
+                let _ = self.files();
+                match self.number_of_files {
+                    Some(n) => n,
+                    None => {
+                        unreachable!();
+                    }
+                }
+            }
+        }
+    }
+
+    // sort the saved files and return them
+    fn files_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.files(); // prime cache
+        self.files.sort();
+        &self.files()
+    }
+}
+
+pub(crate) struct RegistryIndicesCache {
+    /// root path of the cache
+    path: PathBuf,
+    /// list of indices (from alternative registries or so)
+    indices: Vec<RegistryIndex>,
+    /// number of indices found
+    number_of_indices: usize,
+    /// total size of all indices combined
+    total_size: Option<u64>,
+    /// number of files of all indices combined
+    total_number_of_files: Option<usize>,
+}
+
+impl RegistryIndicesCache {
+    /// create a new empty RegistryIndexCache
+    fn new(path: PathBuf) -> Self {
+        let indices_dirs = std::fs::read_dir(&path)
+            .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
+        // map the dirs to RegistryIndexCaches and return them as vector
+        #[allow(clippy::filter_map)]
+        let indices = indices_dirs
+            .map(|direntry| direntry.unwrap().path())
+            .filter(|p| {
+                p.is_dir()
+                    && p.file_name()
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .to_string()
+                        .contains('-')
+            })
+            //.inspect(|p| println!("p: {:?}", p))
+            .map(RegistryIndex::new)
+            .collect::<Vec<RegistryIndex>>();
+
+        Self {
+            path,
+            number_of_indices: indices.len(),
+            indices,
+            total_number_of_files: None,
+            total_size: None,
+        }
+    }
+
+    fn number_of_indices(&mut self) -> usize {
+        self.indices.len()
+    }
+
+    // total size of all indices combined
+    fn total_size(&mut self) -> u64 {
+        match self.total_size {
+            Some(size) => size,
+            None => {
+                let mut total_size = 0;
+                for index in &mut self.indices {
+                    total_size += index.total_size();
+                }
+                self.total_size = Some(total_size);
+                total_size
+            }
+        }
+    }
+
+    fn total_number_of_files(&mut self) -> usize {
+        match self.total_number_of_files {
+            Some(number) => number,
+            None => {
+                let mut total = 0;
+                self.indices
+                    .iter_mut()
+                    .for_each(|index| total += index.total_size());
+
+                total as usize
+            }
+        }
+    }
+
+    fn invalidate(&mut self) {
+        self.indices.iter_mut().for_each(|index| index.invalidate());
+    }
+
+    fn files(&mut self) -> Vec<PathBuf> {
+        let mut all_files = Vec::new();
+        for index in &mut self.indices {
+            all_files.extend(index.files().to_vec());
+        }
+
+        all_files
+    }
+
+    fn files_sorted(&mut self) -> Vec<PathBuf> {
+        let mut files_sorted = self.files();
+        files_sorted.sort();
+        files_sorted
+    }
+}
 
 pub(crate) struct RegistryIndexCache {
     path: PathBuf,
