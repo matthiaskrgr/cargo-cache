@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::Cache;
+use crate::cache::dircache::{Cache, RegCache};
 use crate::cache::*;
 use crate::library::*;
 
@@ -125,7 +125,7 @@ pub(crate) fn remove_dir_via_cmdline(
     size_changed: &mut bool,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    registry_index_caches: &mut Vec<registry_index::RegistryIndexCache>,
+    registry_index_caches: &mut registry_index::RegistryIndicesCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> Result<(), (ErrorKind, String)> {
@@ -265,9 +265,7 @@ pub(crate) fn remove_dir_via_cmdline(
 
     if rm_registry_index {
         // sum the sizes of the separate indices
-        let size_of_all_indices: u64 = registry_index_caches
-            .iter_mut()
-            .fold(0_u64, |sum, cache| sum + cache.total_size());
+        let size_of_all_indices: u64 = registry_index_caches.total_size();
 
         size_removed += size_of_all_indices;
         // @TODO only remove specified index

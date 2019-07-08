@@ -57,7 +57,7 @@ extern crate test; //hack
 use std::process;
 use std::time::SystemTime;
 
-use crate::cache::dircache::Cache;
+use crate::cache::dircache::{Cache, RegCache};
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
@@ -126,8 +126,8 @@ fn main() {
 
     let p2 = CargoCachePaths::default().unwrap(); //@TODO remove this
 
-    let mut registry_index_caches: Vec<registry_index::RegistryIndexCache> =
-        registry_index::get_registry_indices(&p2.registry_index);
+    let mut registry_index_caches: registry_index::RegistryIndicesCache =
+        registry_index::RegistryIndicesCache::new(p2.registry_index);
 
     if config.is_present("top-cache-items") {
         let limit =
@@ -289,9 +289,7 @@ fn main() {
         checkouts_cache.invalidate();
         bare_repos_cache.invalidate();
         registry_pkg_cache.invalidate();
-        registry_index_caches
-            .iter_mut()
-            .for_each(|cache| cache.invalidate());
+        registry_index_caches.invalidate();
         //registry_index_cache.invalidate();
         registry_sources_cache.invalidate();
 

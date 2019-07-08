@@ -24,6 +24,22 @@ pub(crate) trait Cache {
     fn files_sorted(&mut self) -> &[PathBuf];
 }
 
+pub(crate) trait RegCache {
+    // creates a new cache object
+    fn new(path: PathBuf) -> Self;
+    // checks if the path to the directory of an object exists
+    // fn path_exists(&self) -> bool;
+    // invalidates the cache
+    fn invalidate(&mut self);
+    // total size of the cache
+    fn total_size(&mut self) -> u64;
+    // list of files of the cache
+    fn files(&mut self) -> Vec<PathBuf>;
+    // list of files of the cache, sorted
+    fn files_sorted(&mut self) -> Vec<PathBuf>;
+    // number of files in total
+}
+
 /// get the name of a cache directory from a path.
 /// if the full path is bla/github.com-1ecc6299db9ec823, we return github.com
 pub(crate) fn get_cache_name(path: &PathBuf) -> String {
