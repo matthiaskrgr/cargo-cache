@@ -40,6 +40,43 @@ pub(crate) trait RegCache {
     // number of files in total
 }
 
+/// this is a super cache that is used to hold and access multiple multiple subcaches
+/// example: SuperCache: RegistryIndices, SubCache: RegistryIndex
+pub(crate) trait SuperCache {
+    /// creates a new supercache object
+    fn new(path: PathBuf) -> Self;
+
+    /// invalidates all contained subcaches
+    fn invalidate(&mut self);
+    /// total size of the cache
+    fn files(&mut self) -> Vec<PathBuf>;
+    /// list of files of the cache, sorted
+    fn files_sorted(&mut self) -> Vec<PathBuf>;
+    /// number of files in total
+    fn total_size(&mut self) -> u64;
+    /// number of referenced indices (number of subcaches)
+    fn number_of_indices(&mut self) -> usize;
+    /// total number of files over all subcaches
+    fn total_number_of_files(&mut self) -> usize;
+}
+
+pub(crate) trait SubCache {
+    /// create a new subcache
+    fn new(path: PathBuf) -> Self;
+    /// check if the root path of the Cache exists
+    fn path_exists(&self) -> bool;
+    /// invalidates the cache
+    fn invalidate(&mut self);
+    /// total size of the cache
+    fn total_size(&mut self) -> u64;
+    /// list of files contained in the cache
+    fn files(&mut self) -> &[PathBuf];
+    /// number of files in the cache
+    fn number_of_files(&mut self) -> usize;
+    /// sorted list of the files
+    fn files_sorted(&mut self) -> &[PathBuf];
+}
+
 /// get the name of a cache directory from a path.
 /// if the full path is bla/github.com-1ecc6299db9ec823, we return github.com
 pub(crate) fn get_cache_name(path: &PathBuf) -> String {

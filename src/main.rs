@@ -57,7 +57,7 @@ extern crate test; //hack
 use std::process;
 use std::time::SystemTime;
 
-use crate::cache::dircache::{Cache, RegCache};
+use crate::cache::dircache::{Cache, SuperCache};
 use clap::value_t;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;

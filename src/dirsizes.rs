@@ -10,7 +10,7 @@
 use std::fmt;
 
 use crate::cache::dircache::Cache;
-use crate::cache::dircache::RegCache;
+use crate::cache::dircache::SuperCache;
 
 use crate::cache::*;
 use crate::display::*;

@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::{get_cache_name, RegCache};
+use crate::cache::dircache::{get_cache_name, SubCache, SuperCache};
 
 use rayon::iter::*;
 use walkdir::WalkDir;
@@ -31,7 +31,7 @@ pub(crate) struct RegistryIndex {
     files: Vec<PathBuf>,
 }
 
-impl RegistryIndex {
+impl SubCache for RegistryIndex {
     /// create a new empty `RegistryIndex`
     fn new(path: PathBuf) -> Self {
         RegistryIndex {
@@ -146,7 +146,7 @@ pub(crate) struct RegistryIndicesCache {
     total_number_of_files: Option<usize>,
 }
 
-impl RegCache for RegistryIndicesCache {
+impl SuperCache for RegistryIndicesCache {
     /// create a new empty RegistryIndexCache
     fn new(path: PathBuf) -> Self {
         let indices_dirs = std::fs::read_dir(&path)
@@ -210,14 +210,11 @@ impl RegCache for RegistryIndicesCache {
             }
         }
     }
-}
-
-impl RegistryIndicesCache {
-    pub(crate) fn number_of_indices(&mut self) -> usize {
+    fn number_of_indices(&mut self) -> usize {
         self.indices.len()
     }
 
-    pub(crate) fn total_number_of_files(&mut self) -> usize {
+    fn total_number_of_files(&mut self) -> usize {
         match self.total_number_of_files {
             Some(number) => number,
             None => {
