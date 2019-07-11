@@ -210,7 +210,7 @@ impl SuperCache for RegistryIndicesCache {
             }
         }
     }
-    fn number_of_indices(&mut self) -> usize {
+    fn number_of_items(&mut self) -> usize {
         self.indices.len()
     }
 

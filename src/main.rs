@@ -115,10 +115,9 @@ fn main() {
     let mut bin_cache = bin::BinaryCache::new(p.bin_dir);
     let mut checkouts_cache = git_checkouts::GitCheckoutCache::new(p.git_checkouts);
     let mut bare_repos_cache = git_repos_bare::GitRepoCache::new(p.git_repos_bare);
-    println!("REGISTRY pkg CACHE: {:?}", p.registry_pkg_cache);
 
-    let mut registry_pkg_cache =
-        registry_pkg_cache::RegistryCache::new(p.registry_pkg_cache.clone());
+    let mut registry_pkgs_cache =
+        registry_pkg_cache::RegistryPkgCaches::new(p.registry_pkg_cache.clone());
 
     //let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
 
@@ -141,7 +140,7 @@ fn main() {
                     &mut bin_cache,
                     &mut checkouts_cache,
                     &mut bare_repos_cache,
-                    &mut registry_pkg_cache,
+                    &mut registry_pkgs_cache,
                     /* &mut registry_index_cache, */
                     &mut registry_sources_cache,
                 )
@@ -162,7 +161,7 @@ fn main() {
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
-            &mut registry_pkg_cache,
+            &mut registry_pkgs_cache,
             &mut registry_sources_cache,
         );
 
@@ -185,7 +184,7 @@ fn main() {
         &mut bin_cache,
         &mut checkouts_cache,
         &mut bare_repos_cache,
-        &mut registry_pkg_cache,
+        &mut registry_pkgs_cache,
         &mut registry_index_caches,
         &mut registry_sources_cache,
         &cargo_cache,
@@ -208,7 +207,7 @@ fn main() {
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_index_caches,
-            &mut registry_pkg_cache,
+            &mut registry_pkgs_cache,
             &mut registry_sources_cache,
         ) {
             eprintln!("{}", msg);
@@ -288,7 +287,7 @@ fn main() {
         bin_cache.invalidate();
         checkouts_cache.invalidate();
         bare_repos_cache.invalidate();
-        registry_pkg_cache.invalidate();
+        registry_pkgs_cache.invalidate();
         registry_index_caches.invalidate();
         //registry_index_cache.invalidate();
         registry_sources_cache.invalidate();
@@ -298,7 +297,7 @@ fn main() {
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
-            &mut registry_pkg_cache,
+            &mut registry_pkgs_cache,
             &mut registry_index_caches,
             &mut registry_sources_cache,
             &cargo_cache,

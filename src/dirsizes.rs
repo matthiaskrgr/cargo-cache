@@ -43,7 +43,7 @@ impl<'a> DirSizes<'a> {
         bin_cache: &mut bin::BinaryCache,
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,
         bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-        registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+        registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
         registry_index_caches: &mut registry_index::RegistryIndicesCache,
         registry_sources_cache: &mut registry_sources::RegistrySourceCache,
         ccd: &'a CargoCachePaths,
@@ -94,7 +94,7 @@ impl<'a> DirSizes<'a> {
                             || {
                                 (
                                     registry_pkg_cache.total_size(),
-                                    registry_pkg_cache.number_of_files(),
+                                    registry_pkg_cache.total_number_of_files(),
                                 )
                             },
                             || {
@@ -129,7 +129,7 @@ impl<'a> DirSizes<'a> {
             total_reg_cache_size,                 // registry cache size
             total_reg_src_size,                   // registry sources size
             total_reg_index_size: reg_index_size, // registry index size
-            total_reg_index_num: registry_index_caches.number_of_indices() as u64, // number  of indices //@TODO parallelize like the rest
+            total_reg_index_num: registry_index_caches.number_of_items() as u64, // number  of indices //@TODO parallelize like the rest
             numb_reg_cache_entries: total_reg_cache_entries, // number of source archives
             numb_reg_src_checkouts,                          // number of source checkouts
             root_path,

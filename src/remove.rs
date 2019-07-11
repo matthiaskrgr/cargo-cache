@@ -126,7 +126,7 @@ pub(crate) fn remove_dir_via_cmdline(
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_index_caches: &mut registry_index::RegistryIndicesCache,
-    registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+    registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> Result<(), (ErrorKind, String)> {
     // @TODO the passing of the cache is really a mess here... :(
@@ -258,7 +258,7 @@ pub(crate) fn remove_dir_via_cmdline(
     }
 
     if rm_registry_crate_cache {
-        let size = registry_pkg_cache.total_size();
+        let size = registry_pkgs_cache.total_size();
         size_removed += size;
         rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?
     }

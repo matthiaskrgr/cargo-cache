@@ -38,8 +38,8 @@ pub(crate) trait SuperCache {
     fn files_sorted(&mut self) -> Vec<PathBuf>;
     /// number of files in total
     fn total_size(&mut self) -> u64;
-    /// number of referenced indices (number of subcaches)
-    fn number_of_indices(&mut self) -> usize;
+    /// number of subcaches
+    fn number_of_items(&mut self) -> usize;
     /// total number of files over all subcaches
     fn total_number_of_files(&mut self) -> usize;
 }

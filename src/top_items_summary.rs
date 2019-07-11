@@ -22,7 +22,7 @@ pub(crate) fn get_top_crates(
     mut bin_cache: &mut bin::BinaryCache,
     mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    mut registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     mut registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) -> String {
     let (((reg_src, reg_cache), (bare_repos, repo_checkouts)), binaries) = rayon::join(
@@ -41,7 +41,7 @@ pub(crate) fn get_top_crates(
                             registry_pkg_cache_stats(
                                 &ccd.registry_pkg_cache,
                                 limit,
-                                &mut registry_pkg_cache,
+                                &mut registry_pkg_caches,
                             )
                         },
                     )

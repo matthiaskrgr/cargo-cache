@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::Cache;
+use crate::cache::dircache::{Cache, SuperCache};
 use crate::cache::*;
 
 use clap::ArgMatches;
@@ -146,7 +146,7 @@ pub(crate) fn run_query(
     bin_cache: &mut bin::BinaryCache,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    registry_pkg_cache: &mut registry_pkg_cache::RegistryCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_cache: &mut registry_sources::RegistrySourceCache,
 ) {
     let sorting = query_config.value_of("sort");
@@ -185,8 +185,8 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    let mut registry_pkg_cache_matches: Vec<_> = registry_pkg_cache
-        .files()
+    let files = registry_pkg_cache.files(); //@TODO fixme?
+    let mut registry_pkg_cache_matches: Vec<_> = files
         .iter()
         .map(|path| registry_pkg_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
