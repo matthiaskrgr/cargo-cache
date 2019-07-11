@@ -25,7 +25,7 @@ pub(crate) trait Cache {
 }
 
 /// this is a super cache that is used to hold and access multiple multiple subcaches
-/// example: SuperCache: RegistryIndices, SubCache: RegistryIndex
+/// example: `SuperCache`: `RegistryIndices`, `SubCache`: `RegistryIndex`
 pub(crate) trait SuperCache {
     /// creates a new supercache object
     fn new(path: PathBuf) -> Self;

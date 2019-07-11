@@ -34,7 +34,7 @@ pub(crate) struct RegistryIndex {
 impl SubCache for RegistryIndex {
     /// create a new empty `RegistryIndex`
     fn new(path: PathBuf) -> Self {
-        RegistryIndex {
+        Self {
             name: get_cache_name(&path),
             path,
             size: None,
@@ -64,7 +64,7 @@ impl SubCache for RegistryIndex {
             Some(size) => size,
             None => {
                 if self.path.is_dir() {
-                    // get the size of all files in path https://news.ycombinator.com/https://news.ycombinator.com/dir
+                    // get the size of all files in path dir
                     let total_size = self
                         .files()
                         .par_iter()

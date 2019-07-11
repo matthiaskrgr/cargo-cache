@@ -136,7 +136,7 @@ impl SubCache for RegistryPkgCache {
         &self.files()
     }
 }
-/// holds several RegistryPkgCaches (supercache)
+/// holds several `RegistryPkgCaches` (supercache)
 pub(crate) struct RegistryPkgCaches {
     /// root path of the cache
     path: PathBuf,
