@@ -45,7 +45,7 @@ impl<'a> DirSizes<'a> {
         bare_repos_cache: &mut git_repos_bare::GitRepoCache,
         registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
         registry_index_caches: &mut registry_index::RegistryIndicesCache,
-        registry_sources_cache: &mut registry_sources::RegistrySourceCache,
+        registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
         ccd: &'a CargoCachePaths,
     ) -> Self {
         #[allow(clippy::type_complexity)]
@@ -99,8 +99,9 @@ impl<'a> DirSizes<'a> {
                             },
                             || {
                                 (
-                                    registry_sources_cache.total_size(),
-                                    registry_sources_cache.number_of_files_at_depth_2(),
+                                    registry_sources_caches.total_size(),
+                                    registry_sources_caches
+                                        .total_number_of_source_checkout_folders(),
                                 )
                             },
                         )

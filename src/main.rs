@@ -121,7 +121,8 @@ fn main() {
 
     //let mut registry_index_cache = registry_index::RegistryIndexCache::new(p.registry_index);
 
-    let mut registry_sources_cache = registry_sources::RegistrySourceCache::new(p.registry_sources);
+    let mut registry_sources_caches =
+        registry_sources::RegistrySourceCaches::new(p.registry_sources);
 
     let p2 = CargoCachePaths::default().unwrap(); //@TODO remove this
 
@@ -142,7 +143,7 @@ fn main() {
                     &mut bare_repos_cache,
                     &mut registry_pkgs_cache,
                     /* &mut registry_index_cache, */
-                    &mut registry_sources_cache,
+                    &mut registry_sources_caches,
                 )
             );
         }
@@ -162,7 +163,7 @@ fn main() {
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
-            &mut registry_sources_cache,
+            &mut registry_sources_caches,
         );
 
         process::exit(0);
@@ -186,7 +187,7 @@ fn main() {
         &mut bare_repos_cache,
         &mut registry_pkgs_cache,
         &mut registry_index_caches,
-        &mut registry_sources_cache,
+        &mut registry_sources_caches,
         &cargo_cache,
     );
 
@@ -208,7 +209,7 @@ fn main() {
             &mut bare_repos_cache,
             &mut registry_index_caches,
             &mut registry_pkgs_cache,
-            &mut registry_sources_cache,
+            &mut registry_sources_caches,
         ) {
             eprintln!("{}", msg);
             process::exit(1);
@@ -290,7 +291,7 @@ fn main() {
         registry_pkgs_cache.invalidate();
         registry_index_caches.invalidate();
         //registry_index_cache.invalidate();
-        registry_sources_cache.invalidate();
+        registry_sources_caches.invalidate();
 
         // and requery it to let it do its thing
         let cache_size_new = dirsizes::DirSizes::new(
@@ -299,7 +300,7 @@ fn main() {
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_index_caches,
-            &mut registry_sources_cache,
+            &mut registry_sources_caches,
             &cargo_cache,
         )
         .total_size;

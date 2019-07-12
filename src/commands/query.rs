@@ -147,7 +147,7 @@ pub(crate) fn run_query(
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
-    registry_sources_cache: &mut registry_sources::RegistrySourceCache,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) {
     let sorting = query_config.value_of("sort");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
@@ -192,8 +192,8 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    let mut registry_source_cache_matches: Vec<_> = registry_sources_cache
-        .checkout_folders()
+    let mut registry_source_caches_matches: Vec<_> = registry_sources_caches
+        .total_checkout_folders()
         .iter()
         .map(|path| registry_source_cache_to_file(&path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
@@ -263,10 +263,10 @@ pub(crate) fn run_query(
             }
 
             // registry source
-            if !registry_source_cache_matches.is_empty() {
-                sort_files_by_name(&mut registry_source_cache_matches);
+            if !registry_source_caches_matches.is_empty() {
+                sort_files_by_name(&mut registry_source_caches_matches);
                 output.push_str("\nRegistry source cache sorted by name:\n");
-                registry_source_cache_matches.iter().for_each(|b| {
+                registry_source_caches_matches.iter().for_each(|b| {
                     let size = if hr_size {
                         b.size.file_size(&humansize_opts).unwrap()
                     } else {
@@ -335,10 +335,10 @@ pub(crate) fn run_query(
             }
 
             // registry source
-            if !registry_source_cache_matches.is_empty() {
-                sort_files_by_size(&mut registry_source_cache_matches);
+            if !registry_source_caches_matches.is_empty() {
+                sort_files_by_size(&mut registry_source_caches_matches);
                 output.push_str("\nRegistry source cache sorted by size:\n");
-                registry_source_cache_matches.iter().for_each(|b| {
+                registry_source_caches_matches.iter().for_each(|b| {
                     let size = if hr_size {
                         b.size.file_size(&humansize_opts).unwrap()
                     } else {

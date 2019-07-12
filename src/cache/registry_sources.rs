@@ -20,7 +20,7 @@ fn path_dept(path: &PathBuf) -> usize {
     path.iter().count()
 }
 /// describes one registry source cache (extracted .crates)
-pub(crate) struct _RegistrySourceCache {
+pub(crate) struct RegistrySourceCache {
     /// the name of the index
     name: String,
     /// the path of the root dir of the index, this is uniqe
@@ -39,7 +39,7 @@ pub(crate) struct _RegistrySourceCache {
     checkout_folders: Vec<PathBuf>,
 }
 
-impl SubCache for _RegistrySourceCache {
+impl SubCache for RegistrySourceCache {
     fn new(path: PathBuf) -> Self {
         Self {
             name: get_cache_name(&path),
@@ -128,7 +128,7 @@ impl SubCache for _RegistrySourceCache {
     }
 }
 
-impl _RegistrySourceCache {
+impl RegistrySourceCache {
     fn number_of_source_checkout_folders(&mut self) -> usize {
         let _ = self.checkout_folders();
         self.checkout_folders.len()
@@ -158,11 +158,11 @@ impl _RegistrySourceCache {
     }
 }
 
-pub(crate) struct _RegistrySourceCaches {
+pub(crate) struct RegistrySourceCaches {
     /// root path of the cache
     path: PathBuf,
     /// list of pkg caches (from alternative registries or so)
-    caches: Vec<_RegistrySourceCache>,
+    caches: Vec<RegistrySourceCache>,
     /// number of pkg caches found
     number_of_caches: usize,
     /// total size of all indices combined
@@ -174,7 +174,7 @@ pub(crate) struct _RegistrySourceCaches {
     total_checkout_folders_calculated: bool,
 }
 
-impl SuperCache for _RegistrySourceCaches {
+impl SuperCache for RegistrySourceCaches {
     fn new(path: PathBuf) -> Self {
         let registries = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
@@ -190,8 +190,8 @@ impl SuperCache for _RegistrySourceCaches {
                         .to_string()
                         .contains('-')
             })
-            .map(_RegistrySourceCache::new)
-            .collect::<Vec<_RegistrySourceCache>>();
+            .map(RegistrySourceCache::new)
+            .collect::<Vec<RegistrySourceCache>>();
 
         Self {
             path,
@@ -254,8 +254,8 @@ impl SuperCache for _RegistrySourceCaches {
     }
 }
 
-impl _RegistrySourceCaches {
-    fn total_number_of_source_checkout_folders(&mut self) -> usize {
+impl RegistrySourceCaches {
+    pub(crate) fn total_number_of_source_checkout_folders(&mut self) -> usize {
         let mut total = 0;
         let _ = self
             .caches
@@ -264,7 +264,7 @@ impl _RegistrySourceCaches {
         total
     }
 
-    fn total_checkout_folders(&mut self) -> &[PathBuf] {
+    pub(crate) fn total_checkout_folders(&mut self) -> &[PathBuf] {
         let mut folders = Vec::new();
         self.caches.iter_mut().for_each(|registry| {
             registry
@@ -278,166 +278,10 @@ impl _RegistrySourceCaches {
         &self.total_checkout_folders
     }
 
-    fn total_checkout_folders_sorted(&mut self) -> &[PathBuf] {
+    pub(crate) fn total_checkout_folders_sorted(&mut self) -> &[PathBuf] {
         // prime cache
         let _ = self.total_checkout_folders();
         self.total_checkout_folders.sort();
         &self.total_checkout_folders
-    }
-}
-
-//////
-//
-//
-//
-//
-//
-//
-//
-//
-//////
-pub(crate) struct RegistrySourceCache {
-    path: PathBuf,
-    total_size: Option<u64>,
-    number_of_repos: Option<usize>,
-    files_calculated: bool,
-    files: Vec<PathBuf>,
-    repos_calculated: bool,
-    checkout_folders: Vec<PathBuf>,
-}
-
-impl Cache for RegistrySourceCache {
-    fn new(path: PathBuf) -> Self {
-        // calculate only as needed and cache
-        Self {
-            path,
-            total_size: None,
-            files_calculated: false,
-            files: Vec::new(),
-            repos_calculated: false,
-            checkout_folders: Vec::new(),
-            number_of_repos: None,
-        }
-    }
-
-    #[inline]
-    fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
-    fn invalidate(&mut self) {
-        self.total_size = None;
-        self.files_calculated = false;
-        self.repos_calculated = false;
-        self.number_of_repos = None;
-    }
-
-    fn total_size(&mut self) -> u64 {
-        if self.total_size.is_some() {
-            self.total_size.unwrap()
-        } else if self.path.is_dir() {
-            // get the size of all files in path dir
-            let total_size = self
-                .files()
-                .par_iter()
-                .filter(|f| f.is_file())
-                .map(|f| {
-                    fs::metadata(f)
-                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
-                        .len()
-                })
-                .sum();
-            self.total_size = Some(total_size);
-            total_size
-        } else {
-            0
-        }
-    }
-
-    fn files(&mut self) -> &[PathBuf] {
-        if self.files_calculated {
-            &self.files
-        } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .collect::<Vec<PathBuf>>();
-                self.files = v;
-            } else {
-                self.files = Vec::new();
-            }
-            &self.files
-        }
-    }
-
-    fn files_sorted(&mut self) -> &[PathBuf] {
-        let _ = self.files(); // prime cache
-        self.files.sort();
-        &self.files()
-    }
-}
-
-impl RegistrySourceCache {
-    pub(crate) fn number_of_files_at_depth_2(&mut self) -> usize {
-        let root_dir_depth = self.path.iter().count();
-        if self.number_of_repos.is_some() {
-            self.number_of_repos.unwrap()
-        } else if self.path_exists() {
-            // dir must exist, dir must be as depth ${path}+2
-            let count = self
-                .files
-                .par_iter()
-                .filter(|p| p.is_dir())
-                .filter(|p| p.iter().count() == root_dir_depth + 2)
-                .count();
-            self.number_of_repos = Some(count);
-            count
-        } else {
-            0
-        }
-    }
-
-    pub(crate) fn checkout_folders(&mut self) -> &[PathBuf] {
-        if self.repos_calculated {
-            &self.checkout_folders
-        } else {
-            if self.path_exists() {
-                let mut collection = Vec::new();
-
-                let crate_list = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| {
-                        panic!("Failed to read directory (crate list): '{:?}'", &self.path)
-                    })
-                    .map(|cratepath| cratepath.unwrap().path())
-                    .collect::<Vec<PathBuf>>();
-                // need to take 2 levels into account
-                let mut both_levels_vec: Vec<PathBuf> = Vec::new();
-                for repo in crate_list.iter().filter(|repo| !repo.is_file()) {
-                    for i in fs::read_dir(&repo)
-                        .unwrap_or_else(|_| {
-                            panic!("Failed to read directory (repo): '{:?}'", &self.path)
-                        })
-                        .map(|cratepath| cratepath.unwrap().path())
-                    {
-                        both_levels_vec.push(i);
-                    }
-                }
-                collection.extend_from_slice(&both_levels_vec);
-
-                self.repos_calculated = true;
-                self.checkout_folders = collection;
-            } else {
-                self.checkout_folders = Vec::new();
-            }
-            &self.checkout_folders
-        }
-    }
-
-    pub(crate) fn checkout_folders_sorted(&mut self) -> &[PathBuf] {
-        let _ = self.checkout_folders(); // prime cache
-        self.checkout_folders.sort();
-        &self.checkout_folders
     }
 }
