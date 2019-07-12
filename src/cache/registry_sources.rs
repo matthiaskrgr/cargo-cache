@@ -277,6 +277,13 @@ impl _RegistrySourceCaches {
         self.total_checkout_folders_calculated = true;
         &self.total_checkout_folders
     }
+
+    fn total_checkout_folders_sorted(&mut self) -> &[PathBuf] {
+        // prime cache
+        let _ = self.total_checkout_folders();
+        self.total_checkout_folders.sort();
+        &self.total_checkout_folders
+    }
 }
 
 //////
