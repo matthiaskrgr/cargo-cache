@@ -19,6 +19,7 @@ use walkdir::WalkDir;
 fn path_dept(path: &PathBuf) -> usize {
     path.iter().count()
 }
+#[derive(Debug, Clone)]
 /// describes one registry source cache (extracted .crates)
 pub(crate) struct RegistrySourceCache {
     /// the name of the index
@@ -158,6 +159,7 @@ impl RegistrySourceCache {
     }
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct RegistrySourceCaches {
     /// root path of the cache
     path: PathBuf,
@@ -265,15 +267,16 @@ impl RegistrySourceCaches {
     }
 
     pub(crate) fn total_checkout_folders(&mut self) -> &[PathBuf] {
-        let mut folders = Vec::new();
+        let mut all_checkout_folders = Vec::new();
+
         self.caches.iter_mut().for_each(|registry| {
             registry
-                .checkout_folders
+                .checkout_folders()
                 .iter()
-                .for_each(|folder| folders.push(folder.clone()))
+                .for_each(|folder| all_checkout_folders.push(folder.clone()))
         });
 
-        self.total_checkout_folders = folders;
+        self.total_checkout_folders = all_checkout_folders;
         self.total_checkout_folders_calculated = true;
         &self.total_checkout_folders
     }
