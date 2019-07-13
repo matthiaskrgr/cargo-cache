@@ -29,7 +29,6 @@ pub(crate) trait Cache {
 pub(crate) trait RegistrySuperCache {
     /// creates a new supercache object
     fn new(path: PathBuf) -> Self;
-
     /// invalidates all contained subcaches
     fn invalidate(&mut self);
     /// total size of the cache
@@ -47,6 +46,8 @@ pub(crate) trait RegistrySuperCache {
 pub(crate) trait RegistrySubCache {
     /// create a new subcache
     fn new(path: PathBuf) -> Self;
+    // returns the name of the registry
+    fn name<'a>(&'a self) -> &'a str;
     /// check if the root path of the Cache exists
     fn path_exists(&self) -> bool;
     /// invalidates the cache

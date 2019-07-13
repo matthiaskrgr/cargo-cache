@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::{get_cache_name, Cache, RegistrySubCache, RegistrySuperCache};
+use crate::cache::dircache::{get_cache_name, RegistrySubCache, RegistrySuperCache};
 
 use rayon::prelude::*;
 use walkdir::WalkDir;
@@ -52,6 +52,11 @@ impl RegistrySubCache for RegistrySourceCache {
             checkouts_calculated: false,
             checkout_folders: vec![],
         }
+    }
+
+    // returns the name of the registry
+    fn name<'a>(&'a self) -> &'a str {
+        &self.name
     }
 
     #[inline]

@@ -44,6 +44,10 @@ impl RegistrySubCache for RegistryIndex {
         }
     }
 
+    fn name<'a>(&'a self) -> &'a str {
+        &self.name
+    }
+
     /// check if the path is still present
     #[inline]
     fn path_exists(&self) -> bool {
