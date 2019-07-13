@@ -43,6 +43,7 @@ impl RegistrySubCache for RegistryPkgCache {
         }
     }
 
+    // returns the name of the registry
     fn name<'a>(&'a self) -> &'a str {
         &self.name
     }
@@ -155,6 +156,8 @@ pub(crate) struct RegistryPkgCaches {
 }
 
 impl RegistrySuperCache for RegistryPkgCaches {
+    type SubCache = RegistryPkgCache;
+
     /// create a new empty RegistryPkgCaches
     fn new(path: PathBuf) -> Self {
         let cache_dirs = std::fs::read_dir(&path)
@@ -184,6 +187,10 @@ impl RegistrySuperCache for RegistryPkgCaches {
             total_number_of_files: None,
             total_size: None,
         }
+    }
+
+    fn caches(&mut self) -> &mut Vec<Self::SubCache> {
+        &mut self.caches
     }
 
     fn invalidate(&mut self) {

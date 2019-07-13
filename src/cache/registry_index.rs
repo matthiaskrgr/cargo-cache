@@ -44,6 +44,7 @@ impl RegistrySubCache for RegistryIndex {
         }
     }
 
+    // returns the name of the registry
     fn name<'a>(&'a self) -> &'a str {
         &self.name
     }
@@ -151,6 +152,8 @@ pub(crate) struct RegistryIndicesCache {
 }
 
 impl RegistrySuperCache for RegistryIndicesCache {
+    type SubCache = RegistryIndex;
+
     /// create a new empty RegistryIndexCache
     fn new(path: PathBuf) -> Self {
         let indices_dirs = std::fs::read_dir(&path)
@@ -179,6 +182,10 @@ impl RegistrySuperCache for RegistryIndicesCache {
             total_number_of_files: None,
             total_size: None,
         }
+    }
+
+    fn caches(&mut self) -> &mut Vec<Self::SubCache> {
+        &mut self.indices
     }
 
     fn invalidate(&mut self) {

@@ -182,6 +182,12 @@ pub(crate) struct RegistrySourceCaches {
 }
 
 impl RegistrySuperCache for RegistrySourceCaches {
+    type SubCache = RegistrySourceCache;
+
+    fn caches(&mut self) -> &mut Vec<Self::SubCache> {
+        &mut self.caches
+    }
+
     fn new(path: PathBuf) -> Self {
         let registries = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
