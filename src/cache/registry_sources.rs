@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::{get_cache_name, Cache, SubCache, SuperCache};
+use crate::cache::dircache::{get_cache_name, Cache, RegistrySubCache, RegistrySuperCache};
 
 use rayon::prelude::*;
 use walkdir::WalkDir;
@@ -40,7 +40,7 @@ pub(crate) struct RegistrySourceCache {
     checkout_folders: Vec<PathBuf>,
 }
 
-impl SubCache for RegistrySourceCache {
+impl RegistrySubCache for RegistrySourceCache {
     fn new(path: PathBuf) -> Self {
         Self {
             name: get_cache_name(&path),
@@ -176,7 +176,7 @@ pub(crate) struct RegistrySourceCaches {
     total_checkout_folders_calculated: bool,
 }
 
-impl SuperCache for RegistrySourceCaches {
+impl RegistrySuperCache for RegistrySourceCaches {
     fn new(path: PathBuf) -> Self {
         let registries = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));

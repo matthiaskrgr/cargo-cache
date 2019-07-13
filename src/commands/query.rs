@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::{Cache, SuperCache};
+use crate::cache::dircache::{Cache, RegistrySuperCache};
 use crate::cache::*;
 
 use clap::ArgMatches;

@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::{get_cache_name, SubCache, SuperCache};
+use crate::cache::dircache::{get_cache_name, RegistrySubCache, RegistrySuperCache};
 
 use rayon::prelude::*;
 
@@ -30,7 +30,7 @@ pub(crate) struct RegistryPkgCache {
     files: Vec<PathBuf>,
 }
 
-impl SubCache for RegistryPkgCache {
+impl RegistrySubCache for RegistryPkgCache {
     /// create a new empty `RegistryPkgCache`
     fn new(path: PathBuf) -> Self {
         Self {
@@ -150,7 +150,7 @@ pub(crate) struct RegistryPkgCaches {
     total_number_of_files: Option<usize>,
 }
 
-impl SuperCache for RegistryPkgCaches {
+impl RegistrySuperCache for RegistryPkgCaches {
     /// create a new empty RegistryPkgCaches
     fn new(path: PathBuf) -> Self {
         let cache_dirs = std::fs::read_dir(&path)
