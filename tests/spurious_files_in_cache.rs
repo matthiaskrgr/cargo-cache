@@ -26,17 +26,15 @@ fn spurious_files_in_cache_test() {
     let crate_path = PathBuf::from("tests/size_test/");
     let fchp = "target/spurious_files_test"; // fake cargo_home path
     let status = Command::new("cargo")
-        .arg("check")
-        .arg("--target-dir")
-        .arg("../../target/spurious_files_test/")
+        .arg("fetch")
         .current_dir(&crate_path)
         .env("CARGO_HOME", "../../target/spurious_files_test")
         .output();
     // make sure the build succeeded
-    assert!(status.is_ok(), "build of dummy crate did not succeed");
+    assert!(status.is_ok(), "fetch of dummy crate did not succeed");
     assert!(
         status.unwrap().status.success(),
-        "exit status of dummy crate build != 0"
+        "exit status of dummy crate fetch != 0"
     );
     assert!(
         PathBuf::from(&fchp).is_dir(),

@@ -25,17 +25,18 @@ fn build_and_check_size_test() {
     let crate_path = PathBuf::from("tests/size_test/");
     let fchp = "target/fake_cargo_home"; // fake cargo_home path
     let status = Command::new("cargo")
-        .arg("check")
-        .arg("--target-dir")
-        .arg("../../target/size_test/")
+        .arg("fetch")
         .current_dir(&crate_path)
         .env("CARGO_HOME", "../../target/fake_cargo_home")
         .output();
     // make sure the build succeeded
-    assert!(status.is_ok(), "build of dummy crate did not succeed");
+    assert!(
+        status.is_ok(),
+        "fetching deps of dummy crate did not succeed"
+    );
     assert!(
         status.unwrap().status.success(),
-        "build failed of dummy crate, exit status =! 0"
+        "fetch failed of dummy crate, exit status =! 0"
     );
     assert!(
         PathBuf::from(&fchp).is_dir(),
