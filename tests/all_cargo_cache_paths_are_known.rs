@@ -34,8 +34,8 @@ fn CARGO_HOME_subdirs_are_known() {
     // in the fake CARGO_HOME, install cargo-cache via git
     let command = Command::new("cargo")
         .arg("install")
-        .arg("--git")
-        .arg("https://github.com/matthiaskrgr/cargo-cache")
+        .arg("--path")
+        .arg("tests/all_cargo_home_paths_are_known/testcrate")
         .arg("--debug")
         .arg("--force")
         //        .current_dir(&crate_path)
@@ -110,7 +110,7 @@ fn CARGO_HOME_subdirs_are_known() {
     assert!(x
         .next()
         .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"));
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/bin/testcrate"));
     assert!(x
         .next()
         .unwrap()
@@ -123,10 +123,9 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts"));
-    assert!(x
-        .next()
-        .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/cargo-cache-"));
+    assert!(x.next().unwrap().starts_with(
+        "target/cargo_home_subdirs_known_CARGO_HOME/git/checkouts/clippy_travis_test-"
+    ));
     assert!(x
         .next()
         .unwrap()
@@ -134,7 +133,7 @@ fn CARGO_HOME_subdirs_are_known() {
     assert!(x
         .next()
         .unwrap()
-        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-"));
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/clippy_travis_test-"));
     assert!(x
         .next()
         .unwrap()
