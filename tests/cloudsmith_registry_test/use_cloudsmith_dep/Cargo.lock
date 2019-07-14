@@ -6,11 +6,18 @@ version = "0.1.0"
 source = "registry+https://dl.cloudsmith.io/public/matthias-kruger/ccart/cargo/index.git"
 
 [[package]]
+name = "rustc_tools_util"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "use_cloudsmith_dep"
 version = "0.1.0"
 dependencies = [
  "helloworld 0.1.0 (registry+https://dl.cloudsmith.io/public/matthias-kruger/ccart/cargo/index.git)",
+ "rustc_tools_util 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [metadata]
 "checksum helloworld 0.1.0 (registry+https://dl.cloudsmith.io/public/matthias-kruger/ccart/cargo/index.git)" = "ad0e8192c20e2c8e42c0650b323a9def9a8cce5c2afbf178b1c7bae57d741a12"
+"checksum rustc_tools_util 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b725dadae9fabc488df69a287f5a99c5eaf5d10853842a8a3dfac52476f544ee"
