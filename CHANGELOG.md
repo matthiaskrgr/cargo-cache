@@ -24,7 +24,30 @@ Total:                                4.21 GB
     113 bare git repos:             993.72 MB
     7 git repo checkouts:            51.05 MB
 
-(#44 / #36)
+(#44, #36)
+
+Add support for alternative registries.
+"cargo cache registry" or "cargo cache r" will print a per-registry summary:
+
+Cargo cache '/home/matthias/.cargo':
+
+Total:                               4.06 GB
+  103 installed binaries:            1.10 GB
+  Registry:                        163.43 MB
+    Registry index:                156.47 MB
+    5 crate archives:                6.96 MB
+  Registry: dl.cloudsmith.io         4.18 KB
+    Registry index:                  3.21 KB
+    1 crate archives:                 971  B
+  Registry: github.com               1.40 GB
+    Registry index:                 94.28 MB
+    5404 crate archives:           799.06 MB
+    1031 crate source checkouts:   504.58 MB
+  Git db:                            1.40 GB
+    138 bare git repos:              1.37 GB
+    4 git repo checkouts:           32.98 MB
+
+(#50, #51, #53)
 
 print the number of registry indices (if > 0)
 --info: make more detailed, add registry index

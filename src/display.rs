@@ -6,6 +6,7 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+
 #[derive(Clone, Debug)]
 pub(crate) struct TableLine {
     indent_front: usize,
@@ -37,6 +38,9 @@ pub(crate) fn format_2_row_table(
     let mut lines = lines;
     if !align_first_line && !lines.is_empty() {
         // save the first line and remove it from the vec
+        // the first line is special
+        // Cargo cache '/home/matthias/.cargo':
+        // and must not mess up the alignment
         first_line = Some(lines.remove(0).left_column);
     }
 
