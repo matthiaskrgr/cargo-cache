@@ -160,6 +160,16 @@ impl RegistrySuperCache for RegistryIndicesCache {
 
     /// create a new empty RegistryIndexCache
     fn new(path: PathBuf) -> Self {
+        if !path.exists() {
+            return Self {
+                path,
+                number_of_indices: 0,
+                indices: vec![],
+                total_number_of_files: None,
+                total_size: None,
+            };
+        }
+
         let indices_dirs = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
         // map the dirs to RegistryIndexCaches and return them as vector

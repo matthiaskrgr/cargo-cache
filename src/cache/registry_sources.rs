@@ -144,6 +144,11 @@ impl RegistrySourceCache {
         if self.checkouts_calculated {
             &self.checkout_folders
         } else {
+            if !&self.path.exists() {
+                self.checkout_folders = vec![];
+                self.checkouts_calculated = true;
+                return &self.checkout_folders;
+            }
             let folders = std::fs::read_dir(&self.path)
                 .unwrap_or_else(|_| panic!("Failed to read {:?}", self.path.display()))
                 .map(|direntry| direntry.unwrap().path())
@@ -189,6 +194,18 @@ impl RegistrySuperCache for RegistrySourceCaches {
     }
 
     fn new(path: PathBuf) -> Self {
+        if !path.exists() {
+            return Self {
+                path,
+                number_of_caches: 0,
+                caches: vec![],
+                total_number_of_files: None,
+                total_size: None,
+                total_checkout_folders: vec![],
+                total_checkout_folders_calculated: false,
+            };
+        }
+
         let registries = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
         #[allow(clippy::filter_map)]
