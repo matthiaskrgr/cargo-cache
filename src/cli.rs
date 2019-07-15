@@ -121,8 +121,9 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     //</local>
 
     // <registry>
-    let registry = SubCommand::with_name("registry").about("query each crate registry seperately");
-    let registry_short = SubCommand::with_name("r").about("query each crate registry seperately");
+    let registry =
+        SubCommand::with_name("registry").about("query each package registry seperately");
+    let registry_short = SubCommand::with_name("r").about("query each package registry seperately");
     //</registry>
 
     // subcommand (version, which is hidden)
@@ -221,11 +222,13 @@ OPTIONS:
                                          registry-sources,registry-crate-cache,registry-index,registry,all
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    help     Prints this message or the help of the given subcommand(s)
-    l        check local build cache (target) of a rust project
-    local    check local build cache (target) of a rust project
-    q        run a query
-    query    run a query\n");
+    help        Prints this message or the help of the given subcommand(s)
+    l           check local build cache (target) of a rust project
+    local       check local build cache (target) of a rust project
+    q           run a query
+    query       run a query
+    r           query each crate registry seperately
+    registry    query each crate registry seperately\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -261,11 +264,13 @@ OPTIONS:
                                          registry-sources,registry-crate-cache,registry-index,registry,all
     -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    help     Prints this message or the help of the given subcommand(s)
-    l        check local build cache (target) of a rust project
-    local    check local build cache (target) of a rust project
-    q        run a query
-    query    run a query\n");
+    help        Prints this message or the help of the given subcommand(s)
+    l           check local build cache (target) of a rust project
+    local       check local build cache (target) of a rust project
+    q           run a query
+    query       run a query
+    r           query each crate registry seperately
+    registry    query each crate registry seperately\n");
 
         assert_eq!(help_desired, help_real);
     }
