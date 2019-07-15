@@ -170,6 +170,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     // run cargo cache on the new cargo_home
     let cargo_cache_registry_cmd = Command::new(bin_path())
+        .arg("registry")
         .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
         .output()
         .unwrap();
@@ -191,19 +192,19 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         String::from("Cargo cache .*target.*alt_reg_cloudsmith_CARGO_HOME.*\n\n");
 
     desired_output.push_str(
-        "Total:                          .* MB
-  0 installed binaries:             0  B
-  Registry: dl.cloudsmith.io     .* KB
-    Registry index:              .* KB
+        "Total:                 .* MB
+  0 installed binaries:      .*  0  B
+  Registry: dl.cloudsmith.io    .* KB
+    Registry index:             .* KB
     1 crate archives:           .*  B
-    1 crate source checkouts:    .* KB
-  Registry: github.com           .* MB
-    Registry index:              .* MB
-    1 crate archives:            .* KB
-    1 crate source checkouts:    .* KB
-  Git db:                           0  B
-    0 bare git repos:               0  B
-    0 git repo checkouts:           0  B",
+    1 crate source checkouts:   .* KB
+  Registry: github.com          .* MB
+    Registry index:             .* MB
+    1 crate archives:           .* KB
+    1 crate source checkouts:   .* KB
+  Git db:                    .*  0  B
+    0 bare git repos:        .*  0  B
+    0 git repo checkouts:    .*  0  B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();
