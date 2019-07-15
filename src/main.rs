@@ -249,6 +249,7 @@ fn main() {
         let reg_srcs = &cargo_cache.registry_sources;
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
+            let size = cumulative_dir_size(&dir);
             if dir.is_dir() {
                 remove_file(
                     &dir,
@@ -256,7 +257,7 @@ fn main() {
                     &mut size_changed,
                     None,
                     None,
-                    None,
+                    Some(size.dir_size),
                 );
             }
         }

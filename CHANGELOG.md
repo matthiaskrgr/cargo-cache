@@ -52,6 +52,8 @@ Total:                               4.06 GB
 print the number of registry indices (if > 0)
 --info: make more detailed, add registry index
 query: don't print empty line if no matches were found
+--autoclean: when combined with --dry-run, print size of
+	the to-be-removed directory (#54)
 build git2 dependency without default features
 Updated dependencies:
 	git2: 0.8.0 -> 0.9.1
