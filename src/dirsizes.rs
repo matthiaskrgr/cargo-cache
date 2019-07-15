@@ -144,7 +144,7 @@ impl<'a> DirSizes<'a> {
         vec![
             TableLine::new(
                 0,
-                format!("Cargo cache '{}':\n", &self.root_path.display()),
+                format!("Cargo cache '{}':\n\n", &self.root_path.display()),
                 String::new(),
             ),
             TableLine::new(
@@ -369,7 +369,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
         table.extend(self.registries_summary());
         table.extend(self.git());
 
-        let string: String = format_2_row_table(0, &table);
+        let string: String = format_2_row_table(2, table, false);
 
         write!(f, "{}", string)?;
         Ok(())
@@ -392,7 +392,7 @@ pub(crate) fn per_registry_summary(
     ));
     table.extend(dir_size.git());
 
-    format_2_row_table(0, &table)
+    format_2_row_table(2, table, false)
 }
 
 #[cfg(test)]
