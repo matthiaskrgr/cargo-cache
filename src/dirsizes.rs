@@ -12,7 +12,6 @@ use std::fmt;
 use crate::cache::dircache::Cache;
 use crate::cache::dircache::RegistrySubCache;
 use crate::cache::dircache::RegistrySuperCache;
-use crate::cache::registry_sources::RegistrySourceCache;
 
 use crate::cache::*;
 use crate::display::*;
@@ -424,7 +423,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
 }
 
 pub(crate) fn per_registry_summary(
-    dir_size: &DirSizes,
+    dir_size: &DirSizes<'_>,
     mut index_caches: &mut registry_index::RegistryIndicesCache,
     mut pkg_caches: &mut registry_sources::RegistrySourceCaches,
     mut registry_sources: &mut registry_pkg_cache::RegistryPkgCaches,

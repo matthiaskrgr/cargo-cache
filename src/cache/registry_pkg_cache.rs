@@ -44,7 +44,7 @@ impl RegistrySubCache for RegistryPkgCache {
     }
 
     // returns the name of the registry
-    fn name<'a>(&'a self) -> &'a str {
+    fn name(&self) -> &str {
         &self.name
     }
 

@@ -15,10 +15,6 @@ use crate::cache::dircache::{get_cache_name, RegistrySubCache, RegistrySuperCach
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-// depth of a path
-fn path_dept(path: &PathBuf) -> usize {
-    path.iter().count()
-}
 #[derive(Debug, Clone)]
 /// describes one registry source cache (extracted .crates)
 pub(crate) struct RegistrySourceCache {
@@ -55,7 +51,7 @@ impl RegistrySubCache for RegistrySourceCache {
     }
 
     // returns the name of the registry
-    fn name<'a>(&'a self) -> &'a str {
+    fn name(&self) -> &str {
         &self.name
     }
 
@@ -149,7 +145,7 @@ impl RegistrySourceCache {
             &self.checkout_folders
         } else {
             let folders = std::fs::read_dir(&self.path)
-                .expect(&format!("Failed to read {:?}", self.path.display()))
+                .unwrap_or_else(|_| panic!("Failed to read {:?}", self.path.display()))
                 .map(|direntry| direntry.unwrap().path())
                 .filter(|p| {
                     p.is_dir()

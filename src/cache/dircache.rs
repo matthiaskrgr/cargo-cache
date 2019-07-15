@@ -51,7 +51,7 @@ pub(crate) trait RegistrySubCache {
     /// create a new subcache
     fn new(path: PathBuf) -> Self;
     // returns the name of the registry
-    fn name<'a>(&'a self) -> &'a str;
+    fn name(&self) -> &str;
     /// check if the root path of the Cache exists
     fn path_exists(&self) -> bool;
     /// invalidates the cache
