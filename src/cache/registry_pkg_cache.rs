@@ -54,6 +54,10 @@ impl RegistrySubCache for RegistryPkgCache {
         self.path.exists()
     }
 
+    fn path(&self) -> PathBuf {
+        self.path.clone()
+    }
+
     /// invalidate the cache
     #[inline]
     fn invalidate(&mut self) {

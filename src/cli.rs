@@ -120,6 +120,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         SubCommand::with_name("l").about("check local build cache (target) of a rust project");
     //</local>
 
+    // <registry>
+    let registry = SubCommand::with_name("registry").about("query each crate registry seperately");
+    let registry_short = SubCommand::with_name("r").about("query each crate registry seperately");
+    //</registry>
+
     // subcommand (version, which is hidden)
     let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
 
@@ -135,6 +140,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(local.clone())
         .subcommand(local_short.clone())
         .subcommand(version_subcmd.clone())
+        .subcommand(registry.clone())
+        .subcommand(registry_short.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -159,6 +166,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(local)
         .subcommand(local_short)
         .subcommand(version_subcmd)
+        .subcommand(registry)
+        .subcommand(registry_short)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)

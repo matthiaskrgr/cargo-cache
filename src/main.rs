@@ -197,7 +197,20 @@ fn main() {
     }
 
     // no println!() here!
-    print!("{}", dir_sizes);
+    // print the default summary
+    if config.subcommand_matches("registry").is_some() || config.subcommand_matches("r").is_some() {
+        // print per-registry summary
+        let summary = dirsizes::per_registry_summary(
+            &dir_sizes,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+            &mut registry_pkgs_cache,
+        );
+        println!("{}", summary);
+    } else {
+        // print the default cache summary
+        print!("{}", dir_sizes);
+    }
 
     if config.is_present("remove-dir") {
         if let Err((_, msg)) = remove_dir_via_cmdline(

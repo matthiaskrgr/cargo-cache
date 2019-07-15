@@ -64,6 +64,10 @@ impl RegistrySubCache for RegistrySourceCache {
         self.path.exists()
     }
 
+    fn path(&self) -> PathBuf {
+        self.path.clone()
+    }
+
     /// invalidate the cache
     #[inline]
     fn invalidate(&mut self) {
@@ -135,7 +139,7 @@ impl RegistrySubCache for RegistrySourceCache {
 }
 
 impl RegistrySourceCache {
-    fn number_of_source_checkout_folders(&mut self) -> usize {
+    pub(crate) fn number_of_source_checkout_folders(&mut self) -> usize {
         let _ = self.checkout_folders();
         self.checkout_folders.len()
     }

@@ -64,6 +64,8 @@ pub(crate) trait RegistrySubCache {
     fn number_of_files(&mut self) -> usize;
     /// sorted list of the files
     fn files_sorted(&mut self) -> &[PathBuf];
+    // path of the cache
+    fn path(&self) -> PathBuf;
 }
 
 /// get the name of a cache directory from a path.

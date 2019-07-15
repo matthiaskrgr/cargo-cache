@@ -10,7 +10,9 @@
 use std::fmt;
 
 use crate::cache::dircache::Cache;
+use crate::cache::dircache::RegistrySubCache;
 use crate::cache::dircache::RegistrySuperCache;
+use crate::cache::registry_sources::RegistrySourceCache;
 
 use crate::cache::*;
 use crate::display::*;
@@ -138,6 +140,209 @@ impl<'a> DirSizes<'a> {
     }
 }
 
+impl<'a> DirSizes<'a> {
+    fn header(&self) -> String {
+        format!("Cargo cache '{}':\n\n", &self.root_path.display())
+    }
+
+    fn git(&self) -> Vec<TableLine> {
+        vec![
+            TableLine::new(
+                1,
+                "Git db: ".to_string(),
+                self.total_git_db_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+            TableLine::new(
+                2,
+                format!("{} bare git repos: ", self.numb_git_repos_bare_repos),
+                self.total_git_repos_bare_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+            TableLine::new(
+                2,
+                format!("{} git repo checkouts: ", self.numb_git_checkouts),
+                self.total_git_chk_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+        ]
+    }
+
+    fn registry_summary(&self) -> Vec<TableLine> {
+        vec![
+            TableLine::new(
+                1,
+                "Registry: ".to_string(),
+                self.total_reg_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+            TableLine::new(
+                2,
+                // check how many indices there are
+                match self.total_reg_index_num {
+                    1 => String::from("Registry index: "),
+                    _ => format!("{} registry indices: ", &self.total_reg_index_num),
+                },
+                self.total_reg_index_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+            TableLine::new(
+                2,
+                format!("{} crate archives: ", self.numb_reg_cache_entries),
+                self.total_reg_cache_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+            TableLine::new(
+                2,
+                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts),
+                self.total_reg_src_size
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
+            ),
+        ]
+    }
+
+    fn registries_seperate(
+        &self,
+        index_caches: &mut registry_index::RegistryIndicesCache,
+        registry_sources: &mut registry_sources::RegistrySourceCaches,
+        pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    ) -> Vec<TableLine> {
+        let mut v: Vec<TableLine> = vec![];
+
+        // we need to match the separate registries together somehow
+        // do this by folder names
+        let mut registries: Vec<String> = vec![];
+        index_caches.caches().iter().for_each(|registry| {
+            registries.push(
+                registry
+                    .path()
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_string(),
+            )
+        });
+
+        pkg_caches.caches().iter().for_each(|registry| {
+            registries.push(
+                registry
+                    .path()
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_string(),
+            )
+        });
+
+        registry_sources.caches().iter().for_each(|registry| {
+            registries.push(
+                registry
+                    .path()
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_string(),
+            )
+        });
+        // we now collected all the folder names of the registries and can match a single registry accross multiple
+        // caches by this
+
+        /*
+          Registry:                         1.52 GB
+            5 registry indices:           250.20 MB
+            5399 crate archives:          805.46 MB
+            901 crate source checkouts:   460.77 MB
+        */
+
+        registries.sort();
+        registries.dedup();
+
+        for registry in &registries {
+            let mut total_size = 0;
+
+            let mut temp_vec: Vec<TableLine> = Vec::new();
+            let mut registry_name: Option<String> = None;
+
+            for index in index_caches.caches().iter_mut().filter(|r| {
+                &r.path().file_name().unwrap().to_str().unwrap().to_string() == registry
+            }) {
+                temp_vec.push(TableLine::new(
+                    2,
+                    String::from("Registry index:"),
+                    index
+                        .total_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap(),
+                ));
+                total_size += index.total_size();
+                if registry_name.is_none() {
+                    registry_name = Some(index.name().into());
+                }
+            }
+
+            for pkg_cache in pkg_caches.caches().iter_mut().filter(|p| {
+                &p.path().file_name().unwrap().to_str().unwrap().to_string() == registry
+            }) {
+                temp_vec.push(TableLine::new(
+                    2,
+                    format!("{} crate archives: ", pkg_cache.number_of_files()),
+                    pkg_cache
+                        .total_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap(),
+                ));
+                total_size += pkg_cache.total_size();
+                if registry_name.is_none() {
+                    registry_name = Some(pkg_cache.name().into());
+                }
+            }
+
+            for registry_source in registry_sources.caches().iter_mut().filter(|s| {
+                &s.path().file_name().unwrap().to_str().unwrap().to_string() == registry
+            }) {
+                temp_vec.push(TableLine::new(
+                    2,
+                    format!(
+                        "{} crate source checkouts: ",
+                        registry_source.number_of_source_checkout_folders()
+                    ),
+                    registry_source
+                        .total_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap(),
+                ));
+                total_size += registry_source.total_size();
+                if registry_name.is_none() {
+                    registry_name = Some(registry_source.name().into());
+                }
+            }
+
+            let header_line = TableLine::new(
+                1,
+                format!("Registry: {}", registry_name.unwrap_or_default()),
+                total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+            );
+
+            v.push(header_line);
+            v.extend(temp_vec);
+        }
+
+        println!("REGS: {:?}\n\n", registries);
+
+        v
+    }
+}
+
 impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Cargo cache '{}':\n\n", &self.root_path.display())?;
@@ -216,6 +421,34 @@ impl<'a> fmt::Display for DirSizes<'a> {
 
         Ok(())
     }
+}
+
+pub(crate) fn per_registry_summary(
+    dir_size: &DirSizes,
+    mut index_caches: &mut registry_index::RegistryIndicesCache,
+    mut pkg_caches: &mut registry_sources::RegistrySourceCaches,
+    mut registry_sources: &mut registry_pkg_cache::RegistryPkgCaches,
+) -> String {
+    let mut table: Vec<TableLine> = vec![TableLine::new(
+        0,
+        "Total: ".to_string(),
+        dir_size
+            .total_size
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap(),
+    )];
+
+    let mut out: String = dir_size.header();
+
+    table.extend(dir_size.registries_seperate(
+        &mut index_caches,
+        &mut pkg_caches,
+        &mut registry_sources,
+    ));
+    table.extend(dir_size.git());
+
+    out.push_str(&format_2_row_table(2, &table));
+    out
 }
 
 #[cfg(test)]
