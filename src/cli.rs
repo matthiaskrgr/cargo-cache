@@ -227,8 +227,8 @@ SUBCOMMANDS:
     local       check local build cache (target) of a rust project
     q           run a query
     query       run a query
-    r           query each crate registry seperately
-    registry    query each crate registry seperately\n");
+    r           query each package registry seperately
+    registry    query each package registry seperately\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -269,8 +269,8 @@ SUBCOMMANDS:
     local       check local build cache (target) of a rust project
     q           run a query
     query       run a query
-    r           query each crate registry seperately
-    registry    query each crate registry seperately\n");
+    r           query each package registry seperately
+    registry    query each package registry seperately\n");
 
         assert_eq!(help_desired, help_real);
     }
