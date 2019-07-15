@@ -147,4 +147,71 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         regex,
         stdout
     );
+
+    // test "cargo cache registry" output
+
+    /*
+    Cargo cache '/home/matthias/vcs/github/cargo-cache/target/alt_reg_cloudsmith_CARGO_HOME':
+
+    Total:                          80.41 MB
+      0 installed binaries:             0  B
+      Registry: dl.cloudsmith.io     5.52 KB
+        Registry index:              3.21 KB
+        1 crate archives:             971  B
+        1 crate source checkouts:    1.34 KB
+      Registry: github.com          80.40 MB
+        Registry index:             80.39 MB
+        1 crate archives:            2.79 KB
+        1 crate source checkouts:    7.76 KB
+      Git db:                           0  B
+        0 bare git repos:               0  B
+        0 git repo checkouts:           0  B
+    */
+
+    // run cargo cache on the new cargo_home
+    let cargo_cache_registry_cmd = Command::new(bin_path())
+        .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
+        .output()
+        .unwrap();
+
+    if !cargo_cache_registry_cmd.status.success() {
+        println!("error running cargo-cache on alt reg $CARGO_HOME");
+        println!("stderr:\n{:?}", stderr);
+        println!("stdout:\n{:?}", stdout);
+        println!("status: {:?}", status);
+        panic!("error while running cargo-home with alt regs");
+    }
+
+    let stdout = String::from_utf8_lossy(&cargo_cache_registry_cmd.stdout).to_string();
+
+    println!("DEBUG: cargo-cache output:\n\n{}", stdout);
+    // check if the output is what we expect
+
+    let mut desired_output =
+        String::from("Cargo cache .*target.*alt_reg_cloudsmith_CARGO_HOME.*\n\n");
+
+    desired_output.push_str(
+        "Total:                          .* MB
+  0 installed binaries:             0  B
+  Registry: dl.cloudsmith.io     .* KB
+    Registry index:              .* KB
+    1 crate archives:           .*  B
+    1 crate source checkouts:    .* KB
+  Registry: github.com           .* MB
+    Registry index:              .* MB
+    1 crate archives:            .* KB
+    1 crate source checkouts:    .* KB
+  Git db:                           0  B
+    0 bare git repos:               0  B
+    0 git repo checkouts:           0  B",
+    );
+
+    let regex = Regex::new(&desired_output).unwrap();
+
+    assert!(
+        regex.clone().is_match(&stdout),
+        "ERROR: regex did not match!\n\nregex:\n{:?}\n\ncc_output:\n{:?}",
+        regex,
+        stdout
+    );
 }
