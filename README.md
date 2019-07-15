@@ -15,6 +15,7 @@ Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional 
 * recompress git repos
 * search cache via regex queries
 * print crates that take the most space
+* alternative registries supported
 * builds and runs on `stable`, `beta` and `nightly` channel
 
 #### Installation:
