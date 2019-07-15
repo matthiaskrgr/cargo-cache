@@ -140,8 +140,19 @@ impl<'a> DirSizes<'a> {
 }
 
 impl<'a> DirSizes<'a> {
-    fn header(&self) -> String {
-        format!("Cargo cache '{}':\n\n", &self.root_path.display())
+    fn header(&self) -> Vec<TableLine> {
+        vec![
+            TableLine::new(
+                0,
+                format!("Cargo cache '{}':\n", &self.root_path.display()),
+                String::new(),
+            ),
+            TableLine::new(
+                0,
+                "Total: ".to_string(),
+                self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+            ),
+        ]
     }
 
     fn git(&self) -> Vec<TableLine> {
@@ -170,7 +181,7 @@ impl<'a> DirSizes<'a> {
         ]
     }
 
-    fn registry_summary(&self) -> Vec<TableLine> {
+    fn registries_summary(&self) -> Vec<TableLine> {
         vec![
             TableLine::new(
                 1,
@@ -336,8 +347,6 @@ impl<'a> DirSizes<'a> {
             v.extend(temp_vec);
         }
 
-        println!("REGS: {:?}\n\n", registries);
-
         v
     }
 }
@@ -428,17 +437,8 @@ pub(crate) fn per_registry_summary(
     mut pkg_caches: &mut registry_sources::RegistrySourceCaches,
     mut registry_sources: &mut registry_pkg_cache::RegistryPkgCaches,
 ) -> String {
-    let mut table: Vec<TableLine> = vec![TableLine::new(
-        0,
-        "Total: ".to_string(),
-        dir_size
-            .total_size
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap(),
-    )];
-
-    let mut out: String = dir_size.header();
-
+    let mut table: Vec<TableLine> = vec![];
+    table.extend(dir_size.header());
     table.extend(dir_size.registries_seperate(
         &mut index_caches,
         &mut pkg_caches,
@@ -446,8 +446,7 @@ pub(crate) fn per_registry_summary(
     ));
     table.extend(dir_size.git());
 
-    out.push_str(&format_2_row_table(2, &table));
-    out
+    format_2_row_table(2, &table)
 }
 
 #[cfg(test)]
