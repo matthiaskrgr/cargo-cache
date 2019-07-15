@@ -155,6 +155,16 @@ impl<'a> DirSizes<'a> {
         ]
     }
 
+    fn bin(&self) -> Vec<TableLine> {
+        vec![TableLine::new(
+            1,
+            format!("{} installed binaries: ", self.numb_bins),
+            self.total_bin_size
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap(),
+        )]
+    }
+
     fn git(&self) -> Vec<TableLine> {
         vec![
             TableLine::new(
@@ -353,80 +363,15 @@ impl<'a> DirSizes<'a> {
 
 impl<'a> fmt::Display for DirSizes<'a> {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Cargo cache '{}':\n\n", &self.root_path.display())?;
+        let mut table: Vec<TableLine> = vec![];
+        table.extend(self.header());
+        table.extend(self.bin());
+        table.extend(self.registries_summary());
+        table.extend(self.git());
 
-        let lines = vec![
-            TableLine::new(
-                0,
-                "Total: ".to_string(),
-                self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
-            ),
-            TableLine::new(
-                1,
-                format!("{} installed binaries: ", self.numb_bins),
-                self.total_bin_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                1,
-                "Registry: ".to_string(),
-                self.total_reg_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                // check how many indices there are
-                match self.total_reg_index_num {
-                    1 => String::from("Registry index: "),
-                    _ => format!("{} registry indices: ", &self.total_reg_index_num),
-                },
-                self.total_reg_index_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} crate archives: ", self.numb_reg_cache_entries),
-                self.total_reg_cache_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts),
-                self.total_reg_src_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                1,
-                "Git db: ".to_string(),
-                self.total_git_db_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} bare git repos: ", self.numb_git_repos_bare_repos),
-                self.total_git_repos_bare_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} git repo checkouts: ", self.numb_git_checkouts),
-                self.total_git_chk_size
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-        ];
+        let string: String = format_2_row_table(0, &table);
 
-        let table_string = format_2_row_table(2, &lines);
-
-        write!(f, "{}", table_string)?;
-
+        write!(f, "{}", string)?;
         Ok(())
     }
 }
@@ -439,6 +384,7 @@ pub(crate) fn per_registry_summary(
 ) -> String {
     let mut table: Vec<TableLine> = vec![];
     table.extend(dir_size.header());
+    table.extend(dir_size.bin());
     table.extend(dir_size.registries_seperate(
         &mut index_caches,
         &mut pkg_caches,
@@ -446,7 +392,7 @@ pub(crate) fn per_registry_summary(
     ));
     table.extend(dir_size.git());
 
-    format_2_row_table(2, &table)
+    format_2_row_table(0, &table)
 }
 
 #[cfg(test)]
