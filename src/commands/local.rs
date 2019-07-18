@@ -193,7 +193,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
         ));
     }
 
-    output.push_str(&format_2_row_table(MIN_PADDING, lines, false));
+    output.push_str(&format_2_row_table(MIN_PADDING, lines, true));
 
     println!("{}", output);
 }
