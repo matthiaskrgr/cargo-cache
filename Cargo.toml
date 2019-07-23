@@ -17,7 +17,7 @@ bench = [] # run benchmarks
 
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
-cargo_metadata = "0.8.0" # get crate package name
+cargo_metadata = "0.8.1" # get crate package name
 
 # https://github.com/kbknapp/clap-rs
 clap = "2.33.0" # cmdline arg parsing
@@ -35,13 +35,13 @@ humansize = "1.1.0" # convert digits of bytes to human readable size
 rayon = "1.1.0" # parallelize iterators
 
 # https://github.com/rust-lang/regex
-regex = "1.1.7" # use regex for matching
+regex = "1.2.0" # use regex for matching
 
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = "0.2.0" # git version information
 
 # https://github.com/BurntSushi/walkdir
-walkdir = "2.2.8" # walk content of directory/CARGO_HOME recursively
+walkdir = "2.2.9" # walk content of directory/CARGO_HOME recursively
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash

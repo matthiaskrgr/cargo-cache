@@ -56,10 +56,11 @@ query: don't print empty line if no matches were found
 	the to-be-removed directory (#54)
 build git2 dependency without default features
 Updated dependencies:
+	cargo-metadata 0.8.0 -> 0.8.1
 	git2: 0.8.0 -> 0.9.1
 	rayon: 1.0.3 -> 1.1.0
-	regex 1.1.6 -> 1.1.7
-	walkdir: 2.2.7 -> 2.2.8
+	regex 1.1.6 -> 1.2.0
+	walkdir: 2.2.7 -> 2.2.9
 ````
 ## Version 0.2.1 (319bee6)
 ````
