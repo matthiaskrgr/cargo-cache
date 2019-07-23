@@ -190,6 +190,7 @@ fn main() {
         &mut registry_sources_caches,
         &cargo_cache,
     );
+    let dir_sizes_total = dir_sizes.total_size;
 
     if config.is_present("info") {
         println!("{}", get_info(&cargo_cache, &dir_sizes));
@@ -295,10 +296,11 @@ fn main() {
             }
         }
     }
+
     if size_changed && !config.is_present("dry-run") {
         // size has changed
         // in order to get a diff, save the old sizes
-        let cache_size_old = dir_sizes.total_size;
+        let cache_size_old = dir_sizes_total;
 
         // and invalidate the cache
         bin_cache.invalidate();
@@ -306,7 +308,6 @@ fn main() {
         bare_repos_cache.invalidate();
         registry_pkgs_cache.invalidate();
         registry_index_caches.invalidate();
-        //registry_index_cache.invalidate();
         registry_sources_caches.invalidate();
 
         // and requery it to let it do its thing

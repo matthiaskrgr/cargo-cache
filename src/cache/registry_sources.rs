@@ -136,7 +136,9 @@ impl RegistrySubCache for RegistrySourceCache {
 
 impl RegistrySourceCache {
     pub(crate) fn number_of_source_checkout_folders(&mut self) -> usize {
+        // initialize the cache
         let _ = self.checkout_folders();
+        // return the number of files
         self.checkout_folders.len()
     }
 
@@ -235,7 +237,15 @@ impl RegistrySuperCache for RegistrySourceCaches {
     }
 
     fn invalidate(&mut self) {
-        self.caches.iter_mut().for_each(|index| index.invalidate());
+        println!("invalidating registry source cachesSSS");
+        /*  self.caches
+        .iter_mut()
+        .inspect(|i| println!("invalidating: {}", i.name()))
+        .for_each(|cache| cache.invalidate()); */
+        // @BUG(matthiaskgr) this should NOT be needed!!
+        // I assume there is a bug either here or in the other fn invalidate() of this file!
+        let x = RegistrySourceCaches::new(self.path.clone());
+        *self = x;
     }
 
     fn files(&mut self) -> Vec<PathBuf> {
