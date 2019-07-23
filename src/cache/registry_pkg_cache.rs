@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//@TODO fixme
+#![allow(clippy::single_match_else)]
+
 use std::fs;
 use std::path::PathBuf;
 
@@ -148,10 +151,12 @@ impl RegistrySubCache for RegistryPkgCache {
 /// holds several `RegistryPkgCaches` (supercache)
 pub(crate) struct RegistryPkgCaches {
     /// root path of the cache
+    #[allow(unused)]
     path: PathBuf,
     /// list of pkg caches (from alternative registries or so)
     caches: Vec<RegistryPkgCache>,
     /// number of pkg caches found
+    #[allow(unused)]
     number_of_caches: usize,
     /// total size of all indices combined
     total_size: Option<u64>,

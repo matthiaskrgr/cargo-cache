@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//@TODO fixme
+#![allow(clippy::single_match_else)]
+
 use std::fs;
 use std::path::PathBuf;
 
@@ -144,10 +147,12 @@ impl RegistrySubCache for RegistryIndex {
 
 pub(crate) struct RegistryIndicesCache {
     /// root path of the cache
+    #[allow(unused)]
     path: PathBuf,
     /// list of indices (from alternative registries or so)
     indices: Vec<RegistryIndex>,
     /// number of indices found
+    #[allow(unused)]
     number_of_indices: usize,
     /// total size of all indices combined
     total_size: Option<u64>,
@@ -243,12 +248,14 @@ impl RegistrySuperCache for RegistryIndicesCache {
         match self.total_number_of_files {
             Some(number) => number,
             None => {
-                let mut total = 0;
+                let mut total: usize = 0;
+                //@TODO make everyhing used here return usize
+                #[allow(clippy::cast_possible_truncation)]
                 self.indices
                     .iter_mut()
-                    .for_each(|index| total += index.total_size());
+                    .for_each(|index| total += index.total_size() as usize);
 
-                total as usize
+                total
             }
         }
     }

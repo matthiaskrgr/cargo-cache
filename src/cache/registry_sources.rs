@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//@TODO fixme
+#![allow(clippy::single_match_else)]
+
 use std::fs;
 use std::path::PathBuf;
 
@@ -244,7 +247,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
         .for_each(|cache| cache.invalidate()); */
         // @BUG(matthiaskgr) this should NOT be needed!!
         // I assume there is a bug either here or in the other fn invalidate() of this file!
-        let x = RegistrySourceCaches::new(self.path.clone());
+        let x = Self::new(self.path.clone());
         *self = x;
     }
 
@@ -297,8 +300,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
 impl RegistrySourceCaches {
     pub(crate) fn total_number_of_source_checkout_folders(&mut self) -> usize {
         let mut total = 0;
-        let _ = self
-            .caches
+        self.caches
             .iter_mut()
             .for_each(|registry| total += registry.number_of_source_checkout_folders());
         total
