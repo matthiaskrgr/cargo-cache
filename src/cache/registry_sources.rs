@@ -240,15 +240,11 @@ impl RegistrySuperCache for RegistrySourceCaches {
     }
 
     fn invalidate(&mut self) {
-        println!("invalidating registry source cachesSSS");
-        /*  self.caches
-        .iter_mut()
-        .inspect(|i| println!("invalidating: {}", i.name()))
-        .for_each(|cache| cache.invalidate()); */
-        // @BUG(matthiaskgr) this should NOT be needed!!
-        // I assume there is a bug either here or in the other fn invalidate() of this file!
-        let x = Self::new(self.path.clone());
-        *self = x;
+        self.total_number_of_files = None;
+        self.total_size = None;
+        self.total_checkout_folders = vec![];
+        self.total_checkout_folders_calculated = false;
+        self.caches.iter_mut().for_each(|cache| cache.invalidate());
     }
 
     fn files(&mut self) -> Vec<PathBuf> {
