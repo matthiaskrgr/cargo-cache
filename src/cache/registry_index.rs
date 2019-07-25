@@ -208,6 +208,9 @@ impl RegistrySuperCache for RegistryIndicesCache {
     }
 
     fn invalidate(&mut self) {
+        self.number_of_indices = 0;
+        self.total_size = None;
+        self.total_number_of_files = None;
         self.indices.iter_mut().for_each(|index| index.invalidate());
     }
 

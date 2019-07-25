@@ -212,6 +212,9 @@ impl RegistrySuperCache for RegistryPkgCaches {
     }
 
     fn invalidate(&mut self) {
+        self.number_of_caches = 0;
+        self.total_size = None;
+        self.total_number_of_files = None;
         self.caches.iter_mut().for_each(|index| index.invalidate());
     }
 
