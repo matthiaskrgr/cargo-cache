@@ -124,6 +124,10 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let registry =
         SubCommand::with_name("registry").about("query each package registry seperately");
     let registry_short = SubCommand::with_name("r").about("query each package registry seperately");
+    // hidden, but have "cargo cache registries" work too
+    let registries_hidden = SubCommand::with_name("registries")
+        .about("query each package registry seperately")
+        .settings(&[AppSettings::Hidden]);
     //</registry>
 
     // subcommand (version, which is hidden)
@@ -143,6 +147,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(version_subcmd.clone())
         .subcommand(registry.clone())
         .subcommand(registry_short.clone())
+        .subcommand(registries_hidden.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -169,6 +174,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(version_subcmd)
         .subcommand(registry)
         .subcommand(registry_short)
+        .subcommand(registries_hidden)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)

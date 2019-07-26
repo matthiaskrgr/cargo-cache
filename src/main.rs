@@ -201,6 +201,7 @@ fn main() {
     // print the default summary
     let output = if config.subcommand_matches("registry").is_some()
         || config.subcommand_matches("r").is_some()
+        || config.subcommand_matches("registries").is_some()
     {
         // print per-registry summary
         dirsizes::per_registry_summary(
