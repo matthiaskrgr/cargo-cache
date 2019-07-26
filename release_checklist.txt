@@ -1,0 +1,17 @@
+update dependencies
+cargo check
+cargo build
+cargo build --release
+git clean -dffx
+cargo test
+git clean -dffx
+cargo test --release
+cargo audit
+cargo clippy --all-targets --all-features
+cargo fmt --all
+make sure changelog is up to date
+make sure CI catches up and everything is green
+update version
+write release notes
+cargo publish --dry-run
+cargo publish
