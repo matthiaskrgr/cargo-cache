@@ -82,12 +82,12 @@ matrix:
         - cargo audit
 
 
-    - name: "rustfmt"
-      os: linux
-      rust: nightly
-      script:
-        - rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force
-        - cargo fmt --all -- --check
+#    - name: "rustfmt"
+#      os: linux
+#      rust: nightly
+#      script:
+#        - rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force
+#        - cargo fmt --all -- --check
 
 script:
   - cargo build --all ${RELEASE}
