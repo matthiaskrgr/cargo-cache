@@ -1,4 +1,4 @@
-## Git
+## Version 0.3.0
 ````
 Change the default summary/output from:
 

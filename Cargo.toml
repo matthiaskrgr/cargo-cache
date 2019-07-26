@@ -1,6 +1,6 @@
 [package]
 name = "cargo-cache"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
 description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively"
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
