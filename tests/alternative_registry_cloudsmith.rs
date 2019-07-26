@@ -80,7 +80,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         path
     };
 
-    // run the build comand to force cargo to use the alternative registry
+    // run the build command to force cargo to use the alternative registry
     // and fill the cargo_home with the alternative registry
     let fetch_cmd = Command::new("cargo")
         .arg("fetch")

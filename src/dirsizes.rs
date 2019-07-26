@@ -274,7 +274,7 @@ impl<'a> DirSizes<'a> {
                     .to_string(),
             )
         });
-        // we now collected all the folder names of the registries and can match a single registry accross multiple
+        // we now collected all the folder names of the registries and can match a single registry across multiple
         // caches by this
 
         /*

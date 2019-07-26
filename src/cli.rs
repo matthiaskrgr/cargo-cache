@@ -46,7 +46,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .long("info")
         .conflicts_with("list-dirs")
         .help(
-            "Print information cache directories, what they are for and what can be savely deleted",
+            "Print information cache directories, what they are for and what can be safely deleted",
         );
 
     let keep_duplicate_crates = Arg::with_name("keep-duplicate-crates")
@@ -122,11 +122,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
     // <registry>
     let registry =
-        SubCommand::with_name("registry").about("query each package registry seperately");
-    let registry_short = SubCommand::with_name("r").about("query each package registry seperately");
+        SubCommand::with_name("registry").about("query each package registry separately");
+    let registry_short = SubCommand::with_name("r").about("query each package registry separately");
     // hidden, but have "cargo cache registries" work too
     let registries_hidden = SubCommand::with_name("registries")
-        .about("query each package registry seperately")
+        .about("query each package registry separately")
         .settings(&[AppSettings::Hidden]);
     //</registry>
 
@@ -219,7 +219,7 @@ FLAGS:
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
+    -i, --info                   Print information cache directories, what they are for and what can be safely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
@@ -233,8 +233,8 @@ SUBCOMMANDS:
     local       check local build cache (target) of a rust project
     q           run a query
     query       run a query
-    r           query each package registry seperately
-    registry    query each package registry seperately\n");
+    r           query each package registry separately
+    registry    query each package registry separately\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -261,7 +261,7 @@ FLAGS:
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
+    -i, --info                   Print information cache directories, what they are for and what can be safely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
@@ -275,8 +275,8 @@ SUBCOMMANDS:
     local       check local build cache (target) of a rust project
     q           run a query
     query       run a query
-    r           query each package registry seperately
-    registry    query each package registry seperately\n");
+    r           query each package registry separately
+    registry    query each package registry separately\n");
 
         assert_eq!(help_desired, help_real);
     }

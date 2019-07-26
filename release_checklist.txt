@@ -1,3 +1,4 @@
+codespell -L mut,crate src tests -i 3 -w
 update dependencies
 cargo check
 cargo build

@@ -43,7 +43,7 @@ Total:                                4.22 GB
     113 bare git repos:             993.72 MB
     9 git repo checkouts:            55.48 MB
 ````
-To learn more about the subdirectories inside the cargo home and what can be savely deleted, check `--info`.
+To learn more about the subdirectories inside the cargo home and what can be safely deleted, check `--info`.
 
 
 #### Usage:
@@ -56,7 +56,7 @@ FLAGS:
     -d, --dry-run                Don't remove anything, just pretend
     -g, --gc                     Recompress git repositories (may take some time)
     -h, --help                   Prints help information
-    -i, --info                   Print information cache directories, what they are for and what can be savely deleted
+    -i, --info                   Print information cache directories, what they are for and what can be safely deleted
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information
 OPTIONS:

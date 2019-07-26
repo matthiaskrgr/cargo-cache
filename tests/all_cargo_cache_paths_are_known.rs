@@ -46,7 +46,7 @@ fn CARGO_HOME_subdirs_are_known() {
         .env("CARGO_HOME", "target/cargo_home_subdirs_known_CARGO_HOME/")
         .output();
     // note: it does not matter if the build succeeds or not, we only need
-    // cargo to inizialize the CARGO_HOME
+    // cargo to initialize the CARGO_HOME
 
     let status = command.unwrap();
 

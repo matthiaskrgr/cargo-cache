@@ -63,7 +63,7 @@ fn get_manifest() -> PathBuf {
 pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
     const MIN_PADDING: usize = 6; // for the final formatting of the table
 
-    // find the closest manifest, traverse up if neccesary
+    // find the closest manifest, traverse up if necessary
     let manifest = get_manifest();
 
     // get the metadata

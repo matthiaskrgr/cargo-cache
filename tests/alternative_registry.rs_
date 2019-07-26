@@ -199,7 +199,7 @@ rayon = { version = "1", registry = "my-index" }
         path
     };
 
-    // run the build comand to force cargo to use the alternative registry
+    // run the build command to force cargo to use the alternative registry
     // and fill the cargo_home with the alternative registry
     let build_cmd = Command::new("cargo")
         .arg("check")

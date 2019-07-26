@@ -23,7 +23,7 @@ use walkdir::WalkDir;
 pub(crate) struct RegistrySourceCache {
     /// the name of the index
     name: String,
-    /// the path of the root dir of the index, this is uniqe
+    /// the path of the root dir of the index, this is unique
     path: PathBuf,
     /// total size of the index, computed on-demand
     size: Option<u64>,

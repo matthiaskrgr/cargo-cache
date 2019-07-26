@@ -22,7 +22,7 @@ use walkdir::WalkDir;
 pub(crate) struct RegistryIndex {
     /// the name of the index
     name: String,
-    /// the path of the root dir of the index, this is uniqe
+    /// the path of the root dir of the index, this is unique
     path: PathBuf,
     /// total size of the index, computed on-demand
     size: Option<u64>,
@@ -252,7 +252,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
             Some(number) => number,
             None => {
                 let mut total: usize = 0;
-                //@TODO make everyhing used here return usize
+                //@TODO make everything used here return usize
                 #[allow(clippy::cast_possible_truncation)]
                 self.indices
                     .iter_mut()
