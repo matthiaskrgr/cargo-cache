@@ -7,6 +7,9 @@
 
 Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional cache pruning.
 
+
+![Screenshot of cargo cache default output (it's listed below also in textual form)](data/screenshot_readme_f724ec8.png?raw=true "Cargo Cache")
+
 #### Key Features:
 * check the size of the cargo cache and its components (cmd: `cargo cache`)
 * do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
