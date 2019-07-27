@@ -101,18 +101,12 @@ impl RegistrySubCache for RegistryPkgCache {
             &self.files
         } else {
             if self.path_exists() {
-                let mut collection = Vec::new();
-
-                // need to take 2 levels into account
-
-                for i in fs::read_dir(&self.path)
+                let collection = fs::read_dir(&self.path)
                     .unwrap_or_else(|_| {
                         panic!("Failed to read directory (repo): '{:?}'", &self.path)
                     })
                     .map(|cratepath| cratepath.unwrap().path())
-                {
-                    collection.push(i);
-                }
+                    .collect::<Vec<_>>();
 
                 self.files_calculated = true;
                 self.number_of_files = Some(collection.len());
@@ -237,10 +231,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
         match self.total_size {
             Some(size) => size,
             None => {
-                let mut total_size = 0;
-                for cache in &mut self.caches {
-                    total_size += cache.total_size();
-                }
+                let total_size = self.caches.iter_mut().map(|cache| cache.total_size()).sum();
                 self.total_size = Some(total_size);
                 total_size
             }
@@ -254,12 +245,14 @@ impl RegistrySuperCache for RegistryPkgCaches {
         match self.total_number_of_files {
             Some(number) => number,
             None => {
-                let mut total = 0;
-                self.caches
+                let number = self
+                    .caches
                     .iter_mut()
-                    .for_each(|cache| total += cache.number_of_files());
+                    .map(|cache| cache.number_of_files())
+                    .sum();
 
-                total
+                self.total_number_of_files = Some(number);
+                number
             }
         }
     }

@@ -249,9 +249,9 @@ impl RegistrySuperCache for RegistrySourceCaches {
 
     fn files(&mut self) -> Vec<PathBuf> {
         let mut all_files = Vec::new();
-        for cache in &mut self.caches {
-            all_files.extend(cache.files().to_vec());
-        }
+        self.caches
+            .iter_mut()
+            .for_each(|cache| all_files.extend(cache.files().to_vec()));
 
         all_files
     }
@@ -266,10 +266,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
         match self.total_size {
             Some(size) => size,
             None => {
-                let mut total_size = 0;
-                for cache in &mut self.caches {
-                    total_size += cache.total_size();
-                }
+                let total_size = self.caches.iter_mut().map(|cache| cache.total_size()).sum();
                 self.total_size = Some(total_size);
                 total_size
             }
@@ -282,11 +279,13 @@ impl RegistrySuperCache for RegistrySourceCaches {
         match self.total_number_of_files {
             Some(number) => number,
             None => {
-                let mut total = 0;
-                self.caches
+                let total = self
+                    .caches
                     .iter_mut()
-                    .for_each(|cache| total += cache.number_of_files());
+                    .map(|cache| cache.number_of_files())
+                    .sum();
 
+                self.total_number_of_files = Some(total);
                 total
             }
         }

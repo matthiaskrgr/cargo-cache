@@ -234,10 +234,12 @@ impl RegistrySuperCache for RegistryIndicesCache {
         match self.total_size {
             Some(size) => size,
             None => {
-                let mut total_size = 0;
-                for index in &mut self.indices {
-                    total_size += index.total_size();
-                }
+                let total_size = self
+                    .indices
+                    .iter_mut()
+                    .map(|index| index.total_size())
+                    .sum();
+
                 self.total_size = Some(total_size);
                 total_size
             }
@@ -251,14 +253,12 @@ impl RegistrySuperCache for RegistryIndicesCache {
         match self.total_number_of_files {
             Some(number) => number,
             None => {
-                let mut total: usize = 0;
                 //@TODO make everything used here return usize
                 #[allow(clippy::cast_possible_truncation)]
                 self.indices
                     .iter_mut()
-                    .for_each(|index| total += index.total_size() as usize);
-
-                total
+                    .map(|index| index.total_size() as usize)
+                    .sum()
             }
         }
     }
