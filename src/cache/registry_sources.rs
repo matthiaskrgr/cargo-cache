@@ -294,10 +294,11 @@ impl RegistrySuperCache for RegistrySourceCaches {
 
 impl RegistrySourceCaches {
     pub(crate) fn total_number_of_source_checkout_folders(&mut self) -> usize {
-        let mut total = 0;
-        self.caches
+        let total = self
+            .caches
             .iter_mut()
-            .for_each(|registry| total += registry.number_of_source_checkout_folders());
+            .map(|registry| registry.number_of_source_checkout_folders())
+            .sum();
         total
     }
 
