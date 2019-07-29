@@ -1,5 +1,7 @@
 ## Git
 
+Don't crash when encountering spurious files in git directories where folders are expected (#65)
+
 ## Version 0.3.0 (aaed2c9)
 ````
 Change the default summary/output from:

@@ -55,6 +55,10 @@ impl Cache for GitRepoCache {
     }
 
     fn total_size(&mut self) -> u64 {
+        if GitRepoCache::bare_repo_folders(self).len() == 0 {
+            return 0;
+        }
+
         if self.total_size.is_some() {
             self.total_size.unwrap()
         } else if self.path.is_dir() {
@@ -103,7 +107,11 @@ impl GitRepoCache {
         if self.number_of_repos.is_some() {
             self.number_of_repos
         } else {
-            let c = self.bare_repo_folders().iter().count();
+            let c = self
+                .bare_repo_folders()
+                .iter()
+                .filter(|p| p.is_dir())
+                .count();
             // println!("{:?}", self.checkout_folders().iter());
             self.number_of_repos = Some(c);
             self.number_of_repos
@@ -118,6 +126,7 @@ impl GitRepoCache {
                 let crate_list = fs::read_dir(&self.path)
                     .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
+                    .filter(|p| p.is_dir())
                     .collect::<Vec<PathBuf>>();
 
                 self.repos_calculated = true;

@@ -52,6 +52,10 @@ impl Cache for GitCheckoutCache {
     }
 
     fn total_size(&mut self) -> u64 {
+        if GitCheckoutCache::checkout_folders(self).len() == 0 {
+            return 0;
+        }
+
         if self.total_size.is_some() {
             self.total_size.unwrap()
         } else if self.path.is_dir() {
@@ -128,6 +132,7 @@ impl GitCheckoutCache {
                 let crate_list = fs::read_dir(&self.path)
                     .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
+                    .filter(|p| p.is_dir())
                     .collect::<Vec<PathBuf>>();
                 // need to take 2 levels into account
                 let mut both_levels_vec: Vec<PathBuf> = Vec::new();

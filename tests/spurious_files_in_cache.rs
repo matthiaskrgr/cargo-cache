@@ -58,6 +58,17 @@ fn spurious_files_in_cache_test() {
     create_dir_all("target/spurious_files_test/registry/cache/github.com-1ecc6299db9ec823/foo_dir")
         .unwrap();
 
+    // git:
+    create_dir_all("target/spurious_files_test/git/checkouts").unwrap();
+    create_dir_all("target/spurious_files_test/git/db").unwrap();
+    // add some files where the cache might not expect them
+    File::create("target/spurious_files_test/git/.DS_STORE").unwrap();
+    File::create("target/spurious_files_test/git/foo").unwrap();
+    File::create("target/spurious_files_test/git/checkouts/.DS_STORE").unwrap();
+    File::create("target/spurious_files_test/git/checkouts/bar").unwrap();
+    File::create("target/spurious_files_test/git/db/.DS_STORE").unwrap();
+    File::create("target/spurious_files_test/git/db/bla").unwrap();
+
     // make sure the size of the registry matches and we have 4 entries
     let mut registry_pkg_cache_path = PathBuf::from(&fchp);
     registry_pkg_cache_path.push("registry");
@@ -109,15 +120,15 @@ fn spurious_files_in_cache_test() {
         */
 
     desired_output.push_str(
-        "Total:                     .* MB
-  0 installed binaries:         .*  B
-  Registry:                     .* MB
-    Registry index:             .* MB
-   .. crate archives:           .* KB
-   .. crate source checkouts:   .* MB
-  Git db:                       .* 0  B
-    0 bare git repos:           .* 0  B
-    0 git repo checkouts:       .* 0  B",
+        "Total:                    .* MB
+  0 installed binaries:        .*  B
+  Registry:                    .* MB
+    Registry index:            .* MB
+   .. crate archives:          .* KB
+   .. crate source checkouts:  .* MB
+  Git db:                            0  B
+    0 bare git repos:                0  B
+    0 git repo checkouts:            0  B",
     );
 
     let regex = Regex::new(&desired_output);
