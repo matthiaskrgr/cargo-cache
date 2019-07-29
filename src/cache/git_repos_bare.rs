@@ -55,7 +55,7 @@ impl Cache for GitRepoCache {
     }
 
     fn total_size(&mut self) -> u64 {
-        if GitRepoCache::bare_repo_folders(self).len() == 0 {
+        if Self::bare_repo_folders(self).is_empty() {
             return 0;
         }
 

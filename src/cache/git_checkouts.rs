@@ -52,7 +52,7 @@ impl Cache for GitCheckoutCache {
     }
 
     fn total_size(&mut self) -> u64 {
-        if GitCheckoutCache::checkout_folders(self).len() == 0 {
+        if Self::checkout_folders(self).is_empty() {
             return 0;
         }
 
