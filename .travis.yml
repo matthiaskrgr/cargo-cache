@@ -76,9 +76,9 @@ matrix:
 
     - name: "cargo audit"
       os: linux
-      rust: nightly
+      rust: beta
       script:
-        - cargo install cargo-audit --debug || exit
+        - cargo install cargo-audit --debug
         - cargo audit
 
 
