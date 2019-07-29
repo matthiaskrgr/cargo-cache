@@ -86,7 +86,7 @@ fn file_desc_list_from_path(
         .files_sorted()
         .iter()
         .map(|path| FileDesc::new_from_reg_cache(path))
-        .collect::<Vec<_>>()
+        .collect::<Vec<FileDesc>>()
 }
 
 fn stats_from_file_desc_list(file_descs: Vec<FileDesc>) -> Vec<RgchInfo> {

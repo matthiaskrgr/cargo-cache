@@ -78,7 +78,7 @@ matrix:
       os: linux
       rust: nightly
       script:
-        - cargo install cargo-audit --debug
+        - cargo install cargo-audit --debug || exit
         - cargo audit
 
 
