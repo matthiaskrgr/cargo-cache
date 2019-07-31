@@ -362,5 +362,4 @@ mod top_crates_binaries {
         }
         assert_eq!(stats, wanted);
     }
-
 }

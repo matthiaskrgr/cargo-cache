@@ -153,5 +153,4 @@ mod format_table_tests {
         // println!("{}", output);
         assert_eq!(t, output);
     }
-
 }

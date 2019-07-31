@@ -527,7 +527,6 @@ mod top_crates_git_checkouts {
         }
         assert_eq!(is, wanted);
     }
-
 }
 
 #[cfg(all(test, feature = "bench"))]
@@ -592,5 +591,4 @@ mod benchmarks {
             let _ = black_box(is);
         });
     }
-
 }

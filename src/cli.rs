@@ -352,7 +352,6 @@ ARGS:
             v4_s
         );
     }
-
 }
 
 #[cfg(all(test, feature = "bench"))]
@@ -379,5 +378,4 @@ mod benchmarks {
             black_box(x);
         });
     }
-
 }

@@ -440,5 +440,4 @@ mod gittest {
         let res = fsck_repo(&PathBuf::from("target/gitrepo_fsck/"));
         assert!(res.is_ok(), format!("Failed to fsck git repo: {:?}", res));
     }
-
 }

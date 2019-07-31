@@ -578,7 +578,6 @@ mod libtests {
         let last = iter.next();
         assert!(!last.is_some(), "found another directory?!: '{:?}'", last);
     }
-
 }
 
 #[cfg(all(test, feature = "bench"))]
@@ -646,5 +645,4 @@ mod benchmarks {
             let _ = black_box(x);
         });
     }
-
 }

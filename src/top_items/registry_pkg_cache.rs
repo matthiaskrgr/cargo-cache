@@ -567,5 +567,4 @@ mod benchmarks {
             let _ = black_box(is);
         });
     }
-
 }
