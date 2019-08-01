@@ -331,6 +331,19 @@ fn main() {
         );
     }
 
+    if !size_changed
+        && config.is_present("dry-run")
+        // none of the flags that do on-disk changes are present
+        && !(config.is_present("keep-duplicate-crates")
+            || config.is_present("autoclean")
+            || config.is_present("autoclean-expensive")
+            || config.is_present("gc-repos")
+            || config.is_present("fsck-repos")
+            || config.is_present("remove-dir"))
+    {
+        println!("Warning: there is nothing to be dry run!");
+    }
+
     if debug_mode {
         println!("\ndebug:");
 
