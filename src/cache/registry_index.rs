@@ -7,9 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//@TODO fixme
-#![allow(clippy::single_match_else)]
-
 use std::fs;
 use std::path::PathBuf;
 
@@ -122,17 +119,15 @@ impl RegistrySubCache for RegistryIndex {
 
     // number of files of the cache
     fn number_of_files(&mut self) -> usize {
-        match self.number_of_files {
-            Some(number) => number,
-            None => {
-                // prime the cache
-                let _ = self.files();
-                match self.number_of_files {
-                    Some(n) => n,
-                    None => {
-                        unreachable!();
-                    }
-                }
+        if let Some(number) = self.number_of_files {
+            number
+        } else {
+            // prime the cache
+            let _ = self.files();
+            if let Some(n) = self.number_of_files {
+                n
+            } else {
+                unreachable!();
             }
         }
     }
@@ -231,18 +226,17 @@ impl RegistrySuperCache for RegistryIndicesCache {
 
     // total size of all indices combined
     fn total_size(&mut self) -> u64 {
-        match self.total_size {
-            Some(size) => size,
-            None => {
-                let total_size = self
-                    .indices
-                    .iter_mut()
-                    .map(|index| index.total_size())
-                    .sum();
+        if let Some(size) = self.total_size {
+            size
+        } else {
+            let total_size = self
+                .indices
+                .iter_mut()
+                .map(|index| index.total_size())
+                .sum();
 
-                self.total_size = Some(total_size);
-                total_size
-            }
+            self.total_size = Some(total_size);
+            total_size
         }
     }
     fn number_of_items(&mut self) -> usize {

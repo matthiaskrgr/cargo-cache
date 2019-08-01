@@ -7,9 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//@TODO fixme
-#![allow(clippy::single_match_else)]
-
 use std::fs;
 use std::path::PathBuf;
 
@@ -263,31 +260,29 @@ impl RegistrySuperCache for RegistrySourceCaches {
 
     // total size of all caches combined
     fn total_size(&mut self) -> u64 {
-        match self.total_size {
-            Some(size) => size,
-            None => {
-                let total_size = self.caches.iter_mut().map(|cache| cache.total_size()).sum();
-                self.total_size = Some(total_size);
-                total_size
-            }
+        if let Some(size) = self.total_size {
+            size
+        } else {
+            let total_size = self.caches.iter_mut().map(|cache| cache.total_size()).sum();
+            self.total_size = Some(total_size);
+            total_size
         }
     }
     fn number_of_items(&mut self) -> usize {
         self.caches.len()
     }
     fn total_number_of_files(&mut self) -> usize {
-        match self.total_number_of_files {
-            Some(number) => number,
-            None => {
-                let total = self
-                    .caches
-                    .iter_mut()
-                    .map(|cache| cache.number_of_files())
-                    .sum();
+        if let Some(number) = self.total_number_of_files {
+            number
+        } else {
+            let total = self
+                .caches
+                .iter_mut()
+                .map(|cache| cache.number_of_files())
+                .sum();
 
-                self.total_number_of_files = Some(total);
-                total
-            }
+            self.total_number_of_files = Some(total);
+            total
         }
     }
 }
