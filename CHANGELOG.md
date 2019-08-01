@@ -2,7 +2,8 @@
 ````
 Warn if --dry-run is passed but nothing to be dry-run is specified. (#59)
 ````
-## Version 0.3.1
+
+## Version 0.3.1 (4b9baf6)
 ````
 Don't crash when encountering spurious files in git cache directories where folders are expected (#65)
 ````
