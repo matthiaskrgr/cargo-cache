@@ -352,6 +352,24 @@ ARGS:
             v4_s
         );
     }
+
+    #[test]
+    fn bare_dry_run_warns() {
+        let cc_dryrun = Command::new(bin_path())
+            .arg("cache")
+            .arg("--dry-run")
+            .output();
+        assert!(
+            cc_dryrun.is_ok(),
+            "cargo-cache --dry-run failed: '{:?}'",
+            cc_dryrun
+        );
+
+        let stderr = String::from_utf8_lossy(&cc_dryrun.unwrap().stderr).into_owned();
+        let last_line = stderr.lines().last();
+        // last line must be this warning:
+        assert_eq!(last_line, Some("Warning: there is nothing to be dry run!"));
+    }
 }
 
 #[cfg(all(test, feature = "bench"))]

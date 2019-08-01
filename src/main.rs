@@ -341,7 +341,7 @@ fn main() {
             || config.is_present("fsck-repos")
             || config.is_present("remove-dir"))
     {
-        println!("Warning: there is nothing to be dry run!");
+        eprintln!("Warning: there is nothing to be dry run!");
     }
 
     if debug_mode {
