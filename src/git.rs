@@ -210,7 +210,7 @@ fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
         .output();
 
     if cmd.is_err() {
-        return Err((ErrorKind::GitFsckFailed, format!("{:?}", cmd.unwrap())));
+        return Err((ErrorKind::GitFsckFailed, format!("{:?}", cmd)));
     }
 
     let stderr = String::from_utf8_lossy(&cmd.unwrap().stderr).to_string();
