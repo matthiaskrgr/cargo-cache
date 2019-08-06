@@ -14,12 +14,12 @@ use std::path::PathBuf;
 use std::process;
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
-use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 use crate::display::*;
 use crate::library;
+
 /// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
 /// If yes, return a path to it, if not, return None
 fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
@@ -62,45 +62,50 @@ fn get_manifest() -> PathBuf {
     }
 }
 
-pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
-    const MIN_PADDING: usize = 6; // for the final formatting of the table
+/// gather the sizes of subdirs of the `target` directory and prints a formatted table
+/// of the data to stdout
+pub(crate) fn local_subcmd() {
+    // padding of the final formatting of the table
+    const MIN_PADDING: usize = 6;
 
     // find the closest manifest, traverse up if necessary
     let manifest = get_manifest();
 
-    // get the metadata
+    // get the cargo metadata for the manifest
     let metadata = MetadataCommand::new()
         .manifest_path(&manifest)
         .features(CargoOpt::AllFeatures)
         .exec()
         .unwrap_or_else(|_| panic!("Failed to parse manifest: '{}'", &manifest.display()));
 
+    // get the project target dir from the metadata
     let target_dir = metadata.target_directory;
 
     // println!("Found target dir: '{}'", target_dir.display());
+
+    // get the size
     let dirinfo = library::cumulative_dir_size(&target_dir);
-
-    let mut output = String::new();
-
+    // and the human readable size
     let size_hr = dirinfo.dir_size.file_size(file_size_opts::DECIMAL).unwrap();
+
+    let mut stdout = String::new();
 
     let mut lines = Vec::new();
 
-    output.push_str(&format!(
+    stdout.push_str(&format!(
         "Project {:?}\n",
         metadata.workspace_root.to_str().unwrap().to_string()
     ));
 
-    // Do we actually have a target dir?
+    // If there is no target dir, we can quit
     if !target_dir.exists() {
-        output.push_str("No target dir found!");
-
-        eprintln!("{}", output);
-
+        stdout.push_str("No target dir found!");
+        eprintln!("{}", stdout);
         return;
     }
-    output.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
 
+    // print the total size and the header into the table
+    stdout.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
     lines.push(TableLine::new(0, "Total Size: ".to_string(), size_hr));
 
     let p = &target_dir; // path
@@ -195,7 +200,7 @@ pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
         ));
     }
 
-    output.push_str(&format_2_row_table(MIN_PADDING, lines, true));
+    stdout.push_str(&format_2_row_table(MIN_PADDING, lines, true));
 
-    println!("{}", output);
+    println!("{}", stdout);
 }

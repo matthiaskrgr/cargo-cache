@@ -168,15 +168,17 @@ fn main() {
 
         process::exit(0);
     } else if config.is_present("local") || config.is_present("l") {
+        // this is not actually not needed and was previously passed into local_subcmd()
+        /*
         let local_config = if config.is_present("local") {
             config
                 .subcommand_matches("local")
                 .expect("unwrap failed here")
         } else {
             config.subcommand_matches("l").expect("unwrap failed there")
-        };
+        }; */
 
-        local::local_run(&local_config);
+        local::local_subcmd();
 
         process::exit(0);
     }
