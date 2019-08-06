@@ -7,16 +7,20 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+/// This file provides the command line interface of the cargo-cache crate
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;
 
+/// generates the version info with what we have in the build.rs
 pub(crate) fn get_version() -> String {
+    // remove the "cargo-cache" since CLAP already adds that by itself
     rustc_tools_util::get_version_info!()
         .to_string()
         .replacen("cargo-cache ", "", 1)
 }
 
+/// generates the clap config which is used to control the crate
 #[allow(clippy::too_many_lines)]
 pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let version_string = get_version();
@@ -84,6 +88,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .hidden(true);
 
     // <query>
+    // arg of query sbcmd
     let query_order = Arg::with_name("sort")
         .short("s")
         .long("sort-by")
@@ -91,6 +96,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .possible_values(&["size", "name"]);
 
+    // arg of query sbcmd
     let human_readable = Arg::with_name("hr")
         .short("h")
         .long("human-readable")
@@ -103,7 +109,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&query_order)
         .arg(&human_readable);
 
-    // short q
+    // short q (shorter query sbcmd)
     let query_short = SubCommand::with_name("q")
         .about("run a query")
         .arg(Arg::with_name("QUERY"))
@@ -112,15 +118,16 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     // </query>
 
     //<local>
-    // subcommand
+    // local subcommand
     let local =
         SubCommand::with_name("local").about("check local build cache (target) of a rust project");
-
+    // shorter local subcommand (l)
     let local_short =
         SubCommand::with_name("l").about("check local build cache (target) of a rust project");
     //</local>
 
     // <registry>
+    // registry subcommand
     let registry =
         SubCommand::with_name("registry").about("query each package registry separately");
     let registry_short = SubCommand::with_name("r").about("query each package registry separately");
@@ -130,10 +137,14 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .settings(&[AppSettings::Hidden]);
     //</registry>
 
-    // subcommand (version, which is hidden)
+    // "version" subcommand which is also hidden, prints crate version
     let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
 
+    // now thread all of these together
+
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
+    // "cargo cache foo" works because cargo, since it does not implement the "cache" subcommand
+    // itself will look if there is a "cargo-cache" binary and exec that
     let cache_subcmd = SubCommand::with_name("cache")
         .version(&*version_string)
         .bin_name("cargo-cache")
