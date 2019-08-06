@@ -20,9 +20,9 @@ use walkdir::WalkDir;
 
 use crate::display::*;
 use crate::library;
-
+/// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
+/// If yes, return a path to it, if not, return None
 fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
-    // check if the "Cargo.toml" manifest can be seen in the current directory
     #[allow(clippy::filter_map)]
     read_dir(&path)
         .unwrap()
@@ -31,9 +31,12 @@ fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
         .find(|f| f.file_name() == Some(OsStr::new("Cargo.toml")))
 }
 
+/// start at the cwd, walk downwards and check if we encounter a Cargo.toml somewhere
 fn get_manifest() -> PathBuf {
-    // find the closest manifest (Cargo.toml)
-    let mut cwd = match env::current_dir() {
+    //@TODO: make this function return Result<Pathbuf>
+
+    // get the cwd
+    let mut cwd: PathBuf = match env::current_dir() {
         Ok(cwd) => cwd,
         Err(e) => {
             eprintln!("failed to determine current work directory '{}'", e);
@@ -41,23 +44,22 @@ fn get_manifest() -> PathBuf {
         }
     };
 
-    let manifest;
-
+    // walk downwards and try to find a "Cargo.toml"
     loop {
-        if let Some(mf) = seeing_manifest(&cwd) {
-            manifest = mf;
-            break;
+        if let Some(manifest_path) = seeing_manifest(&cwd) {
+            // if the manifest is seen, return it
+            return manifest_path;
         } else {
+            // otherwise continue walking down and check again
             let fs_root_reached = !cwd.pop();
 
             if fs_root_reached {
+                // we have reached the file system root without finding anything
                 eprintln!("Did not find manifest!");
                 std::process::exit(123);
             }
         }
     }
-
-    manifest
 }
 
 pub(crate) fn local_run(_local_config: &ArgMatches<'_>) {
