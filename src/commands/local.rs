@@ -7,6 +7,22 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+/// This file implements the "local" subcommand:
+/// `cargo cache local`
+/// `cargo cache l`
+/// The goal of this subcommand is to provide a simple overview of the
+/// target directory sizes which are "local" to the project
+/// We print the total size of each subdirectory that we know to be rust-related (so debug/release/package etc)
+/// and sum up the rest under "other:"; the output can look like this:
+/// ````
+/// Project "/home/matthias/vcs/github/cargo-cache"
+/// Target dir: /home/matthias/vcs/github/cargo-cache/target
+///
+/// Total Size:         3.06 GB
+/// debug:              2.48 GB
+/// release:          224.26 MB
+/// other:            360.57 MB
+/// ````
 use std::env;
 use std::ffi::OsStr;
 use std::fs::read_dir;
@@ -104,10 +120,10 @@ pub(crate) fn local_subcmd() {
         return;
     }
 
-    // print the total size and the header into the table
     stdout.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
     lines.push(TableLine::new(0, "Total Size: ".to_string(), size_hr));
 
+    // we are going to check these directories:
     let p = &target_dir; // path
     let target_dir_debug = p.clone().join("debug");
     let target_dir_rls = p.clone().join("rls");
@@ -115,6 +131,7 @@ pub(crate) fn local_subcmd() {
     let target_dir_package = p.clone().join("package");
     let target_dir_doc = p.join("doc");
 
+    // gather the sizes of all these directories, `TableLine` will be used for formatting
     let size_debug = library::cumulative_dir_size(&target_dir_debug).dir_size;
     if size_debug > 0 {
         lines.push(TableLine::new(
@@ -200,7 +217,8 @@ pub(crate) fn local_subcmd() {
         ));
     }
 
+    // add the formatted table to the output
     stdout.push_str(&format_2_row_table(MIN_PADDING, lines, true));
-
+    // and finally print it
     println!("{}", stdout);
 }
