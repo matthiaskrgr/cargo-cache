@@ -7,14 +7,23 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+/// This file provicdes the `TableLine` struct which is used by
+/// `format_2_row_table()` to create neat-looking 2-column tables.
+
+/// struct used to format 2-column tables
 #[derive(Clone, Debug)]
 pub(crate) struct TableLine {
+    /// the padding before `left_column`, mostly used for semantic indentation
     indent_front: usize,
+    /// left column
     left_column: String,
+    /// right column
     right_column: String,
 }
 
 impl TableLine {
+    /// creates a new `TableLine` struct
+    /// if the right column ends with " B", we pad it to "  B" to align with " MB", " GB" etc
     pub(crate) fn new(indent_front: usize, left_column: String, right_column: String) -> Self {
         let mut right_column = right_column;
         if right_column.ends_with(" B") {
@@ -29,9 +38,13 @@ impl TableLine {
     }
 }
 
+/// creates a formatted 2 row table (String) from a `Vec` of `TableLines`
 pub(crate) fn format_2_row_table(
+    // minimal padding between left and right column
     min_padding_middle: usize,
+    // List of TableLine lines to format
     lines: Vec<TableLine>,
+    // whether the first line is to be aligned or not
     align_first_line: bool,
 ) -> String {
     let mut first_line: Option<String> = None;
