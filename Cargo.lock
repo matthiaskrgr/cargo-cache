@@ -65,7 +65,7 @@ dependencies = [
  "cargo_metadata 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "home 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "home 0.4.1 (git+https://github.com/lzutao/home/?rev=64de940e4db172503e65c78193abfcae08fb3c97)",
  "humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "path-slash 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -203,10 +203,10 @@ dependencies = [
 
 [[package]]
 name = "home"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+version = "0.4.1"
+source = "git+https://github.com/lzutao/home/?rev=64de940e4db172503e65c78193abfcae08fb3c97#64de940e4db172503e65c78193abfcae08fb3c97"
 dependencies = [
- "scopeguard 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "scopeguard 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -426,11 +426,6 @@ dependencies = [
 
 [[package]]
 name = "scopeguard"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "scopeguard"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
@@ -635,7 +630,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
 "checksum failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "ea1063915fd7ef4309e222a5a07cf9c319fb9c7836b1f89b85458672dbb127e1"
 "checksum git2 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "8cb400360e8a4d61b10e648285bbfa919bbf9519d0d5d5720354456f44349226"
-"checksum home 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "29302b90cfa76231a757a887d1e3153331a63c7f80b6c75f86366334cbe70708"
+"checksum home 0.4.1 (git+https://github.com/lzutao/home/?rev=64de940e4db172503e65c78193abfcae08fb3c97)" = "<none>"
 "checksum humansize 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b6cab2627acfc432780848602f3f558f7e9dd427352224b0d9324025796d2a5e"
 "checksum idna 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "02e2673c30ee86b5b96a9cb52ad15718aa1f966f5ab9ad54a8b95d5ca33120a9"
 "checksum itoa 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "501266b7edd0174f8530248f87f99c88fbe60ca4ef3dd486835b8d8d53136f7f"
@@ -665,7 +660,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 "checksum ryu 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c92464b447c0ee8c4fb3824ecc8383b81717b9f1e74ba2e72540aef7b9f82997"
 "checksum same-file 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)" = "585e8ddcedc187886a30fa705c47985c3fa88d06624095856b36ca0b82ff4421"
-"checksum scopeguard 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "94258f53601af11e6a49f722422f6e3425c52b06245a5cf9bc09908b174f5e27"
 "checksum scopeguard 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b42e15e59b18a828bbf5c58ea01debb36b9b096346de35d941dcb89009f24a0d"
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
