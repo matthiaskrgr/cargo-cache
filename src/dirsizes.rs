@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+/// This file provides the `DirSize` struct which holds information on the sizes and the number of files of the cargo cache.
+/// When constructing the struct, the caches from the cache modules are used.
+/// The new() method does parallel processing to a bit of time
 use std::fmt;
 
 use crate::cache::dircache::Cache;
@@ -19,27 +22,45 @@ use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
 
+/// Holds the sizes and the number of files of the components of the cargo cache
 #[derive(Debug)]
 pub(crate) struct DirSizes<'a> {
-    pub(crate) total_size: u64,                // total size of cargo root dir
-    pub(crate) numb_bins: usize,               // number of binaries found
-    pub(crate) total_bin_size: u64,            // total size of binaries found
-    pub(crate) total_reg_size: u64,            // registry size
-    pub(crate) total_git_db_size: u64,         // size of bare repos and checkouts combined
-    pub(crate) total_git_repos_bare_size: u64, // git db size
-    pub(crate) numb_git_repos_bare_repos: usize, // number of cloned repos
-    pub(crate) numb_git_checkouts: usize,      // number of checked out repos
-    pub(crate) total_git_chk_size: u64,        // git checkout size
-    pub(crate) total_reg_cache_size: u64,      // registry cache size
-    pub(crate) total_reg_src_size: u64,        // registry sources size
-    pub(crate) total_reg_index_size: u64,      // registry index size
-    pub(crate) total_reg_index_num: u64,       // number of registry indices size
-    pub(crate) numb_reg_cache_entries: usize,  // number of source archives
-    pub(crate) numb_reg_src_checkouts: usize,  // number of source checkouts
+    /// total size of the cache / .cargo rood directory
+    pub(crate) total_size: u64,
+    /// number of binaries found
+    pub(crate) numb_bins: usize,
+    /// total size of binaries
+    pub(crate) total_bin_size: u64,
+    /// total size of the registries (src + cache)
+    pub(crate) total_reg_size: u64,
+    /// total size of the git db (bare repos and checkouts)
+    pub(crate) total_git_db_size: u64,
+    /// total size of bare git repos
+    pub(crate) total_git_repos_bare_size: u64,
+    /// number of bare git repos
+    pub(crate) numb_git_repos_bare_repos: usize,
+    /// number of git checkouts (source checkouts)
+    pub(crate) numb_git_checkouts: usize,
+    /// total size of git checkouts
+    pub(crate) total_git_chk_size: u64,
+    /// total size of registry caches (.crates)
+    pub(crate) total_reg_cache_size: u64,
+    /// total size of registry sources (extracted .crates, .rs sourcefiles)
+    pub(crate) total_reg_src_size: u64,
+    /// total size of registry indices
+    pub(crate) total_reg_index_size: u64,
+    /// total number of registry indices
+    pub(crate) total_reg_index_num: u64,
+    /// number of source archives (.crates) // @TODO clarify
+    pub(crate) numb_reg_cache_entries: usize,
+    /// number of registry source checkouts// @TODO clarify
+    pub(crate) numb_reg_src_checkouts: usize,
+    /// root path of the cache
     pub(crate) root_path: &'a std::path::PathBuf,
 }
 
 impl<'a> DirSizes<'a> {
+    /// create a new DirSize object by querying the caches for their data, done in parallel
     pub(crate) fn new(
         bin_cache: &mut bin::BinaryCache,
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,
@@ -49,6 +70,7 @@ impl<'a> DirSizes<'a> {
         registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
         ccd: &'a CargoCachePaths,
     ) -> Self {
+        // @TODO this is a mess and there's probably a way cleaner way to do this (threadpool?)
         #[allow(clippy::type_complexity)]
         let (
             (
@@ -140,6 +162,7 @@ impl<'a> DirSizes<'a> {
 }
 
 impl<'a> DirSizes<'a> {
+    /// returns the header of the summary which contains the path to the cache and its total size
     fn header(&self) -> Vec<TableLine> {
         vec![
             TableLine::new(
@@ -155,6 +178,7 @@ impl<'a> DirSizes<'a> {
         ]
     }
 
+    /// returns amount and size of installed crate binaries
     fn bin(&self) -> Vec<TableLine> {
         vec![TableLine::new(
             1,
@@ -165,6 +189,7 @@ impl<'a> DirSizes<'a> {
         )]
     }
 
+    /// returns amount and size of bare git repos and git repo checkouts
     fn git(&self) -> Vec<TableLine> {
         vec![
             TableLine::new(
@@ -191,6 +216,7 @@ impl<'a> DirSizes<'a> {
         ]
     }
 
+    /// returns summary of sizes of registry indices and registries (both, .crate archives and the extracted sources)
     fn registries_summary(&self) -> Vec<TableLine> {
         vec![
             TableLine::new(
@@ -228,6 +254,7 @@ impl<'a> DirSizes<'a> {
         ]
     }
 
+    /// returns more detailed summary about each registry
     fn registries_seperate(
         &self,
         index_caches: &mut registry_index::RegistryIndicesCache,
@@ -362,6 +389,7 @@ impl<'a> DirSizes<'a> {
 }
 
 impl<'a> fmt::Display for DirSizes<'a> {
+    /// returns the default summary of cargo-cache (cmd: "cargo cache")
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
         let mut table: Vec<TableLine> = vec![];
         table.extend(self.header());
@@ -376,6 +404,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
     }
 }
 
+/// returns a summary with details on each registry (cmd: "cargo cache registry")
 pub(crate) fn per_registry_summary(
     dir_size: &DirSizes<'_>,
     mut index_caches: &mut registry_index::RegistryIndicesCache,
