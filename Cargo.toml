@@ -26,7 +26,7 @@ clap = "2.33.0" # cmdline arg parsing
 git2 = { version = "0.9.1", default-features = false } # check if repo is git repo
 
 # https://github.com/brson/home
-home = "0.4.1" # get CARGO_HOME
+home = "0.3.4" # get CARGO_HOME
 
 # https://github.com/LeopoldArkham/humansize
 humansize = "1.1.0" # convert digits of bytes to human readable size
