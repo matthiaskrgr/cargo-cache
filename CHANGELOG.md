@@ -1,6 +1,9 @@
 ## Git
 ````
 Warn if --dry-run is passed but nothing to be dry-run is specified. (#59)
+
+Updated dependencies:
+	home 0.3.4 -> 0.4.2
 ````
 
 ## Version 0.3.1 (4b9baf6)
