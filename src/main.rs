@@ -10,7 +10,7 @@
 // bench feat. cannot be used in beta or stable so hide them behind a feature
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 // deny unsafe code
-#![deny(unsafe_code)]
+#![deny(unsafe_code, clippy::unimplemented)]
 // these [allow()] by default, make them warn:
 #![warn(
     ellipsis_inclusive_range_patterns,
@@ -36,7 +36,14 @@
     clippy::pub_enum_variant_names,
     clippy::string_add,
     clippy::string_add_assign,
-    clippy::redundant_clone
+    clippy::redundant_clone,
+    clippy::else_if_without_else,
+    clippy::empty_enum,
+    clippy::explicit_iter_loop,
+    clippy::match_same_arms,
+    clippy::needless_borrow,
+    clippy::needless_continue,
+    clippy::path_buf_push_overwrite
 )]
 mod cache;
 mod cli;
