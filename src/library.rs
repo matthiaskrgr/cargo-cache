@@ -38,22 +38,6 @@ pub(crate) struct CargoCachePaths {
 }
 
 #[derive(Debug)]
-pub(crate) enum ErrorKind {
-    GitRepoNotOpened,
-    GitRepoDirNotFound,
-    GitGCFailed,
-    GitPackRefsFailed,
-    GitReflogFailed,
-    GitFsckErrored,
-    GitFsckFailed,
-    MalformedPackageName,
-    CargoFailedGetConfig,
-    CargoHomeNotDirectory,
-    InvalidDeletableDir,
-    RemoveDirNoArg,
-}
-
-#[derive(Debug)]
 pub(crate) enum Error {
     GitRepoNotOpened(PathBuf),
     GitRepoDirNotFound(PathBuf),
@@ -62,17 +46,24 @@ pub(crate) enum Error {
     GitReflogFailed(PathBuf, std::io::Error),
     GitFsckFailed(PathBuf, std::io::Error),
     MalformedPackageName(String),
-    CargoFailedGetConfig(PathBuf),
+    GetCargoHomeFailed,
     CargoHomeNotDirectory(PathBuf),
-    InvalidDeletableDir(PathBuf),
+    InvalidDeletableDirs(String),
     RemoveDirNoArg,
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let valid_deletable_dirs =
+            "git-db,git-repos,registry-sources,registry-crate-cache,registry-index,registry,all";
+
         match &self {
             Self::GitRepoNotOpened(path) => {
                 write!(f, "Failed to open git repository at \"{}\"", path.display())
+            }
+
+            Self::GitRepoDirNotFound(path) => {
+                write!(f, "Git repo \"{}\" not found", path.display())
             }
 
             Self::GitGCFailed(path, error) => write!(
@@ -81,38 +72,68 @@ impl fmt::Display for Error {
                 path.display(),
                 error
             ),
-            Self::GitRepoDirNotFound(path) => {
-                write!(f, "Git repo \"{}\" not found", path.display())
-            }
-            Self::GitRepoNotOpened(path) => {
-                write!(f, "Failed to open git repository\"{}\"", path.display())
+
+            Self::GitPackRefsFailed(path, error) => write!(
+                f,
+                "Failed to git pack-refs repository \"{}\":\n{:?}",
+                path.display(),
+                error
+            ),
+
+            Self::GitReflogFailed(path, error) => write!(
+                f,
+                "Failed to git reflog repository \"{}\":\n{:?}",
+                path.display(),
+                error
+            ),
+
+            Self::GitFsckFailed(path, error) => write!(
+                f,
+                "Failed to git fsck repository \"{}\":\n{:?}",
+                path.display(),
+                error
+            ),
+
+            Self::MalformedPackageName(pkgname) => {
+                write!(f, "Error:  \"{}\" is not a valid package name", pkgname)
             }
 
-            _ => write!(f, ""),
+            Self::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
+
+            Self::CargoHomeNotDirectory(path) => write!(
+                f,
+                "CARGO_HOME \"{}\" is not an existing directory!",
+                path.display()
+            ),
+
+            Self::InvalidDeletableDirs(dirs) => write!(
+                f,
+                "\"{}\" are not valid removable directories! Chose one or several from {}",
+                dirs, valid_deletable_dirs
+            ),
+
+            Self::RemoveDirNoArg => write!(
+                f,
+                "No argument passed to \"--remove-dir\"! Chose one or several from {}",
+                valid_deletable_dirs
+            ),
         }
     }
 }
 
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
-    pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
+    pub(crate) fn default() -> Result<Self, Error> {
         let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
             cargo_home
         } else {
-            return Err((
-                ErrorKind::CargoFailedGetConfig,
-                "Failed to get cargo_home!".to_string(),
-            ));
+            return Err(Error::GetCargoHomeFailed);
         };
 
         let cargo_home_path = cargo_home;
 
         if !cargo_home_path.is_dir() {
-            let msg = format!(
-                "Error, no cargo home path directory '{}' found.",
-                cargo_home_path.display()
-            );
-            return Err((ErrorKind::CargoHomeNotDirectory, msg));
+            return Err(Error::CargoHomeNotDirectory(cargo_home_path));
         }
         // get the paths to the relevant directories
         let cargo_home = cargo_home_path;
@@ -393,13 +414,9 @@ mod libtests {
     use crate::test_helpers::assert_path_end;
 
     impl CargoCachePaths {
-        pub(crate) fn new(dir: PathBuf) -> Result<Self, (ErrorKind, String)> {
+        pub(crate) fn new(dir: PathBuf) -> Result<Self, Error> {
             if !dir.is_dir() {
-                let msg = format!(
-                    "Error, no cargo home path directory '{}' found.",
-                    dir.display()
-                );
-                return Err((ErrorKind::CargoHomeNotDirectory, msg));
+                return Err(Error::CargoHomeNotDirectory(dir));
             }
 
             // get the paths to the relevant directories

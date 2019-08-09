@@ -97,8 +97,8 @@ fn main() {
 
     let cargo_cache = match CargoCachePaths::default() {
         Ok(cargo_cache) => cargo_cache,
-        Err((_, msg)) => {
-            eprintln!("{}", msg);
+        Err(e) => {
+            eprintln!("{}", e);
             process::exit(1);
         }
     };
@@ -219,7 +219,7 @@ fn main() {
     print!("{}", output);
 
     if config.is_present("remove-dir") {
-        if let Err((_, msg)) = remove_dir_via_cmdline(
+        if let Err(e) = remove_dir_via_cmdline(
             config.value_of("remove-dir"),
             config.is_present("dry-run"),
             &cargo_cache,
@@ -230,7 +230,7 @@ fn main() {
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
         ) {
-            eprintln!("{}", msg);
+            eprintln!("{}", e);
             process::exit(1);
         }
     }

@@ -38,11 +38,12 @@ fn CARGO_HOME_is_nonexisting_dir() {
     let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
     assert!(!stderr.is_empty(), "found no stderr!");
     let re =
-        Regex::new(r"Error, no cargo home path directory .*./xyxyxxxyyyxxyxyxqwertywasd' found.\n")
+        Regex::new(r"CARGO_HOME .*./xyxyxxxyyyxxyxyxqwertywasd. is not an existing directory!\n")
             .unwrap();
+    eprintln!("REGEX:\n{}", &re);
+    eprintln!("OUTPUT:\n{}", &stderr);
     assert!(re.is_match(&stderr));
 }
-
 #[allow(non_snake_case)]
 fn CARGO_HOME_is_empty() {
     // CARGO_HOME is empty
@@ -57,7 +58,7 @@ fn CARGO_HOME_is_empty() {
     // stderr
     let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
     let stdout = String::from_utf8_lossy(&cmd.stdout).into_owned();
-    assert!(stderr.is_empty(), "found stderr");
+    assert!(stderr.is_empty());
     let re = Regex::new(r"Cargo cache.*\.cargo.*:").unwrap();
     assert!(re.is_match(&stdout));
 }

@@ -47,7 +47,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
         // validate that the directory is a git repo
         let repo = match git2::Repository::open(&path) {
             Ok(repo) => repo,
-            Err(e) => return Err(Error::GitRepoNotOpened(path.into())),
+            Err(_e) => return Err(Error::GitRepoNotOpened(path.into())),
         };
         let repo_path = repo.path();
         // delete all history of all checkouts and so on.
@@ -125,7 +125,6 @@ pub(crate) fn git_gc_everything(
         git_repos.sort();
 
         for repo in git_repos {
-            let repostr = repo.display();
             // compress
             let (size_before, size_after) = match gc_repo(&repo, dry_run) {
                 // run gc
@@ -193,7 +192,7 @@ fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
 
     let repo = match git2::Repository::open(&path) {
         Ok(repo) => repo,
-        Err(e) => return Err(Error::GitRepoNotOpened(path.into())),
+        Err(_e) => return Err(Error::GitRepoNotOpened(path.into())),
     };
     let repo_path = repo.path();
 
@@ -232,7 +231,6 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
         git_repos.sort();
 
         for repo in git_repos {
-            let repostr = repo.display();
             // compress
             match fsck_repo(&repo) {
                 // run gc

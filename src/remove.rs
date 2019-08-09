@@ -128,14 +128,14 @@ pub(crate) fn remove_dir_via_cmdline(
     registry_index_caches: &mut registry_index::RegistryIndicesCache,
     registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-) -> Result<(), (ErrorKind, String)> {
+) -> Result<(), Error> {
     // @TODO the passing of the cache is really a mess here... :(
     fn rm(
         dir: &PathBuf,
         dry_run: bool,
         size_changed: &mut bool,
         total_size_from_cache: Option<u64>,
-    ) -> Result<(), (ErrorKind, String)> {
+    ) -> Result<(), Error> {
         // remove a specified subdirectory from cargo cache
         let msg = Some(format!("removing: '{}'", dir.display()));
 
@@ -153,11 +153,7 @@ pub(crate) fn remove_dir_via_cmdline(
     let input = if let Some(value) = directory {
         value
     } else {
-        return Err((
-            ErrorKind::RemoveDirNoArg,
-            "No argument assigned to --remove-dir, example: 'git-repos,registry-sources'"
-                .to_string(),
-        ));
+        return Err(Error::RemoveDirNoArg);
     };
 
     let inputs = input.split(',');
@@ -225,11 +221,8 @@ pub(crate) fn remove_dir_via_cmdline(
     } // for word in inputs
     if terminate {
         // remove trailing whitespace
-        let inv_dirs = invalid_dirs.trim();
-        return Err((
-            ErrorKind::InvalidDeletableDir,
-            format!("Invalid deletable dir(s): {}", inv_dirs),
-        ));
+        let inv_dirs_trimmed = invalid_dirs.trim();
+        return Err(Error::InvalidDeletableDirs(inv_dirs_trimmed.to_string()));
     }
 
     let mut size_removed: u64 = 0;
