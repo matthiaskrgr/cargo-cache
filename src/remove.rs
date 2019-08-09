@@ -66,7 +66,7 @@ pub(crate) fn rm_old_crates(
                     pkgpath.display()
                 );
                 remove_file(
-                    &pkgpath,
+                    pkgpath,
                     dry_run,
                     size_changed,
                     None,
@@ -95,7 +95,7 @@ pub(crate) fn rm_old_crates(
                         pkgpath.display()
                     );
                     remove_file(
-                        &pkgpath,
+                        pkgpath,
                         dry_run,
                         size_changed,
                         None,
@@ -140,7 +140,7 @@ pub(crate) fn remove_dir_via_cmdline(
         let msg = Some(format!("removing: '{}'", dir.display()));
 
         remove_file(
-            &dir,
+            dir,
             dry_run,
             size_changed,
             msg,

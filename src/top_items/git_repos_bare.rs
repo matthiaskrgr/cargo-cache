@@ -31,7 +31,7 @@ fn name_from_pb(path: &PathBuf) -> String {
 
 impl FileDesc {
     fn new_from_git_bare(path: &PathBuf) -> Self {
-        let name = name_from_pb(&path);
+        let name = name_from_pb(path);
         let walkdir = WalkDir::new(path.display().to_string());
         let size = walkdir
             .into_iter()

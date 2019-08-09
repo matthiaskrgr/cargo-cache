@@ -37,7 +37,6 @@
     clippy::string_add,
     clippy::string_add_assign,
     clippy::redundant_clone,
-    clippy::else_if_without_else,
     clippy::empty_enum,
     clippy::explicit_iter_loop,
     clippy::match_same_arms,
@@ -165,7 +164,7 @@ fn main() {
         };
 
         query::run_query(
-            &query_config,
+            query_config,
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
@@ -260,10 +259,10 @@ fn main() {
         let reg_srcs = &cargo_cache.registry_sources;
         let git_checkouts = &cargo_cache.git_checkouts;
         for dir in &[reg_srcs, git_checkouts] {
-            let size = cumulative_dir_size(&dir);
+            let size = cumulative_dir_size(dir);
             if dir.is_dir() {
                 remove_file(
-                    &dir,
+                    dir,
                     config.is_present("dry-run"),
                     &mut size_changed,
                     None,

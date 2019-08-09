@@ -98,7 +98,7 @@ impl Cache for GitCheckoutCache {
     fn files_sorted(&mut self) -> &[PathBuf] {
         let _ = self.files(); // prime cache
         self.files.sort();
-        &self.files()
+        self.files()
     }
 }
 

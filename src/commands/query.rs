@@ -47,7 +47,7 @@ fn path_to_name_unstemmed(path: &PathBuf) -> String {
 
 fn binary_to_file(path: &PathBuf) -> File<'_> {
     File {
-        path: &path,
+        path,
         name: path_to_name_unstemmed(path),
         size: fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
@@ -57,7 +57,7 @@ fn binary_to_file(path: &PathBuf) -> File<'_> {
 
 fn git_checkout_to_file(path: &PathBuf) -> File<'_> {
     File {
-        path: &path,
+        path,
         name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
@@ -76,7 +76,7 @@ fn git_checkout_to_file(path: &PathBuf) -> File<'_> {
 
 fn bare_repo_to_file(path: &PathBuf) -> File<'_> {
     File {
-        path: &path,
+        path,
         name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
@@ -96,7 +96,7 @@ fn bare_repo_to_file(path: &PathBuf) -> File<'_> {
 fn registry_pkg_cache_to_file(path: &PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
-        path: &path,
+        path,
         name: path_to_name_stemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
@@ -116,7 +116,7 @@ fn registry_pkg_cache_to_file(path: &PathBuf) -> File<'_> {
 fn registry_source_cache_to_file(path: &PathBuf) -> File<'_> {
     File {
         // todo: sum up the versions
-        path: &path,
+        path,
         name: path_to_name_unstemmed(path),
         size: WalkDir::new(path.display().to_string())
             .into_iter()
@@ -167,35 +167,35 @@ pub(crate) fn run_query(
     let mut binary_matches: Vec<File<'_>> = bin_cache
         .files()
         .iter()
-        .map(|path| binary_to_file(&path)) // convert the path into a file struct
+        .map(|path| binary_to_file(path)) // convert the path into a file struct
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
     let mut git_checkout_matches: Vec<_> = checkouts_cache
         .checkout_folders()
         .iter()
-        .map(|path| git_checkout_to_file(&path))
+        .map(|path| git_checkout_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
     let mut bare_repos_matches: Vec<_> = bare_repos_cache
         .bare_repo_folders()
         .iter()
-        .map(|path| bare_repo_to_file(&path))
+        .map(|path| bare_repo_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
     let files = registry_pkg_cache.files(); //@TODO fixme?
     let mut registry_pkg_cache_matches: Vec<_> = files
         .iter()
-        .map(|path| registry_pkg_cache_to_file(&path))
+        .map(|path| registry_pkg_cache_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
     let mut registry_source_caches_matches: Vec<_> = registry_sources_caches
         .total_checkout_folders()
         .iter()
-        .map(|path| registry_source_cache_to_file(&path))
+        .map(|path| registry_source_cache_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 

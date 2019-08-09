@@ -32,7 +32,7 @@ fn name_from_pb(path: &PathBuf) -> String {
 
 impl FileDesc {
     pub(crate) fn new_from_reg_src(path: &PathBuf) -> Self {
-        let name = name_from_pb(&path);
+        let name = name_from_pb(path);
         let walkdir = WalkDir::new(path.display().to_string());
 
         let size = walkdir

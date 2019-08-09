@@ -191,7 +191,7 @@ mod bininfo_struct {
             r#"BinInfo { name: "a", size: 5 }"#,
             r#"BinInfo { name: "c", size: 10 }"#,
         ] {
-            wanted.push_str(&i);
+            wanted.push_str(i);
         }
         assert_eq!(order_string, wanted);
     }

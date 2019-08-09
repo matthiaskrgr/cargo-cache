@@ -30,7 +30,7 @@ fn name_from_pb(path: &PathBuf) -> String {
 
 impl FileDesc {
     pub(crate) fn new_from_reg_cache(path: &PathBuf) -> Self {
-        let name = name_from_pb(&path);
+        let name = name_from_pb(path);
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();

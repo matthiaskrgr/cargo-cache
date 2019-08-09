@@ -65,7 +65,7 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
                 new_row.push_str(&cell_new);
             } else {
                 // just add the new cell
-                new_row.push_str(&cell);
+                new_row.push_str(cell);
             }
             // add space between each cell
             new_row.push_str(SEPARATOR);
