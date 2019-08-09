@@ -52,67 +52,71 @@ pub(crate) enum Error {
     RemoveDirNoArg,
 }
 
+//@FIXME on stable 1.36 this does not compile since
+// "enum variants om type aliases are experimental"
+// fix the warning as soon as 1.37 is stable
+#[allow(clippy::use_self)]
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let valid_deletable_dirs =
             "git-db,git-repos,registry-sources,registry-crate-cache,registry-index,registry,all";
 
         match &self {
-            Self::GitRepoNotOpened(path) => {
+            Error::GitRepoNotOpened(path) => {
                 write!(f, "Failed to open git repository at \"{}\"", path.display())
             }
 
-            Self::GitRepoDirNotFound(path) => {
+            Error::GitRepoDirNotFound(path) => {
                 write!(f, "Git repo \"{}\" not found", path.display())
             }
 
-            Self::GitGCFailed(path, error) => write!(
+            Error::GitGCFailed(path, error) => write!(
                 f,
                 "Failed to git gc repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Self::GitPackRefsFailed(path, error) => write!(
+            Error::GitPackRefsFailed(path, error) => write!(
                 f,
                 "Failed to git pack-refs repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Self::GitReflogFailed(path, error) => write!(
+            Error::GitReflogFailed(path, error) => write!(
                 f,
                 "Failed to git reflog repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Self::GitFsckFailed(path, error) => write!(
+            Error::GitFsckFailed(path, error) => write!(
                 f,
                 "Failed to git fsck repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Self::MalformedPackageName(pkgname) => {
+            Error::MalformedPackageName(pkgname) => {
                 write!(f, "Error:  \"{}\" is not a valid package name", pkgname)
             }
 
-            Self::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
+            Error::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
 
-            Self::CargoHomeNotDirectory(path) => write!(
+            Error::CargoHomeNotDirectory(path) => write!(
                 f,
                 "CARGO_HOME \"{}\" is not an existing directory!",
                 path.display()
             ),
 
-            Self::InvalidDeletableDirs(dirs) => write!(
+            Error::InvalidDeletableDirs(dirs) => write!(
                 f,
                 "\"{}\" are not valid removable directories! Chose one or several from {}",
                 dirs, valid_deletable_dirs
             ),
 
-            Self::RemoveDirNoArg => write!(
+            Error::RemoveDirNoArg => write!(
                 f,
                 "No argument passed to \"--remove-dir\"! Chose one or several from {}",
                 valid_deletable_dirs
