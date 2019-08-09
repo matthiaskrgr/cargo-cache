@@ -14,9 +14,10 @@ use std::process::Command;
 
 use humansize::{file_size_opts, FileSize};
 
+use crate::library::Error;
 use crate::library::*;
 
-fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, String)> {
+fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -27,7 +28,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
     print!("Recompressing '{}': ", &repo_name);
     // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
-        return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
+        return Err(Error::GitRepoDirNotFound(path.into()));
     }
 
     // get size before
@@ -46,7 +47,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
         // validate that the directory is a git repo
         let repo = match git2::Repository::open(&path) {
             Ok(repo) => repo,
-            Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
+            Err(e) => return Err(Error::GitRepoNotOpened(path.into())),
         };
         let repo_path = repo.path();
         // delete all history of all checkouts and so on.
@@ -59,7 +60,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .current_dir(repo_path)
             .output()
         {
-            return Err((ErrorKind::GitReflogFailed, format!("{:?}", e)));
+            return Err(Error::GitReflogFailed(path.into(), e));
         }
 
         // pack refs of branches/tags etc into one file
@@ -70,7 +71,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .current_dir(repo_path)
             .output()
         {
-            return Err((ErrorKind::GitPackRefsFailed, format!("{:?}", e)));
+            return Err(Error::GitPackRefsFailed(path.into(), e));
         }
 
         // recompress the repo from scratch and ignore all dangling objects
@@ -81,7 +82,7 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), (ErrorKind, Stri
             .current_dir(repo_path)
             .output()
         {
-            return Err((ErrorKind::GitGCFailed, format!("{:?}", e)));
+            return Err(Error::GitGCFailed(path.into(), e));
         }
 
         let repo_size_after = cumulative_dir_size(path).dir_size;
@@ -129,20 +130,14 @@ pub(crate) fn git_gc_everything(
             let (size_before, size_after) = match gc_repo(&repo, dry_run) {
                 // run gc
                 Ok((before, after)) => (before, after),
-                Err((errorkind, msg)) => match errorkind {
-                    ErrorKind::GitGCFailed => {
-                        println!("Warning, git gc failed, skipping '{}'", repostr);
-                        println!("git error: '{}'", msg);
+                Err(error) => match error {
+                    Error::GitGCFailed(_, _)
+                    | Error::GitRepoDirNotFound(_)
+                    | Error::GitRepoNotOpened(_) => {
+                        eprintln!("{}", error);
                         continue;
                     }
-                    ErrorKind::GitRepoDirNotFound => {
-                        println!("Git repo not found: '{}'", msg);
-                        continue;
-                    }
-                    ErrorKind::GitRepoNotOpened => {
-                        println!("Failed to parse git repo: '{}'", msg);
-                        continue;
-                    }
+
                     _ => unreachable!(),
                 },
             };

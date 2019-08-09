@@ -53,6 +53,47 @@ pub(crate) enum ErrorKind {
     RemoveDirNoArg,
 }
 
+#[derive(Debug)]
+pub(crate) enum Error {
+    GitRepoNotOpened(PathBuf),
+    GitRepoDirNotFound(PathBuf),
+    GitGCFailed(PathBuf, std::io::Error),
+    GitPackRefsFailed(PathBuf, std::io::Error),
+    GitReflogFailed(PathBuf, std::io::Error),
+    GitFsckErrored(PathBuf),
+    GitFsckFailed(PathBuf),
+    MalformedPackageName(String),
+    CargoFailedGetConfig(PathBuf),
+    CargoHomeNotDirectory(PathBuf),
+    InvalidDeletableDir(PathBuf),
+    RemoveDirNoArg,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Self::GitRepoNotOpened(path) => {
+                write!(f, "Failed to open git repository at \"{}\"", path.display())
+            }
+
+            Self::GitGCFailed(path, error) => write!(
+                f,
+                "Failed to git gc repository \"{}\":\n{:?}",
+                path.display(),
+                error
+            ),
+            Self::GitRepoDirNotFound(path) => {
+                write!(f, "Git repo \"{}\" not found", path.display())
+            }
+            Self::GitRepoNotOpened(path) => {
+                write!(f, "Failed to open git repository\"{}\"", path.display())
+            }
+
+            _ => write!(f, ""),
+        }
+    }
+}
+
 impl CargoCachePaths {
     // holds the PathBufs to the different components of the cargo cache
     pub(crate) fn default() -> Result<Self, (ErrorKind, String)> {
