@@ -176,7 +176,7 @@ pub(crate) fn git_gc_everything(
     );
 }
 
-fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
+fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -188,30 +188,23 @@ fn fsck_repo(path: &PathBuf) -> Result<(), (ErrorKind, String)> {
 
     // if something went wrong and this is not actually a directory, return an error
     if !path.is_dir() {
-        return Err((ErrorKind::GitRepoDirNotFound, path.display().to_string()));
+        return Err(Error::GitRepoDirNotFound(path.into()));
     }
 
     let repo = match git2::Repository::open(&path) {
         Ok(repo) => repo,
-        Err(e) => return Err(((ErrorKind::GitRepoNotOpened), format!("{:?}", e))),
+        Err(e) => return Err(Error::GitRepoNotOpened(path.into())),
     };
     let repo_path = repo.path();
 
-    let cmd = Command::new("git")
+    if let Err(e) = Command::new("git")
         .arg("fsck")
         .arg("--no-progress")
         .arg("--strict")
         .current_dir(repo_path)
-        .output();
-
-    if cmd.is_err() {
-        return Err((ErrorKind::GitFsckFailed, format!("{:?}", cmd)));
-    }
-
-    let stderr = String::from_utf8_lossy(&cmd.unwrap().stderr).to_string();
-
-    if stderr.contains("error: ") {
-        return Err((ErrorKind::GitFsckErrored, stderr));
+        .output()
+    {
+        return Err(Error::GitFsckFailed(path.into(), e));
     }
 
     Ok(())
@@ -244,24 +237,14 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
             match fsck_repo(&repo) {
                 // run gc
                 Ok(_) => {}
-                Err((errorkind, msg)) => match errorkind {
-                    ErrorKind::GitFsckErrored => {
-                        println!("Fsck found errors in {}", repostr);
-                        println!("{}", msg);
-                    }
-                    ErrorKind::GitFsckFailed => {
-                        println!("Warning, git fsck failed, skipping '{}'", repostr);
-                        println!("git error: '{}'", msg);
+                Err(error) => match error {
+                    Error::GitFsckFailed(_, _)
+                    | Error::GitRepoDirNotFound(_)
+                    | Error::GitRepoNotOpened(_) => {
+                        eprintln!("{}", error);
                         continue;
                     }
-                    ErrorKind::GitRepoDirNotFound => {
-                        println!("Git repo not found: '{}'", msg);
-                        continue;
-                    }
-                    ErrorKind::GitRepoNotOpened => {
-                        println!("Failed to parse git repo: '{}'", msg);
-                        continue;
-                    }
+
                     _ => unreachable!(),
                 },
             };

@@ -21,7 +21,7 @@ pub(crate) fn rm_old_crates(
     dry_run: bool,
     registry_src_path: &PathBuf,
     size_changed: &mut bool,
-) -> Result<(), (ErrorKind, PathBuf)> {
+) -> Result<(), Error> {
     println!();
 
     // remove crate sources from cache
@@ -42,13 +42,13 @@ pub(crate) fn rm_old_crates(
         for pkgpath in &crate_list {
             let path_end = match pkgpath.iter().last() {
                 Some(path_end) => path_end,
-                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.to_owned()))),
+                None => return Err(Error::MalformedPackageName(pkgpath.display().to_string())),
             };
 
             let mut vec = path_end.to_str().unwrap().split('-').collect::<Vec<&str>>();
             let pkgver = match vec.pop() {
                 Some(pkgver) => pkgver,
-                None => return Err((ErrorKind::MalformedPackageName, (pkgpath.to_owned()))),
+                None => return Err(Error::MalformedPackageName(pkgpath.display().to_string())),
             };
             let pkgname = vec.join("-");
 

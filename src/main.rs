@@ -286,13 +286,10 @@ fn main() {
             &mut size_changed,
         ) {
             Ok(()) => {}
-            Err((error_kind, path)) => {
-                match error_kind {
-                    ErrorKind::MalformedPackageName => {
-                        panic!(format!(
-                            "Error: can't parse package string: '{}'",
-                            &path.display()
-                        ));
+            Err(error) => {
+                match error {
+                    Error::MalformedPackageName(_) => {
+                        panic!("{}", error);
                     }
                     _ => unreachable!(),
                 };
