@@ -7,6 +7,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+THIS FILE IS COMMENTED OUT ON PURPOSE
+The old alternative registry index test has been replaced by the current one!
+
+
+
+
 #[path = "../src/test_helpers.rs"]
 mod test_helpers;
 

@@ -19,14 +19,6 @@ use walkdir::WalkDir;
 #[allow(non_snake_case)]
 #[test]
 fn CARGO_HOME_subdirs_are_known() {
-    // FIXME
-    // until cargo 0.37 / 1.36 is stable, this tests only succeeds on nightly
-    let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
-    let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
-    if !version_output.contains("nightly") {
-        return;
-    }
-
     // this tests makes cargo create a new CARGO_HOME and makes sure that the paths that are found
     // are known by cargo cache
     let cargo_home = "target/cargo_home_subdirs_known_CARGO_HOME/";
