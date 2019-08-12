@@ -74,6 +74,10 @@ pub(crate) enum Error {
     InvalidDeletableDirs(String),
     /// --remove-dir didn't get any args passed
     RemoveDirNoArg,
+    /// failed to find current working directory
+    NoCWD,
+    // failed to find Cargo.toml manifest
+    NoCargoManifest(PathBuf),
 }
 
 //@FIXME on stable 1.36 this does not compile since
@@ -144,6 +148,12 @@ impl fmt::Display for Error {
                 f,
                 "No argument passed to \"--remove-dir\"! Chose one or several from {}",
                 valid_deletable_dirs
+            ),
+            Error::NoCWD => write!(f, "Failed to find current working directory!",),
+            Error::NoCargoManifest(dir) => write!(
+                f,
+                "Failed to Cargo.toml manifest in {} or upwards.",
+                dir.display()
             ),
         }
     }

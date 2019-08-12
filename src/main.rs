@@ -184,9 +184,15 @@ fn main() {
             config.subcommand_matches("l").expect("unwrap failed there")
         }; */
 
-        local::local_subcmd();
-
-        process::exit(0);
+        match local::local_subcmd() {
+            Ok(_) => {
+                process::exit(0);
+            }
+            Err(error) => {
+                eprintln!("{}", error);
+                process::exit(1);
+            }
+        }
     }
 
     let dir_sizes = dirsizes::DirSizes::new(

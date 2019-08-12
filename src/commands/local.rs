@@ -27,7 +27,6 @@ use std::env;
 use std::ffi::OsStr;
 use std::fs::read_dir;
 use std::path::PathBuf;
-use std::process;
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
 use humansize::{file_size_opts, FileSize};
@@ -35,6 +34,7 @@ use walkdir::WalkDir;
 
 use crate::display::*;
 use crate::library;
+use crate::library::Error;
 
 /// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
 /// If yes, return a path to it, if not, return None
@@ -48,31 +48,27 @@ fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
 }
 
 /// start at the cwd, walk downwards and check if we encounter a Cargo.toml somewhere
-fn get_manifest() -> PathBuf {
-    //@TODO: make this function return Result<Pathbuf>
-
+fn get_manifest() -> Result<PathBuf, Error> {
     // get the cwd
-    let mut cwd: PathBuf = match env::current_dir() {
-        Ok(cwd) => cwd,
-        Err(e) => {
-            eprintln!("failed to determine current work directory '{}'", e);
-            process::exit(1);
-        }
+    let mut cwd: PathBuf = if let Ok(cwd) = env::current_dir() {
+        cwd
+    } else {
+        return Err(Error::NoCWD);
     };
+    let orig_cwd = cwd.clone();
 
     // walk downwards and try to find a "Cargo.toml"
     loop {
         if let Some(manifest_path) = seeing_manifest(&cwd) {
             // if the manifest is seen, return it
-            return manifest_path;
+            return Ok(manifest_path);
         } else {
             // otherwise continue walking down and check again
             let fs_root_reached = !cwd.pop();
 
             if fs_root_reached {
                 // we have reached the file system root without finding anything
-                eprintln!("Did not find manifest!");
-                std::process::exit(123);
+                return Err(Error::NoCargoManifest(orig_cwd));
             }
         }
     }
@@ -80,12 +76,12 @@ fn get_manifest() -> PathBuf {
 
 /// gather the sizes of subdirs of the `target` directory and prints a formatted table
 /// of the data to stdout
-pub(crate) fn local_subcmd() {
+pub(crate) fn local_subcmd() -> Result<(), (Error)> {
     // padding of the final formatting of the table
     const MIN_PADDING: usize = 6;
 
     // find the closest manifest, traverse up if necessary
-    let manifest = get_manifest();
+    let manifest = get_manifest()?;
 
     // get the cargo metadata for the manifest
     let metadata = MetadataCommand::new()
@@ -117,7 +113,6 @@ pub(crate) fn local_subcmd() {
     if !target_dir.exists() {
         stdout.push_str("No target dir found!");
         eprintln!("{}", stdout);
-        return;
     }
 
     stdout.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
@@ -221,4 +216,5 @@ pub(crate) fn local_subcmd() {
     stdout.push_str(&format_2_row_table(MIN_PADDING, lines, true));
     // and finally print it
     println!("{}", stdout);
+    Ok(())
 }
