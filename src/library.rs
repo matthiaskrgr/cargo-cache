@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+/// This file provides core logic of the crate
 use std::fmt;
 use std::fs;
 use std::path::PathBuf;
@@ -17,38 +18,61 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
+/// `DirInfo` is used so to be able to easily differenciate between size and number of files of a directory
 #[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
     // since both are of the same type
+    /// size of a directory
     pub(crate) dir_size: u64,
+    /// number of files of a directory
     pub(crate) file_number: u64,
 }
-
+/// `CargoCachePaths` contains paths to all the subcomponents of the cargo cache
 #[derive(Debug, Clone)]
 pub(crate) struct CargoCachePaths {
+    /// the root path to the cargo home
     pub(crate) cargo_home: PathBuf,
+    /// the directory where installed (cargo install..) binaries are located
     pub(crate) bin_dir: PathBuf,
+    /// path where registries are stored
     pub(crate) registry: PathBuf,
+    /// path where registry caches are stored (the .crate archives)
     pub(crate) registry_pkg_cache: PathBuf,
+    /// path where registry sources (.rs files / extracted .crate archives) are stored
     pub(crate) registry_sources: PathBuf,
+    /// path where the registry indices (git repo containing information on available crates, versions etc) are stored
     pub(crate) registry_index: PathBuf,
+    /// bare git repositories are stored here
     pub(crate) git_repos_bare: PathBuf,
+    /// git repository checkouts are stored here
     pub(crate) git_checkouts: PathBuf,
 }
 
+/// possible errors the crate may encounter, most of them unrecoverable
 #[derive(Debug)]
 pub(crate) enum Error {
+    /// git-rs failed to open a git repo
     GitRepoNotOpened(PathBuf),
+    /// a repository expected to be a git repo was not found
     GitRepoDirNotFound(PathBuf),
+    /// git gc errored
     GitGCFailed(PathBuf, std::io::Error),
+    /// git pack-refs errored
     GitPackRefsFailed(PathBuf, std::io::Error),
+    /// git reflog errored
     GitReflogFailed(PathBuf, std::io::Error),
+    /// git fsck errored
     GitFsckFailed(PathBuf, std::io::Error),
+    /// a package name inside the cache failed to parse
     MalformedPackageName(String),
+    /// could not get the cargo home directory
     GetCargoHomeFailed,
+    /// cargo-home exists but is not a directory
     CargoHomeNotDirectory(PathBuf),
+    /// one of the parameters of --remove-dir was not recognized
     InvalidDeletableDirs(String),
+    /// --remove-dir didn't get any args passed
     RemoveDirNoArg,
 }
 
@@ -126,7 +150,7 @@ impl fmt::Display for Error {
 }
 
 impl CargoCachePaths {
-    // holds the PathBufs to the different components of the cargo cache
+    /// returns CargoCachePaths object which makes all the subpaths accessible to the crate
     pub(crate) fn default() -> Result<Self, Error> {
         let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
             cargo_home
@@ -162,6 +186,7 @@ impl CargoCachePaths {
     }
 } // impl CargoCachePaths
 
+// this is the output of `cargo cache --list-dirs`
 impl std::fmt::Display for CargoCachePaths {
     fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
@@ -205,6 +230,7 @@ impl std::fmt::Display for CargoCachePaths {
     }
 }
 
+/// get the total size and number of files of a directory
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
@@ -252,6 +278,7 @@ pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     }
 }
 
+/// "cargo cache --info" output
 pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     let mut strn = String::with_capacity(1500);
 
@@ -360,7 +387,13 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn
 }
 
-pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_before: bool) -> String {
+//@TODO add tests
+/// provides a textual summary of changes (of file sizes)
+pub(crate) fn size_diff_format(
+    size_before: u64,
+    size_after: u64,
+    display_size_before: bool,
+) -> String {
     #[allow(clippy::cast_possible_wrap)]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
@@ -382,7 +415,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
     let percentage: f32 = ((perc * f32::from(100_i8)).trunc()) / (f32::from(100_u8));
 
     if size_before == size_after {
-        if dspl_sze_before {
+        if display_size_before {
             format!(
                 "{} => {}",
                 size_before_human_readabel, size_after_human_readable
@@ -390,7 +423,7 @@ pub(crate) fn size_diff_format(size_before: u64, size_after: u64, dspl_sze_befor
         } else {
             size_after_human_readable
         }
-    } else if dspl_sze_before {
+    } else if display_size_before {
         format!(
             "{} => {} ({}{}, {}%)",
             size_before_human_readabel,
