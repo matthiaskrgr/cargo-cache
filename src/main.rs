@@ -261,11 +261,14 @@ fn main() {
     }
 
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
-        git_gc_everything(
+        if let Err(e) = git_gc_everything(
             &cargo_cache.git_repos_bare,
             &cargo_cache.registry_pkg_cache,
             config.is_present("dry-run"),
-        );
+        ) {
+            eprintln!("{}", e);
+            process::exit(2);
+        }
         size_changed = true;
     }
 

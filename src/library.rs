@@ -80,6 +80,8 @@ pub(crate) enum Error {
     NoCargoManifest(PathBuf),
     /// faild to parse query regex
     QueryRegexFailedParsing(String),
+    /// tried to "git gc" a file instead of a directory
+    GitGCFile(PathBuf),
 }
 
 //@FIXME on stable 1.36 this does not compile since
@@ -161,6 +163,11 @@ impl fmt::Display for Error {
                 f,
                 "Failed to parse regular expression \"{}\"",
                 regex.to_string()
+            ),
+            Error::GitGCFile(path) => write!(
+                f,
+                "Tried to \"git gc\" a file instead of a directory: \"{}\"",
+                path.display()
             ),
         }
     }

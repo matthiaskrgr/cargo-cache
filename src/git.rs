@@ -100,18 +100,15 @@ pub(crate) fn git_gc_everything(
     git_repos_bare_dir: &PathBuf,
     registry_pkg_cache_dir: &PathBuf,
     dry_run: bool,
-) {
+) -> Result<(), Error> {
     // gc repos and registries inside cargo cache
 
-    fn gc_subdirs(path: &PathBuf, dry_run: bool) -> (u64, u64) {
+    fn gc_subdirs(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
         if path.is_file() {
-            panic!(
-                "gc_subdirs() tried to compress file instead of directory: '{}'",
-                path.display()
-            );
+            return Err(Error::GitGCFile(path.to_path_buf()));
         } else if !path.is_dir() {
             // if the directory does not exist, skip it
-            return (0, 0);
+            return Ok((0, 0));
         }
         // takes directory, finds all subdirectories and tries to gc those
         let mut size_sum_before: u64 = 0;
@@ -143,7 +140,7 @@ pub(crate) fn git_gc_everything(
             size_sum_before += size_before;
             size_sum_after += size_after;
         }
-        (size_sum_before, size_sum_after)
+        Ok((size_sum_before, size_sum_after))
     } // fn gc_subdirs
 
     // gc cloned git repos of crates and registries
@@ -152,7 +149,7 @@ pub(crate) fn git_gc_everything(
 
     println!("\nRecompressing repositories. Please be patient...");
     // gc git repos of crates
-    let (repos_before, repos_after) = gc_subdirs(git_repos_bare_dir, dry_run);
+    let (repos_before, repos_after) = gc_subdirs(git_repos_bare_dir, dry_run)?;
     total_size_before += repos_before;
     total_size_after += repos_after;
 
@@ -162,7 +159,7 @@ pub(crate) fn git_gc_everything(
     let _ = repo_index.pop();
     repo_index.push("index");
     // gc registries
-    let (regs_before, regs_after) = gc_subdirs(&repo_index, dry_run);
+    let (regs_before, regs_after) = gc_subdirs(&repo_index, dry_run)?;
     total_size_before += regs_before;
     total_size_after += regs_after;
 
@@ -173,6 +170,7 @@ pub(crate) fn git_gc_everything(
             .unwrap(),
         size_diff_format(total_size_before, total_size_after, false)
     );
+    Ok(())
 }
 
 fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
