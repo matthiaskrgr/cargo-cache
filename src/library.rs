@@ -76,8 +76,10 @@ pub(crate) enum Error {
     RemoveDirNoArg,
     /// failed to find current working directory
     NoCWD,
-    // failed to find Cargo.toml manifest
+    /// failed to find Cargo.toml manifest
     NoCargoManifest(PathBuf),
+    /// faild to parse query regex
+    QueryRegexFailedParsing(String),
 }
 
 //@FIXME on stable 1.36 this does not compile since
@@ -154,6 +156,11 @@ impl fmt::Display for Error {
                 f,
                 "Failed to Cargo.toml manifest in {} or upwards.",
                 dir.display()
+            ),
+            Error::QueryRegexFailedParsing(regex) => write!(
+                f,
+                "Failed to parse regular expression \"{}\"",
+                regex.to_string()
             ),
         }
     }

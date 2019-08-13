@@ -12,6 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::dircache::{Cache, RegistrySuperCache};
 use crate::cache::*;
+use crate::library::Error;
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
@@ -148,7 +149,7 @@ pub(crate) fn run_query(
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-) {
+) -> Result<(), Error> {
     let sorting = query_config.value_of("sort");
     let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
     let hr_size = query_config.is_present("hr");
@@ -158,9 +159,8 @@ pub(crate) fn run_query(
     // make the regex
     let re = match Regex::new(query) {
         Ok(re) => re,
-        Err(e) => {
-            eprintln!("Query failed to parse regex '{}': '{}'", query, e);
-            std::process::exit(10);
+        Err(_e) => {
+            return Err(Error::QueryRegexFailedParsing(query.to_string()));
         }
     };
 
@@ -358,6 +358,7 @@ pub(crate) fn run_query(
     if !trimmed.is_empty() {
         println!("{}", trimmed);
     }
+    Ok(())
 }
 
 #[cfg(test)]

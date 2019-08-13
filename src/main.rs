@@ -163,7 +163,7 @@ fn main() {
             config.subcommand_matches("q").expect("unwrap failed there")
         };
 
-        query::run_query(
+        let query = query::run_query(
             query_config,
             &mut bin_cache,
             &mut checkouts_cache,
@@ -171,8 +171,16 @@ fn main() {
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
         );
-
-        process::exit(0);
+        #[allow(clippy::single_match_else)]
+        match query {
+            Err(e) => {
+                eprintln!("{}", e);
+                process::exit(1)
+            }
+            Ok(_) => {
+                process::exit(0);
+            }
+        }
     } else if config.is_present("local") || config.is_present("l") {
         // this is not actually not needed and was previously passed into local_subcmd()
         /*
