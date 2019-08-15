@@ -84,87 +84,83 @@ pub(crate) enum Error {
     GitGCFile(PathBuf),
 }
 
-//@FIXME on stable 1.36 this does not compile since
-// "enum variants om type aliases are experimental"
-// fix the warning as soon as 1.37 is stable
-#[allow(clippy::use_self)]
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let valid_deletable_dirs =
             "git-db,git-repos,registry-sources,registry-crate-cache,registry-index,registry,all";
 
         match &self {
-            Error::GitRepoNotOpened(path) => {
+            Self::GitRepoNotOpened(path) => {
                 write!(f, "Failed to open git repository at \"{}\"", path.display())
             }
 
-            Error::GitRepoDirNotFound(path) => {
+            Self::GitRepoDirNotFound(path) => {
                 write!(f, "Git repo \"{}\" not found", path.display())
             }
 
-            Error::GitGCFailed(path, error) => write!(
+            Self::GitGCFailed(path, error) => write!(
                 f,
                 "Failed to git gc repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Error::GitPackRefsFailed(path, error) => write!(
+            Self::GitPackRefsFailed(path, error) => write!(
                 f,
                 "Failed to git pack-refs repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Error::GitReflogFailed(path, error) => write!(
+            Self::GitReflogFailed(path, error) => write!(
                 f,
                 "Failed to git reflog repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Error::GitFsckFailed(path, error) => write!(
+            Self::GitFsckFailed(path, error) => write!(
                 f,
                 "Failed to git fsck repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
 
-            Error::MalformedPackageName(pkgname) => {
+            Self::MalformedPackageName(pkgname) => {
                 write!(f, "Error:  \"{}\" is not a valid package name", pkgname)
             }
 
-            Error::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
+            Self::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
 
-            Error::CargoHomeNotDirectory(path) => write!(
+            Self::CargoHomeNotDirectory(path) => write!(
                 f,
                 "CARGO_HOME \"{}\" is not an existing directory!",
                 path.display()
             ),
 
-            Error::InvalidDeletableDirs(dirs) => write!(
+            Self::InvalidDeletableDirs(dirs) => write!(
                 f,
                 "\"{}\" are not valid removable directories! Chose one or several from {}",
                 dirs, valid_deletable_dirs
             ),
 
-            Error::RemoveDirNoArg => write!(
+            Self::RemoveDirNoArg => write!(
                 f,
                 "No argument passed to \"--remove-dir\"! Chose one or several from {}",
                 valid_deletable_dirs
             ),
-            Error::NoCWD => write!(f, "Failed to find current working directory!",),
-            Error::NoCargoManifest(dir) => write!(
+            Self::NoCWD => write!(f, "Failed to find current working directory!",),
+            Self::NoCargoManifest(dir) => write!(
                 f,
                 "Failed to Cargo.toml manifest in {} or upwards.",
                 dir.display()
             ),
-            Error::QueryRegexFailedParsing(regex) => write!(
+            Self::QueryRegexFailedParsing(regex) => write!(
                 f,
                 "Failed to parse regular expression \"{}\"",
                 regex.to_string()
             ),
-            Error::GitGCFile(path) => write!(
+            Self::GitGCFile(path) => write!(
                 f,
                 "Tried to \"git gc\" a file instead of a directory: \"{}\"",
                 path.display()
