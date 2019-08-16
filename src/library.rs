@@ -178,13 +178,10 @@ impl CargoCachePaths {
             return Err(Error::GetCargoHomeFailed);
         };
 
-        let cargo_home_path = cargo_home;
-
-        if !cargo_home_path.is_dir() {
-            return Err(Error::CargoHomeNotDirectory(cargo_home_path));
+        if !cargo_home.is_dir() {
+            return Err(Error::CargoHomeNotDirectory(cargo_home));
         }
         // get the paths to the relevant directories
-        let cargo_home = cargo_home_path;
         let bin = cargo_home.join("bin");
         let registry = cargo_home.join("registry");
         let registry_index = registry.join("index");
