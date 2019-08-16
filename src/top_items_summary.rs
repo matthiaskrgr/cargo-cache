@@ -25,37 +25,35 @@ pub(crate) fn get_top_crates(
     mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> String {
-    let (((reg_src, reg_cache), (bare_repos, repo_checkouts)), binaries) = rayon::join(
-        || {
-            rayon::join(
-                || {
-                    rayon::join(
-                        || {
-                            registry_source_stats(
-                                &ccd.registry_sources,
-                                limit,
-                                &mut registry_sources_caches,
-                            )
-                        },
-                        || {
-                            registry_pkg_cache_stats(
-                                &ccd.registry_pkg_cache,
-                                limit,
-                                &mut registry_pkg_caches,
-                            )
-                        },
-                    )
-                },
-                || {
-                    rayon::join(
-                        || git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut bare_repos_cache),
-                        || git_checkouts_stats(&ccd.git_checkouts, limit, &mut checkouts_cache),
-                    )
-                },
-            )
-        },
-        || binary_stats(&ccd.bin_dir, limit, &mut bin_cache),
-    );
+    let mut reg_src = String::new();
+    let mut reg_cache = String::new();
+    let mut bare_repos = String::new();
+    let mut repo_checkouts = String::new();
+    let mut binaries = String::new();
+
+    rayon::scope(|s| {
+        s.spawn(|_| {
+            reg_src =
+                registry_source_stats(&ccd.registry_sources, limit, &mut registry_sources_caches)
+        });
+
+        s.spawn(|_| {
+            reg_cache =
+                registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, &mut registry_pkg_caches)
+        });
+
+        s.spawn(|_| {
+            bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut bare_repos_cache);
+        });
+
+        s.spawn(|_| {
+            repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, &mut checkouts_cache);
+        });
+
+        s.spawn(|_| {
+            binaries = binary_stats(&ccd.bin_dir, limit, &mut bin_cache);
+        });
+    });
 
     let mut output = String::with_capacity(
         binaries.len() + reg_src.len() + reg_cache.len() + bare_repos.len() + repo_checkouts.len(),
