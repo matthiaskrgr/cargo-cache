@@ -70,92 +70,74 @@ impl<'a> DirSizes<'a> {
         registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
         ccd: &'a CargoCachePaths,
     ) -> Self {
-        // @TODO this is a mess and there's probably a way cleaner way to do this (threadpool?)
-        #[allow(clippy::type_complexity)]
-        let (
-            (
-                reg_index_size,
-                ((bin_dir_size, numb_bins), (total_git_repos_bare_size, numb_git_repos_bare_repos)),
-            ),
-            (
-                (total_git_chk_size, numb_git_checkouts),
-                (
-                    (total_reg_cache_size, total_reg_cache_entries),
-                    (total_reg_src_size, numb_reg_src_checkouts),
-                ),
-            ),
-        ): (
-            (u64, ((u64, usize), (u64, usize))),
-            ((u64, usize), ((u64, usize), (u64, usize))),
-        ) = rayon::join(
-            || {
-                rayon::join(
-                    || registry_index_caches.total_size(),
-                    || {
-                        rayon::join(
-                            || (bin_cache.total_size(), bin_cache.number_of_files()),
-                            || {
-                                (
-                                    bare_repos_cache.total_size(),
-                                    bare_repos_cache.number_of_checkout_repos().unwrap(),
-                                )
-                            },
-                        )
-                    },
-                )
-            },
-            || {
-                rayon::join(
-                    || {
-                        (
-                            checkouts_cache.total_size(),
-                            checkouts_cache.number_of_files_at_depth_2(),
-                        )
-                    },
-                    || {
-                        rayon::join(
-                            || {
-                                (
-                                    registry_pkg_cache.total_size(),
-                                    registry_pkg_cache.total_number_of_files(),
-                                )
-                            },
-                            || {
-                                (
-                                    registry_sources_caches.total_size(),
-                                    registry_sources_caches
-                                        .total_number_of_source_checkout_folders(),
-                                )
-                            },
-                        )
-                    },
-                )
-            },
-        );
+        let mut reg_index_size: Option<u64> = None;
+        let mut bin_dir_size: Option<u64> = None;
+        let mut numb_bins: Option<usize> = None;
+        let mut total_git_repos_bare_size: Option<u64> = None;
+        let mut numb_git_repos_bare_repos: Option<usize> = None;
+        let mut total_git_chk_size: Option<u64> = None;
+        let mut numb_git_checkouts: Option<usize> = None;
+        let mut total_reg_cache_size: Option<u64> = None;
+        let mut total_reg_cache_entries: Option<usize> = None;
+        let mut total_reg_src_size: Option<u64> = None;
+        let mut numb_reg_src_checkouts: Option<usize> = None;
+
+        rayon::scope(|s| {
+            // spawn one thread per cache
+            s.spawn(|_| reg_index_size = Some(registry_index_caches.total_size()));
+
+            s.spawn(|_| {
+                bin_dir_size = Some(bin_cache.total_size());
+                numb_bins = Some(bin_cache.number_of_files());
+            });
+
+            s.spawn(|_| {
+                total_git_repos_bare_size = Some(bare_repos_cache.total_size());
+                numb_git_repos_bare_repos =
+                    Some(bare_repos_cache.number_of_checkout_repos().unwrap());
+            });
+
+            s.spawn(|_| {
+                total_git_chk_size = Some(checkouts_cache.total_size());
+                numb_git_checkouts = Some(checkouts_cache.number_of_files_at_depth_2());
+            });
+
+            s.spawn(|_| {
+                total_reg_cache_size = Some(registry_pkg_cache.total_size());
+                total_reg_cache_entries = Some(registry_pkg_cache.total_number_of_files());
+            });
+
+            s.spawn(|_| {
+                total_reg_src_size = Some(registry_sources_caches.total_size());
+                numb_reg_src_checkouts =
+                    Some(registry_sources_caches.total_number_of_source_checkout_folders());
+            });
+        });
 
         let root_path = &ccd.cargo_home;
-        let total_reg_size = total_reg_cache_size + total_reg_src_size + reg_index_size;
-        let total_git_db_size = total_git_repos_bare_size + total_git_chk_size;
+        let total_reg_size =
+            total_reg_cache_size.unwrap() + total_reg_src_size.unwrap() + reg_index_size.unwrap();
+        let total_git_db_size = total_git_repos_bare_size.unwrap() + total_git_chk_size.unwrap();
 
-        let total_bin_size = bin_dir_size;
+        let total_bin_size = bin_dir_size.unwrap();
 
         let total_size = total_reg_size + total_git_db_size + total_bin_size;
         Self {
-            total_size,                           // total size of cargo root dir
-            numb_bins,                            // number of binaries found
-            total_bin_size,                       // total size of binaries found
-            total_reg_size,                       // registry size
-            total_git_db_size,                    // size of bare repos and checkouts combined
-            total_git_repos_bare_size,            // git db size
-            numb_git_repos_bare_repos,            // number of cloned repos
-            numb_git_checkouts,                   // number of checked out repos
-            total_git_chk_size,                   // git checkout size
-            total_reg_cache_size,                 // registry cache size
-            total_reg_src_size,                   // registry sources size
-            total_reg_index_size: reg_index_size, // registry index size
+            total_size,                    // total size of cargo root dir
+            numb_bins: numb_bins.unwrap(), // number of binaries found
+            total_bin_size,                // total size of binaries found
+            total_reg_size,                // registry size
+            total_git_db_size,             // size of bare repos and checkouts combined
+            total_git_repos_bare_size: total_git_repos_bare_size.unwrap(), // git db size
+            numb_git_repos_bare_repos: numb_git_repos_bare_repos.unwrap(), // number of cloned repos
+            numb_git_checkouts: numb_git_checkouts.unwrap(), // number of checked out repos
+            total_git_chk_size: total_git_chk_size.unwrap(), // git checkout size
+            total_reg_cache_size: total_reg_cache_size.unwrap(), // registry cache size
+            total_reg_src_size: total_reg_src_size.unwrap(), // registry sources size
+            total_reg_index_size: reg_index_size.unwrap(), // registry index size
             total_reg_index_num: registry_index_caches.number_of_items() as u64, // number  of indices //@TODO parallelize like the rest
-            numb_reg_cache_entries: total_reg_cache_entries, // number of source archives
-            numb_reg_src_checkouts,                          // number of source checkouts
+            numb_reg_cache_entries: total_reg_cache_entries.unwrap(), // number of source archives
+            numb_reg_src_checkouts: numb_reg_src_checkouts.unwrap(),  // number of source checkouts
             root_path,
         }
     }
