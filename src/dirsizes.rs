@@ -26,37 +26,37 @@ use humansize::{file_size_opts, FileSize};
 #[derive(Debug)]
 pub(crate) struct DirSizes<'a> {
     /// total size of the cache / .cargo rood directory
-    pub(crate) total_size: u64,
+    total_size: u64,
     /// number of binaries found
-    pub(crate) numb_bins: usize,
+    numb_bins: usize,
     /// total size of binaries
-    pub(crate) total_bin_size: u64,
+    total_bin_size: u64,
     /// total size of the registries (src + cache)
-    pub(crate) total_reg_size: u64,
+    total_reg_size: u64,
     /// total size of the git db (bare repos and checkouts)
-    pub(crate) total_git_db_size: u64,
+    total_git_db_size: u64,
     /// total size of bare git repos
-    pub(crate) total_git_repos_bare_size: u64,
+    total_git_repos_bare_size: u64,
     /// number of bare git repos
-    pub(crate) numb_git_repos_bare_repos: usize,
+    numb_git_repos_bare_repos: usize,
     /// number of git checkouts (source checkouts)
-    pub(crate) numb_git_checkouts: usize,
+    numb_git_checkouts: usize,
     /// total size of git checkouts
-    pub(crate) total_git_chk_size: u64,
+    total_git_chk_size: u64,
     /// total size of registry caches (.crates)
-    pub(crate) total_reg_cache_size: u64,
+    total_reg_cache_size: u64,
     /// total size of registry sources (extracted .crates, .rs sourcefiles)
-    pub(crate) total_reg_src_size: u64,
+    total_reg_src_size: u64,
     /// total size of registry indices
-    pub(crate) total_reg_index_size: u64,
+    total_reg_index_size: u64,
     /// total number of registry indices
-    pub(crate) total_reg_index_num: u64,
+    total_reg_index_num: u64,
     /// number of source archives (.crates) // @TODO clarify
-    pub(crate) numb_reg_cache_entries: usize,
+    numb_reg_cache_entries: usize,
     /// number of registry source checkouts// @TODO clarify
-    pub(crate) numb_reg_src_checkouts: usize,
+    numb_reg_src_checkouts: usize,
     /// root path of the cache
-    pub(crate) root_path: &'a std::path::PathBuf,
+    root_path: &'a std::path::PathBuf,
 }
 
 impl<'a> DirSizes<'a> {
@@ -141,6 +141,56 @@ impl<'a> DirSizes<'a> {
             root_path,
         }
     }
+
+    pub(crate) fn total_size(&self) -> u64 {
+        self.total_size
+    }
+    pub(crate) fn numb_bins(&self) -> usize {
+        self.numb_bins
+    }
+    pub(crate) fn total_bin_size(&self) -> u64 {
+        self.total_bin_size
+    }
+    pub(crate) fn total_reg_size(&self) -> u64 {
+        self.total_reg_size
+    }
+    pub(crate) fn total_git_db_size(&self) -> u64 {
+        self.total_git_db_size
+    }
+    pub(crate) fn total_git_repos_bare_size(&self) -> u64 {
+        self.total_git_repos_bare_size
+    }
+    pub(crate) fn numb_git_repos_bare_repos(&self) -> usize {
+        self.numb_git_repos_bare_repos
+    }
+    pub(crate) fn numb_git_checkouts(&self) -> usize {
+        self.numb_git_checkouts
+    }
+    pub(crate) fn total_git_chk_size(&self) -> u64 {
+        self.total_git_chk_size
+    }
+    pub(crate) fn total_reg_cache_size(&self) -> u64 {
+        self.total_reg_cache_size
+    }
+    pub(crate) fn total_reg_src_size(&self) -> u64 {
+        self.total_reg_src_size
+    }
+    pub(crate) fn total_reg_index_size(&self) -> u64 {
+        self.total_reg_index_size
+    }
+    pub(crate) fn total_reg_index_num(&self) -> u64 {
+        self.total_reg_index_num
+    }
+
+    pub(crate) fn numb_reg_cache_entries(&self) -> usize {
+        self.numb_reg_cache_entries
+    }
+    pub(crate) fn numb_reg_src_checkouts(&self) -> usize {
+        self.numb_reg_src_checkouts
+    }
+    pub(crate) fn root_path(&self) -> &'a std::path::PathBuf {
+        self.root_path
+    }
 }
 
 impl<'a> DirSizes<'a> {
@@ -149,13 +199,15 @@ impl<'a> DirSizes<'a> {
         vec![
             TableLine::new(
                 0,
-                format!("Cargo cache '{}':\n\n", &self.root_path.display()),
+                format!("Cargo cache '{}':\n\n", &self.root_path().display()),
                 String::new(),
             ),
             TableLine::new(
                 0,
                 "Total: ".to_string(),
-                self.total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+                self.total_size()
+                    .file_size(file_size_opts::DECIMAL)
+                    .unwrap(),
             ),
         ]
     }
@@ -164,8 +216,8 @@ impl<'a> DirSizes<'a> {
     fn bin(&self) -> Vec<TableLine> {
         vec![TableLine::new(
             1,
-            format!("{} installed binaries: ", self.numb_bins),
-            self.total_bin_size
+            format!("{} installed binaries: ", self.numb_bins()),
+            self.total_bin_size()
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap(),
         )]
@@ -177,21 +229,21 @@ impl<'a> DirSizes<'a> {
             TableLine::new(
                 1,
                 "Git db: ".to_string(),
-                self.total_git_db_size
+                self.total_git_db_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} bare git repos: ", self.numb_git_repos_bare_repos),
-                self.total_git_repos_bare_size
+                format!("{} bare git repos: ", self.numb_git_repos_bare_repos()),
+                self.total_git_repos_bare_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} git repo checkouts: ", self.numb_git_checkouts),
-                self.total_git_chk_size
+                format!("{} git repo checkouts: ", self.numb_git_checkouts()),
+                self.total_git_chk_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
@@ -204,7 +256,7 @@ impl<'a> DirSizes<'a> {
             TableLine::new(
                 1,
                 "Registry: ".to_string(),
-                self.total_reg_size
+                self.total_reg_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
@@ -213,23 +265,23 @@ impl<'a> DirSizes<'a> {
                 // check how many indices there are
                 match self.total_reg_index_num {
                     1 => String::from("Registry index: "),
-                    _ => format!("{} registry indices: ", &self.total_reg_index_num),
+                    _ => format!("{} registry indices: ", &self.total_reg_index_num()),
                 },
-                self.total_reg_index_size
+                self.total_reg_index_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} crate archives: ", self.numb_reg_cache_entries),
-                self.total_reg_cache_size
+                format!("{} crate archives: ", self.numb_reg_cache_entries()),
+                self.total_reg_cache_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts),
-                self.total_reg_src_size
+                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts()),
+                self.total_reg_src_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),

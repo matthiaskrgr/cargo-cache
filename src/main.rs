@@ -212,7 +212,7 @@ fn main() {
         &mut registry_sources_caches,
         &cargo_cache,
     );
-    let dir_sizes_total = dir_sizes.total_size;
+    let dir_sizes_total = dir_sizes.total_size();
 
     if config.is_present("info") {
         println!("{}", get_info(&cargo_cache, &dir_sizes));
@@ -343,7 +343,7 @@ fn main() {
             &mut registry_sources_caches,
             &cargo_cache,
         )
-        .total_size;
+        .total_size();
 
         let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
         println!(

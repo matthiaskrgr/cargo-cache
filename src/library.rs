@@ -315,15 +315,17 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 
     strn.push_str(&format!(
         "Total cache size: {}\n\n",
-        s.total_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_size().file_size(file_size_opts::DECIMAL).unwrap()
     ));
 
     strn.push_str(&c.bin_dir.display().to_string());
     strn.push_str("\n");
     strn.push_str(&format!(
         "\t{} binaries installed in binary directory, total size: {}\n",
-        s.numb_bins,
-        s.total_bin_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.numb_bins(),
+        s.total_bin_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str("\tThese are the binaries installed via 'cargo install'.\n");
     strn.push_str("\tUse 'cargo uninstall' to remove binaries if needed.\n");
@@ -333,7 +335,9 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\n");
     strn.push_str(&format!(
         "\tRegistry root dir, size: {}\n",
-        s.total_reg_size.file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_reg_size()
+            .file_size(file_size_opts::DECIMAL)
+            .unwrap()
     ));
     strn.push_str("\tCrate registries are stored here.\n");
     strn.push_str("\n");
@@ -342,7 +346,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\n");
     strn.push_str(&format!(
         "\tRegistry index, size: {}\n",
-        s.total_reg_index_size
+        s.total_reg_index_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
@@ -356,7 +360,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\n");
     strn.push_str(&format!(
         "\tCrate source package archive, size: {}\n",
-        s.total_reg_cache_size
+        s.total_reg_cache_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
@@ -370,7 +374,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 
     strn.push_str(&format!(
         "\tCrate sources, size: {}\n",
-        s.total_reg_src_size
+        s.total_reg_src_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
@@ -382,7 +386,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\n");
     strn.push_str(&format!(
         "\tGit database, size: {}\n",
-        s.total_git_repos_bare_size
+        s.total_git_repos_bare_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
@@ -394,7 +398,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\n");
     strn.push_str(&format!(
         "\tGit repo checkouts, size: {}\n",
-        s.total_git_chk_size
+        s.total_git_chk_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
     ));
