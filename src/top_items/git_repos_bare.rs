@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::dircache::Cache;
+use crate::cache::cache::Cache;
 use crate::cache::*;
 use crate::top_items::common::{dir_exists, format_table, FileDesc, Pair};
 

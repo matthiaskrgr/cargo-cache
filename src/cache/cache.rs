@@ -51,6 +51,7 @@ pub(crate) trait RegistrySuperCache {
     fn total_number_of_files(&mut self) -> usize;
 }
 
+/// each registry is stored in a seperate subcache
 pub(crate) trait RegistrySubCache {
     /// create a new subcache
     fn new(path: PathBuf) -> Self;
