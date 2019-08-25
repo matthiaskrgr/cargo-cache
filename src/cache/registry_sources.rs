@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::cache::{get_cache_name, RegistrySubCache, RegistrySuperCache};
+use crate::cache::dircache::{get_cache_name, RegistrySubCache, RegistrySuperCache};
 
 use rayon::prelude::*;
 use walkdir::WalkDir;

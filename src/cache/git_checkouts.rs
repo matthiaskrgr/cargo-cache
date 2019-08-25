@@ -10,7 +10,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::cache::cache::Cache;
+use crate::cache::dircache::Cache;
 
 use rayon::prelude::*;
 use walkdir::WalkDir;
