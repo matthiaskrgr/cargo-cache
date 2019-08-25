@@ -42,9 +42,8 @@ impl Cache for GitRepoCache {
         }
     }
 
-    #[inline]
-    fn path_exists(&self) -> bool {
-        self.path.exists()
+    fn path(&self) -> &PathBuf {
+        &self.path
     }
 
     fn invalidate(&mut self) {

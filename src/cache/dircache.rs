@@ -12,8 +12,12 @@ use std::path::PathBuf;
 pub(crate) trait Cache {
     // creates a new cache object
     fn new(path: PathBuf) -> Self;
+    // returns reference to the root path of the cache
+    fn path(&self) -> &PathBuf;
     // checks if the path to the directory of an object exists
-    fn path_exists(&self) -> bool;
+    fn path_exists(&self) -> bool {
+        self.path().exists()
+    }
     // invalidates the cache
     fn invalidate(&mut self);
     // total size of the cache
@@ -53,7 +57,9 @@ pub(crate) trait RegistrySubCache {
     // returns the name of the registry
     fn name(&self) -> &str;
     /// check if the root path of the Cache exists
-    fn path_exists(&self) -> bool;
+    fn path_exists(&self) -> bool {
+        self.path().exists()
+    }
     /// invalidates the cache
     fn invalidate(&mut self);
     /// total size of the cache
@@ -65,7 +71,7 @@ pub(crate) trait RegistrySubCache {
     /// sorted list of the files
     fn files_sorted(&mut self) -> &[PathBuf];
     // path of the cache
-    fn path(&self) -> PathBuf;
+    fn path(&self) -> &PathBuf;
 }
 
 /// get the name of a cache directory from a path.

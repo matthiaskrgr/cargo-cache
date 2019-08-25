@@ -50,18 +50,13 @@ impl RegistrySubCache for RegistrySourceCache {
         }
     }
 
+    fn path(&self) -> &PathBuf {
+        &self.path
+    }
+
     // returns the name of the registry
     fn name(&self) -> &str {
         &self.name
-    }
-
-    #[inline]
-    fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
-    fn path(&self) -> PathBuf {
-        self.path.clone()
     }
 
     /// invalidate the cache

@@ -48,14 +48,8 @@ impl RegistrySubCache for RegistryPkgCache {
         &self.name
     }
 
-    /// check if the path is still present
-    #[inline]
-    fn path_exists(&self) -> bool {
-        self.path.exists()
-    }
-
-    fn path(&self) -> PathBuf {
-        self.path.clone()
+    fn path(&self) -> &PathBuf {
+        &self.path
     }
 
     /// invalidate the cache

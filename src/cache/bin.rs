@@ -22,6 +22,20 @@ pub(crate) struct BinaryCache {
     files: Vec<PathBuf>,
 }
 
+impl BinaryCache {
+    pub(crate) fn number_of_files(&mut self) -> usize {
+        if self.number_of_files.is_some() {
+            self.number_of_files.unwrap()
+        } else if self.path_exists() {
+            let count = self.files().len();
+            self.number_of_files = Some(count);
+            count
+        } else {
+            0
+        }
+    }
+}
+
 impl Cache for BinaryCache {
     fn new(path: PathBuf) -> Self {
         // init fields lazily and only compute/save values as needed
@@ -33,10 +47,8 @@ impl Cache for BinaryCache {
             files: Vec::new(),
         }
     }
-
-    #[inline]
-    fn path_exists(&self) -> bool {
-        self.path.exists()
+    fn path(&self) -> &PathBuf {
+        &self.path
     }
 
     fn invalidate(&mut self) {
@@ -48,7 +60,7 @@ impl Cache for BinaryCache {
     fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
-        } else if self.path.is_dir() {
+        } else if self.path().is_dir() {
             let total_size = self
                 .files()
                 .par_iter()
@@ -69,7 +81,7 @@ impl Cache for BinaryCache {
         if self.files_calculated {
             &self.files
         } else {
-            self.files = fs::read_dir(&self.path)
+            self.files = fs::read_dir(&self.path())
                 .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                 .map(|f| f.unwrap().path())
                 .filter(|f| f.is_file())
@@ -83,19 +95,5 @@ impl Cache for BinaryCache {
         let _ = self.files(); // prime cache
         self.files.sort();
         self.files()
-    }
-}
-
-impl BinaryCache {
-    pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
-        } else if self.path_exists() {
-            let count = self.files().len();
-            self.number_of_files = Some(count);
-            count
-        } else {
-            0
-        }
     }
 }
