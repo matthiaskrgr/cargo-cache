@@ -12,9 +12,9 @@
 /// The new() method does parallel processing to a bit of time
 use std::fmt;
 
-use crate::cache::dircache::Cache;
-use crate::cache::dircache::RegistrySubCache;
-use crate::cache::dircache::RegistrySuperCache;
+use crate::cache::caches::Cache;
+use crate::cache::caches::RegistrySubCache;
+use crate::cache::caches::RegistrySuperCache;
 
 use crate::cache::*;
 use crate::display::*;
