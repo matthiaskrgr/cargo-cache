@@ -5,6 +5,7 @@ Fix crash when calling "local" subcommand on a project without target dir (#67)
 
 Updated dependencies:
 	home 0.3.4 -> 0.5.0
+	rayon 1.1.0 -> 1.2.0
 ````
 
 ## Version 0.3.1 (4b9baf6)

@@ -32,7 +32,7 @@ home = "0.5.0" # get CARGO_HOME
 humansize = "1.1.0" # convert digits of bytes to human readable size
 
 # https://github.com/rayon-rs/rayon
-rayon = "1.1.0" # parallelize iterators
+rayon = "1.2.0" # parallelize iterators
 
 # https://github.com/rust-lang/regex
 regex = "1.2.0" # use regex for matching
