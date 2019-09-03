@@ -1,9 +1,10 @@
 ## Git
 ````
 Warn if --dry-run is passed but nothing to be dry-run is specified. (#59)
+Fix crash when calling "local" subcommand on a project without target dir (#67)
 
 Updated dependencies:
-	home 0.3.4 -> 0.4.2
+	home 0.3.4 -> 0.5.0
 ````
 
 ## Version 0.3.1 (4b9baf6)

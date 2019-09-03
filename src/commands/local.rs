@@ -93,6 +93,11 @@ pub(crate) fn local_subcmd() -> Result<(), (Error)> {
     // get the project target dir from the metadata
     let target_dir = metadata.target_directory;
 
+    // the target dir might not exist!
+    if !target_dir.is_dir() {
+        return Err(Error::LocalNoTargetDir(target_dir));
+    }
+
     // println!("Found target dir: '{}'", target_dir.display());
 
     // get the size

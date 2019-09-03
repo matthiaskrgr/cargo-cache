@@ -82,6 +82,8 @@ pub(crate) enum Error {
     QueryRegexFailedParsing(String),
     /// tried to "git gc" a file instead of a directory
     GitGCFile(PathBuf),
+    // local tried to open a target dir that does not exist
+    LocalNoTargetDir(PathBuf),
 }
 
 impl fmt::Display for Error {
@@ -163,6 +165,10 @@ impl fmt::Display for Error {
             Self::GitGCFile(path) => write!(
                 f,
                 "Tried to \"git gc\" a file instead of a directory: \"{}\"",
+                path.display()
+            ),
+            Self::LocalNoTargetDir(path) => write!(
+                f, "error: \"local\" subcommand tried to read \"target\" directory that does not exist: \"{}\"",
                 path.display()
             ),
         }
