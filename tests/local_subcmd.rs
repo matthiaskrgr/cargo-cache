@@ -18,6 +18,11 @@ use std::process::Command;
 
 #[test]
 fn cargo_new_and_run_local() {
+    // need to work out the path
+    if cfg!(windows) {
+        return;
+    }
+
     // first we create a new empty cargo project
     let target_dir = PathBuf::from("target");
     let local_project = target_dir.join("local_project");
