@@ -60,8 +60,10 @@ fn cargo_new_and_run_local() {
     let local_project = local_project.canonicalize().unwrap();
 
     // if we are in  target/local_project, the binary is in ../../target/debug/...
+
     let cc_binary = {
-        let mut s = String::from("../../");
+        let parent_dirs = if cfg!(windows) { "..\\..\\" } else { "../../" };
+        let mut s = PathBuf::from(parent_dirs).display().to_string();
         s.push_str(&bin_path());
         s
     };
