@@ -62,37 +62,10 @@ fn cargo_new_and_run_local() {
     // if we are in  target/local_project, the binary is in ../../target/debug/...
 
     let cc_binary = {
-        let mut parent_dirs = if cfg!(windows) { r#"..\..\"# } else { "../../" };
-
         let mut cwd = std::env::current_dir().expect("Could not get cwd!");
-
         cwd.push(&bin_path());
-
-        println!("DEBUG");
-        println!("CWD: {:?}", cwd);
-        println!("DEBUG");
-
-        println!("DEBUG");
-        println!("PATH: {:?}", parent_dirs);
-        println!("DEBUG");
-
-        let mut s = PathBuf::from(parent_dirs).display().to_string();
-        println!("DEBUG");
-        println!("s string: {:?}", s);
-        println!("DEBUG");
-
-        s.push_str(&bin_path());
-        println!("DEBUG");
-        println!("s string 2: {:?}", s);
-        println!("DEBUG");
-
-        //s
         cwd
     };
-
-    println!("DEBUG");
-    println!("cc_binary: {:?}", cc_binary);
-    println!("DEBUG");
 
     let cargo_cache_local = Command::new(&cc_binary)
         .arg("local")
