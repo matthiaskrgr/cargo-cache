@@ -44,6 +44,9 @@
     clippy::needless_continue,
     clippy::path_buf_push_overwrite
 )]
+// supress these warnings:
+#![allow(clippy::too_many_lines)] // I don't care
+
 mod cache;
 mod cli;
 mod commands;
