@@ -62,7 +62,7 @@ fn cargo_new_and_run_local() {
     // if we are in  target/local_project, the binary is in ../../target/debug/...
 
     let cc_binary = {
-        let parent_dirs = if cfg!(windows) { "..\\..\\" } else { "../../" };
+        let parent_dirs = if cfg!(windows) { r#"..\..\"# } else { "../../" };
 
         println!("DEBUG");
         println!("PATH: {:?}", parent_dirs);
