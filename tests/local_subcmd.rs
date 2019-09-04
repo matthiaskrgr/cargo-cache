@@ -18,11 +18,6 @@ use std::process::Command;
 
 #[test]
 fn cargo_new_and_run_local() {
-    // need to work out the path
-    if cfg!(windows) {
-        return;
-    }
-
     // first we create a new empty cargo project
     let target_dir = PathBuf::from("target");
     let local_project = target_dir.join("local_project");
@@ -68,10 +63,27 @@ fn cargo_new_and_run_local() {
 
     let cc_binary = {
         let parent_dirs = if cfg!(windows) { "..\\..\\" } else { "../../" };
+
+        println!("DEBUG");
+        println!("PATH: {:?}", parent_dirs);
+        println!("DEBUG");
+
         let mut s = PathBuf::from(parent_dirs).display().to_string();
+        println!("DEBUG");
+        println!("s string: {:?}", s);
+        println!("DEBUG");
+
         s.push_str(&bin_path());
+        println!("DEBUG");
+        println!("s string 2: {:?}", s);
+        println!("DEBUG");
+
         s
     };
+
+    println!("DEBUG");
+    println!("cc_binary: {:?}", cc_binary);
+    println!("DEBUG");
 
     let cargo_cache_local = Command::new(&cc_binary)
         .arg("local")
