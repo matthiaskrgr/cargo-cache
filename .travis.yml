@@ -86,7 +86,9 @@ matrix:
       os: linux
       rust: nightly
       script:
-        - rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force
+        - rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force  || EXIT="true"
+# don't fail the build if clippy fails to build
+        - if [[ $EXIT == "true" ]]; then exit; fi
         - cargo fmt --all -- --check
 
 script:
