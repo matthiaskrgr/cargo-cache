@@ -128,15 +128,15 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         String::from("Cargo cache .*target.*alt_reg_cloudsmith_CARGO_HOME.*\n\n");
 
     desired_output.push_str(
-        "Total:                          .* MB
-  0 installed binaries:             0  B
-  Registry:                     .* MB
-    2 registry indices:         .* MB
-    2 crate archives:            .* KB
-    2 crate source checkouts:    .* KB
-  Git db:                           0  B
-    0 bare git repos:               0  B
-    0 git repo checkouts:           0  B",
+        "Total:                        .* MB
+  0 installed binaries:      .* 0  B
+  Registry:                    .* MB
+    2 registry indices:        .* MB
+    2 crate archives:          .* KB
+    2 crate source checkouts:  .* KB
+  Git db:                    .* 0  B
+    0 bare git repos:        .* 0  B
+    0 git repo checkouts:    .* 0  B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();
