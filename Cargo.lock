@@ -40,7 +40,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "cargo-cache"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cargo_metadata 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
