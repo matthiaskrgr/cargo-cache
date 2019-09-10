@@ -4,8 +4,11 @@ Warn if --dry-run is passed but nothing to be dry-run is specified. (#59)
 Fix crash when calling "local" subcommand on a project without target dir (#67)
 
 Updated dependencies:
+	cargo_metadata 0.8.1 -> 0.8.2
+	git2 0.10.0 -> 0.10.1
 	home 0.3.4 -> 0.5.0
 	rayon 1.1.0 -> 1.2.0
+	regex 1.2.0 -> 1.3.1
 ````
 
 ## Version 0.3.1 (4b9baf6)
