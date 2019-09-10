@@ -1,4 +1,6 @@
-## Version 0.3.2
+## Git
+
+## Version 0.3.2 (f7184cc)
 ````
 Warn if --dry-run is passed but nothing to be dry-run is specified. (#59)
 Fix crash when calling "local" subcommand on a project without target dir (#67)

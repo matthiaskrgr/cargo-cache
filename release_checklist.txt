@@ -18,3 +18,10 @@ update version
 write release notes
 cargo publish --dry-run
 cargo publish
+
+
+post release:
+
+add git tag
+add hash of tag to changelog
+readd changlog git section
