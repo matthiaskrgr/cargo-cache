@@ -12,12 +12,12 @@ Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional 
 
 #### Key Features:
 * check the size of the cargo cache and its components (cmd: `cargo cache`)
-* do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk
+* do a simple cleanup removing checkouts but keeping original files needed for reconstruction on disk (`--autoclean`)
 * clean up everything (cargo will re-download as needed)
-* dry-run to see what would be removed
-* recompress git repos
-* search cache via regex queries
-* print crates that take the most space
+* dry-run to see what would be removed (`--dry-run`)
+* recompress git repos (`--gc`)
+* search cache via regex queries (`cargo cache query`)
+* print crates that take the most space (`--top-cache-items`)
 * alternative registries supported
 * builds and runs on `stable`, `beta` and `nightly` channel
 
@@ -145,6 +145,10 @@ Total:                                2.83 GB
 
 The crate also works if you override the default location of the cargo home via
 the $CARGO_HOME env var!
+
+
+Side note: cargo-cache started as my *learning-by-doing* rust project, if you see something that you find very odd or is in dire need of improvement please let me know and open a ticket!
+
 
 #### License:
 
