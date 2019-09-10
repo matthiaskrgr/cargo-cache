@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/// This file provicdes the `TableLine` struct which is used by
+/// This file provides the `TableLine` struct which is used by
 /// `format_2_row_table()` to create neat-looking 2-column tables.
 
 /// struct used to format 2-column tables

@@ -110,6 +110,6 @@ fn cargo_new_and_run_local() {
     // status must be none zero / bad
     assert!(
         cargo_cache_local.status.success(),
-        "cargo cache local did not deliver bad exit whan target dir should have been found"
+        "cargo cache local did not deliver bad exit when target dir should have been found"
     );
 }

@@ -18,7 +18,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
-/// `DirInfo` is used so to be able to easily differenciate between size and number of files of a directory
+/// `DirInfo` is used so to be able to easily differentiate between size and number of files of a directory
 #[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
     // make sure we do not accidentally confuse dir_size and file_number
@@ -78,7 +78,7 @@ pub(crate) enum Error {
     NoCWD,
     /// failed to find Cargo.toml manifest
     NoCargoManifest(PathBuf),
-    /// faild to parse query regex
+    /// failed to parse query regex
     QueryRegexFailedParsing(String),
     /// tried to "git gc" a file instead of a directory
     GitGCFile(PathBuf),

@@ -1,3 +1,4 @@
+cargo udeps # check for unused deps
 codespell -L mut,crate src tests -i 3 -w
 cargo rustdoc --open -- --document-private-items
 update dependencies
