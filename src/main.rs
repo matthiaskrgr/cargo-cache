@@ -42,7 +42,8 @@
     clippy::match_same_arms,
     clippy::needless_borrow,
     clippy::needless_continue,
-    clippy::path_buf_push_overwrite
+    clippy::path_buf_push_overwrite,
+//   clippy::wildcard_enum_match_arm // too many FPS for _ => unreachable!()
 )]
 // suppress these warnings:
 #![allow(clippy::too_many_lines)] // I don't care
