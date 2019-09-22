@@ -50,6 +50,9 @@ path-slash = "0.1.1" # normalize windows paths
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "0.6.1" # colored diff assertions
 
+# https://github.com/webdesus/fs_extra
+fs_extra = "1.1.0" # copy directories recursively
+
 [build-dependencies]
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = "0.2.0" # git version information
