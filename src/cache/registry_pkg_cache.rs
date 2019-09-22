@@ -103,7 +103,11 @@ impl RegistrySubCache for RegistryPkgCache {
                 self.number_of_files = Some(collection.len());
                 self.files = collection;
             } else {
+                // there is no directory
+                // we need to reflect that in the cache
                 self.files = Vec::new();
+                self.files_calculated = true;
+                self.number_of_files = Some(0);
             }
             &self.files
         }
@@ -119,7 +123,7 @@ impl RegistrySubCache for RegistryPkgCache {
             if let Some(n) = self.number_of_files {
                 n
             } else {
-                unreachable!();
+                unreachable!("registry_pkg_cache: self.files is None!");
             }
         }
     }

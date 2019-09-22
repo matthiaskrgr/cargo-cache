@@ -1,4 +1,11 @@
 ## Git
+````
+Fix a bug where `--remove-dir registry-crate-cache` would panic if we removed a directory and did update 
+	the cache accordingly leading to inconsistent cache state, unmet expectations and unwrap of None.
+	This was discovered while investigating #72
+
+````
+
 
 ## Version 0.3.2 (f7184cc)
 ````
