@@ -66,6 +66,12 @@ fn remove_dirs() {
         let source = cargo_home_src.clone();
         println!("SOURCE: {:?}, DEST: {:?}", source, cargo_home_dest);
         //fs_extra::copy_items(&vec![source], &cargo_home_dest, &copy_options).unwrap();
+
+        // copy cargo home
+        // run cargo cache remove dir ..
+        // make sure nothing panics
+        // make sure size is reduced
+        //
     }
     return;
     // make sure the size of the registry matches and we have 4 entries
