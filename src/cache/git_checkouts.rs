@@ -50,6 +50,13 @@ impl Cache for GitCheckoutCache {
         self.number_of_checkouts = None;
     }
 
+    fn known_to_be_empty(&mut self) {
+        self.files = Vec::new();
+        self.files_calculated = true;
+        self.number_of_checkouts = Some(0);
+        self.checkouts_calculated = true;
+    }
+
     fn total_size(&mut self) -> u64 {
         if Self::checkout_folders(self).is_empty() {
             return 0;
@@ -71,6 +78,7 @@ impl Cache for GitCheckoutCache {
             self.total_size = Some(total_size);
             total_size
         } else {
+            self.known_to_be_empty();
             0
         }
     }
@@ -88,7 +96,11 @@ impl Cache for GitCheckoutCache {
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
+                self.total_size = Some(0);
                 self.files = Vec::new();
+                self.files_calculated = true;
+                self.number_of_checkouts = Some(0);
+                self.checkouts_calculated = true;
             }
             &self.files
         }
@@ -117,6 +129,7 @@ impl GitCheckoutCache {
             self.number_of_checkouts = Some(count);
             count
         } else {
+            self.known_to_be_empty();
             0
         }
     }

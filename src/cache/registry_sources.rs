@@ -70,6 +70,15 @@ impl RegistrySubCache for RegistrySourceCache {
         self.checkout_folders = vec![];
     }
 
+    fn known_to_be_empty(&mut self) {
+        self.size = Some(0);
+        self.files_calculated = true;
+        self.number_of_files = Some(0);
+        self.files = Vec::new();
+        self.checkouts_calculated = true;
+        self.checkout_folders = Vec::new();
+    }
+
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files
@@ -83,7 +92,7 @@ impl RegistrySubCache for RegistrySourceCache {
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
-                self.files = Vec::new();
+                self.known_to_be_empty();
             }
             &self.files
         }
@@ -101,9 +110,10 @@ impl RegistrySubCache for RegistrySourceCache {
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.size = Some(size);
-            size
+            self.size.unwrap()
         } else {
-            0
+            self.known_to_be_empty();
+            self.size.unwrap()
         }
     }
 
@@ -123,6 +133,7 @@ impl RegistrySubCache for RegistrySourceCache {
                 self.number_of_files = Some(count);
                 count
             } else {
+                self.known_to_be_empty();
                 0
             }
         }

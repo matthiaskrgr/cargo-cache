@@ -26,6 +26,8 @@ pub(crate) trait Cache {
     fn files(&mut self) -> &[PathBuf];
     // list of files of the cache, sorted
     fn files_sorted(&mut self) -> &[PathBuf];
+    // the cache is known to be empty because it was just cleared / the directory removed
+    fn known_to_be_empty(&mut self);
 }
 
 /// this is a super cache that is used to hold and access multiple multiple subcaches
@@ -72,6 +74,8 @@ pub(crate) trait RegistrySubCache {
     fn files_sorted(&mut self) -> &[PathBuf];
     // path of the cache
     fn path(&self) -> &PathBuf;
+    // the cache is known to be empty because it was just cleared / the directory removed
+    fn known_to_be_empty(&mut self);
 }
 
 /// get the name of a cache directory from a path.

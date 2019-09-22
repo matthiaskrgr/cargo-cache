@@ -57,6 +57,12 @@ impl Cache for BinaryCache {
         self.files_calculated = false;
     }
 
+    fn known_to_be_empty(&mut self) {
+        self.total_size = Some(0);
+        self.files = Vec::new();
+        self.files_calculated = true;
+    }
+
     fn total_size(&mut self) -> u64 {
         if self.total_size.is_some() {
             self.total_size.unwrap()
@@ -73,6 +79,7 @@ impl Cache for BinaryCache {
             self.total_size = Some(total_size);
             total_size
         } else {
+            self.known_to_be_empty();
             0
         }
     }

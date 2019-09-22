@@ -68,6 +68,13 @@ impl RegistrySubCache for RegistryIndex {
         self.files = vec![];
     }
 
+    fn known_to_be_empty(&mut self) {
+        self.size = Some(0);
+        self.files_calculated = true;
+        self.number_of_files = Some(0);
+        self.files = Vec::new();
+    }
+
     fn total_size(&mut self) -> u64 {
         match self.size {
             Some(size) => size,
@@ -87,6 +94,7 @@ impl RegistrySubCache for RegistryIndex {
                     self.size = Some(total_size);
                     total_size
                 } else {
+                    self.known_to_be_empty();
                     0
                 }
             }
@@ -110,8 +118,7 @@ impl RegistrySubCache for RegistryIndex {
                 self.files = vec;
                 self.files_calculated = true;
             } else {
-                self.files = Vec::new();
-                self.number_of_files = Some(0);
+                self.known_to_be_empty();
             }
             &self.files
         }

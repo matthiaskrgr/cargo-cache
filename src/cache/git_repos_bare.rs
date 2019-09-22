@@ -53,6 +53,14 @@ impl Cache for GitRepoCache {
         self.number_of_repos = None;
     }
 
+    fn known_to_be_empty(&mut self) {
+        self.total_size = Some(0);
+        self.files = Vec::new();
+        self.files_calculated = true;
+        self.repos_calculated = true;
+        self.number_of_repos = Some(0);
+    }
+
     fn total_size(&mut self) -> u64 {
         if Self::bare_repo_folders(self).is_empty() {
             return 0;
@@ -71,6 +79,7 @@ impl Cache for GitRepoCache {
             self.total_size = Some(total_size);
             total_size
         } else {
+            self.known_to_be_empty();
             0
         }
     }
@@ -88,7 +97,7 @@ impl Cache for GitRepoCache {
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
-                self.files = Vec::new();
+                self.known_to_be_empty();
             }
             &self.files
         }
@@ -131,7 +140,7 @@ impl GitRepoCache {
                 self.repos_calculated = true;
                 self.bare_repos_folders = crate_list;
             } else {
-                self.bare_repos_folders = Vec::new();
+                self.known_to_be_empty();
             }
             &self.bare_repos_folders
         }
