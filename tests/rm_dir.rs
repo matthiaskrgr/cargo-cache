@@ -27,12 +27,14 @@ fn remove_dirs() {
     // set a fake CARGO_HOME and build the dummy crate there
     let crate_path = PathBuf::from("tests/all_cargo_home_paths_are_known/testcrate");
     let fchp = "target/remove_dir_cargo_home_orig"; // fake cargo_home path
+    println!("FETCHING");
     let status = Command::new("cargo")
         .arg("fetch")
         .current_dir(&crate_path)
         .env("CARGO_HOME", "../../target/remove_dir_cargo_home_orig")
         .output();
     // make sure the build succeeded
+    println!("ASSERTING");
     assert!(
         status.is_ok(),
         "fetching deps of dummy crate did not succeed"
@@ -47,6 +49,7 @@ fn remove_dirs() {
         {:?}",
         fchp
     );
+    println!("DOING");
 
     let cargo_home_src = PathBuf::from(fchp);
 
@@ -73,6 +76,7 @@ fn remove_dirs() {
         // make sure size is reduced
         //
     }
+    panic!();
     return;
     // make sure the size of the registry matches and we have 4 entries
     let mut registry_pkg_cache_path = PathBuf::from(&fchp);
