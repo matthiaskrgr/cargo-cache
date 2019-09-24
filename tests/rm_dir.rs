@@ -15,6 +15,7 @@ use fs_extra::dir;
 use regex::Regex;
 use std::path::PathBuf;
 use std::process::Command;
+use tempfile::tempdir;
 use walkdir::WalkDir;
 
 #[test]
@@ -71,19 +72,37 @@ fn remove_dirs() {
         // our CWD is the repo root!!
         //      let x = std::fs::read_dir(".").unwrap().collect::<Vec<_>>();
         //println!("{:?}", x);
+        let dir = format!("target/rm_dir_cargohomes/{}", param);
+        assert!(std::fs::create_dir_all(&dir).is_ok());
 
-        // create a new cargo home
-        let cargo_home_dest = PathBuf::from(format!("target/rm_dir_cargohomes/{}/", param));
-        if !cargo_home_dest.is_dir() {
-            assert!(std::fs::create_dir_all(&cargo_home_dest).is_ok());
-        } else {
-            // remove the dir
-            // std::fs:remove_dir_all
-        }
+        let tmp_cargo_home = tempfile::tempdir_in(&dir).unwrap();
+        println!("{:?}", tmp_cargo_home);
+
+        assert!(tmp_cargo_home.path().is_dir());
+        // create a new cargo home as temporary directory
+
         let copy_options = dir::CopyOptions::new();
         let source = cargo_home_src.clone();
-        println!("SOURCE: {:?}, DEST: {:?}", source, cargo_home_dest);
-       // fs_extra::copy_items(&vec![source], &cargo_home_dest, &copy_options).unwrap();
+        println!("SOURCE: {:?}, DEST: {:?}", source, tmp_cargo_home);
+        fs_extra::copy_items(&vec![source], &tmp_cargo_home, &copy_options).unwrap();
+        // run cargo cache and --rm-dir the cache and make sure cargo cache does not crash
+        let cargo_cache = Command::new(bin_path())
+            .env("CARGO_HOME", &tmp_cargo_home.path())
+            .output();
+        assert!(cargo_cache.is_ok(), "cargo cache failed to run");
+        assert!(
+            cargo_cache.unwrap().status.success(),
+            "cargo cache exit status not good"
+        );
+        // run again, this should still succeed
+        let cargo_cache = Command::new(bin_path())
+            .env("CARGO_HOME", &tmp_cargo_home.path())
+            .output();
+        assert!(cargo_cache.is_ok(), "cargo cache failed to run");
+        assert!(
+            cargo_cache.unwrap().status.success(),
+            "cargo cache exit status not good"
+        );
 
         // copy cargo home
         // run cargo cache remove dir ..
@@ -91,73 +110,4 @@ fn remove_dirs() {
         // make sure size is reduced
         //
     }
-    panic!();
-    return;
-    // make sure the size of the registry matches and we have 4 entries
-    let mut registry_pkg_cache_path = PathBuf::from(&fchp);
-    registry_pkg_cache_path.push("registry");
-    registry_pkg_cache_path.push("cache");
-    assert!(registry_pkg_cache_path.is_dir(), "no registry cache found");
-
-    let mut filenames = WalkDir::new(registry_pkg_cache_path)
-        .min_depth(2)
-        .into_iter()
-        .map(|dir| dir.unwrap().path().file_name().unwrap().to_owned())
-        .collect::<Vec<_>>();
-    filenames.sort();
-
-    // make sure the filenames all match
-    assert!(filenames.len() == 4);
-
-    assert_eq!(
-        filenames,
-        [
-            "cc-1.0.18.crate",
-            "libc-0.2.42.crate",
-            "pkg-config-0.3.12.crate",
-            "unicode-xid-0.0.4.crate"
-        ]
-    );
-
-    // run it on the fake cargo cache dir
-    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", &fchp).output();
-    assert!(cargo_cache.is_ok(), "cargo cache failed to run");
-    let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
-    // we need to get the actual path to fake cargo home dir and make it an absolute path
-    let mut desired_output = String::from("Cargo cache .*fake_cargo_home.*:\n\n");
-
-    /*
-        Cargo cache '...cargo-cache/target/fake_cargo_home/':
-
-    Total:                              103.68 MB
-      0 installed binaries:                  0  B
-      Registry:                         103.68 MB
-        Registry index:                 101.23 MB
-        4 crate archives:               407.74 KB
-        4 crate source checkouts:         2.04 MB
-      Git db:                                0  B
-        0 bare git repos:                    0  B
-        0 git repo checkouts:                0  B
-        */
-
-    desired_output.push_str(
-        "Total:                     .* MB
-  0 installed binaries:         .*  B
-  Registry:                     .* MB
-    Registry index:             .* MB
-   .. crate archives:           .* KB
-   .. crate source checkouts:   .* MB
-  Git db:                       .* 0  B
-    0 bare git repos:           .* 0  B
-    0 git repo checkouts:       .* 0  B",
-    );
-
-    let regex = Regex::new(&desired_output);
-
-    assert!(
-        regex.clone().unwrap().is_match(&cc_output),
-        "regex: {:?}, cc_output: {}",
-        regex,
-        cc_output
-    );
 }
