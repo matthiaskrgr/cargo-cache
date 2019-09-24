@@ -12,11 +12,8 @@ mod test_helpers;
 
 use crate::test_helpers::bin_path;
 use fs_extra::dir;
-use regex::Regex;
 use std::path::PathBuf;
 use std::process::Command;
-use tempfile::tempdir;
-use walkdir::WalkDir;
 
 #[test]
 fn remove_dirs() {
