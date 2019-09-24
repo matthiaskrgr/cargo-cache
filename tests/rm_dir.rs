@@ -88,6 +88,7 @@ fn remove_dirs() {
         // run cargo cache and --rm-dir the cache and make sure cargo cache does not crash
         let cargo_cache = Command::new(bin_path())
             .env("CARGO_HOME", &tmp_cargo_home.path())
+            .args(&["--remove-dir", param])
             .output();
         assert!(cargo_cache.is_ok(), "cargo cache failed to run");
         assert!(
@@ -97,6 +98,7 @@ fn remove_dirs() {
         // run again, this should still succeed
         let cargo_cache = Command::new(bin_path())
             .env("CARGO_HOME", &tmp_cargo_home.path())
+            .args(&["--remove-dir", param])
             .output();
         assert!(cargo_cache.is_ok(), "cargo cache failed to run");
         assert!(
