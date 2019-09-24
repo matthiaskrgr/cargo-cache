@@ -23,15 +23,21 @@ fn remove_dirs() {
     // build test crate in new cargo home
     //
 
+    let root_dir = std::env::current_dir();
+
+    println!("cwd: {:?}", root_dir);
     // move into the directory of our dummy crate
     // set a fake CARGO_HOME and build the dummy crate there
     let crate_path = PathBuf::from("tests/all_cargo_home_paths_are_known/testcrate");
     let fchp = "target/remove_dir_cargo_home_orig"; // fake cargo_home path
     println!("FETCHING");
+    let mut path = root_dir.unwrap().clone();
+    path.push("target");
+    path.push("remove_dir_cargo_home_orig");
     let status = Command::new("cargo")
         .arg("fetch")
         .current_dir(&crate_path)
-        .env("CARGO_HOME", "../../target/remove_dir_cargo_home_orig")
+        .env("CARGO_HOME", path)
         .output();
     // make sure the build succeeded
     println!("ASSERTING");
@@ -62,13 +68,22 @@ fn remove_dirs() {
         "registry",
         "all",
     ] {
-        // create a new cargo home
-        let cargo_home_dest = PathBuf::from(format!("target/{}/", param));
+        // our CWD is the repo root!!
+        //      let x = std::fs::read_dir(".").unwrap().collect::<Vec<_>>();
+        //println!("{:?}", x);
 
+        // create a new cargo home
+        let cargo_home_dest = PathBuf::from(format!("target/rm_dir_cargohomes/{}/", param));
+        if !cargo_home_dest.is_dir() {
+            assert!(std::fs::create_dir_all(&cargo_home_dest).is_ok());
+        } else {
+            // remove the dir
+            // std::fs:remove_dir_all
+        }
         let copy_options = dir::CopyOptions::new();
         let source = cargo_home_src.clone();
         println!("SOURCE: {:?}, DEST: {:?}", source, cargo_home_dest);
-        //fs_extra::copy_items(&vec![source], &cargo_home_dest, &copy_options).unwrap();
+       // fs_extra::copy_items(&vec![source], &cargo_home_dest, &copy_options).unwrap();
 
         // copy cargo home
         // run cargo cache remove dir ..
