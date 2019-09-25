@@ -17,6 +17,12 @@ use std::process::Command;
 use walkdir::WalkDir;
 
 fn dir_size(path: &PathBuf) -> u64 {
+    /* WalkDir::new(&path)
+    .into_iter()
+    .map(|e| e.unwrap().path().to_owned())
+    .filter(|f| f.exists())
+    .for_each(|file| println!("{:?}", file)); */
+
     WalkDir::new(&path)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
@@ -46,6 +52,7 @@ fn remove_dirs() {
     let mut path = root_dir.unwrap().clone();
     path.push("target");
     path.push("remove_dir_cargo_home_orig");
+
     let status = Command::new("cargo")
         .arg("fetch")
         .current_dir(&crate_path)
@@ -100,6 +107,8 @@ fn remove_dirs() {
 
         let size_before = dir_size(&PathBuf::from(&dir));
 
+        println!("CARGO HOME: {:?}", tmp_cargo_home.path());
+
         let cargo_cache = Command::new(bin_path())
             .env("CARGO_HOME", &tmp_cargo_home.path())
             .args(&["--remove-dir", param])
@@ -110,8 +119,11 @@ fn remove_dirs() {
             "cargo cache exit status not good"
         );
         // run again, this should still succeed
+        let mut cargo_home_path: PathBuf = tmp_cargo_home.path().into();
+        cargo_home_path.push("remove_dir_cargo_home_orig");
+
         let cargo_cache = Command::new(bin_path())
-            .env("CARGO_HOME", &tmp_cargo_home.path())
+            .env("CARGO_HOME", &cargo_home_path)
             .args(&["--remove-dir", param])
             .output();
         assert!(cargo_cache.is_ok(), "cargo cache failed to run");
@@ -122,6 +134,13 @@ fn remove_dirs() {
         let size_after = dir_size(&PathBuf::from(&dir));
 
         // size should be reduced! ( > ) @FIXME
-        assert!(size_before >= size_after);
-    }
+        // how can it be that size is not reduced?
+
+        println!(
+            "dir: {:?}, size before: {}, size after: {}",
+            &dir, size_before, size_after
+        );
+        std::mem::drop(tmp_cargo_home);
+        assert!(size_before > size_after);
+    } // for param in ..
 }
