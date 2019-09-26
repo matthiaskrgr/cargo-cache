@@ -18,6 +18,10 @@ update version
 write release notes
 cargo publish --dry-run
 cargo publish
+# check build times
+cargo build --release -Ztimings
+cargo clean
+cargo build --release -Ztimings --all-targets --all-features
 
 
 post release:

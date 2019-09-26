@@ -1,7 +1,7 @@
 ## Git
 ````
-Fix bugs where `--remove-dir` could panic if we removed a directory and did update 
-	the cache accordingly leading to inconsistent cache state, unmet expectations and unwrap of None.
+Fix bugs where `--remove-dir` could panic if we removed a directory and an internal cache
+	was not updated properly leading to inconsistent cache state, unmet expectations and unwrap of None resulting in a panic.
 	This was discovered while investigating #72
 ````
 
