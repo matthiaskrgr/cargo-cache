@@ -1,4 +1,4 @@
-## Git
+## VERSION 0.3.3
 ````
 Fix bugs where `--remove-dir` could panic if we removed a directory and an internal cache
 	was not updated properly leading to inconsistent cache state, unmet expectations and unwrap of None resulting in a panic.
