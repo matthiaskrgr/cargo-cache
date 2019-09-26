@@ -17,12 +17,6 @@ use std::process::Command;
 use walkdir::WalkDir;
 
 fn dir_size(path: &PathBuf) -> u64 {
-    /* WalkDir::new(&path)
-    .into_iter()
-    .map(|e| e.unwrap().path().to_owned())
-    .filter(|f| f.exists())
-    .for_each(|file| println!("{:?}", file)); */
-
     WalkDir::new(&path)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
@@ -39,7 +33,6 @@ fn dir_size(path: &PathBuf) -> u64 {
 fn remove_dirs() {
     // make sure cargo cache --remove-dir works
     // build test crate in new cargo home
-    //
 
     let root_dir = std::env::current_dir();
 
@@ -87,9 +80,6 @@ fn remove_dirs() {
         "registry",
         "all",
     ] {
-        // our CWD is the repo root!!
-        //      let x = std::fs::read_dir(".").unwrap().collect::<Vec<_>>();
-        //println!("{:?}", x);
         let dir = format!("target/rm_dir_cargohomes/{}", param);
         assert!(std::fs::create_dir_all(&dir).is_ok());
 
@@ -118,7 +108,7 @@ fn remove_dirs() {
             cargo_cache.unwrap().status.success(),
             "cargo cache exit status not good"
         );
-        // run again, this should still succeed
+        // run again, this should still succeed (it panicd here previously due to corrupted cache)
         let mut cargo_home_path: PathBuf = tmp_cargo_home.path().into();
         cargo_home_path.push("remove_dir_cargo_home_orig");
 
@@ -133,14 +123,12 @@ fn remove_dirs() {
         );
         let size_after = dir_size(&PathBuf::from(&dir));
 
-        // size should be reduced! ( > ) @FIXME
-        // how can it be that size is not reduced?
-
         println!(
             "dir: {:?}, size before: {}, size after: {}",
             &dir, size_before, size_after
         );
         std::mem::drop(tmp_cargo_home);
+        // make sure we reduced size!
         assert!(size_before > size_after);
     } // for param in ..
 }
