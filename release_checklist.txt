@@ -1,4 +1,10 @@
+# check for unused deps
 cargo udeps # check for unused deps
+# check build times
+cargo build --release -Ztimings
+cargo clean
+cargo build --release -Ztimings --all-targets --all-features
+#
 codespell -L mut,crate src tests -i 3 -w
 cargo rustdoc --open -- --document-private-items
 update dependencies
@@ -18,10 +24,6 @@ update version
 write release notes
 cargo publish --dry-run
 cargo publish
-# check build times
-cargo build --release -Ztimings
-cargo clean
-cargo build --release -Ztimings --all-targets --all-features
 
 
 post release:
