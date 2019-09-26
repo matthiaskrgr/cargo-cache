@@ -1,10 +1,11 @@
-## VERSION 0.3.3
+## Git
+
+## Version 0.3.3 (b5e5752)
 ````
 Fix bugs where `--remove-dir` could panic if we removed a directory and an internal cache
 	was not updated properly leading to inconsistent cache state, unmet expectations and unwrap of None resulting in a panic.
 	This was discovered while investigating #72
 ````
-
 
 ## Version 0.3.2 (f7184cc)
 ````
