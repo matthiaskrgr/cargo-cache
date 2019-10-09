@@ -134,7 +134,7 @@ fn spurious_files_in_cache_test() {
     let regex = Regex::new(&desired_output);
 
     assert!(
-        regex.clone().unwrap().is_match(&cc_output),
+        regex.unwrap().is_match(&cc_output),
         "regex: {:?}, cc_output: {}",
         desired_output,
         cc_output

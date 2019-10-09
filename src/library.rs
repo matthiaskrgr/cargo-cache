@@ -176,7 +176,7 @@ impl fmt::Display for Error {
 }
 
 impl CargoCachePaths {
-    /// returns CargoCachePaths object which makes all the subpaths accessible to the crate
+    /// returns `CargoCachePaths` object which makes all the subpaths accessible to the crate
     pub(crate) fn default() -> Result<Self, Error> {
         let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
             cargo_home

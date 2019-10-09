@@ -60,7 +60,7 @@ pub(crate) struct DirSizes<'a> {
 }
 
 impl<'a> DirSizes<'a> {
-    /// create a new DirSize object by querying the caches for their data, done in parallel
+    /// create a new `DirSize` object by querying the caches for their data, done in parallel
     pub(crate) fn new(
         bin_cache: &mut bin::BinaryCache,
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,

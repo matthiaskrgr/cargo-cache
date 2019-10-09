@@ -165,7 +165,7 @@ pub(crate) struct RegistryIndicesCache {
 impl RegistrySuperCache for RegistryIndicesCache {
     type SubCache = RegistryIndex;
 
-    /// create a new empty RegistryIndexCache
+    /// create a new empty `RegistryIndexCache`
     fn new(path: PathBuf) -> Self {
         if !path.exists() {
             return Self {

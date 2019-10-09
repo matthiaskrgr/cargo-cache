@@ -162,7 +162,7 @@ pub(crate) struct RegistryPkgCaches {
 impl RegistrySuperCache for RegistryPkgCaches {
     type SubCache = RegistryPkgCache;
 
-    /// create a new empty RegistryPkgCaches
+    /// create a new empty `RegistryPkgCaches`
     fn new(path: PathBuf) -> Self {
         if !path.exists() {
             return Self {
