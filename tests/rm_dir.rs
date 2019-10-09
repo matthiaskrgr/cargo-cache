@@ -42,7 +42,7 @@ fn remove_dirs() {
     let crate_path = PathBuf::from("tests/all_cargo_home_paths_are_known/testcrate");
     let fchp = "target/remove_dir_cargo_home_orig"; // fake cargo_home path
     println!("FETCHING");
-    let mut path = root_dir.unwrap().clone();
+    let mut path = root_dir.unwrap();
     path.push("target");
     path.push("remove_dir_cargo_home_orig");
 
