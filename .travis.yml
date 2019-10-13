@@ -1,12 +1,12 @@
 language: rust
-dist: xenial
-sudo: false
+#dist: xenial
 
 #cache deps
 #cache: cargo
 
 env:
   global:
+    - CRATE_NAME=cargo-cache
     - RUST_BACKTRACE=full
 
 matrix:
@@ -16,7 +16,7 @@ matrix:
     - name: "windows nightly release"
       os: windows
       rust: nightly
-      env: RELEASE="--release
+      env: RELEASE="--release"
 
     - name: "windows nightly debug"
       os: windows
@@ -36,7 +36,7 @@ matrix:
     - name: "stable linux release"
       os: linux
       rust: stable
-      env: RELEASE="--release
+      env: RELEASE="--release"
 
     - name: "stable linux debug"
       os: linux
@@ -111,3 +111,20 @@ script:
   - cargo cache --keep-duplicate-crates 10 --dry-run
   - cargo cache --keep-duplicate-crates 1  --dry-run
   - cargo cache --keep-duplicate-crates 0  --dry-run
+
+
+before_deploy:
+  - pushd target/release/
+  - tar -czf "$TRAVIS_BUILD_DIR"/"$CRATE_NAME"-"$TRAVIS_TAG"-"$TRAVIS_OS_NAME".tar.gz "$CRATE_NAME"
+  - popd
+
+deploy:
+- provider: releases
+  # edge: true
+  api_key: "$GITHUB_TOKEN"
+  file_glob: true
+  file: "$CRATE_NAME-$TRAVIS_TAG-$TRAVIS_OS_NAME.tar.gz"
+  on:
+    condition: $TRAVIS_RUST_VERSION = "nightly" && $RELEASE = "--release"
+    tags: true
+  skip_cleanup: true
