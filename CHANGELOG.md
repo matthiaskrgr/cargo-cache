@@ -1,5 +1,8 @@
 ## Git
 
+Updated dependencies:
+	home 0.5.0 -> 0.5.1
+
 ## Version 0.3.3 (b5e5752)
 ````
 Fix bugs where `--remove-dir` could panic if we removed a directory and an internal cache
