@@ -149,6 +149,10 @@ the $CARGO_HOME env var!
 
 Side note: cargo-cache started as my *learning-by-doing* rust project, if you see something that you find very odd or is in dire need of improvement please let me know and open a ticket!
 
+#### FAQ
+Q: Is this project related to [sccache](https://github.com/mozilla/sccache)?  
+A: Nope, this project does not interact with sccaches cache.
+
 
 #### License:
 
