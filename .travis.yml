@@ -16,7 +16,7 @@ matrix:
     - name: "windows nightly release"
       os: windows
       rust: nightly
-      env: RELEASE="--release"
+      env: RELEASE="--release" EXE_SUFFIX=.exe
 
     - name: "windows nightly debug"
       os: windows
@@ -114,9 +114,7 @@ script:
 
 
 before_deploy:
-  - pushd target/release/
-  - tar -czf "$TRAVIS_BUILD_DIR"/"$CRATE_NAME"-"$TRAVIS_TAG"-"$TRAVIS_OS_NAME".tar.gz "$CRATE_NAME"
-  - popd
+  - ( cd target/release/ && tar -czf "$TRAVIS_BUILD_DIR"/"$CRATE_NAME"-"$TRAVIS_TAG"-"$TRAVIS_OS_NAME".tar.gz "${CRATE_NAME}${EXE_SUFFIX}" )
 
 deploy:
 - provider: releases
