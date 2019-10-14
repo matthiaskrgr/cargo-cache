@@ -61,6 +61,7 @@ cfg_if::cfg_if! {
         mod remove;
         mod top_items;
         mod top_items_summary;
+        mod date;
         use crate::cache::caches::{Cache, RegistrySuperCache};
         use clap::value_t;
         use humansize::{file_size_opts, FileSize};
@@ -143,6 +144,28 @@ fn main() {
 
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
+
+    //
+    //
+    //
+    ////
+    ////
+    ////
+    ////
+    ///
+    crate::date::dates(&mut registry_sources_caches);
+
+    ////
+    ////
+    ////
+    ////
+    ////
+    ////
+    ////
+    ////
+    ////
+    ////
+    //
 
     if config.is_present("top-cache-items") {
         let limit =

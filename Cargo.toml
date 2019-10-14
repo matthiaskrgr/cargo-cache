@@ -65,6 +65,8 @@ tempfile = "3.1.0" # create and rm temporary directories for tests
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = "0.2.0" # git version information
 
+
+chrono = "0.4.9"
 [[bin]]
 name = "cargo-cache"
 path = "src/main.rs"
