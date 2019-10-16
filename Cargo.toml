@@ -11,6 +11,7 @@ keywords = ["cargo", "cache", "cli", "manage", "cargo-home"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins", "development-tools"]
 build = "src/build.rs"
 edition = "2018"
+include = ["ci_autoclean/**/*"]
 
 [features]
 bench = [] # run benchmarks
