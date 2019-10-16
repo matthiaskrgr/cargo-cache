@@ -1,0 +1,11 @@
+[package]
+name = "ci_autoclean"
+version = "0.1.0"
+authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+walkdir = "2.2.9"
+home = "*"
