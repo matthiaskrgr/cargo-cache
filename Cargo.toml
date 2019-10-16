@@ -15,13 +15,6 @@ edition = "2018"
 [features]
 bench = [] # run benchmarks
 
-# enable cargo build --package ci_autoclean
-#[workspace]
-#members = [
-#	"ci_autoclean"
-#]
-
-
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
 cargo_metadata = "0.8.2" # get crate package name
