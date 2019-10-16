@@ -16,10 +16,10 @@ edition = "2018"
 bench = [] # run benchmarks
 
 # enable cargo build --package ci_autoclean
-[workspace]
-members = [
-	"ci_autoclean"
-]
+#[workspace]
+#members = [
+#	"ci_autoclean"
+#]
 
 
 [dependencies]
