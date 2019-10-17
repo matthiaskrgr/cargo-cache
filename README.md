@@ -26,7 +26,7 @@ Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional 
 
 or for the bleeding edge development version:
 
-```cargo install --git https://github.com/matthiaskrgr/cargo-cache```
+```cargo install --git https://github.com/matthiaskrgr/cargo-cache cargo-cache```
 
 #### Default output (`cargo cache`):
 This only calculates the sizes and does not touch anything:
