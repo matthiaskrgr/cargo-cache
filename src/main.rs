@@ -81,13 +81,17 @@ mod top_items_summary;
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
-use std::process;
-use std::time::SystemTime;
-
+#[cfg(not(feature = "mini"))]
 use crate::cache::caches::{Cache, RegistrySuperCache};
 #[cfg(not(feature = "mini"))]
 use clap::value_t;
+#[cfg(not(feature = "mini"))]
 use humansize::{file_size_opts, FileSize};
+#[cfg(not(feature = "mini"))]
+use std::process;
+#[cfg(not(feature = "mini"))]
+use std::time::SystemTime;
+#[cfg(not(feature = "mini"))]
 use walkdir::WalkDir;
 
 #[cfg(not(feature = "mini"))]
@@ -98,7 +102,7 @@ use crate::commands::{local, query};
 
 #[cfg(not(feature = "mini"))]
 use crate::git::*;
-
+#[cfg(not(feature = "mini"))]
 use crate::library::*;
 
 #[cfg(not(feature = "mini"))]
@@ -419,11 +423,7 @@ fn main() {
 
 #[cfg(feature = "mini")]
 fn main() {
-    use home::*;
-    use std::fmt;
-    use std::fs;
     use std::path::PathBuf;
-    use walkdir::WalkDir;
 
     #[derive(Debug, Clone)]
     pub(crate) struct DirInfo {
@@ -494,7 +494,7 @@ fn main() {
 
     // this is the output of `cargo cache --list-dirs`
     impl std::fmt::Display for CargoCachePaths {
-        fn fmt(&self, f: &'_ mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt(&self, f: &'_ mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             writeln!(
                 f,
                 "\ncargo home:                 {}",
@@ -537,71 +537,19 @@ fn main() {
     }
 
     /// get the total size and number of files of a directory
-    pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
-        // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
-        if !dir.is_dir() {
-            return DirInfo {
-                dir_size: 0,
-                file_number: 0,
-            };
-        }
 
-        // traverse recursively and sum filesizes, parallelized by rayon
-        let walkdir_start = dir.display().to_string();
-
-        let dir_size = WalkDir::new(&walkdir_start)
-            .into_iter()
-            .map(|e| e.unwrap().path().to_owned())
-            .filter(|f| f.exists()) // avoid broken symlinks
-            .collect::<Vec<_>>() // @TODO perhaps WalkDir will impl ParallelIterator one day
-            .iter()
-            .filter(|f| f.exists()) // check if the file still exists. Since collecting and processing a
-            // path, some time may have passed and if we have a "cargo build" operation
-            // running in the directory, a temporary file may be gone already and failing to unwrap() (#43)
-            .map(|f| {
-                fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &f.display()))
-                    .len()
-            })
-            .sum();
-
-        // for the file number, we don't want the actual number of files but only the number of
-        // files in the current directory, limit search depth
-
-        let file_number = if walkdir_start.contains("registry") {
-            WalkDir::new(&walkdir_start)
-                .max_depth(2)
-                .min_depth(2)
-                .into_iter()
-                .count()
-        } else {
-            fs::read_dir(&dir).unwrap().count()
-        } as u64;
-
-        DirInfo {
-            dir_size,
-            file_number,
-        }
-    }
-
-    pub(crate) fn remove_file(
-        path: &PathBuf,
-
-        deletion_msg: Option<String>,
-        dry_run_msg: Option<String>,
-        total_size_from_cache: Option<u64>,
-    ) {
+    pub(crate) fn remove_file(path: &PathBuf, deletion_msg: Option<String>) {
         // print deletion message if we have one
         if let Some(msg) = deletion_msg {
             println!("{}", msg);
         }
 
-        if path.is_file() && fs::remove_file(&path).is_err() {
+        if path.is_file() && std::fs::remove_file(&path).is_err() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         } else {
         }
 
-        if path.is_dir() && fs::remove_dir_all(&path).is_err() {
+        if path.is_dir() && std::fs::remove_dir_all(&path).is_err() {
             eprintln!(
                 "Warning: failed to recursively remove directory \"{}\".",
                 path.display()
@@ -612,7 +560,7 @@ fn main() {
 
     let cargo_cache = match CargoCachePaths::default() {
         Ok(cargo_cache) => cargo_cache,
-        Err(e) => {
+        Err(_e) => {
             std::process::exit(1);
         }
     };
@@ -620,9 +568,8 @@ fn main() {
     let reg_srcs = &cargo_cache.registry_sources;
     let git_checkouts = &cargo_cache.git_checkouts;
     for dir in &[reg_srcs, git_checkouts] {
-        let size = cumulative_dir_size(dir);
         if dir.is_dir() {
-            remove_file(dir, None, None, Some(size.dir_size));
+            remove_file(dir, None);
         }
     }
 }

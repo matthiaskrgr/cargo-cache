@@ -14,6 +14,7 @@ edition = "2018"
 
 [features]
 bench = [] # run benchmarks
+mini = []
 
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
