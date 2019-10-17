@@ -46,7 +46,7 @@
 //   clippy::wildcard_enum_match_arm // too many FPS for _ => unreachable!()
 )]
 // suppress these warnings:
-#![allow(clippy::too_many_lines)] // I don't care
+#![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
 
 mod cache;
 mod cli;
