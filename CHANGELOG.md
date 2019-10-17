@@ -1,4 +1,8 @@
 ## Git
+Add ci-autoclean binary
+       The binary runs `cargo cache --autoclean` and has all other features and dependencies stripped out.
+       It is intended for usage on continuous integration when the $CARGO_HOME is cached in order to reduce size before uploading the cargo home to the ci cache.
+		Run `cargo install (--git github.com/matthiaskrgr/cargo-cache / cargo-cache)--no-default-features --features mini)` to install inside ci.
 
 Updated dependencies:
 	home 0.5.0 -> 0.5.1
