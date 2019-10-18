@@ -72,7 +72,7 @@ cfg_if::cfg_if! {
         use crate::library::*;
         use crate::remove::*;
         use crate::top_items_summary::*;
-}
+    }
 }
 
 #[cfg(any(test, feature = "bench"))]
