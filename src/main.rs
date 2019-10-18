@@ -48,69 +48,40 @@
 // suppress these warnings:
 #![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
 
-#[cfg(not(feature = "mini"))]
+cfg_if::cfg_if! {
+    if #[cfg(not(feature = "mini"))] {
 mod cache;
-#[cfg(not(feature = "mini"))]
 mod cli;
-
-#[cfg(not(feature = "mini"))]
 mod commands;
-
-#[cfg(not(feature = "mini"))]
 mod dirsizes;
-
-#[cfg(not(feature = "mini"))]
 mod display;
-
-#[cfg(not(feature = "mini"))]
 mod git;
-
-#[cfg(not(feature = "mini"))]
 mod library;
-
-#[cfg(not(feature = "mini"))]
 mod remove;
+mod top_items;
+mod top_items_summary;
+use crate::cache::caches::{Cache, RegistrySuperCache};
+use clap::value_t;
+use humansize::{file_size_opts, FileSize};
+use std::process;
+use std::time::SystemTime;
+use walkdir::WalkDir;
+use crate::cache::*;
+use crate::commands::{local, query};
+use crate::git::*;
+use crate::library::*;
+use crate::remove::*;
+use crate::top_items_summary::*;
+
+
+}
+}
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
-#[cfg(not(feature = "mini"))]
-mod top_items;
-
-#[cfg(not(feature = "mini"))]
-mod top_items_summary;
 
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
-#[cfg(not(feature = "mini"))]
-use crate::cache::caches::{Cache, RegistrySuperCache};
-#[cfg(not(feature = "mini"))]
-use clap::value_t;
-#[cfg(not(feature = "mini"))]
-use humansize::{file_size_opts, FileSize};
-#[cfg(not(feature = "mini"))]
-use std::process;
-#[cfg(not(feature = "mini"))]
-use std::time::SystemTime;
-#[cfg(not(feature = "mini"))]
-use walkdir::WalkDir;
-
-#[cfg(not(feature = "mini"))]
-use crate::cache::*;
-
-#[cfg(not(feature = "mini"))]
-use crate::commands::{local, query};
-
-#[cfg(not(feature = "mini"))]
-use crate::git::*;
-#[cfg(not(feature = "mini"))]
-use crate::library::*;
-
-#[cfg(not(feature = "mini"))]
-use crate::remove::*;
-
-#[cfg(not(feature = "mini"))]
-use crate::top_items_summary::*;
-#[cfg(not(feature = "mini"))]
 #[allow(clippy::cognitive_complexity)]
 fn main() {
     // parse args
