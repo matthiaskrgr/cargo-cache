@@ -463,52 +463,6 @@ fn main() {
         }
     } // impl CargoCachePaths
 
-    // this is the output of `cargo cache --list-dirs`
-    impl std::fmt::Display for CargoCachePaths {
-        fn fmt(&self, f: &'_ mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            writeln!(
-                f,
-                "\ncargo home:                 {}",
-                &self.cargo_home.display()
-            )?;
-            writeln!(f, "binaries directory:         {}", &self.bin_dir.display())?;
-            writeln!(
-                f,
-                "registry directory:         {}",
-                &self.registry.display()
-            )?;
-            writeln!(
-                f,
-                "registry index:             {}",
-                &self.registry_index.display()
-            )?;
-            writeln!(
-                f,
-                "crate source archives:      {}",
-                &self.registry_pkg_cache.display()
-            )?;
-            writeln!(
-                f,
-                "unpacked crate sources:     {}",
-                &self.registry_sources.display()
-            )?;
-            writeln!(
-                f,
-                "bare git repos:             {}",
-                &self.git_repos_bare.display()
-            )?;
-            writeln!(
-                f,
-                "git repo checkouts:         {}",
-                &self.git_checkouts.display()
-            )?;
-
-            Ok(())
-        }
-    }
-
-    /// get the total size and number of files of a directory
-
     pub(crate) fn remove_file(path: &PathBuf, deletion_msg: Option<String>) {
         // print deletion message if we have one
         if let Some(msg) = deletion_msg {
