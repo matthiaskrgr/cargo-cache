@@ -50,32 +50,31 @@
 
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "mini"))] {
-mod cache;
-mod cli;
-mod commands;
-mod dirsizes;
-mod display;
-mod git;
-mod library;
-mod remove;
-mod top_items;
-mod top_items_summary;
-use crate::cache::caches::{Cache, RegistrySuperCache};
-use clap::value_t;
-use humansize::{file_size_opts, FileSize};
-use std::process;
-use std::time::SystemTime;
-use walkdir::WalkDir;
-use crate::cache::*;
-use crate::commands::{local, query};
-use crate::git::*;
-use crate::library::*;
-use crate::remove::*;
-use crate::top_items_summary::*;
-
-
+        mod cache;
+        mod cli;
+        mod commands;
+        mod dirsizes;
+        mod display;
+        mod git;
+        mod library;
+        mod remove;
+        mod top_items;
+        mod top_items_summary;
+        use crate::cache::caches::{Cache, RegistrySuperCache};
+        use clap::value_t;
+        use humansize::{file_size_opts, FileSize};
+        use std::process;
+        use std::time::SystemTime;
+        use walkdir::WalkDir;
+        use crate::cache::*;
+        use crate::commands::{local, query};
+        use crate::git::*;
+        use crate::library::*;
+        use crate::remove::*;
+        use crate::top_items_summary::*;
 }
 }
+
 #[cfg(any(test, feature = "bench"))]
 mod test_helpers;
 
@@ -83,6 +82,7 @@ mod test_helpers;
 extern crate test; //hack
 
 #[allow(clippy::cognitive_complexity)]
+#[cfg(not(feature = "mini"))]
 fn main() {
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
