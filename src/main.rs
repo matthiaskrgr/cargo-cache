@@ -48,8 +48,9 @@
 // suppress these warnings:
 #![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
 
+// for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {
-    if #[cfg(not(feature = "mini"))] {
+    if #[cfg(not(feature = "ci-autoclean"))] {
         mod cache;
         mod cli;
         mod commands;
@@ -81,8 +82,9 @@ mod test_helpers;
 #[cfg(all(test, feature = "bench"))]
 extern crate test; //hack
 
+// the default main function
 #[allow(clippy::cognitive_complexity)]
-#[cfg(not(feature = "mini"))]
+#[cfg(not(feature = "ci-autoclean"))]
 fn main() {
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
@@ -392,28 +394,20 @@ fn main() {
     }
 }
 
-#[cfg(feature = "mini")]
+// the main function when using the ci-autoclean feature
+// this is a very stripped-down version of cargo-cache which has minimal external dependencies and should
+// compile within a couple of seconds in order to be used on CI to clean the cargo-home for caching on CI-cache (travis/azure etc)
+#[cfg(feature = "ci-autoclean")]
 fn main() {
     use std::path::PathBuf;
 
     #[derive(Debug, Clone)]
-    pub(crate) struct CargoCachePaths {
-        /// the root path to the cargo home
-        pub(crate) cargo_home: PathBuf,
-        /// the directory where installed (cargo install..) binaries are located
-        pub(crate) bin_dir: PathBuf,
-        /// path where registries are stored
-        pub(crate) registry: PathBuf,
-        /// path where registry caches are stored (the .crate archives)
-        pub(crate) registry_pkg_cache: PathBuf,
+    struct CargoCachePaths {
         /// path where registry sources (.rs files / extracted .crate archives) are stored
-        pub(crate) registry_sources: PathBuf,
-        /// path where the registry indices (git repo containing information on available crates, versions etc) are stored
-        pub(crate) registry_index: PathBuf,
-        /// bare git repositories are stored here
-        pub(crate) git_repos_bare: PathBuf,
+        registry_sources: PathBuf,
+
         /// git repository checkouts are stored here
-        pub(crate) git_checkouts: PathBuf,
+        git_checkouts: PathBuf,
     }
 
     impl CargoCachePaths {
@@ -429,22 +423,12 @@ fn main() {
                 std::process::exit(1);
             }
             // get the paths to the relevant directories
-            let bin = cargo_home.join("bin");
             let registry = cargo_home.join("registry");
-            let registry_index = registry.join("index");
-            let reg_cache = registry.join("cache");
             let reg_src = registry.join("src");
-            let git_repos_bare = cargo_home.join("git").join("db");
             let git_checkouts = cargo_home.join("git").join("checkouts");
 
             Ok(Self {
-                cargo_home,
-                bin_dir: bin,
-                registry,
-                registry_index,
-                registry_pkg_cache: reg_cache,
                 registry_sources: reg_src,
-                git_repos_bare,
                 git_checkouts,
             })
         }
