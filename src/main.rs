@@ -395,7 +395,6 @@ fn main() {
 #[cfg(feature = "mini")]
 fn main() {
     use std::path::PathBuf;
-
     #[derive(Debug, Clone)]
     pub(crate) struct DirInfo {
         // make sure we do not accidentally confuse dir_size and file_number
@@ -463,15 +462,9 @@ fn main() {
         }
     } // impl CargoCachePaths
 
-    pub(crate) fn remove_file(path: &PathBuf, deletion_msg: Option<String>) {
-        // print deletion message if we have one
-        if let Some(msg) = deletion_msg {
-            println!("{}", msg);
-        }
-
+    pub(crate) fn remove_file(path: &PathBuf) {
         if path.is_file() && std::fs::remove_file(&path).is_err() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
-        } else {
         }
 
         if path.is_dir() && std::fs::remove_dir_all(&path).is_err() {
@@ -479,7 +472,6 @@ fn main() {
                 "Warning: failed to recursively remove directory \"{}\".",
                 path.display()
             );
-        } else {
         }
     }
 
@@ -494,7 +486,7 @@ fn main() {
     let git_checkouts = &cargo_cache.git_checkouts;
     for dir in &[reg_srcs, git_checkouts] {
         if dir.is_dir() {
-            remove_file(dir, None);
+            remove_file(dir);
         }
     }
 }
