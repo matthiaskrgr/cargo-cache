@@ -395,15 +395,6 @@ fn main() {
 #[cfg(feature = "mini")]
 fn main() {
     use std::path::PathBuf;
-    #[derive(Debug, Clone)]
-    pub(crate) struct DirInfo {
-        // make sure we do not accidentally confuse dir_size and file_number
-        // since both are of the same type
-        /// size of a directory
-        pub(crate) dir_size: u64,
-        /// number of files of a directory
-        pub(crate) file_number: u64,
-    }
 
     #[derive(Debug, Clone)]
     pub(crate) struct CargoCachePaths {
@@ -432,13 +423,10 @@ fn main() {
                 cargo_home
             } else {
                 std::process::exit(1);
-                //  return Err(Error::GetCargoHomeFailed);
             };
 
             if !cargo_home.is_dir() {
                 std::process::exit(1);
-
-                //   return Err(Error::CargoHomeNotDirectory(cargo_home));
             }
             // get the paths to the relevant directories
             let bin = cargo_home.join("bin");
