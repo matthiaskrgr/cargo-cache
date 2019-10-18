@@ -76,10 +76,10 @@ cfg_if::cfg_if! {
     }
 }
 
-#[cfg(any(test, feature = "bench"))]
+#[cfg(all(any(test, feature = "bench", not(feature = "ci-autoclean"))))]
 mod test_helpers;
 
-#[cfg(all(test, feature = "bench"))]
+#[cfg(all(test, feature = "bench", not(feature = "ci-autoclean")))]
 extern crate test; //hack
 
 // the default main function
