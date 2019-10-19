@@ -149,6 +149,17 @@ the $CARGO_HOME env var!
 
 Side note: cargo-cache started as my *learning-by-doing* rust project, if you see something that you find very odd or is in dire need of improvement please let me know and open a ticket!
 
+#### Cleaning the cache on CI
+Sometimes it is desired to [cache the $CARGO_HOME in CI](https://doc.rust-lang.org/nightly/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci).
+As noted in the document, this might cache sources twice which adds unneccessary overhead.  
+To reduce the size of the cache before storing it, you might want to run `cargo cache --autoclean`.
+The `ci-autoclean` feature provides a very stripped-down version of the crate that is only capable of running `cargo-cache --autoclean` automatically on launch and should compile within a couple of seconds.  
+To make use of this, you can add these commands to your ci:
+````bash
+cargo install (--git github.com/matthiaskrgr/cargo-cache OR cargo-cache) --no-default-features --features ci-autoclean
+cargo-cache
+````
+
 #### FAQ
 Q: Is this project related to [sccache](https://github.com/mozilla/sccache)?  
 A: Nope, this project does not interact with sccaches cache.

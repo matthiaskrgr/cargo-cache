@@ -48,38 +48,43 @@
 // suppress these warnings:
 #![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
 
-mod cache;
-mod cli;
-mod commands;
-mod dirsizes;
-mod display;
-mod git;
-mod library;
-mod remove;
-#[cfg(any(test, feature = "bench"))]
-mod test_helpers;
-mod top_items;
-mod top_items_summary;
+// for the "ci-autoclean" feature, we don't need all these modules so ignore them
+cfg_if::cfg_if! {
+    if #[cfg(not(feature = "ci-autoclean"))] {
+        mod cache;
+        mod cli;
+        mod commands;
+        mod dirsizes;
+        mod display;
+        mod git;
+        mod library;
+        mod remove;
+        mod top_items;
+        mod top_items_summary;
+        use crate::cache::caches::{Cache, RegistrySuperCache};
+        use clap::value_t;
+        use humansize::{file_size_opts, FileSize};
+        use std::process;
+        use std::time::SystemTime;
+        use walkdir::WalkDir;
+        use crate::cache::*;
+        use crate::commands::{local, query};
+        use crate::git::*;
+        use crate::library::*;
+        use crate::remove::*;
+        use crate::top_items_summary::*;
+    }
+}
 
-#[cfg(all(test, feature = "bench"))]
+#[cfg(all(any(test, feature = "bench", not(feature = "ci-autoclean"))))]
+mod test_helpers;
+
+#[cfg(all(test, feature = "bench", not(feature = "ci-autoclean")))]
 extern crate test; //hack
 
-use std::process;
-use std::time::SystemTime;
-
-use crate::cache::caches::{Cache, RegistrySuperCache};
-use clap::value_t;
-use humansize::{file_size_opts, FileSize};
-use walkdir::WalkDir;
-
-use crate::cache::*;
-use crate::commands::{local, query};
-use crate::git::*;
-use crate::library::*;
-use crate::remove::*;
-use crate::top_items_summary::*;
-
+// the default main function
 #[allow(clippy::cognitive_complexity)]
+#[cfg(not(feature = "ci-autoclean"))]
 fn main() {
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
@@ -386,5 +391,74 @@ fn main() {
         let ns_per_file = time_as_nanos / file_count as u128;
         println!("{} files per ms", files_per_ms);
         println!("{} ns per file", ns_per_file);
+    }
+}
+
+// the main function when using the ci-autoclean feature
+// this is a very stripped-down version of cargo-cache which has minimal external dependencies and should
+// compile within a couple of seconds in order to be used on CI to clean the cargo-home for caching on CI-cache (travis/azure etc)
+#[cfg(feature = "ci-autoclean")]
+fn main() {
+    use std::path::PathBuf;
+
+    #[derive(Debug, Clone)]
+    struct CargoCachePaths {
+        /// path where registry sources (.rs files / extracted .crate archives) are stored
+        registry_sources: PathBuf,
+
+        /// git repository checkouts are stored here
+        git_checkouts: PathBuf,
+    }
+
+    impl CargoCachePaths {
+        /// returns `CargoCachePaths` object which makes all the subpaths accessible to the crate
+        pub(crate) fn default() -> Result<Self, ()> {
+            let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
+                cargo_home
+            } else {
+                std::process::exit(1);
+            };
+
+            if !cargo_home.is_dir() {
+                std::process::exit(1);
+            }
+            // get the paths to the relevant directories
+            let registry = cargo_home.join("registry");
+            let reg_src = registry.join("src");
+            let git_checkouts = cargo_home.join("git").join("checkouts");
+
+            Ok(Self {
+                registry_sources: reg_src,
+                git_checkouts,
+            })
+        }
+    } // impl CargoCachePaths
+
+    pub(crate) fn remove_file(path: &PathBuf) {
+        if path.is_file() && std::fs::remove_file(&path).is_err() {
+            eprintln!("Warning: failed to remove file \"{}\".", path.display());
+        }
+
+        if path.is_dir() && std::fs::remove_dir_all(&path).is_err() {
+            eprintln!(
+                "Warning: failed to recursively remove directory \"{}\".",
+                path.display()
+            );
+        }
+    }
+
+    let cargo_cache = match CargoCachePaths::default() {
+        Ok(cargo_cache) => cargo_cache,
+        Err(_e) => {
+            std::process::exit(1);
+        }
+    };
+
+    let reg_srcs = &cargo_cache.registry_sources;
+    let git_checkouts = &cargo_cache.git_checkouts;
+    for dir in &[reg_srcs, git_checkouts] {
+        if dir.is_dir() {
+            remove_file(dir);
+        }
     }
 }
