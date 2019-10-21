@@ -1,4 +1,6 @@
 ## Git
+Fix bug where `cargo cache local` would panic on crates with workspaces
+		This was caused by passing wrong parameters to cargo_metadata when parsing the manifest
 Add ci-autoclean feature
 		The feature creates a `cargo-cache` binary that only executes `cargo cache --autoclean`
 		and has all other features and dependencies stripped out.

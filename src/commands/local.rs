@@ -28,7 +28,7 @@ use std::ffi::OsStr;
 use std::fs::read_dir;
 use std::path::PathBuf;
 
-use cargo_metadata::{CargoOpt, MetadataCommand};
+use cargo_metadata::MetadataCommand;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
@@ -86,9 +86,14 @@ pub(crate) fn local_subcmd() -> Result<(), (Error)> {
     // get the cargo metadata for the manifest
     let metadata = MetadataCommand::new()
         .manifest_path(&manifest)
-        .features(CargoOpt::AllFeatures)
         .exec()
-        .unwrap_or_else(|_| panic!("Failed to parse manifest: '{}'", &manifest.display()));
+        .unwrap_or_else(|error| {
+            panic!(
+                "Failed to parse manifest: '{}'\nError: '{:?}'",
+                &manifest.display(),
+                error
+            )
+        });
 
     // get the project target dir from the metadata
     let target_dir = metadata.target_directory;
