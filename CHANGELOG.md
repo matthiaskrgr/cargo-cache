@@ -8,6 +8,7 @@ Add ci-autoclean feature
 		Run `cargo install (--git github.com/matthiaskrgr/cargo-cache / cargo-cache) --no-default-features --features ci-autoclean` to install inside ci.
 
 Updated dependencies:
+	cargo_metadata 0.8.2 -> 0.9.0
 	home 0.5.0 -> 0.5.1
 	cfg-if: new
 
