@@ -8,7 +8,7 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
     let mut dates = files
         .iter()
         .map(|f| f.metadata().unwrap().accessed().unwrap())
-        .map(|d: std::time::SystemTime| chrono::DateTime::<Local>::from(d))
+        .map(chrono::DateTime::<Local>::from)
         .map(|d| d.naive_local())
         .collect::<Vec<_>>();
 
@@ -54,7 +54,7 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
 
     let filtered = dates
         .iter()
-        .filter(|file_date| file_date > &&date_to_compare)
+        .filter(|file_date| **file_date > date_to_compare)
         .collect::<Vec<_>>();
 
     // parse user time
