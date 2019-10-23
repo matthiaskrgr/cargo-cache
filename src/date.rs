@@ -1,13 +1,13 @@
 use crate::cache::*;
 use chrono::{prelude::*, FixedOffset, NaiveDateTime, TimeZone};
 use regex::Regex;
-use std::fs;
+
 
 pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
     let files = reg_cache.total_checkout_folders();
 
     for file in files {
-        let m = file.metadata();
+        let _m = file.metadata();
     }
 
     let mut dates = files
@@ -22,8 +22,8 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
     // get the current date
     let date = Local::now();
 
-    let current_date = date.format("%Y.%M.%D"); // get the current date
-    let current_time = date.format("%H:%M:%S"); // current time
+    let _current_date = date.format("%Y.%M.%D"); // get the current date
+    let _current_time = date.format("%H:%M:%S"); // current time
     let user_input = "2019.05.05"; //"20:33:02"; // 2019.10.01
 
     let date_to_compare: NaiveDateTime = {

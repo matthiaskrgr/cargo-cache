@@ -145,27 +145,8 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    //
-    //
-    //
-    ////
-    ////
-    ////
-    ////
-    ///
+    // just test
     crate::date::dates(&mut registry_sources_caches);
-
-    ////
-    ////
-    ////
-    ////
-    ////
-    ////
-    ////
-    ////
-    ////
-    ////
-    //
 
     if config.is_present("top-cache-items") {
         let limit =
