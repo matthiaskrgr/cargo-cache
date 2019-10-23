@@ -1,14 +1,9 @@
 use crate::cache::*;
-use chrono::{prelude::*, FixedOffset, NaiveDateTime, TimeZone};
+use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
-
 
 pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
     let files = reg_cache.total_checkout_folders();
-
-    for file in files {
-        let _m = file.metadata();
-    }
 
     let mut dates = files
         .iter()
