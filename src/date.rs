@@ -13,6 +13,8 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
     let mut dates = files
         .iter()
         .map(|f| f.metadata().unwrap().accessed().unwrap())
+        .map(|d: std::time::SystemTime| chrono::DateTime::<Local>::from(d))
+        .map(|d| d.naive_local())
         .collect::<Vec<_>>();
 
     dates.sort();
@@ -22,7 +24,7 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
 
     let current_date = date.format("%Y.%M.%D"); // get the current date
     let current_time = date.format("%H:%M:%S"); // current time
-    let user_input = "12:33:02";
+    let user_input = "2019.05.05"; //"20:33:02"; // 2019.10.01
 
     let date_to_compare: NaiveDateTime = {
         // we only havea date but no time
@@ -55,11 +57,17 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
         }
     };
 
+    let filtered = dates
+        .iter()
+        .filter(|file_date| file_date > &&date_to_compare)
+        .collect::<Vec<_>>();
+
     // parse user time
 
     // if the user does not specify a date, (which we need), take the default date of $today
     // and use it
-    let compare_date = NaiveDateTime::parse_from_str("12:09:13", "%H:%M:%S %Y.%M.%D");
+
+    //let compare_date = NaiveDateTime::parse_from_str("12:09:13", "%H:%M:%S %Y.%M.%D");
 
     // NaiveDate::from_ymd(2015, 9, 25).and_hms(12, 34, 56);
 
@@ -69,4 +77,6 @@ pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
 
     //  println!("{:?}", dates);
     println!("{:?}", date_to_compare);
+
+    println!("filtered len: {}", filtered.len());
 }
