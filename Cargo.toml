@@ -48,6 +48,8 @@ walkdir = { version = "2.2.9", optional = true } # walk content of directory/CAR
 # https://github.com/alexcrichton/cfg-if
 cfg-if = { version = "0.1.10" } # if cfg(..)  { ...  }
 
+chrono = "0.4.9"
+
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
 path-slash = "0.1.1" # normalize windows paths
@@ -66,7 +68,6 @@ tempfile = "3.1.0" # create and rm temporary directories for tests
 rustc_tools_util = "0.2.0" # git version information
 
 
-chrono = "0.4.9"
 [[bin]]
 name = "cargo-cache"
 path = "src/main.rs"
