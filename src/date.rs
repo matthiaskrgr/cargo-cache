@@ -2,7 +2,50 @@ use crate::cache::*;
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
-pub(crate) fn dates(reg_cache: &mut registry_sources::RegistrySourceCaches) {
+fn parse_date(date: &str) -> Result<NaiveDateTime, ()> {
+    // @TODO date parseerror
+
+    let date_to_compare: NaiveDateTime = {
+        // we only have a date but no time
+        if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
+            // most likely a date
+            dbg!("date is ymd");
+            let now = Local::now();
+            let split = date
+                .split('.')
+                .map(|d| d.parse::<u32>().unwrap()) // else parse error
+                .collect::<Vec<u32>>();
+            NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
+                .unwrap() // else parse error
+                .and_hms(now.hour(), now.minute(), now.second())
+        } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
+            // probably a time
+            dbg!("date is hms");
+
+            let today = Local::today();
+            let split = date
+                .split(':')
+                .map(|d| d.parse::<u32>().unwrap()) // else parse error
+                .collect::<Vec<u32>>();
+
+            NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
+                .unwrap() // else parse error
+                .and_hms(split[0], split[1], split[2])
+        } else {
+            return Err(()); // parse error
+        }
+    };
+    Ok(date_to_compare)
+}
+
+// need to get (part of the?) clap config
+pub(crate) fn dates(
+    reg_cache: &mut registry_sources::RegistrySourceCaches,
+    arg_younger: &Option<&str>,
+    arg_older: &Option<&str>,
+) {
+    // @TODO  if both are supplied, combine them with  OR
+
     let files = reg_cache.total_checkout_folders();
 
     let mut dates = files

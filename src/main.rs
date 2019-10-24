@@ -146,7 +146,11 @@ fn main() {
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
     // just test
-    crate::date::dates(&mut registry_sources_caches);
+    crate::date::dates(
+        &mut registry_sources_caches,
+        &config.value_of("remove-if-younger"),
+        &config.value_of("remove-if-older"),
+    );
 
     if config.is_present("top-cache-items") {
         let limit =

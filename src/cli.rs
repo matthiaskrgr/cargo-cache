@@ -82,6 +82,16 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    let remove_if_older = Arg::with_name("remove-if-older").short("o").long("remove-if-older")
+        .help("Removes items older than specified date: YYYY:MM:DD or HH:MM:SS or YYYY:HH:MM HH::MM::SS")
+        .takes_value(true)
+        .value_name("date");
+
+    let remove_if_younger = Arg::with_name("remove-if-younger").short("y").long("remove-if-younger")
+        .help("Removes items younger than the specified date: YYYY:MM:DD or HH:MM:SS or YYYY:HH:MM HH::MM::SS")
+        .takes_value(true)
+        .value_name("date");
+
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -169,6 +179,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&remove_if_younger)
+        .arg(&remove_if_older)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -196,6 +208,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&remove_if_younger)
+        .arg(&remove_if_older)
         .arg(&debug)
         .get_matches()
 }
