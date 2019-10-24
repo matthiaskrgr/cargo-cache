@@ -1,10 +1,9 @@
 use crate::cache::*;
+use crate::library::Error;
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
-fn parse_date(date: &str) -> Result<NaiveDateTime, ()> {
-    // @TODO date parseerror
-
+fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
@@ -32,7 +31,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, ()> {
                 .unwrap() // else parse error
                 .and_hms(split[0], split[1], split[2])
         } else {
-            return Err(()); // parse error
+            return Err(Error::DateParseError("a".into(), "b".into())); // parse error
         }
     };
     Ok(date_to_compare)
@@ -44,25 +43,67 @@ pub(crate) fn dates(
     arg_younger: &Option<&str>,
     arg_older: &Option<&str>,
 ) {
+    struct FileWithDate {
+        file: std::path::PathBuf,
+        access_date: NaiveDateTime,
+    }
+
     // @TODO  if both are supplied, combine them with  OR
 
     let files = reg_cache.total_checkout_folders();
 
-    let mut dates = files
+    let mut dates: Vec<FileWithDate> = files
         .iter()
-        .map(|f| f.metadata().unwrap().accessed().unwrap())
-        .map(chrono::DateTime::<Local>::from)
-        .map(|d| d.naive_local())
-        .collect::<Vec<_>>();
+        .map(|f| {
+            let path = f;
+            let access_time = f.metadata().unwrap().accessed().unwrap();
+            let naive_datetime = chrono::DateTime::<Local>::from(access_time).naive_local();
+            FileWithDate {
+                file: *path,
+                access_date: naive_datetime,
+            }
+        })
+        .collect();
 
-    dates.sort();
+    dates.sort_by_key(|f| f.file);
 
     // get the current date
-    let date = Local::now();
+    let now = Local::now();
 
-    let _current_date = date.format("%Y.%M.%D"); // get the current date
-    let _current_time = date.format("%H:%M:%S"); // current time
-    let user_input = "2019.05.05"; //"20:33:02"; // 2019.10.01
+    let current_date = now.format("%Y.%M.%D"); // get the current date
+    let current_time = now.format("%H:%M:%S"); // current time
+
+    let filter_closure: Vec<&FileWithDate> = match (arg_younger, arg_older) {
+        (None, None) => {
+            // @TODO warn no date
+            vec![]
+        }
+        (Some(younger_date), None) => {
+            let younger_than = parse_date(&younger_date).unwrap(/*@TODO*/);
+            dates
+                .iter()
+                .filter(|file| file.access_date > younger_than)
+                .collect()
+        }
+        (None, Some(older_date)) => {
+            let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
+            dates
+                .iter()
+                .filter(|file| file.access_date < older_than)
+                .collect()
+        }
+        (Some(younger_date), Some(older_date)) => {
+            let younger_than = parse_date(&younger_date).unwrap(/*@TODO*/);
+            let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
+
+            dates
+                .iter()
+                .filter(|file| file.access_date < older_than || file.access_date > younger_than)
+                .collect()
+        }
+    };
+
+    //let date_to_compare = parse_date();
 
     let date_to_compare: NaiveDateTime = {
         // we only havea date but no time
