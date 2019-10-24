@@ -43,6 +43,7 @@ pub(crate) fn dates(
     arg_younger: &Option<&str>,
     arg_older: &Option<&str>,
 ) {
+    #[derive(Debug, Clone)]
     struct FileWithDate {
         file: std::path::PathBuf,
         access_date: NaiveDateTime,
@@ -55,25 +56,25 @@ pub(crate) fn dates(
     let mut dates: Vec<FileWithDate> = files
         .iter()
         .map(|f| {
-            let path = f;
+            let path = f.clone();
             let access_time = f.metadata().unwrap().accessed().unwrap();
             let naive_datetime = chrono::DateTime::<Local>::from(access_time).naive_local();
             FileWithDate {
-                file: *path,
+                file: path,
                 access_date: naive_datetime,
             }
         })
         .collect();
 
-    dates.sort_by_key(|f| f.file);
+    dates.sort_by_key(|f| f.file.clone());
 
     // get the current date
-    let now = Local::now();
+    // let now = Local::now();
 
-    let current_date = now.format("%Y.%M.%D"); // get the current date
-    let current_time = now.format("%H:%M:%S"); // current time
+    //let current_date = now.format("%Y.%M.%D"); // get the current date
+    //let current_time = now.format("%H:%M:%S"); // current time
 
-    let filter_closure: Vec<&FileWithDate> = match (arg_younger, arg_older) {
+    let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {
             // @TODO warn no date
             vec![]
@@ -103,44 +104,6 @@ pub(crate) fn dates(
         }
     };
 
-    //let date_to_compare = parse_date();
-
-    let date_to_compare: NaiveDateTime = {
-        // we only havea date but no time
-        if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(user_input) {
-            // most likely a date
-            dbg!("there");
-            let now = Local::now();
-            let split = user_input
-                .split('.')
-                .map(|d| d.parse::<u32>().unwrap())
-                .collect::<Vec<u32>>();
-            NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
-                .unwrap()
-                .and_hms(now.hour(), now.minute(), now.second())
-        } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap(/*@FIXME*/).is_match(user_input) {
-            // probably a time
-            dbg!("here");
-
-            let today = Local::today();
-            let split = user_input
-                .split(':')
-                .map(|d| d.parse::<u32>().unwrap())
-                .collect::<Vec<u32>>();
-
-            NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
-                .unwrap()
-                .and_hms(split[0], split[1], split[2])
-        } else {
-            panic!("Failed to parse: '{}'", user_input);
-        }
-    };
-
-    let filtered = dates
-        .iter()
-        .filter(|file_date| **file_date > date_to_compare)
-        .collect::<Vec<_>>();
-
     // parse user time
 
     // if the user does not specify a date, (which we need), take the default date of $today
@@ -155,7 +118,5 @@ pub(crate) fn dates(
     // // https://docs.rs/chrono/0.4.9/chrono/naive/struct.NaiveDateTime.html#method.date
 
     //  println!("{:?}", dates);
-    println!("{:?}", date_to_compare);
-
-    println!("filtered len: {}", filtered.len());
+    println!("{:?}", filtered_files);
 }
