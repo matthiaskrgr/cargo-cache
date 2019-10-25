@@ -4,7 +4,7 @@ use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
-    dbg!(&date);
+    //  dbg!(&date);
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
@@ -38,7 +38,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
             return Err(Error::DateParseError("a".into(), "b".into())); // parse error
         }
     };
-    dbg!(date_to_compare);
+    // dbg!(date_to_compare);
     Ok(date_to_compare)
 }
 
@@ -48,8 +48,8 @@ pub(crate) fn dates(
     arg_younger: &Option<&str>,
     arg_older: &Option<&str>,
 ) {
-    dbg!(arg_younger);
-    dbg!(arg_older);
+    //  dbg!(arg_younger);
+    //   dbg!(arg_older);
     #[derive(Debug, Clone)]
     struct FileWithDate {
         file: std::path::PathBuf,
@@ -81,7 +81,7 @@ pub(crate) fn dates(
     //let current_date = now.format("%Y.%M.%D"); // get the current date
     //let current_time = now.format("%H:%M:%S"); // current time
 
-    dbg!((arg_younger, arg_older));
+    // dbg!((arg_younger, arg_older));
 
     let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {
@@ -97,7 +97,7 @@ pub(crate) fn dates(
         }
         (None, Some(older_date)) => {
             let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
-            dbg!(older_than);
+            //   dbg!(older_than);
             dates
                 .iter()
                 .filter(|file| file.access_date > older_than)
@@ -114,7 +114,7 @@ pub(crate) fn dates(
         }
     };
 
-    dbg!(&filtered_files);
+    //  dbg!(&filtered_files);
 
     // parse user time
 
@@ -130,5 +130,11 @@ pub(crate) fn dates(
     // // https://docs.rs/chrono/0.4.9/chrono/naive/struct.NaiveDateTime.html#method.date
 
     //  println!("{:?}", dates);
-    println!("{:?}", filtered_files);
+    //
+    let names = filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>();
+    names.iter().for_each(|n| println!("{}", n.display()));
+    /* println!(
+        "{:?}",
+        filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>()
+    );*/
 }
