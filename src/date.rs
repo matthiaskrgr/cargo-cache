@@ -4,11 +4,13 @@ use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
+    dbg!(&date);
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
             // most likely a date
-            dbg!("date is ymd");
+            println!("date is ymd");
+            dbg!(date);
             let now = Local::now();
             let split = date
                 .split('.')
@@ -19,7 +21,8 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .and_hms(now.hour(), now.minute(), now.second())
         } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
             // probably a time
-            dbg!("date is hms");
+            println!("date is hms");
+            dbg!(date);
 
             let today = Local::today();
             let split = date
@@ -31,9 +34,11 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .unwrap() // else parse error
                 .and_hms(split[0], split[1], split[2])
         } else {
+            println!("could not parse date");
             return Err(Error::DateParseError("a".into(), "b".into())); // parse error
         }
     };
+    dbg!(date_to_compare);
     Ok(date_to_compare)
 }
 
@@ -43,6 +48,8 @@ pub(crate) fn dates(
     arg_younger: &Option<&str>,
     arg_older: &Option<&str>,
 ) {
+    dbg!(arg_younger);
+    dbg!(arg_older);
     #[derive(Debug, Clone)]
     struct FileWithDate {
         file: std::path::PathBuf,
@@ -74,6 +81,8 @@ pub(crate) fn dates(
     //let current_date = now.format("%Y.%M.%D"); // get the current date
     //let current_time = now.format("%H:%M:%S"); // current time
 
+    dbg!((arg_younger, arg_older));
+
     let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {
             // @TODO warn no date
@@ -83,14 +92,15 @@ pub(crate) fn dates(
             let younger_than = parse_date(&younger_date).unwrap(/*@TODO*/);
             dates
                 .iter()
-                .filter(|file| file.access_date > younger_than)
+                .filter(|file| file.access_date < younger_than)
                 .collect()
         }
         (None, Some(older_date)) => {
             let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
+            dbg!(older_than);
             dates
                 .iter()
-                .filter(|file| file.access_date < older_than)
+                .filter(|file| file.access_date > older_than)
                 .collect()
         }
         (Some(younger_date), Some(older_date)) => {
@@ -103,6 +113,8 @@ pub(crate) fn dates(
                 .collect()
         }
     };
+
+    dbg!(&filtered_files);
 
     // parse user time
 
