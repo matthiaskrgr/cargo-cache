@@ -4,7 +4,6 @@ use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
-    //  dbg!(&date);
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
@@ -35,10 +34,9 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .and_hms(split[0], split[1], split[2])
         } else {
             println!("could not parse date");
-            return Err(Error::DateParseError("a".into(), "b".into())); // parse error
+            return Err(Error::DateParseFailure("a".into(), "b".into())); // parse error
         }
     };
-    // dbg!(date_to_compare);
     Ok(date_to_compare)
 }
 
@@ -74,14 +72,6 @@ pub(crate) fn dates(
         .collect();
 
     dates.sort_by_key(|f| f.file.clone());
-
-    // get the current date
-    // let now = Local::now();
-
-    //let current_date = now.format("%Y.%M.%D"); // get the current date
-    //let current_time = now.format("%H:%M:%S"); // current time
-
-    // dbg!((arg_younger, arg_older));
 
     let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {

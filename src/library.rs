@@ -85,7 +85,7 @@ pub(crate) enum Error {
     // local tried to open a target dir that does not exist
     LocalNoTargetDir(PathBuf),
     // failed to parse date given to younger or older
-    DateParseError(String, String),
+    DateParseFailure(String, String),
 }
 
 impl fmt::Display for Error {
@@ -173,7 +173,7 @@ impl fmt::Display for Error {
                 f, "error: \"local\" subcommand tried to read \"target\" directory that does not exist: \"{}\"",
                 path.display()
             ),
-            Self::DateParseError(date, error) => write!(
+            Self::DateParseFailure(date, error) => write!(
                 f, "ERROR failed to parse {} as date ... . . .: {}",
                 date, error
             ),
