@@ -20,7 +20,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .collect::<Vec<u32>>();
             NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
                 .expect(&format!(
-                    "Failed to parse  {}:{}:{} as time",
+                    "Failed to parse  {}.{}.{} as date",
                     split[0], split[1], split[2]
                 ))
                 .and_hms(now.hour(), now.minute(), now.second())
@@ -40,7 +40,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
 
             NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
                 .expect(&format!(
-                    "Failed to parse  {}.{}.{} as date",
+                    "Failed to parse  {}:{}:{} as time",
                     split[0], split[1], split[2]
                 ))
                 .and_hms(split[0], split[1], split[2])
