@@ -6,19 +6,25 @@ use regex::Regex;
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
-        if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
+        if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap().is_match(date) {
             // most likely a date
             println!("date is ymd");
             dbg!(date);
             let now = Local::now();
             let split = date
                 .split('.')
-                .map(|d| d.parse::<u32>().unwrap()) // else parse error
+                .map(|d| {
+                    d.parse::<u32>()
+                        .expect(&format!("'{}' seems to not be an u32", d))
+                }) // else parse error
                 .collect::<Vec<u32>>();
             NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
-                .unwrap() // else parse error
+                .expect(&format!(
+                    "Failed to parse  {}:{}:{} as time",
+                    split[0], split[1], split[2]
+                ))
                 .and_hms(now.hour(), now.minute(), now.second())
-        } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap(/*@FIXME*/).is_match(date) {
+        } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap().is_match(date) {
             // probably a time
             println!("date is hms");
             dbg!(date);
@@ -26,11 +32,17 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
             let today = Local::today();
             let split = date
                 .split(':')
-                .map(|d| d.parse::<u32>().unwrap()) // else parse error
+                .map(|d| {
+                    d.parse::<u32>()
+                        .expect(&format!("'{}' seems to not be an u32", d))
+                })
                 .collect::<Vec<u32>>();
 
             NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
-                .unwrap() // else parse error
+                .expect(&format!(
+                    "Failed to parse  {}.{}.{} as date",
+                    split[0], split[1], split[2]
+                ))
                 .and_hms(split[0], split[1], split[2])
         } else {
             println!("could not parse date");
