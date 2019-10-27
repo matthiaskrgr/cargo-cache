@@ -46,7 +46,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .and_hms(split[0], split[1], split[2])
         } else {
             println!("could not parse date");
-            return Err(Error::DateParseFailure("a".into(), "b".into())); // parse error
+            return Err(Error::DateParseFailure("a".into(), "b".into())); // @TODO
         }
     };
     Ok(date_to_compare)
@@ -65,8 +65,6 @@ pub(crate) fn dates(
         file: std::path::PathBuf,
         access_date: NaiveDateTime,
     }
-
-    // @TODO  if both are supplied, combine them with  OR
 
     let files = reg_cache.total_checkout_folders();
 
@@ -87,18 +85,18 @@ pub(crate) fn dates(
 
     let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {
-            // @TODO warn no date
+            eprintln!("ERROR: no dates were supplied altough -o -y were passed!");
             vec![]
         }
         (Some(younger_date), None) => {
-            let younger_than = parse_date(&younger_date).unwrap(/*@TODO*/);
+            let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
             dates
                 .iter()
                 .filter(|file| file.access_date < younger_than)
                 .collect()
         }
         (None, Some(older_date)) => {
-            let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
+            let older_than = parse_date(older_date).unwrap(/*@TODO*/);
             //   dbg!(older_than);
             dates
                 .iter()
@@ -106,8 +104,8 @@ pub(crate) fn dates(
                 .collect()
         }
         (Some(younger_date), Some(older_date)) => {
-            let younger_than = parse_date(&younger_date).unwrap(/*@TODO*/);
-            let older_than = parse_date(&older_date).unwrap(/*@TODO*/);
+            let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
+            let older_than = parse_date(older_date).unwrap(/*@TODO*/);
 
             dates
                 .iter()
@@ -116,23 +114,6 @@ pub(crate) fn dates(
         }
     };
 
-    //  dbg!(&filtered_files);
-
-    // parse user time
-
-    // if the user does not specify a date, (which we need), take the default date of $today
-    // and use it
-
-    //let compare_date = NaiveDateTime::parse_from_str("12:09:13", "%H:%M:%S %Y.%M.%D");
-
-    // NaiveDate::from_ymd(2015, 9, 25).and_hms(12, 34, 56);
-
-    // then, filter out all files with date older/younger than x
-    //
-    // // https://docs.rs/chrono/0.4.9/chrono/naive/struct.NaiveDateTime.html#method.date
-
-    //  println!("{:?}", dates);
-    //
     let names = filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>();
     names.iter().for_each(|n| println!("{}", n.display()));
     /* println!(
