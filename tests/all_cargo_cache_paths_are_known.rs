@@ -64,8 +64,6 @@ fn CARGO_HOME_subdirs_are_known() {
     /*
     "target/cargo_home_subdirs_known_CARGO_HOME/"
     "target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"
-    nightly:       "target/cargo_home_subdirs_known_CARGO_HOME/.crates2.toml"
-
     "target/cargo_home_subdirs_known_CARGO_HOME/.package-cache"
     "target/cargo_home_subdirs_known_CARGO_HOME/bin"
     "target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"
@@ -76,7 +74,7 @@ fn CARGO_HOME_subdirs_are_known() {
     "target/cargo_home_subdirs_known_CARGO_HOME/git/db/cargo-cache-16826c8e13331adc"
     "target/cargo_home_subdirs_known_CARGO_HOME/registry"
     "target/cargo_home_subdirs_known_CARGO_HOME/registry/cache"
-    "target/cargo_home_subdiyrs_known_CARGO_HOME/registry/cache/github.com-1ecc6299db9ec823"
+    "target/cargo_home_subdirs_known_CARGO_HOME/registry/cache/github.com-1ecc6299db9ec823"
     "target/cargo_home_subdirs_known_CARGO_HOME/registry/index"
     "target/cargo_home_subdirs_known_CARGO_HOME/registry/index/github.com-1ecc6299db9ec823"
     "target/cargo_home_subdirs_known_CARGO_HOME/registry/src"
@@ -92,19 +90,10 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"),);
-    // we need some special handling until cargo 0.41.0 hits stable
-    // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
-    let next = x.next().unwrap();
-    if next.contains("crates2.toml") {
-        assert!(next.starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates2.toml"),);
-    } else {
-        assert!(next.starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.package-cache"));
-    }
-
-    /*  assert!(x
-    .next()
-    .unwrap()
-    .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.package-cache"),); */
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.package-cache"),);
 
     assert!(x
         .next()
