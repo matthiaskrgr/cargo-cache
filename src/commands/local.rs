@@ -76,7 +76,7 @@ fn get_manifest() -> Result<PathBuf, Error> {
 
 /// gather the sizes of subdirs of the `target` directory and prints a formatted table
 /// of the data to stdout
-pub(crate) fn local_subcmd() -> Result<(), Error> {
+pub(crate) fn local_subcmd() -> Result<(), (Error)> {
     // padding of the final formatting of the table
     const MIN_PADDING: usize = 6;
 
