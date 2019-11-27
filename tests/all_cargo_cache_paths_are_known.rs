@@ -19,6 +19,14 @@ use walkdir::WalkDir;
 #[allow(non_snake_case)]
 #[test]
 fn CARGO_HOME_subdirs_are_known() {
+    // stuff is inconsisten until cargo 0.41.0 hits stable
+    // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
+    let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
+    let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
+    if version_output.contains("nightly") {
+        return;
+    }
+
     // this tests makes cargo create a new CARGO_HOME and makes sure that the paths that are found
     // are known by cargo cache
     let cargo_home = "target/cargo_home_subdirs_known_CARGO_HOME/";
@@ -64,6 +72,7 @@ fn CARGO_HOME_subdirs_are_known() {
     /*
     "target/cargo_home_subdirs_known_CARGO_HOME/"
     "target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"
+    "target/cargo_home_subdirs_known_CARGO_HOME/.crates2.toml"
     "target/cargo_home_subdirs_known_CARGO_HOME/.package-cache"
     "target/cargo_home_subdirs_known_CARGO_HOME/bin"
     "target/cargo_home_subdirs_known_CARGO_HOME/bin/cargo-cache"
