@@ -1,11 +1,15 @@
 name: Rust_CI
 
-on: [push, pull_request]
-# also every 24 hours
+on: 
+  push
+  pull_request
+  # every day at 05:00
+  schedule: 0 5 * * *
+
 
 jobs:
   build_nightly:
-    runs-on: "ubuntu-latest"
+    runs-on: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v1
     - name: install nightly toolchain
@@ -20,6 +24,7 @@ jobs:
       run: cargo test --verbose
 
 
+# check for vulns in deps with cargo-audit
   cargo-audit:
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +40,7 @@ jobs:
     - name: run cargo-audit
       run: cargo-audit
 
-
+# code with clippy
   clippy:
     runs-on: ubuntu-latest
     steps:
@@ -49,6 +54,7 @@ jobs:
     - name: clippy
       run: cargo clippy --all-targets --all-features
 
+# make sure code formatting is consistent
   rustfmt:
     runs-on: ubuntu-latest
     steps:
