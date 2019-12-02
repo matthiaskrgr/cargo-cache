@@ -19,7 +19,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     steps:
     - name: ${{ matrix.mode }}
-    - steps: echo 1
+    - run: echo 1
       
 
   build_nightly:
