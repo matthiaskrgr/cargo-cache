@@ -20,25 +20,29 @@ jobs:
         include:
           - build: one
             os: ubuntu-latest
-            rust: stable
+            toolchain: stable
+
           - build: two
             os: ubuntu-latest
-            rust: beta
+            toolchain: beta
+
           - build: three
             os: ubuntu-latest
-            rust: nightly
+            toolchain: nightly
+
           - build: four
             os: macos-latest
-            rust: stable
+            toolchain: stable
+
           - build: five
             os: windows-latest
-            rust: stable
+            toiolchain: stable
     steps:
     - uses: actions/checkout@v1
-    - name: install nightly toolchain
+    - name: install toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: nightly
+        toolchain: matrix.toolchain
         override: true
         profile: minimal
     - run: cargo build
