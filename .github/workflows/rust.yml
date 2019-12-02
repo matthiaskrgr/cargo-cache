@@ -11,8 +11,8 @@ jobs:
     - name: install nightly toolchain
       uses: actions-rs/toolchain@v1
       with:
-          toolchain: nightly
-          override: true
+        toolchain: nightly
+        override: true
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -26,8 +26,8 @@ jobs:
     - name: install nightly toolchain
       uses: actions-rs/toolchain@v1
       with:
-          toolchain: nightly
-          override: true
+        toolchain: nightly
+        override: true
       - name: install cargo-audit
         run: cargo install cargo-audit --debug
       - name: run cargo-audit
