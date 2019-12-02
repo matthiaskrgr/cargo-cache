@@ -1,10 +1,11 @@
-name: Rust
+name: Rust_CI
 
-on: [push]
+on: [push, pull_request]
+# also every 24 hours
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: [ubuntu-latest, osx-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -13,22 +14,16 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-  build-windows:
-    runs-on: windows-latest
+
+
+
+jobs:
+  build-release:
+    runs-on: [ubuntu-latest, osx-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v1
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --release --verbose
     - name: Run tests
-      run: cargo test --verbose
-
-  macos-windows:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --release --verbose
