@@ -18,18 +18,19 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-
-  cargo-audit:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-    - name: install cargo-audit
-      run: cargo install cargo-audit --debug
-    - name: run cargo-audit
-      run: cargo-audit
-
+#
+#  cargo-audit:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v1
+#    - name: install nightly toolchain
+#      uses: actions-rs/toolchain@v1
+#      with:
+#        toolchain: nightly
+#        profile: default
+#        override: true
+#    - name: install cargo-audit
+#      run: cargo install cargo-audit --debug
+#    - name: run cargo-audit
+#      run: cargo-audit
+#
