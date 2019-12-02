@@ -7,8 +7,8 @@ on:
   schedule:
       - cron: '0 5 * * *'
 
-jobs:
 
+jobs:
   strategy:
     matrix:
       os: [ubuntu-latest, windows-latest, macos-latest]
@@ -20,6 +20,9 @@ jobs:
     - name: ${{ matrix.mode }}
       run: echo 1
       
+
+
+jobs:
 
   build_nightly:
     runs-on: [ubuntu-latest]
