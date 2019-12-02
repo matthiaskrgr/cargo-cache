@@ -7,8 +7,21 @@ on:
   schedule:
       - cron: '0 5 * * *'
 
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest, macos-latest]
+    mode: ["--release", "--debug"]
+
 
 jobs:
+
+  bla:
+    runs-on:  ${{ matrix.os }}
+    steps:
+    - name: ${{ matrix.mode }}
+    - steps: echo 1
+      
+
   build_nightly:
     runs-on: [ubuntu-latest]
     steps:
