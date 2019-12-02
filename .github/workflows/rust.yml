@@ -4,9 +4,9 @@ on: [push, pull_request]
 # also every 24 hours
 
 jobs:
-  build:
+  build nightly:
     runs-on: ["ubuntu-latest", "osx-latest", "windows-latest"]
-
+    toolchain: nightly
     steps:
     - uses: actions/checkout@v1
     - name: Build
@@ -16,6 +16,7 @@ jobs:
 
 
   cargo-audit:
+    toolchain: stable
     runs-on: ubuntu-latest
     steps:
       - name: install cargo-audit
@@ -24,6 +25,7 @@ jobs:
         run: cargo-audit
 
   rustfmt:
+    toolchain: nightly
     env:
       EXIT: "false"
     runs-on: ubuntu-latest
