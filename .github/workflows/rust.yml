@@ -15,9 +15,6 @@ jobs:
       run: cargo test --verbose
 
 
-
-
-jobs:
   build-release:
     runs-on: [ubuntu-latest, osx-latest, windows-latest]
 
@@ -27,3 +24,5 @@ jobs:
       run: cargo build --release --verbose
     - name: Run tests
       run: cargo test --release --verbose
+
+      
