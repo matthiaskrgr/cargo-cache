@@ -8,7 +8,74 @@ on:
       - cron: '0 5 * * *'
 
 
+
+
 jobs:
+# windows nightly debug
+  windows_nightly_debug:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+
+# windows nightly release
+  windows_nightly_release:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
+    - name: Build
+      run: cargo build --verbose --release
+    - name: Run tests
+      run: cargo test --verbose --release
+
+# osx nightly debug
+  osx_nightly_debug:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+
+# osx nightly release
+  osx_nightly_release:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
+    - name: Build
+      run: cargo build --verbose --release
+    - name: Run tests
+      run: cargo test --verbose --release
+
+
   build_nightly:
     runs-on: [ubuntu-latest]
     steps:
