@@ -1,4 +1,4 @@
-name: Rust_CI
+name: continuous integration
 
 # trigger on pushes, PRs and every day at 05:00
 on: 
