@@ -104,6 +104,15 @@ jobs:
     - name: install cargo-cache --debug
       run: cargo install --force --path . --debug
       if: matrix.debug == true
+    - name: test benchmarks debug
+      if: matrix.debug == true && matrix.toolchain == "nightly"
+      run: cargo test --features bench
+    - name: test benchmarks release
+      if: matrix.debug == false && matrix.toolchain == "nightly"
+      run: |
+      cargo test --features bench --release
+      cargo bench
+      cargo bench --features bench
     - name: run cargo-cache 
       run: |
         cargo-cache
