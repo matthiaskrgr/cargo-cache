@@ -3,7 +3,7 @@ name: Rust_CI
 on: 
   push
   pull_request
-  # every day at 05:00
+# every day at 05:00
   schedule:
     - cron: '0 5 * * *'
 
