@@ -81,16 +81,16 @@ jobs:
         override: true
         profile: minimal
     - name: cargo build
-      run: cargo build --verbose
+      run: cargo build --verbose --all
       if: matrix.debug == true
-    - name: cargo build --release
+    - name: cargo build --release --all
       run: cargo build --verbose --release
       if: matrix.debug == false
     - name: test 
-      run: cargo test --verbose
+      run: cargo test --verbose --all -- --nocapture
       if: matrix.debug == true
     - name: test  --release
-      run: cargo test --verbose --release
+      run: cargo test --verbose --release --all -- --nocapture
       if: matrix.debug == false
     - name: cargo run 
       run: cargo run
