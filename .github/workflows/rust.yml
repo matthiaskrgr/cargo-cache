@@ -5,7 +5,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: [ubuntu-latest, osx-latest, windows-latest]
+    runs-on: ["ubuntu-latest", "osx-latest", "windows-latest"]
 
     steps:
     - uses: actions/checkout@v1
@@ -16,7 +16,7 @@ jobs:
 
 
   build-release:
-    runs-on: [ubuntu-latest, osx-latest, windows-latest]
+    runs-on: ["ubuntu-latest", "osx-latest", "windows-latest"]
 
     steps:
     - uses: actions/checkout@v1
