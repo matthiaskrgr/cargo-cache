@@ -4,7 +4,7 @@ on: [push, pull_request]
 # also every 24 hours
 
 jobs:
-  build nightly:
+  build_nightly:
     runs-on: ["ubuntu-latest", "osx-latest", "windows-latest"]
     steps:
     - uses: actions/checkout@v1
