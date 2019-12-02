@@ -110,9 +110,9 @@ jobs:
     - name: test benchmarks release
       if: matrix.debug == false && matrix.toolchain == "nightly"
       run: |
-      cargo test --features bench --release
-      cargo bench
-      cargo bench --features bench
+        cargo test --features bench --release
+        cargo bench
+        cargo bench --features bench
     - name: run cargo-cache 
       run: |
         cargo-cache
