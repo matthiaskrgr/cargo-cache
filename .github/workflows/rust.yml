@@ -20,5 +20,21 @@ jobs:
     steps:
       - name: install cargo-audit
         run: cargo install cargo-audit --debug
+
       - name: run cargo-audit
         run: cargo-audit
+
+  rustfmt:
+    env:
+      EXIT: "false"
+    runs-on: ubuntu-latest
+    steps:
+      - name: install rustfmt
+        run: rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force  || EXIT="true"
+
+      - name: maybe exit build
+        if: EXIT == "false"
+        run: exit
+
+      - name: run cargo fmt
+        run: carog fmt --all -- --check
