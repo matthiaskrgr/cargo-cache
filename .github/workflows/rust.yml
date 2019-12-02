@@ -103,7 +103,7 @@ jobs:
       if: matrix.debug == false
     - name: install cargo-cache --debug
       run: cargo install --force --path . --debug
-      if: matrix.debug == false
+      if: matrix.debug == true
     - name: run cargo-cache 
       run: |
         cargo-cache
