@@ -8,10 +8,6 @@ on:
       - cron: '0 5 * * *'
 
 
-
-
-
-
 jobs:
 # run tests on linux, macos and windows
   test:
@@ -113,12 +109,16 @@ jobs:
         cargo test --features bench --release
         cargo bench
         cargo bench --features bench
-    - name: run cargo-cache 
+    - name: run cargo-cache commands
       run: |
         cargo-cache
         cargo cache
         cargo cache --help
         cargo cache --top-cache-items 20
+# causes
+#Skipping 'C:\Users\runneradmin\.cargo\git\checkouts' because it doesn't exist.
+##[error]Process completed with exit code 1.
+
         cargo cache --gc --dry-run
         cargo cache --gc
         cargo cache --info
