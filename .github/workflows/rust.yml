@@ -10,183 +10,47 @@ on:
 
 
 
+
+
 jobs:
-# windows nightly debug
-  windows_nightly_debug:
-    runs-on: windows-latest
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [linux-stable, linux-beta, linux-nightly, macos-nightly, windows-nightly]
+        include:
+          - build: linux-stable
+            os: ubuntu-latest
+            toolchain: stable
+
+          - build: linux-beta
+            os: ubuntu-latest
+            toolchain: beta
+
+          - build: linux-nightly
+            os: ubuntu-latest
+            toolchain: nightly
+
+          - build: macos-nightly
+            os: macos-latest
+            toolchain: nightly
+
+          - build: windows-nightly
+            os: windows-latest
+            toolchain: nightly
     steps:
     - uses: actions/checkout@v1
-    - name: install nightly toolchain
+    - name: install toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: nightly
+        toolchain: ${{ matrix.toolchain }}
         override: true
         profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    - run: cargo build --verbose
+    - run: cargo test --verbose
 
-# windows nightly release
-  windows_nightly_release:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose --release
-
-# osx nightly debug
-  osx_nightly_debug:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-
-# osx nightly release
-  osx_nightly_release:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose --release
-
-#linux stable
-  linux_stable_release:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose --release
-
-  linux_stable_debug:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-
-#linux beta
-  linux_beta_release:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: beta
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose --release
-
-  linux_beta_debug:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-
-
-
-#linux nightly
-  linux_nightly_release:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Run tests
-      run: cargo test --verbose --release
-
-  linux_mightly_debug:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-
-
-
-
-  build_nightly:
-    runs-on: [ubuntu-latest]
-    steps:
-    - uses: actions/checkout@v1
-    - name: install nightly toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-        profile: minimal
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
 
 
 # check for vulns in deps with cargo-audit
