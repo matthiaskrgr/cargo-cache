@@ -7,13 +7,12 @@ on:
   schedule:
       - cron: '0 5 * * *'
 
-strategy:
-  matrix:
-    os: [ubuntu-latest, windows-latest, macos-latest]
-    mode: ["--release", "--debug"]
-
-
 jobs:
+
+  strategy:
+    matrix:
+      os: [ubuntu-latest, windows-latest, macos-latest]
+      mode: ["--release", "--debug"]
 
   bla:
     runs-on:  ${{ matrix.os }}
