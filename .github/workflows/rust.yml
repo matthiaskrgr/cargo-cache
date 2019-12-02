@@ -3,9 +3,28 @@ name: Rust
 on: [push]
 
 jobs:
-  build:
-
+  build-linux:
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+
+  macos-windows:
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
