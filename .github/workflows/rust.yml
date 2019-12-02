@@ -9,21 +9,6 @@ on:
 
 
 jobs:
-  strategy:
-    matrix:
-      os: [ubuntu-latest, windows-latest, macos-latest]
-      mode: ["--release", "--debug"]
-
-  bla:
-    runs-on:  ${{ matrix.os }}
-    steps:
-    - name: ${{ matrix.mode }}
-      run: echo 1
-      
-
-
-jobs:
-
   build_nightly:
     runs-on: [ubuntu-latest]
     steps:
