@@ -1,11 +1,11 @@
 name: Rust_CI
 
+# trigger on pushes, PRs and every day at 05:00
 on: 
   push
   pull_request
-# every day at 05:00
   schedule:
-    - cron: '0 5 * * *'
+      - cron: '0 5 * * *'
 
 
 jobs:
