@@ -9,16 +9,41 @@ on:
 
 
 jobs:
-  runs-on: ${{ matrix.os }}
-  strategy:
-    matrix:
-      os: [macos-latest, windows-latest, ubuntu-18.04]
-      node: [4, 6, 8, 10]
-      include:
-        # includes a new variable of npm with a value of 2 for the matrix leg matching the os and version
-        - os: windows-latest
-          node: 4
-          npm: 2
+
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [one, two, three, four, five]
+        include:
+          - build: one
+            os: ubuntu-latest
+            rust: stable
+          - build: two
+            os: ubuntu-latest
+            rust: beta
+          - build: three
+            os: ubuntu-latest
+            rust: nightly
+          - build: four
+            os: macos-latest
+            rust: stable
+          - build: five
+            os: windows-latest
+            rust: stable
+    steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
+    - run: cargo build
+    - run: cargo test
+
 
 # windows nightly debug
   windows_nightly_debug:
