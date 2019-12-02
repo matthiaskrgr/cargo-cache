@@ -48,3 +48,16 @@ jobs:
         profile: default
     - name: clippy
       run: cargo clippy --all-targets --all-features
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: default
+    - name: rustfmt: check formatting
+      run: cargo fmt --all -- --check
