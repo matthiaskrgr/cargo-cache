@@ -6,9 +6,13 @@ on: [push, pull_request]
 jobs:
   build nightly:
     runs-on: ["ubuntu-latest", "osx-latest", "windows-latest"]
-    toolchain: nightly
     steps:
     - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -16,24 +20,16 @@ jobs:
 
 
   cargo-audit:
-    toolchain: stable
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
+    - name: install nightly toolchain
+      uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
       - name: install cargo-audit
         run: cargo install cargo-audit --debug
       - name: run cargo-audit
         run: cargo-audit
 
-  rustfmt:
-    toolchain: nightly
-    env:
-      EXIT: "false"
-    runs-on: ubuntu-latest
-    steps:
-      - name: install rustfmt
-        run: |
-          EXIT="false"
-          rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force  || EXIT="true"
-          if [[ "$EXIT" == "FALSE" ]]; then exit; fi
-      - name: run cargo fmt
-        run: cargo fmt --all -- --check
