@@ -42,7 +42,7 @@ jobs:
     - name: install toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: matrix.toolchain
+        toolchain: ${{ matrix.toolchain }}
         override: true
         profile: minimal
     - run: cargo build
