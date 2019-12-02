@@ -98,9 +98,14 @@ jobs:
     - name: cargo run --release
       run: cargo run --release
       if: matrix.debug == false 
-
-    - run: cargo install --force --path .
-    - run: |
+    - name: install cargo-cache
+      run: cargo install --force --path .
+      if: matrix.debug == false
+    - name: install cargo-cache --debug
+      run: cargo install --force --path . --debug
+      if: matrix.debug == false
+    - name: run cargo-cache 
+      run: |
         cargo-cache
         cargo cache
         cargo cache --help
