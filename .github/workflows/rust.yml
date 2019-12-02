@@ -16,27 +16,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [one, two, three, four, five]
+        build: [linux-stable, linux-beta, linux-nightly, macos-nightly, windows-nightly]
         include:
-          - build: one
+          - build: linux-stable
             os: ubuntu-latest
             toolchain: stable
 
-          - build: two
+          - build: linux-beta
             os: ubuntu-latest
             toolchain: beta
 
-          - build: three
+          - build: linux-nightly
             os: ubuntu-latest
             toolchain: nightly
 
-          - build: four
+          - build: macos-nightly
             os: macos-latest
-            toolchain: stable
+            toolchain: nightly
 
-          - build: five
+          - build: windows-nightly
             os: windows-latest
-            toolchain: stable
+            toolchain: nightly
     steps:
     - uses: actions/checkout@v1
     - name: install toolchain
