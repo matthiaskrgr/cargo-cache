@@ -107,14 +107,17 @@ jobs:
         run: cargo install --force --path . --debug
         if: matrix.debug == true
       - name: test benchmarks debug
-        if: matrix.debug == true && matrix.toolchain == 'nightly'
+        if: matrix.debug == true && matrix.toovlchain == 'nightly'
         run: cargo test --features bench
       - name: test benchmarks release
         if: matrix.debug == false && matrix.toolchain == 'nightly'
-        run: |
-          cargo test --features bench --release
-          cargo bench
-          cargo bench --features bench
+        run: cargo test --features bench --release
+      - name: run cargo bench
+        if: matrix.debug == false && matrix.toolchain == 'nightly'
+        run: cargo bench
+      - name: actually run benchmarks
+        if: matrix.debug == false && matrix.toolchain == 'nightly'
+        run: cargo bench --features bench
       - name: 1
         run: cargo-cache
       - name: 2
@@ -132,7 +135,7 @@ jobs:
       - name: 8
         run: cargo cache --list-dirs
       - name: 9
-        run: cargo cache   --keep-duplicate-crates 10 --dry-run
+        run: cargo cache --keep-duplicate-crates 10 --dry-run
       - name: 10
         run: cargo cache --keep-duplicate-crates 1  --dry-run
       - name: 11
