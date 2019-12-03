@@ -82,32 +82,37 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           override: true
           profile: minimal
+      # build
       - name: cargo build
         run: cargo build --verbose --all
         if: matrix.debug == true
       - name: cargo build --release --all
         run: cargo build --verbose --release
         if: matrix.debug == false
+      # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
         if: matrix.debug == true
       - name: test  --release
         run: cargo test --verbose --release --all -- --nocapture
         if: matrix.debug == false
+      # run cargo cache
       - name: cargo run
         run: cargo run
         if: matrix.debug == true
       - name: cargo run --release
         run: cargo run --release
         if: matrix.debug == false
+      # install cargo cache
       - name: install cargo-cache
         run: cargo install --force --path .
         if: matrix.debug == false
       - name: install cargo-cache --debug
         run: cargo install --force --path . --debug
         if: matrix.debug == true
+      # in release mode, run the benchmarks, otherwise just test them
       - name: test benchmarks debug
-        if: matrix.debug == true && matrix.toovlchain == 'nightly'
+        if: matrix.debug == true && matrix.toolchain == 'nightly'
         run: cargo test --features bench
       - name: test benchmarks release
         if: matrix.debug == false && matrix.toolchain == 'nightly'
@@ -118,27 +123,28 @@ jobs:
       - name: actually run benchmarks
         if: matrix.debug == false && matrix.toolchain == 'nightly'
         run: cargo bench --features bench
-      - name: 1
+      # run cargo cache
+      - name: run "cargo-cache"
         run: cargo-cache
-      - name: 2
+      - name: run "cargo cache"
         run: cargo cache
-      - name: 3
+      - name: run "cargo cache --help"
         run: cargo cache --help
-      - name: 4
+      - name: run "cargo cache --top-cache-items 20"
         run: cargo cache --top-cache-items 20
-      - name: 5
+      - name: run "cargo cache --gc --dry-run"
         run: cargo cache --gc --dry-run
-      - name: 6
+      - name: run "cargo cache --gc"
         run: cargo cache --gc
-      - name: 7
+      - name: run "cargo cache --info"
         run: cargo cache --info
-      - name: 8
+      - name: run "cargo cache --list-dirs"
         run: cargo cache --list-dirs
-      - name: 9
+      - name: run "cargo cache --keep-duplicate-crates 10 --dry-run"
         run: cargo cache --keep-duplicate-crates 10 --dry-run
-      - name: 10
+      - name: run "cargo cache --keep-duplicate-crates 1  --dry-run"
         run: cargo cache --keep-duplicate-crates 1  --dry-run
-      - name: 11
+      - name: run "cargo cache --keep-duplicate-crates 0  --dry-run"
         run: cargo cache --keep-duplicate-crates 0  --dry-run
 
   # check for vulns in deps with cargo-audit
