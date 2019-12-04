@@ -11,6 +11,7 @@ jobs:
   # run tests on linux, macos and windows
   test:
     name: Test
+    env: RUSTC_BACKTRACE: full
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -150,6 +151,7 @@ jobs:
   # check for vulns in deps with cargo-audit
   cargo-audit:
     runs-on: ubuntu-latest
+    env: RUSTC_BACKTRACE: full
     steps:
       - uses: actions/checkout@v1
       - name: install nightly toolchain
@@ -166,6 +168,7 @@ jobs:
   # code with clippy
   clippy:
     runs-on: ubuntu-latest
+    env: RUSTC_BACKTRACE: full
     steps:
       - uses: actions/checkout@v1
       - name: install toolchain
@@ -180,6 +183,7 @@ jobs:
   # make sure code formatting is consistent
   rustfmt:
     runs-on: ubuntu-latest
+    env: RUSTC_BACKTRACE: full
     steps:
       - uses: actions/checkout@v1
       - name: install toolchain
