@@ -85,10 +85,10 @@ jobs:
       # build
       - name: cargo build
         run: cargo build --verbose --all
-        if: contains( ${{ matrix.build }}, 'debug')
+        if: contains( '${{ matrix.build }}', 'debug')
       - name: cargo build --release --all
         run: cargo build --verbose --release
-        if: not contains( ${{ matrix.build }}, 'debug')
+        if: not contains( '${{ matrix.build }}', 'debug')
       # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
