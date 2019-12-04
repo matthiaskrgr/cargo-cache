@@ -1,0 +1,206 @@
+name: continuous integration
+
+# trigger on pushes, PRs and every day at 05:00
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  # run tests on linux, macos and windows
+  test:
+    name: Test
+    env:
+      RUSTC_BACKTRACE: full
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build:
+          [
+            linux-nightly-release,
+            linux-nightly-debug,
+            linux-stable-release,
+            linux-stable-debug,
+            linux-beta-release,
+            linux-beta-debug,
+            macos-nightly-release,
+            macos-nightly-debug,
+            windows-nightly-release,
+            windows-nightly-debug,
+          ]
+        include:
+          - build: linux-nightly-release
+            os: ubuntu-latest
+            toolchain: nightly
+            release: true
+          - build: linux-nightly-debug
+            os: ubuntu-latest
+            toolchain: nightly
+            debug: true
+
+          - build: macos-nightly-release
+            os: macos-latest
+            toolchain: nightly
+            mode: release
+            release: true
+          - build: macos-nightly-debug
+            os: macos-latest
+            toolchain: nightly
+            debug: true
+
+          - build: windows-nightly-release
+            os: windows-latest
+            toolchain: nightly
+            release: true
+          - build: windows-nightly-debug
+            os: windows-latest
+            toolchain: nightly
+            debug: true
+
+          - build: linux-beta-release
+            os: ubuntu-latest
+            toolchain: beta
+            release: true
+          - build: linux-beta-debug
+            os: ubuntu-latest
+            toolchain: beta
+            debug: true
+
+          - build: linux-stable-release
+            os: ubuntu-latest
+            toolchain: stable
+            release: true
+          - build: linux-stable-debug
+            os: ubuntu-latest
+            toolchain: stable
+            debug: true
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+          profile: minimal
+
+      # build
+      - name: cargo build
+        run: cargo build --verbose --all
+        if: matrix.debug
+      - name: cargo build --release --all
+        run: cargo build --verbose --release
+        if: matrix.release
+
+      # run tests
+      - name: test
+        run: cargo test --verbose --all -- --nocapture
+        if: matrix.debug
+      - name: test  --release
+        run: cargo test --verbose --release --all -- --nocapture
+        if: matrix.release
+
+      # run cargo cache
+      - name: cargo run
+        run: cargo run
+        if: matrix.debug
+      - name: cargo run --release
+        run: cargo run --release
+        if: matrix.release
+
+      # install cargo cache
+      - name: install cargo-cache
+        run: cargo install --force --path .
+        if: matrix.release
+      - name: install cargo-cache --debug
+        run: cargo install --force --path . --debug
+        if: matrix.debug
+
+      # in release mode, run the benchmarks, otherwise just test them
+      - name: test benchmarks debug
+        if: matrix.debug && matrix.toolchain == 'nightly'
+        run: cargo test --features bench
+      - name: test benchmarks release
+        if: matrix.release && matrix.toolchain == 'nightly'
+        run: cargo test --features bench --release
+      - name: run cargo bench
+        if: matrix.release && matrix.toolchain == 'nightly'
+        run: cargo bench
+      - name: actually run benchmarks
+        if: matrix.release && matrix.toolchain == 'nightly'
+        run: cargo bench --features bench
+
+      # run cargo cache
+      - name: run "cargo-cache"
+        run: cargo-cache
+      - name: run "cargo cache"
+        run: cargo cache
+      - name: run "cargo cache --help"
+        run: cargo cache --help
+      - name: run "cargo cache --top-cache-items 20"
+        run: cargo cache --top-cache-items 20
+      - name: run "cargo cache --gc --dry-run"
+        run: cargo cache --gc --dry-run
+      - name: run "cargo cache --gc"
+        run: cargo cache --gc
+      - name: run "cargo cache --info"
+        run: cargo cache --info
+      - name: run "cargo cache --list-dirs"
+        run: cargo cache --list-dirs
+      - name: run "cargo cache --keep-duplicate-crates 10 --dry-run"
+        run: cargo cache --keep-duplicate-crates 10 --dry-run
+      - name: run "cargo cache --keep-duplicate-crates 1  --dry-run"
+        run: cargo cache --keep-duplicate-crates 1  --dry-run
+      - name: run "cargo cache --keep-duplicate-crates 0  --dry-run"
+        run: cargo cache --keep-duplicate-crates 0  --dry-run
+
+  # check for vulns in deps with cargo-audit
+  cargo-audit:
+    runs-on: ubuntu-latest
+    env:
+      RUSTC_BACKTRACE: full
+    steps:
+      - uses: actions/checkout@v1
+      - name: install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+      - name: install cargo-audit
+        run: cargo install cargo-audit --debug
+      - name: run cargo-audit
+        run: cargo-audit
+
+  # code with clippy
+  clippy:
+    runs-on: ubuntu-latest
+    env:
+      RUSTC_BACKTRACE: full
+    steps:
+      - uses: actions/checkout@v1
+      - name: install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: default
+      - name: clippy
+        run: cargo clippy --all-targets --all-features
+
+  # make sure code formatting is consistent
+  rustfmt:
+    runs-on: ubuntu-latest
+    env:
+      RUSTC_BACKTRACE: full
+    steps:
+      - uses: actions/checkout@v1
+      - name: install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: default
+      - name: rustfmt check formatting
+        run: cargo fmt --all -- --check
