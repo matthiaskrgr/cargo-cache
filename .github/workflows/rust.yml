@@ -31,48 +31,48 @@ jobs:
           - build: linux-nightly-release
             os: ubuntu-latest
             toolchain: nightly
-            debug: false
+            debug: 0
           - build: linux-nightly-debug
             os: ubuntu-latest
             toolchain: nightly
-            debug: true
+            debug: 1
 
           - build: macos-nightly-release
             os: macos-latest
             toolchain: nightly
             mode: release
-            debug: false
+            debug: 0
           - build: macos-nightly-debug
             os: macos-latest
             toolchain: nightly
-            debug: true
+            debug: 1
 
           - build: windows-nightly-release
             os: windows-latest
             toolchain: nightly
-            debug: false
+            debug: 0
           - build: windows-nightly-debug
             os: windows-latest
             toolchain: nightly
-            debug: true
+            debug: 1
 
           - build: linux-beta-release
             os: ubuntu-latest
             toolchain: beta
-            debug: false
+            debug: 0
           - build: linux-beta-debug
             os: ubuntu-latest
             toolchain: beta
-            debug: true
+            debug: 1
 
-          - build: linux-stable-debug
-            os: ubuntu-latest
-            toolchain: stable
-            debug: true
           - build: linux-stable-release
             os: ubuntu-latest
             toolchain: stable
-            debug: false
+            debug: 0
+          - build: linux-stable-debug
+            os: ubuntu-latest
+            toolchain: stable
+            debug: 1
 
     steps:
       - uses: actions/checkout@v1
@@ -85,10 +85,10 @@ jobs:
       # build
       - name: cargo build
         run: cargo build --verbose --all
-        if: contains( '${{ matrix.build }}', 'debug')
+        if: ${{matrix.debug}}
       - name: cargo build --release --all
         run: cargo build --verbose --release
-        if: not contains( '${{ matrix.build }}', 'debug')
+        if: not ${{matrix.debug}}
       # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
