@@ -88,7 +88,7 @@ jobs:
         if: matrix.debug
       - name: cargo build --release --all
         run: cargo build --verbose --release
-        if: matrix.debug
+        if: not matrix.debug
       # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
