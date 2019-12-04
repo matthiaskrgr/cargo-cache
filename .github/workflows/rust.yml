@@ -84,6 +84,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           override: true
           profile: minimal
+
       # build
       - name: cargo build
         run: cargo build --verbose --all
@@ -91,6 +92,7 @@ jobs:
       - name: cargo build --release --all
         run: cargo build --verbose --release
         if: matrix.release
+
       # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
@@ -98,6 +100,7 @@ jobs:
       - name: test  --release
         run: cargo test --verbose --release --all -- --nocapture
         if: matrix.release
+
       # run cargo cache
       - name: cargo run
         run: cargo run
@@ -105,6 +108,7 @@ jobs:
       - name: cargo run --release
         run: cargo run --release
         if: matrix.release
+
       # install cargo cache
       - name: install cargo-cache
         run: cargo install --force --path .
@@ -112,6 +116,7 @@ jobs:
       - name: install cargo-cache --debug
         run: cargo install --force --path . --debug
         if: matrix.debug
+
       # in release mode, run the benchmarks, otherwise just test them
       - name: test benchmarks debug
         if: matrix.debug && matrix.toolchain == 'nightly'
@@ -125,6 +130,7 @@ jobs:
       - name: actually run benchmarks
         if: matrix.release && matrix.toolchain == 'nightly'
         run: cargo bench --features bench
+
       # run cargo cache
       - name: run "cargo-cache"
         run: cargo-cache
