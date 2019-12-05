@@ -173,8 +173,8 @@ jobs:
       - name: run cargo-audit
         run: cargo-audit
 
-  # code with clippy
-  clippy:
+  # check code with clippy
+  run_clippy:
     runs-on: ubuntu-latest
     env:
       RUSTC_BACKTRACE: full
@@ -204,3 +204,17 @@ jobs:
           profile: default
       - name: rustfmt check formatting
         run: cargo fmt --all -- --check
+
+  run_clippy_action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: clippy
+          override: true
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
