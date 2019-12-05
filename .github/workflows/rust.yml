@@ -1,11 +1,11 @@
 name: continuous integration
 
-# trigger on pushes, PRs and every day at 05:00
+# trigger on pushes, PRs and every day at 03:00 GMT, 05:00 CEST
 on:
   push:
   pull_request:
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 3 * * *"
 
 jobs:
   # run tests on linux, macos and windows
