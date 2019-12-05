@@ -263,9 +263,10 @@ impl<'a> DirSizes<'a> {
             TableLine::new(
                 2,
                 // check how many indices there are
-                match self.total_reg_index_num {
-                    1 => String::from("Registry index: "),
-                    _ => format!("{} registry indices: ", &self.total_reg_index_num()),
+                if let 1 = self.total_reg_index_num {
+                    String::from("Registry index: ")
+                } else {
+                    format!("{} registry indices: ", &self.total_reg_index_num())
                 },
                 self.total_reg_index_size()
                     .file_size(file_size_opts::DECIMAL)
