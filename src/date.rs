@@ -116,8 +116,8 @@ pub(crate) fn dates(
 
     let names = filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>();
     names.iter().for_each(|n| println!("{}", n.display()));
-    /* println!(
+    println!(
         "{:?}",
         filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>()
-    );*/
+    );
 }
