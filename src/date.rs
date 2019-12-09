@@ -26,7 +26,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 .split('.')
                 .map(|d| {
                     d.parse::<u32>()
-                        .expect(&format!("'{}' seems to not be an u32", d))
+                        .unwrap_or_else(|_| panic!("'{}' seems to not be an u32", d))
                 }) // else parse error
                 .collect::<Vec<u32>>();
             NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
