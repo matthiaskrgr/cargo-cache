@@ -4,7 +4,7 @@ use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
 #[derive(Debug, Clone)]
-enum date_comparison<'a> {
+enum DateComparison<'a> {
     NoDate,
     Older(&'a str),
     Younger(&'a str),
@@ -77,11 +77,11 @@ pub(crate) fn dates(
         access_date: NaiveDateTime,
     }
 
-    let date_comp: date_comparison<'_> = match (arg_older, arg_younger) {
-        (None, None) => date_comparison::NoDate,
-        (None, Some(younger)) => date_comparison::Younger(younger),
-        (Some(older), None) => date_comparison::Older(older),
-        (Some(older), Some(younger)) => date_comparison::OlderOrYounger(older, younger),
+    let date_comp: DateComparison<'_> = match (arg_older, arg_younger) {
+        (None, None) => DateComparison::NoDate,
+        (None, Some(younger)) => DateComparison::Younger(younger),
+        (Some(older), None) => DateComparison::Older(older),
+        (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
     };
 
     let files = reg_cache.total_checkout_folders();
@@ -102,17 +102,17 @@ pub(crate) fn dates(
     dates.sort_by_key(|f| f.file.clone());
 
     let filtered_files: Vec<&FileWithDate> = match date_comp {
-        date_comparison::NoDate => {
+        DateComparison::NoDate => {
             unreachable!("ERROR: no dates were supplied altough -o -y were passed!");
         }
-        date_comparison::Younger(younger_date) => {
+        DateComparison::Younger(younger_date) => {
             let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
             dates
                 .iter()
                 .filter(|file| file.access_date < younger_than)
                 .collect()
         }
-        date_comparison::Older(older_date) => {
+        DateComparison::Older(older_date) => {
             let older_than = parse_date(older_date).unwrap(/*@TODO*/);
             //   dbg!(older_than);
             dates
@@ -120,7 +120,7 @@ pub(crate) fn dates(
                 .filter(|file| file.access_date > older_than)
                 .collect()
         }
-        date_comparison::OlderOrYounger(older_date, younger_date) => {
+        DateComparison::OlderOrYounger(older_date, younger_date) => {
             let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
             let older_than = parse_date(older_date).unwrap(/*@TODO*/);
 
