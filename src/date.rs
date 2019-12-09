@@ -3,6 +3,14 @@ use crate::library::Error;
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
+#[derive(Debug, Clone)]
+enum date_comparison<'a> {
+    NoDate,
+    Older(&'a str),
+    Younger(&'a str),
+    OlderOrYounger(&'a str, &'a str),
+}
+
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
     // TODO
     // handle dd.mm.yy if yy
@@ -69,6 +77,13 @@ pub(crate) fn dates(
         access_date: NaiveDateTime,
     }
 
+    let date_comp: date_comparison = match (arg_older, arg_younger) {
+        (None, None) => date_comparison::NoDate,
+        (None, Some(younger)) => date_comparison::Younger(younger),
+        (Some(older), None) => date_comparison::Older(older),
+        (Some(older), Some(younger)) => date_comparison::OlderOrYounger(older, younger),
+    };
+
     let files = reg_cache.total_checkout_folders();
 
     let mut dates: Vec<FileWithDate> = files
@@ -88,8 +103,7 @@ pub(crate) fn dates(
 
     let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
         (None, None) => {
-            eprintln!("ERROR: no dates were supplied altough -o -y were passed!");
-            vec![]
+            unreachable!("ERROR: no dates were supplied altough -o -y were passed!");
         }
         (Some(younger_date), None) => {
             let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
