@@ -101,18 +101,18 @@ pub(crate) fn dates(
 
     dates.sort_by_key(|f| f.file.clone());
 
-    let filtered_files: Vec<&FileWithDate> = match (arg_younger, arg_older) {
-        (None, None) => {
+    let filtered_files: Vec<&FileWithDate> = match date_comp {
+        date_comparison::NoDate => {
             unreachable!("ERROR: no dates were supplied altough -o -y were passed!");
         }
-        (Some(younger_date), None) => {
+        date_comparison::Younger(younger_date) => {
             let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
             dates
                 .iter()
                 .filter(|file| file.access_date < younger_than)
                 .collect()
         }
-        (None, Some(older_date)) => {
+        date_comparison::Older(older_date) => {
             let older_than = parse_date(older_date).unwrap(/*@TODO*/);
             //   dbg!(older_than);
             dates
@@ -120,7 +120,7 @@ pub(crate) fn dates(
                 .filter(|file| file.access_date > older_than)
                 .collect()
         }
-        (Some(younger_date), Some(older_date)) => {
+        date_comparison::OlderOrYounger(older_date, younger_date) => {
             let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
             let older_than = parse_date(older_date).unwrap(/*@TODO*/);
 
