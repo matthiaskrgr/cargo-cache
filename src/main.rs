@@ -145,12 +145,13 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    // just test
-    crate::date::dates(
-        &mut registry_sources_caches,
-        &config.value_of("remove-if-younger"),
-        &config.value_of("remove-if-older"),
-    );
+    if config.is_present("remove-if-younger") || config.is_present("remove-if-older") {
+        crate::date::dates(
+            &mut registry_sources_caches,
+            &config.value_of("remove-if-younger"),
+            &config.value_of("remove-if-older"),
+        );
+    }
 
     if config.is_present("top-cache-items") {
         let limit =

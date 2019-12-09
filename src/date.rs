@@ -4,6 +4,9 @@ use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
+    // TODO
+    // handle dd.mm.yy if yy
+
     let date_to_compare: NaiveDateTime = {
         // we only have a date but no time
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap().is_match(date) {
