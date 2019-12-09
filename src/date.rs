@@ -77,7 +77,7 @@ pub(crate) fn dates(
         access_date: NaiveDateTime,
     }
 
-    let date_comp: date_comparison = match (arg_older, arg_younger) {
+    let date_comp: date_comparison<'_> = match (arg_older, arg_younger) {
         (None, None) => date_comparison::NoDate,
         (None, Some(younger)) => date_comparison::Younger(younger),
         (Some(older), None) => date_comparison::Older(older),
