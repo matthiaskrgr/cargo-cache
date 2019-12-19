@@ -23,7 +23,7 @@ fn CARGO_HOME_subdirs_are_known() {
     // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
     let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
-    if version_output.contains("nightly") {
+    if version_output.contains("stable") {
         return;
     }
 
@@ -99,6 +99,10 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"),);
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/.crates2.json"),);
     assert!(x
         .next()
         .unwrap()
