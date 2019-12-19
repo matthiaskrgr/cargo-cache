@@ -23,7 +23,7 @@ fn CARGO_HOME_subdirs_are_known() {
     // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
     let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
-    if version_output.contains("1.39") {
+    if version_output.contains("1.40") {
         return;
     }
 
