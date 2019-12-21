@@ -12,17 +12,17 @@ env:
 matrix:
   fast_finish: false
   include:
-# windows nightly
+    # windows nightly
     - name: "windows nightly release"
       os: windows
-      rust: nightly
+      rust: nightly-2019-12-19
       env: RELEASE="--release
 
     - name: "windows nightly debug"
       os: windows
-      rust: nightly
+      rust: nightly-2019-12-19
       env: RELEASE="" DEBUG="--debug"
-# osx nightly
+    # osx nightly
     - name: "nightly osx release"
       os: osx
       rust: nightly
@@ -32,7 +32,7 @@ matrix:
       os: osx
       rust: nightly
       env: RELEASE="" DEBUG="--debug"
-# linux stable
+    # linux stable
     - name: "stable linux release"
       os: linux
       rust: stable
@@ -42,7 +42,7 @@ matrix:
       os: linux
       rust: stable
       env: RELEASE="" DEBUG="--debug"
-# linux beta
+    # linux beta
     - name: "beta linux release"
       os: linux
       rust: beta
@@ -52,7 +52,7 @@ matrix:
       os: linux
       rust: beta
       env: RELEASE="" DEBUG="--debug"
-# linux nightly
+    # linux nightly
     - name: "nightly linux release"
       os: linux
       rust: nightly
@@ -63,14 +63,14 @@ matrix:
       rust: nightly
       env: RELEASE="" DEBUG="--debug"
 
-# linux tools
+    # linux tools
     - name: "clippy"
       os: linux
       rust: nightly
       script:
         - EXIT="false"
         - rustup component add clippy-preview --toolchain=nightly || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy || EXIT="true"
-# don't fail the build if clippy fails to build
+        # don't fail the build if clippy fails to build
         - if [[ $EXIT == "true" ]]; then exit; fi
         - cargo clippy --all-targets --all-features -- -D warnings
 
@@ -81,13 +81,12 @@ matrix:
         - cargo install cargo-audit --debug
         - cargo audit
 
-
     - name: "rustfmt"
       os: linux
       rust: nightly
       script:
         - rustup component add rustfmt-preview --toolchain=nightly || cargo install rustfmt-nightly --force || cargo install --git https://github.com/rust-lang/rustfmt/ --force  || EXIT="true"
-# don't fail the build if clippy fails to build
+        # don't fail the build if clippy fails to build
         - if [[ $EXIT == "true" ]]; then exit; fi
         - cargo fmt --all -- --check
 
