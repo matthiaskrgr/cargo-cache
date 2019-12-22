@@ -1,6 +1,6 @@
 ## cargo cache
 
-[![Build Status](https://travis-ci.org/matthiaskrgr/cargo-cache.svg?branch=master)](https://travis-ci.org/matthiaskrgr/cargo-cache)
+[![Build Status](https://github.com/matthiaskrgr/cargo-cache/workflows/ci/badge.svg)](https://github.com/matthiaskrgr/cargo-cache/actions)
 [![dependency status](https://deps.rs/repo/github/matthiaskrgr/cargo-cache/status.svg)](https://deps.rs/repo/github/matthiaskrgr/cargo-cache)
 [![Latest Version](https://img.shields.io/crates/v/cargo-cache.svg)](https://crates.io/crates/cargo-cache)
 [![libs.rs](https://img.shields.io/badge/libs.rs-gray.svg)](https://lib.rs/crates/cargo-cache)
