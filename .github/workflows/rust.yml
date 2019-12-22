@@ -1,4 +1,4 @@
-name: continuous integration
+name: ci
 
 # trigger on pushes, PRs and every day at 03:00 GMT, 05:00 CEST
 on:
