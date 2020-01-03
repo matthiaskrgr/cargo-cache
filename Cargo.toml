@@ -72,7 +72,7 @@ test = true
 bench = true
 
 [badges]
-travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
+#travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
 [profile.release]
 lto = true
