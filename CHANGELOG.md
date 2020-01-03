@@ -1,4 +1,5 @@
 ## Git
+````
 Fix bug where `cargo cache local` would panic on crates with workspaces
 		This was caused by passing wrong parameters to cargo_metadata when parsing the manifest
 Add ci-autoclean feature
@@ -12,6 +13,7 @@ Updated dependencies:
 	cargo_metadata 0.8.2 -> 0.9.0
 	home 0.5.0 -> 0.5.1
 	cfg-if: new
+````
 
 ## Version 0.3.3 (b5e5752)
 ````
