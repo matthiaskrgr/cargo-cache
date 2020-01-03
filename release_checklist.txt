@@ -12,9 +12,9 @@ cargo check
 cargo build
 cargo build --release
 git clean -dffx
-cargo test
-git clean -dffx
 cargo check --no-default-features --features ci-autoclean
+git clean -dffx
+cargo test
 git clean -dffx
 cargo test --release
 cargo audit
