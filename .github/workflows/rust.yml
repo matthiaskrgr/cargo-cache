@@ -190,9 +190,12 @@ jobs:
           toolchain: nightly
           override: true
           profile: default
-      - name: clippy
+      - name: clippy all targets all features
         run: cargo clippy --all-targets --all-features
-
+      - name: clippy ci_autoclean
+        run: cargo clippy --no-default-features --features ci-autoclean
+      - name: clippy default features
+        run: cargo clippy --all-targets --features default
   # make sure code formatting is consistent
   rustfmt:
     runs-on: ubuntu-latest

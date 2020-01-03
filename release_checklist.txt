@@ -19,6 +19,8 @@ git clean -dffx
 cargo test --release
 cargo audit
 cargo clippy --all-targets --all-features
+cargo clippy --no-default-features --features ci-autoclean
+cargo clippy --all-targets --features default
 cargo fmt --all
 make sure changelog is up to date
 make sure CI catches up and everything is green
