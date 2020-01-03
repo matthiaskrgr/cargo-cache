@@ -157,7 +157,8 @@ jobs:
       # check ci-autoclean feature
       - name: install with ci_autoclean feature
         run: cargo install --force --git https://github.com/matthiaskrgr/cargo-cache --no-default-features --features ci-autoclean cargo-cache
-
+      - name: run ci_autoclean
+        run: cargo-cache
   # check for vulns in deps with cargo-audit
   cargo-audit:
     runs-on: ubuntu-latest

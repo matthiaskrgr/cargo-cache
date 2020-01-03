@@ -3,7 +3,7 @@
 Fix bug where `cargo cache local` would panic on crates with workspaces
 		This was caused by passing wrong parameters to cargo_metadata when parsing the manifest
 Add ci-autoclean feature
-		The feature creates a `cargo-cache` binary that only executes `cargo cache --autoclean`
+		The feature creates a `cargo-cache` binary that only executes `cargo cache --autoclean` by default (requires no arguments, just run `cargo-cache`).
 		and has all other features and dependencies stripped out.
 		This is intended for usage on continuous integration when the $CARGO_HOME is cached in order to reduce size	before uploading the cargo home to the ci cache.
 		Run `cargo install (--git github.com/matthiaskrgr/cargo-cache / cargo-cache) --no-default-features --features ci-autoclean` to install inside ci.
