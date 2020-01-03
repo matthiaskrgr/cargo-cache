@@ -156,7 +156,7 @@ To reduce the size of the cache before storing it, you might want to run `cargo 
 The `ci-autoclean` feature provides a very stripped-down version of the crate that is only capable of running `cargo-cache --autoclean` automatically on launch and should compile within a couple of seconds.  
 To make use of this, you can add these commands to your ci:
 ````bash
-cargo install (--git github.com/matthiaskrgr/cargo-cache OR cargo-cache) --no-default-features --features ci-autoclean
+cargo install (--git git://github.com/matthiaskrgr/cargo-cache OR cargo-cache) --no-default-features --features ci-autoclean cargo-cache
 cargo-cache # no further arguments required
 ````
 
