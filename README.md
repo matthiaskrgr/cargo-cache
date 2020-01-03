@@ -167,7 +167,7 @@ A: Nope, this project does not interact with sccaches cache.
 
 #### License:
 
-Copyright 2017-2019 Matthias Krüger
+Copyright 2017-2020 Matthias Krüger
 
 ````
 Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
