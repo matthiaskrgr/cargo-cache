@@ -1,4 +1,7 @@
-## Version 0.3.4
+## Git
+````
+````
+## Version 0.3.4 (650849a)
 ````
 Fix bug where `cargo cache local` would panic on crates with workspaces
 		This was caused by passing wrong parameters to cargo_metadata when parsing the manifest
