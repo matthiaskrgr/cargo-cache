@@ -156,7 +156,7 @@ jobs:
         run: cargo cache --keep-duplicate-crates 0  --dry-run
       # check ci-autoclean feature
       - name: install with ci_autoclean feature
-        run: cargo install --force --git github.com/matthiaskrgr/cargo-cache --no-default-features --features ci-autoclean
+        run: cargo install --force --git https://github.com/matthiaskrgr/cargo-cache --no-default-features --features ci-autoclean cargo-cache
 
   # check for vulns in deps with cargo-audit
   cargo-audit:
