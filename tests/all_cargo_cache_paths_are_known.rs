@@ -19,7 +19,7 @@ use walkdir::WalkDir;
 #[allow(non_snake_case)]
 #[test]
 fn CARGO_HOME_subdirs_are_known() {
-    // stuff is inconsisten until cargo 0.41.0 hits stable
+    // stuff is inconsistent until cargo 0.41.0 hits stable
     // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
     let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
