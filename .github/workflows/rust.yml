@@ -210,4 +210,4 @@ jobs:
           override: true
           profile: default
       - name: rustfmt check formatting
-        run: cargo fmt --all -- --check
+        run: cargo fmt -- --check
