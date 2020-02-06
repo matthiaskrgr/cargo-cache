@@ -282,8 +282,13 @@ fn main() {
     }
 
     if config.is_present("autoclean") || config.is_present("autoclean-expensive") {
+        // clean the registry sources and git checkouts
         let reg_srcs = &cargo_cache.registry_sources;
         let git_checkouts = &cargo_cache.git_checkouts;
+
+        // depending on the size of the cache and the system (SSD, HDD...) this can take a few seconds.
+        println!("\nClearing cache...");
+
         for dir in &[reg_srcs, git_checkouts] {
             let size = cumulative_dir_size(dir);
             if dir.is_dir() {
