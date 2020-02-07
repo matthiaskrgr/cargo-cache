@@ -86,6 +86,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     // get the cargo metadata for the manifest
     let metadata = MetadataCommand::new()
         .manifest_path(&manifest)
+        .no_deps()
         .exec()
         .unwrap_or_else(|error| {
             panic!(

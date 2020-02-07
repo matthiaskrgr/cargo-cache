@@ -1,5 +1,6 @@
 ## Git
 ````
+local: ignore crate deps when using the local subcommand
 ````
 ## Version 0.3.4 (650849a)
 ````
