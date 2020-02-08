@@ -1,6 +1,8 @@
 ## Git
 ````
 local: ignore crate deps when using the local subcommand
+	this cargo-cache local "freezing" when being run while a different process was already writing to the $CARGO_HOME
+Print message that we are clearing the cache when using autoclean after printing the before-stats since clearing can take some time depending on hardware
 ````
 ## Version 0.3.4 (650849a)
 ````
