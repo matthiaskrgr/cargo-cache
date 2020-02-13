@@ -459,6 +459,8 @@ fn main() {
         }
     };
 
+    println!("cargo-cache: running \"cargo cache --autoclean\"");
+
     let reg_srcs = &cargo_cache.registry_sources;
     let git_checkouts = &cargo_cache.git_checkouts;
     for dir in &[reg_srcs, git_checkouts] {
