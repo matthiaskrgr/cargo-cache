@@ -205,35 +205,35 @@ pub(crate) fn remove_dir_via_cmdline(
 
     dirs.for_each(|dir| match dir {
         RemovableDir::All => {
-            dirs_to_remove.extend(vec![
-                Dir::GitDB,
-                Dir::GitRepos,
-                Dir::RegistrySources,
-                Dir::RegistryCrateCache,
-                Dir::RegistryIndex,
-            ]);
+            dirs_to_remove.extend(
+                // everything
+                vec![
+                    Dir::GitDB,
+                    Dir::GitRepos,
+                    Dir::RegistrySources,
+                    Dir::RegistryCrateCache,
+                    Dir::RegistryIndex,
+                ],
+            );
         }
-        GitDB => {
+        RemovableDir::GitDB => {
             dirs_to_remove.extend(vec![Dir::GitDB, Dir::GitRepos]);
         }
-        GitRepos => {
+        RemovableDir::GitRepos => {
             dirs_to_remove.push(Dir::GitRepos);
         }
-        RegistrySources => {
+        RemovableDir::RegistrySources => {
             dirs_to_remove.push(Dir::RegistrySources);
-            dirs_to_remove.push(Dir::RegistryCrateCache);
         }
-        RegistryCrateCache => {
-            dirs_to_remove.push(Dir::RegistryCrateCache);
+        RemovableDir::RegistryCrateCache => {
+            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache]);
         }
-        RegistryIndex => {
+        RemovableDir::RegistryIndex => {
             dirs_to_remove.push(Dir::RegistryIndex);
         }
-        Registry => dirs_to_remove.extend(vec![
-            Dir::RegistrySources,
-            Dir::RegistryCrateCache,
-            Dir::RegistryIndex,
-        ]),
+        RemovableDir::Registry => {
+            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache])
+        }
     });
 
     // remove duplicates
