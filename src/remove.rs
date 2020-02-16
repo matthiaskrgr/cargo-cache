@@ -16,6 +16,46 @@ use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
 
+// these are everything what we can specify to remove via --remove-dir
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+enum RemovableDir {
+    All,
+    GitDB,
+    GitRepos,
+    RegistrySources,
+    RegistryCrateCache,
+    RegistryIndex,
+    Registry,
+}
+
+impl std::str::FromStr for RemovableDir {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, String> {
+        match s {
+            "all" => Ok(RemovableDir::All),
+            "git-db" => Ok(RemovableDir::GitDB),
+            "git-repos" => Ok(RemovableDir::GitRepos),
+            "registry-sources" => Ok(RemovableDir::RegistrySources),
+            "registry-crate-cache" => Ok(RemovableDir::RegistryCrateCache),
+            "registry-index" => Ok(RemovableDir::RegistryIndex),
+            "registry" => Ok(RemovableDir::Registry),
+            other => Err(other.to_string()),
+        }
+    }
+}
+
+// these are actually the components of the cache
+// we have to mape the RemovableDirs to the CacheComponents
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+enum Dir {
+    GitDB,              // git/db
+    GitRepos,           // git/checkouts
+    RegistrySources,    // registry/src
+    RegistryCrateCache, // registry/cahce
+    RegistryIndex,      // registry/index
+}
+
 pub(crate) fn rm_old_crates(
     amount_to_keep: u64,
     dry_run: bool,
@@ -135,74 +175,70 @@ pub(crate) fn remove_dir_via_cmdline(
         return Err(Error::RemoveDirNoArg);
     };
 
-    let inputs = input.split(',');
-    let valid_dirs = vec![
-        "git-db",
-        "git-repos",
-        "registry-sources",
-        "registry-crate-cache",
-        "registry-index",
-        "registry",
-        "all",
-    ];
-
-    // keep track of what we want to remove
-    let mut rm_git_repos = false;
-    let mut rm_git_checkouts = false;
-    let mut rm_registry_sources = false;
-    let mut rm_registry_crate_cache = false;
-    let mut rm_registry_index = false;
+    // sort failed and successfull parses
+    #[allow(clippy::type_complexity)]
+    let (dirs, errors): (
+        Vec<Result<RemovableDir, String>>,
+        Vec<Result<RemovableDir, String>>,
+    ) = input.split(',').map(str::parse).partition(Result::is_ok);
 
     // validate input
-    let mut invalid_dirs = String::new();
-    let mut terminate: bool = false;
-
-    for word in inputs {
-        if valid_dirs.contains(&word) {
-            // dir is recognized
-            // dedupe
-            match word {
-                "all" => {
-                    rm_git_repos = true;
-                    rm_git_checkouts = true;
-                    rm_registry_sources = true;
-                    rm_registry_crate_cache = true;
-                    rm_registry_index = true;
-                    // we clean the entire cache anyway,
-                    // no need to look further, break out of loop
-                    break; // for word in inputs
-                }
-                "registry" | "registry-crate-cache" => {
-                    rm_registry_sources = true;
-                    rm_registry_crate_cache = true;
-                }
-                "registry-sources" => {
-                    rm_registry_sources = true;
-                }
-                "registry-index" => {
-                    rm_registry_index = true;
-                }
-                "git-repos" => {
-                    rm_git_checkouts = true;
-                }
-                "git-db" => {
-                    rm_git_repos = true;
-                    rm_git_checkouts = true;
-                }
-                _ => unreachable!(),
-            } // match *word
-        } else {
-            // collect all invalid dirs and print all of them as merged string later
-            invalid_dirs.push_str(word);
-            invalid_dirs.push_str(" ");
-            terminate = true;
-        }
-    } // for word in inputs
-    if terminate {
-        // remove trailing whitespace
-        let inv_dirs_trimmed = invalid_dirs.trim();
+    let invalid_dirs = errors
+        .into_iter()
+        .map(|e| e.err().unwrap())
+        .collect::<Vec<String>>();
+    // check if we have errors, if yes, abort and return a list of the unrecognized directories
+    if !invalid_dirs.is_empty() {
+        let inv_dirs_joined = invalid_dirs.join(" ");
+        let inv_dirs_trimmed = inv_dirs_joined.trim();
         return Err(Error::InvalidDeletableDirs(inv_dirs_trimmed.to_string()));
     }
+
+    // at this point we were able to parse all the user input.
+
+    // map the RemovableDirs to Dirs
+
+    // unwrap the Results
+    let dirs = dirs.into_iter().map(|d| d.ok().unwrap());
+
+    let mut dirs_to_remove = Vec::new();
+
+    dirs.for_each(|dir| match dir {
+        RemovableDir::All => {
+            dirs_to_remove.extend(
+                // everything
+                vec![
+                    Dir::GitDB,
+                    Dir::GitRepos,
+                    Dir::RegistrySources,
+                    Dir::RegistryCrateCache,
+                    Dir::RegistryIndex,
+                ],
+            );
+        }
+        RemovableDir::GitDB => {
+            dirs_to_remove.extend(vec![Dir::GitDB, Dir::GitRepos]);
+        }
+        RemovableDir::GitRepos => {
+            dirs_to_remove.push(Dir::GitRepos);
+        }
+        RemovableDir::RegistrySources => {
+            dirs_to_remove.push(Dir::RegistrySources);
+        }
+        RemovableDir::RegistryCrateCache => {
+            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache]);
+        }
+        RemovableDir::RegistryIndex => {
+            dirs_to_remove.push(Dir::RegistryIndex);
+        }
+        RemovableDir::Registry => {
+            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache])
+        }
+    });
+
+    // remove duplicates
+    dirs_to_remove.sort();
+    dirs_to_remove.dedup();
 
     let mut size_removed: u64 = 0;
 
@@ -210,43 +246,43 @@ pub(crate) fn remove_dir_via_cmdline(
         println!(); // newline
     }
 
-    // finally delete
-    if rm_git_checkouts {
-        let size = checkouts_cache.total_size();
-        size_removed += size;
-        rm(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
-    }
+    for component in dirs_to_remove {
+        match component {
+            Dir::RegistryCrateCache => {
+                let size = registry_pkgs_cache.total_size();
+                size_removed += size;
+                rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?;
+            }
 
-    if rm_git_repos {
-        let size = bare_repos_cache.total_size();
-        size_removed += size;
-        rm(&ccd.git_repos_bare, dry_run, size_changed, Some(size))?
-    }
+            Dir::RegistrySources => {
+                let size = registry_sources_caches.total_size();
+                size_removed += size;
+                rm(&ccd.registry_sources, dry_run, size_changed, Some(size))?;
+            }
+            Dir::RegistryIndex => {
+                // sum the sizes of the separate indices
+                let size_of_all_indices: u64 = registry_index_caches.total_size();
 
-    if rm_registry_sources {
-        let size = registry_sources_caches.total_size();
-        size_removed += size;
-        rm(&ccd.registry_sources, dry_run, size_changed, Some(size))?
-    }
-
-    if rm_registry_crate_cache {
-        let size = registry_pkgs_cache.total_size();
-        size_removed += size;
-        rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?
-    }
-
-    if rm_registry_index {
-        // sum the sizes of the separate indices
-        let size_of_all_indices: u64 = registry_index_caches.total_size();
-
-        size_removed += size_of_all_indices;
-        // @TODO only remove specified index
-        rm(
-            &ccd.registry_index,
-            dry_run,
-            size_changed,
-            Some(size_of_all_indices),
-        )?
+                size_removed += size_of_all_indices;
+                // @TODO only remove specified index
+                rm(
+                    &ccd.registry_index,
+                    dry_run,
+                    size_changed,
+                    Some(size_of_all_indices),
+                )?
+            }
+            Dir::GitRepos => {
+                let size = checkouts_cache.total_size();
+                size_removed += size;
+                rm(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
+            }
+            Dir::GitDB => {
+                let size = bare_repos_cache.total_size();
+                size_removed += size;
+                rm(&ccd.git_repos_bare, dry_run, size_changed, Some(size))?;
+            }
+        }
     }
 
     if dry_run {
