@@ -199,7 +199,7 @@ pub(crate) fn remove_dir_via_cmdline(
     // map the RemovableDirs to Dirs
 
     // unwrap the Results
-    let mut dirs = dirs.into_iter().map(|d| d.ok().unwrap());
+    let dirs = dirs.into_iter().map(|d| d.ok().unwrap());
 
     let mut dirs_to_remove = Vec::new();
 
