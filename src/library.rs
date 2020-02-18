@@ -285,11 +285,11 @@ impl std::str::FromStr for RemovableDir {
 // these are actually the components of the cache
 // we have to mape the RemovableDirs to the CacheComponents
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
-pub(crate) enum Dir {
+pub(crate) enum Component {
     GitDB,              // git/db
     GitRepos,           // git/checkouts
     RegistrySources,    // registry/src
-    RegistryCrateCache, // registry/cahce
+    RegistryCrateCache, // registry/cache
     RegistryIndex,      // registry/index
 }
 

@@ -168,32 +168,36 @@ pub(crate) fn remove_dir_via_cmdline(
             dirs_to_remove.extend(
                 // everything
                 vec![
-                    Dir::GitDB,
-                    Dir::GitRepos,
-                    Dir::RegistrySources,
-                    Dir::RegistryCrateCache,
-                    Dir::RegistryIndex,
+                    Component::GitDB,
+                    Component::GitRepos,
+                    Component::RegistrySources,
+                    Component::RegistryCrateCache,
+                    Component::RegistryIndex,
                 ],
             );
         }
         RemovableDir::GitDB => {
-            dirs_to_remove.extend(vec![Dir::GitDB, Dir::GitRepos]);
+            dirs_to_remove.extend(vec![Component::GitDB, Component::GitRepos]);
         }
         RemovableDir::GitRepos => {
-            dirs_to_remove.push(Dir::GitRepos);
+            dirs_to_remove.push(Component::GitRepos);
         }
         RemovableDir::RegistrySources => {
-            dirs_to_remove.push(Dir::RegistrySources);
+            dirs_to_remove.push(Component::RegistrySources);
         }
         RemovableDir::RegistryCrateCache => {
-            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache]);
+            dirs_to_remove.extend(vec![
+                Component::RegistrySources,
+                Component::RegistryCrateCache,
+            ]);
         }
         RemovableDir::RegistryIndex => {
-            dirs_to_remove.push(Dir::RegistryIndex);
+            dirs_to_remove.push(Component::RegistryIndex);
         }
-        RemovableDir::Registry => {
-            dirs_to_remove.extend(vec![Dir::RegistrySources, Dir::RegistryCrateCache])
-        }
+        RemovableDir::Registry => dirs_to_remove.extend(vec![
+            Component::RegistrySources,
+            Component::RegistryCrateCache,
+        ]),
     });
 
     // remove duplicates
@@ -208,18 +212,18 @@ pub(crate) fn remove_dir_via_cmdline(
 
     for component in dirs_to_remove {
         match component {
-            Dir::RegistryCrateCache => {
+            Component::RegistryCrateCache => {
                 let size = registry_pkgs_cache.total_size();
                 size_removed += size;
                 rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?;
             }
 
-            Dir::RegistrySources => {
+            Component::RegistrySources => {
                 let size = registry_sources_caches.total_size();
                 size_removed += size;
                 rm(&ccd.registry_sources, dry_run, size_changed, Some(size))?;
             }
-            Dir::RegistryIndex => {
+            Component::RegistryIndex => {
                 // sum the sizes of the separate indices
                 let size_of_all_indices: u64 = registry_index_caches.total_size();
 
@@ -232,12 +236,12 @@ pub(crate) fn remove_dir_via_cmdline(
                     Some(size_of_all_indices),
                 )?
             }
-            Dir::GitRepos => {
+            Component::GitRepos => {
                 let size = checkouts_cache.total_size();
                 size_removed += size;
                 rm(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
             }
-            Dir::GitDB => {
+            Component::GitDB => {
                 let size = bare_repos_cache.total_size();
                 size_removed += size;
                 rm(&ccd.git_repos_bare, dry_run, size_changed, Some(size))?;
