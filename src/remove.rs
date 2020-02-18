@@ -138,8 +138,8 @@ pub(crate) fn remove_dir_via_cmdline(
     // sort failed and successfull parses
     #[allow(clippy::type_complexity)]
     let (dirs, errors): (
-        Vec<Result<RemovableDir, String>>,
-        Vec<Result<RemovableDir, String>>,
+        Vec<Result<RemovableGroup, String>>,
+        Vec<Result<RemovableGroup, String>>,
     ) = input.split(',').map(str::parse).partition(Result::is_ok);
 
     // validate input
@@ -156,7 +156,7 @@ pub(crate) fn remove_dir_via_cmdline(
 
     // at this point we were able to parse all the user input.
 
-    // map the RemovableDirs to Dirs
+    // map the RemovableGroups to Dirs
 
     // unwrap the Results
     let dirs = dirs.into_iter().map(|d| d.ok().unwrap());
@@ -164,7 +164,7 @@ pub(crate) fn remove_dir_via_cmdline(
     let mut dirs_to_remove = Vec::new();
 
     dirs.for_each(|dir| match dir {
-        RemovableDir::All => {
+        RemovableGroup::All => {
             dirs_to_remove.extend(
                 // everything
                 vec![
@@ -176,25 +176,25 @@ pub(crate) fn remove_dir_via_cmdline(
                 ],
             );
         }
-        RemovableDir::GitDB => {
+        RemovableGroup::GitDB => {
             dirs_to_remove.extend(vec![Component::GitDB, Component::GitRepos]);
         }
-        RemovableDir::GitRepos => {
+        RemovableGroup::GitRepos => {
             dirs_to_remove.push(Component::GitRepos);
         }
-        RemovableDir::RegistrySources => {
+        RemovableGroup::RegistrySources => {
             dirs_to_remove.push(Component::RegistrySources);
         }
-        RemovableDir::RegistryCrateCache => {
+        RemovableGroup::RegistryCrateCache => {
             dirs_to_remove.extend(vec![
                 Component::RegistrySources,
                 Component::RegistryCrateCache,
             ]);
         }
-        RemovableDir::RegistryIndex => {
+        RemovableGroup::RegistryIndex => {
             dirs_to_remove.push(Component::RegistryIndex);
         }
-        RemovableDir::Registry => dirs_to_remove.extend(vec![
+        RemovableGroup::Registry => dirs_to_remove.extend(vec![
             Component::RegistrySources,
             Component::RegistryCrateCache,
         ]),

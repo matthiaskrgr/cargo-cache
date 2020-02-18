@@ -255,7 +255,7 @@ impl std::fmt::Display for CargoCachePaths {
 
 // these are everything what we can specify to remove via --remove-dir or similar options
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
-pub(crate) enum RemovableDir {
+pub(crate) enum RemovableGroup {
     All,
     GitDB,
     GitRepos,
@@ -265,25 +265,25 @@ pub(crate) enum RemovableDir {
     Registry,
 }
 
-impl std::str::FromStr for RemovableDir {
+impl std::str::FromStr for RemovableGroup {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, String> {
         match s {
-            "all" => Ok(RemovableDir::All),
-            "git-db" => Ok(RemovableDir::GitDB),
-            "git-repos" => Ok(RemovableDir::GitRepos),
-            "registry-sources" => Ok(RemovableDir::RegistrySources),
-            "registry-crate-cache" => Ok(RemovableDir::RegistryCrateCache),
-            "registry-index" => Ok(RemovableDir::RegistryIndex),
-            "registry" => Ok(RemovableDir::Registry),
+            "all" => Ok(RemovableGroup::All),
+            "git-db" => Ok(RemovableGroup::GitDB),
+            "git-repos" => Ok(RemovableGroup::GitRepos),
+            "registry-sources" => Ok(RemovableGroup::RegistrySources),
+            "registry-crate-cache" => Ok(RemovableGroup::RegistryCrateCache),
+            "registry-index" => Ok(RemovableGroup::RegistryIndex),
+            "registry" => Ok(RemovableGroup::Registry),
             other => Err(other.to_string()),
         }
     }
 }
 
-// these are actually the components of the cache
-// we have to mape the RemovableDirs to the CacheComponents
+// these are the actual atomic components of the cache
+// we have to map the RemovableGroups to the Components, deduplicate and finally remove them
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub(crate) enum Component {
     GitDB,              // git/db
