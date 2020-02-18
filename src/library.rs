@@ -253,6 +253,46 @@ impl std::fmt::Display for CargoCachePaths {
     }
 }
 
+// these are everything what we can specify to remove via --remove-dir or similar options
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub(crate) enum RemovableDir {
+    All,
+    GitDB,
+    GitRepos,
+    RegistrySources,
+    RegistryCrateCache,
+    RegistryIndex,
+    Registry,
+}
+
+impl std::str::FromStr for RemovableDir {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, String> {
+        match s {
+            "all" => Ok(RemovableDir::All),
+            "git-db" => Ok(RemovableDir::GitDB),
+            "git-repos" => Ok(RemovableDir::GitRepos),
+            "registry-sources" => Ok(RemovableDir::RegistrySources),
+            "registry-crate-cache" => Ok(RemovableDir::RegistryCrateCache),
+            "registry-index" => Ok(RemovableDir::RegistryIndex),
+            "registry" => Ok(RemovableDir::Registry),
+            other => Err(other.to_string()),
+        }
+    }
+}
+
+// these are actually the components of the cache
+// we have to mape the RemovableDirs to the CacheComponents
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub(crate) enum Dir {
+    GitDB,              // git/db
+    GitRepos,           // git/checkouts
+    RegistrySources,    // registry/src
+    RegistryCrateCache, // registry/cahce
+    RegistryIndex,      // registry/index
+}
+
 /// get the total size and number of files of a directory
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
