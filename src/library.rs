@@ -293,6 +293,92 @@ pub(crate) enum Component {
     RegistryIndex,      // registry/index
 }
 
+// map a String to a list of RemovableGroups to actual Components
+// returns either a group of successfully converted Components or a list of unrecognized
+// RemovableGroups as Error
+pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Component>, Error> {
+    let input_string = if let Some(value) = input {
+        value
+    } else {
+        return Err(Error::RemoveDirNoArg);
+    };
+
+    // sort failed and successfull parses
+    #[allow(clippy::type_complexity)]
+    let (dirs, errors): (
+        Vec<Result<RemovableGroup, String>>,
+        Vec<Result<RemovableGroup, String>>,
+    ) = input_string
+        .split(',')
+        .map(str::parse)
+        .partition(Result::is_ok);
+
+    // we got errors, abort
+    if !errors.is_empty() {
+        let invalid_dirs = errors
+            .into_iter()
+            .map(|e| e.err().unwrap())
+            .collect::<Vec<String>>();
+
+        let inv_dirs_joined = invalid_dirs.join(" ");
+        let inv_dirs_trimmed = inv_dirs_joined.trim();
+        //@TODO fix this enum variant name to be more
+        return Err(Error::InvalidDeletableDirs(inv_dirs_trimmed.to_string()));
+    }
+
+    // at this point we were able to parse all the user input.
+
+    // map the RemovableGroups to Dirs
+
+    // unwrap the Results
+    let dirs = dirs.into_iter().map(|d| d.ok().unwrap());
+
+    let mut mapped_dirs = Vec::new();
+
+    dirs.for_each(|dir| match dir {
+        RemovableGroup::All => {
+            mapped_dirs.extend(
+                // everything
+                vec![
+                    Component::GitDB,
+                    Component::GitRepos,
+                    Component::RegistrySources,
+                    Component::RegistryCrateCache,
+                    Component::RegistryIndex,
+                ],
+            );
+        }
+        RemovableGroup::GitDB => {
+            mapped_dirs.extend(vec![Component::GitDB, Component::GitRepos]);
+        }
+        RemovableGroup::GitRepos => {
+            mapped_dirs.push(Component::GitRepos);
+        }
+        RemovableGroup::RegistrySources => {
+            mapped_dirs.push(Component::RegistrySources);
+        }
+        RemovableGroup::RegistryCrateCache => {
+            mapped_dirs.extend(vec![
+                Component::RegistrySources,
+                Component::RegistryCrateCache,
+            ]);
+        }
+        RemovableGroup::RegistryIndex => {
+            mapped_dirs.push(Component::RegistryIndex);
+        }
+        RemovableGroup::Registry => mapped_dirs.extend(vec![
+            Component::RegistrySources,
+            Component::RegistryCrateCache,
+        ]),
+    });
+
+    // remove duplicates
+    mapped_dirs.sort();
+    mapped_dirs.dedup();
+
+    Ok(mapped_dirs)
+}
+
 /// get the total size and number of files of a directory
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
