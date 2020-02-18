@@ -16,7 +16,7 @@ Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional 
 * clean up everything (cargo will re-download as needed)
 * dry-run to see what would be removed (`--dry-run`)
 * recompress git repos (`--gc`)
-* search cache via regex queries (`cargo cache query`)
+* search cache via regex queries (`cargo cache query "reg.*x"`)
 * print crates that take the most space (`--top-cache-items`)
 * alternative registries supported
 * builds and runs on `stable`, `beta` and `nightly` channel
