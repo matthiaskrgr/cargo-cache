@@ -18,6 +18,7 @@ use walkdir::WalkDir;
 
 #[allow(non_snake_case)]
 #[test]
+#[cfg_attr(feature = "offline_tests", ignore)]
 fn CARGO_HOME_subdirs_are_known() {
     // stuff is inconsistent until cargo 0.41.0 hits stable
     // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952

@@ -20,6 +20,7 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 #[test]
+#[cfg_attr(feature = "offline_tests", ignore)]
 fn spurious_files_in_cache_test() {
     // move into the directory of our dummy crate
     // set a fake CARGO_HOME and build the dummy crate there

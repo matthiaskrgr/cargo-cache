@@ -30,6 +30,7 @@ fn dir_size(path: &PathBuf) -> u64 {
 }
 
 #[test]
+#[cfg_attr(feature = "offline_tests", ignore)]
 fn remove_dirs() {
     // make sure cargo cache --remove-dir works
     // build test crate in new cargo home

@@ -19,6 +19,7 @@ use regex::Regex;
 
 #[allow(non_snake_case)]
 #[test]
+#[cfg_attr(feature = "offline_tests", ignore)]
 fn alternative_registry_works() {
     // make sure alternative registries work
 
