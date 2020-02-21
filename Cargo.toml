@@ -17,6 +17,7 @@ default = ["cargo_metadata", "clap", "git2", "humansize", "rayon", "regex", "rus
 bench = [] # run benchmarks
 ci-autoclean = [] # minimal implementation that builds fast for CI
 offline_tests =  [] # only run tests that do not require internet connection
+# some details: https://github.com/NixOS/nixpkgs/pull/77310
 
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
