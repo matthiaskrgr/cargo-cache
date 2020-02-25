@@ -111,7 +111,7 @@ fn filter_files_by_date<'a>(
 
             Ok(files
                 .iter()
-                .filter(|file| file.access_date > older_than || file.access_date < younger_than)
+                .filter(|file| file.access_date < younger_than || file.access_date > older_than)
                 .collect())
         }
     }
@@ -130,13 +130,12 @@ pub(crate) fn remove_files_by_dates(
     dirs: &Option<&str>,
 ) -> Result<(), Error> {
     if dirs.is_none() {
-        eprintln!("date: no deletable component supplied!"); //@TODO improve
-        std::process::exit(9);
+        return Err(Error::RemoveDirNoArg);
     }
 
     // get the list of components that we want to check
     let components_to_remove_from = components_from_groups(dirs)?;
-    println!("components: {:?}", components_to_remove_from);
+    //println!("components: {:?}", components_to_remove_from);
 
     let mut files_of_components: Vec<std::path::PathBuf> = Vec::new();
 
@@ -192,19 +191,18 @@ pub(crate) fn remove_files_by_dates(
 
     dates.sort_by_key(|f| f.file.clone());
 
-    // @TODO we can probably do this without collecting first
     // filter the files by comparing the given date and the files access time
     let filtered_files: Vec<&FileWithDate> = filter_files_by_date(&date_comp, &dates)?;
 
     // name of the files we are going to delete
-    let paths = filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>();
+    //let paths = filtered_files.iter().map(|f| &f.file);
 
-    paths.iter().for_each(|n| println!("{}", n.display()));
+    // paths.for_each(|n| println!("{}", n.display()));
 
     if dry_run {
-        println!("Dry-run: would remove {} items", paths.len());
+        println!("Dry-run: would remove {} items", filtered_files.len());
     } else {
-        println!("Deleting {} items", paths.len());
+        println!("Deleting {} items", filtered_files.len());
     }
     // todo  remove the files
     Ok(())
