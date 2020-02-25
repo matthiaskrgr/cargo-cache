@@ -210,16 +210,77 @@ pub(crate) fn remove_files_by_dates(
     Ok(())
 }
 
-/*
 #[cfg(test)]
 mod libtests {
     use super::*;
-    use chrono::{prelude::*, NaiveDateTime};
 
     use pretty_assertions::assert_eq;
 
-    #[allow(non_snake_case)]
     #[test]
-    fn parse_dates() {}
+    fn parse_dates() {
+        assert!(parse_date(&String::new()).is_err());
+        assert!(parse_date(&String::from("a")).is_err());
+
+        assert!(parse_date(&String::from("01.01:2002")).is_err());
+        assert!(parse_date(&String::from("01.01.2002")).is_err()); // need yyyy.mm.dd
+        assert!(parse_date(&String::from("2002.30.30")).is_err());
+
+        assert_eq!(
+            parse_date(&String::from("2002.01.01"))
+                .unwrap()
+                .format("%Y.%m.%d")
+                .to_string(),
+            String::from("2002.01.01")
+        );
+
+        assert_eq!(
+            parse_date(&String::from("1234.12.08"))
+                .unwrap()
+                .format("%Y.%m.%d")
+                .to_string(),
+            String::from("1234.12.08")
+        );
+
+        assert_eq!(
+            parse_date(&String::from("1990.12.08"))
+                .unwrap()
+                .format("%Y.%m.%d")
+                .to_string(),
+            String::from("1990.12.08")
+        );
+
+        assert_eq!(
+            parse_date(&String::from("12:00:00"))
+                .unwrap()
+                .format("%H:%M:%S")
+                .to_string(),
+            String::from("12:00:00")
+        );
+
+        assert_eq!(
+            parse_date(&String::from("00:00:00"))
+                .unwrap()
+                .format("%H:%M:%S")
+                .to_string(),
+            String::from("00:00:00")
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid time")]
+    fn parse_dates_panic1() {
+        assert!(parse_date(&String::from("24:00:00")).is_err());
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid time")]
+    fn parse_dates_panic2() {
+        assert!(parse_date(&String::from("24:30:24")).is_err());
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid time")]
+    fn parse_dates_panic3() {
+        assert!(parse_date(&String::from("30:30:24")).is_err());
+    }
 }
-*/
