@@ -61,6 +61,7 @@ cfg_if::cfg_if! {
         mod remove;
         mod top_items;
         mod top_items_summary;
+        mod date;
         use crate::cache::caches::{Cache, RegistrySuperCache};
         use clap::value_t;
         use humansize::{file_size_opts, FileSize};
@@ -143,6 +144,24 @@ fn main() {
 
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
+
+    if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
+        let res = crate::date::remove_files_by_dates(
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            /* &mut registry_index_cache, */
+            &mut registry_sources_caches,
+            &config.value_of("remove-if-younger-than"),
+            &config.value_of("remove-if-older-than"),
+            config.is_present("dry-run"),
+            &config.value_of("remove-dir"),
+        );
+        eprintln!("res: {:?}", res);
+        // we can get the parameters of --remove-dir  to sort out what to delete
+        // don't run --remove-dir stuff
+        std::process::exit(0);
+    }
 
     if config.is_present("top-cache-items") {
         let limit =

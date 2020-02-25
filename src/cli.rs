@@ -82,6 +82,16 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
+    let remove_if_older = Arg::with_name("remove-if-older-than").short("o").long("remove-if-older-than")
+        .help("Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM HH::MM::SS")
+        .takes_value(true)
+        .value_name("date");
+
+    let remove_if_younger = Arg::with_name("remove-if-younger-than").short("y").long("remove-if-younger-than")
+        .help("Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM HH::MM::SS")
+        .takes_value(true)
+        .value_name("date");
+
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -169,6 +179,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&remove_if_younger)
+        .arg(&remove_if_older)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -196,6 +208,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
+        .arg(&remove_if_younger)
+        .arg(&remove_if_older)
         .arg(&debug)
         .get_matches()
 }
@@ -234,10 +248,14 @@ FLAGS:
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
-    -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,
-                                         registry-sources,registry-crate-cache,registry-index,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
+    -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
+    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: git-db,git-repos,
+                                           registry-sources,registry-crate-cache,registry-index,registry,all
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM
+                                           HH::MM::SS
+    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
+                                           YYYY.HH.MM HH::MM::SS
+    -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help        Prints this message or the help of the given subcommand(s)
     l           check local build cache (target) of a rust project
@@ -276,10 +294,14 @@ FLAGS:
     -l, --list-dirs              List all found directory paths
     -V, --version                Prints version information\n
 OPTIONS:
-    -k, --keep-duplicate-crates <N>      Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>    Remove directories, accepted values: git-db,git-repos,
-                                         registry-sources,registry-crate-cache,registry-index,registry,all
-    -t, --top-cache-items <N>            List the top N items taking most space in the cache\n
+    -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
+    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: git-db,git-repos,
+                                           registry-sources,registry-crate-cache,registry-index,registry,all
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM
+                                           HH::MM::SS
+    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
+                                           YYYY.HH.MM HH::MM::SS
+    -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help        Prints this message or the help of the given subcommand(s)
     l           check local build cache (target) of a rust project
