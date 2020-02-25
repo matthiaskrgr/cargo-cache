@@ -111,7 +111,7 @@ fn filter_files_by_date<'a>(
 
             files
                 .iter()
-                .filter(|file| file.access_date < older_than || file.access_date > younger_than)
+                .filter(|file| file.access_date > older_than || file.access_date < younger_than)
                 .collect()
         }
     }
