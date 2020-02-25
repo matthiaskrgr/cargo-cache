@@ -174,7 +174,7 @@ impl fmt::Display for Error {
                 path.display()
             ),
             Self::DateParseFailure(date, error) => write!(
-                f, "ERROR failed to parse {} as date ... . . .: {}",
+                f, "ERROR failed to parse {} as date {}",
                 date, error
             ),
         }

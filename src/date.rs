@@ -5,12 +5,9 @@ use crate::library::*;
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
 
-// remove cache items that are older than X or younger than X
-// (or between X and Y)
+// remove cache items that are older than X or younger than Y (or between X and Y)
 
-//  T E S T
-//
-//
+//  testing:
 // ./target/debug/cargo-cache --dry-run  --remove-dir=git-db  --remove-if-younger-than 08:08:08
 
 // check how to query files
@@ -30,45 +27,49 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
         if Regex::new(r"^\d{4}.\d{2}.\d{2}$").unwrap().is_match(date) {
             // most likely a date
             let now = Local::now();
-            let split = date
-                .split('.')
-                .map(|d| {
-                    d.parse::<u32>()
-                        .unwrap_or_else(|_| panic!("'{}' seems to not be an u32", d))
-                }) // else parse error
-                .collect::<Vec<u32>>();
+            let split: Result<Vec<u32>, _> = date.split('.').map(str::parse).collect();
+            let split = match split {
+                Ok(result) => result,
+                Err(a) => return Err(Error::DateParseFailure(a.to_string(), "u32".into())),
+            };
             #[allow(clippy::cast_possible_wrap)]
-            NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2])
-                .unwrap_or_else(|| {
-                    panic!(
-                        "Failed to parse  {}.{}.{} as date",
-                        split[0], split[1], split[2]
-                    )
-                })
-                .and_hms(now.hour(), now.minute(), now.second())
+            let nd =
+                if let Some(date) = NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2]) {
+                    date
+                } else {
+                    return Err(Error::DateParseFailure(
+                        format!("{}.{}.{}", split[0], split[1], split[2]),
+                        "date".into(),
+                    ));
+                };
+
+            nd.and_hms(now.hour(), now.minute(), now.second())
+
         // xx:xx:xx => hh::mm::ss
         } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap().is_match(date) {
             // probably a time
             let today = Local::today();
-            let split = date
-                .split(':')
-                .map(|d| {
-                    d.parse::<u32>()
-                        .unwrap_or_else(|_| panic!("'{}' seems to not be an u32", d))
-                })
-                .collect::<Vec<u32>>();
 
-            NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
-                .unwrap_or_else(|| {
-                    panic!(
-                        "Failed to parse  {}:{}:{} as time",
-                        split[0], split[1], split[2]
-                    )
-                })
-                .and_hms(split[0], split[1], split[2])
+            let split: Result<Vec<u32>, _> = date.split(':').map(str::parse).collect();
+            let split = match split {
+                Ok(result) => result,
+                Err(a) => return Err(Error::DateParseFailure(a.to_string(), "u32".into())),
+            };
+
+            let nd = if let Some(date) =
+                NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
+            {
+                date
+            } else {
+                return Err(Error::DateParseFailure(
+                    format!("{}:{}:{}", today.year(), today.month(), today.day()),
+                    "date".into(),
+                ));
+            };
+
+            nd.and_hms(split[0], split[1], split[2])
         } else {
-            println!("could not parse date");
-            return Err(Error::DateParseFailure("a".into(), "b".into())); // @TODO
+            return Err(Error::DateParseFailure(date.into(), "a valid date".into()));
         }
     };
     Ok(date_to_compare)
