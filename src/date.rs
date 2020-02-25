@@ -86,33 +86,33 @@ struct FileWithDate {
 fn filter_files_by_date<'a>(
     date: &DateComparison<'_>,
     files: &'a [FileWithDate],
-) -> Vec<&'a FileWithDate> {
+) -> Result<Vec<&'a FileWithDate>, Error> {
     match date {
         DateComparison::NoDate => {
             unreachable!("ERROR: no dates were supplied altough -o -y were passed!");
         }
         DateComparison::Younger(younger_date) => {
-            let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
-            files
+            let younger_than = parse_date(younger_date)?;
+            Ok(files
                 .iter()
                 .filter(|file| file.access_date < younger_than)
-                .collect()
+                .collect())
         }
         DateComparison::Older(older_date) => {
-            let older_than = parse_date(older_date).unwrap(/*@TODO*/);
-            files
+            let older_than = parse_date(older_date)?;
+            Ok(files
                 .iter()
                 .filter(|file| file.access_date > older_than)
-                .collect()
+                .collect())
         }
         DateComparison::OlderOrYounger(older_date, younger_date) => {
-            let younger_than = parse_date(younger_date).unwrap(/*@TODO*/);
-            let older_than = parse_date(older_date).unwrap(/*@TODO*/);
+            let younger_than = parse_date(younger_date)?;
+            let older_than = parse_date(older_date)?;
 
-            files
+            Ok(files
                 .iter()
                 .filter(|file| file.access_date > older_than || file.access_date < younger_than)
-                .collect()
+                .collect())
         }
     }
 }
@@ -194,7 +194,7 @@ pub(crate) fn remove_files_by_dates(
 
     // @TODO we can probably do this without collecting first
     // filter the files by comparing the given date and the files access time
-    let filtered_files: Vec<&FileWithDate> = filter_files_by_date(&date_comp, &dates);
+    let filtered_files: Vec<&FileWithDate> = filter_files_by_date(&date_comp, &dates)?;
 
     // name of the files we are going to delete
     let paths = filtered_files.iter().map(|f| &f.file).collect::<Vec<_>>();
