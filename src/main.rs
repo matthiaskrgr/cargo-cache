@@ -47,6 +47,7 @@
 )]
 // suppress these warnings:
 #![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
+#![allow(clippy::wildcard_imports)] // breaks code, false positives
 
 // for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {
