@@ -178,10 +178,9 @@ pub(crate) fn remove_files_by_dates(
 
     // for each file, get the access time
     let mut dates: Vec<FileWithDate> = files_of_components
-        .iter()
-        .map(|f| {
-            let path = f.clone();
-            let access_time = f.metadata().unwrap().accessed().unwrap();
+        .into_iter()
+        .map(|path| {
+            let access_time = path.metadata().unwrap().accessed().unwrap();
             let naive_datetime = chrono::DateTime::<Local>::from(access_time).naive_local();
             FileWithDate {
                 file: path,
