@@ -55,6 +55,7 @@ fn get_manifest() -> Result<PathBuf, Error> {
     } else {
         return Err(Error::NoCWD);
     };
+    // save the original path since we call .pop() later
     let orig_cwd = cwd.clone();
 
     // walk downwards and try to find a "Cargo.toml"
@@ -131,10 +132,10 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
 
     // we are going to check these directories:
     let p = &target_dir; // path
-    let target_dir_debug = p.clone().join("debug");
-    let target_dir_rls = p.clone().join("rls");
-    let target_dir_release = p.clone().join("release");
-    let target_dir_package = p.clone().join("package");
+    let target_dir_debug = p.join("debug");
+    let target_dir_rls = p.join("rls");
+    let target_dir_release = p.join("release");
+    let target_dir_package = p.join("package");
     let target_dir_doc = p.join("doc");
 
     // gather the sizes of all these directories, `TableLine` will be used for formatting
