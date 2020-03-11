@@ -84,10 +84,12 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
     let remove_if_older = Arg::with_name("remove-if-older-than").short("o").long("remove-if-older-than")
         .help("Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM HH::MM::SS")
+        .conflicts_with("remove-if-older-than")  // remove later
         .takes_value(true)
         .value_name("date");
 
     let remove_if_younger = Arg::with_name("remove-if-younger-than").short("y").long("remove-if-younger-than")
+        .conflicts_with("remove-if-younger-than") // remove later
         .help("Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM HH::MM::SS")
         .takes_value(true)
         .value_name("date");

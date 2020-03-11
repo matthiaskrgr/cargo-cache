@@ -16,7 +16,7 @@ enum DateComparison<'a> {
     NoDate,
     Older(&'a str),
     Younger(&'a str),
-    OlderOrYounger(&'a str, &'a str),
+    // OlderOrYounger(&'a str, &'a str),
 }
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
@@ -104,16 +104,15 @@ fn filter_files_by_date<'a>(
                 .iter()
                 .filter(|file| file.access_date > older_than)
                 .collect())
-        }
-        DateComparison::OlderOrYounger(older_date, younger_date) => {
-            let younger_than = parse_date(younger_date)?;
-            let older_than = parse_date(older_date)?;
+        } /*   DateComparison::OlderOrYounger(older_date, younger_date) => {
+              let younger_than = parse_date(younger_date)?;
+              let older_than = parse_date(older_date)?;
 
-            Ok(files
-                .iter()
-                .filter(|file| file.access_date < younger_than || file.access_date > older_than)
-                .collect())
-        }
+              Ok(files
+                  .iter()
+                  .filter(|file| file.access_date < younger_than || file.access_date > older_than)
+                  .collect())
+          } */
     }
 }
 
@@ -172,7 +171,9 @@ pub(crate) fn remove_files_by_dates(
         (None, None) => DateComparison::NoDate,
         (None, Some(younger)) => DateComparison::Younger(younger),
         (Some(older), None) => DateComparison::Older(older),
-        (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
+        (Some(_older), Some(_younger)) => {
+            unreachable!("passing both, --remove-if-{older,younger}-than was temporarily disabled!")
+        } // (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
     };
 
     // for each file, get the access time
