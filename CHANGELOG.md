@@ -8,7 +8,7 @@ Add "offline_tests" feature which disables tests that would require internet con
 	(to download crates/registry indices and initialize ${CARGO_HOMES})
 Dependencies:
 	chrono: new
-	git2: 0.11.0 -> 0.12.0
+	git2: 0.11.0 -> 0.13.0
 ````
 ## Version 0.3.4 (650849a)
 ````
