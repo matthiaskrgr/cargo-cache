@@ -187,11 +187,17 @@ pub(crate) fn remove_dir_via_cmdline(
 }
 
 pub(crate) fn remove_file(
+    // path of the file to be deleted
     path: &PathBuf,
+    // is this only a dry run? if yes, remove nothing
     dry_run: bool,
+    // did we actually remove anything?
     size_changed: &mut bool,
+    // print a custom deletion message
     deletion_msg: Option<String>,
+    // print a custom dryrun message
     dry_run_msg: Option<String>,
+    // size of the file according to cache
     total_size_from_cache: Option<u64>,
 ) {
     if dry_run {

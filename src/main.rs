@@ -157,6 +157,7 @@ fn main() {
             &config.value_of("remove-if-older-than"),
             config.is_present("dry-run"),
             &config.value_of("remove-dir"),
+            &mut size_changed,
         );
         match res {
             Err(error) => {

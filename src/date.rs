@@ -1,6 +1,7 @@
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
 use crate::library::*;
+use crate::remove::remove_file;
 
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
@@ -89,7 +90,7 @@ fn filter_files_by_date<'a>(
 ) -> Result<Vec<&'a FileWithDate>, Error> {
     match date {
         DateComparison::NoDate => {
-            unreachable!("ERROR: no dates were supplied altough -o -y were passed!");
+            unreachable!("ERROR: no dates were supplied altough -o or -y were passed!");
         }
         DateComparison::Younger(younger_date) => {
             let younger_than = parse_date(younger_date)?;
@@ -127,6 +128,7 @@ pub(crate) fn remove_files_by_dates(
     arg_older: &Option<&str>,
     dry_run: bool,
     dirs: &Option<&str>,
+    mut size_changed: &mut bool,
 ) -> Result<(), Error> {
     if dirs.is_none() {
         return Err(Error::RemoveDirNoArg);
@@ -194,17 +196,36 @@ pub(crate) fn remove_files_by_dates(
     // filter the files by comparing the given date and the files access time
     let filtered_files: Vec<&FileWithDate> = filter_files_by_date(&date_comp, &dates)?;
 
-    // name of the files we are going to delete
-    //let paths = filtered_files.iter().map(|f| &f.file);
-
-    // paths.for_each(|n| println!("{}", n.display()));
-
     if dry_run {
-        println!("Dry-run: would remove {} items", filtered_files.len());
+        // dry run
+        println!(
+            "dry-run: would delete {} items that are {}.",
+            filtered_files.len(),
+            match date_comp {
+                DateComparison::Younger(date) => format!("younger than {}", date),
+                DateComparison::Older(date) => format!("older than {}", date),
+                _ => unreachable!("@HERE abc"),
+            },
+        );
     } else {
-        println!("Deleting {} items", filtered_files.len());
+        // no dry run / actual run
+        println!(
+            "Deleting {} items that are {}.",
+            filtered_files.len(),
+            match date_comp {
+                DateComparison::Younger(date) => format!("younger than {}", date),
+                DateComparison::Older(date) => format!("older than {}", date),
+                _ => unreachable!("@HERE abc"),
+            },
+        );
+        filtered_files
+            .into_iter()
+            .map(|fwd| &fwd.file)
+            //.inspect(|p| println!("{}", p.display()))
+            .for_each(|path| remove_file(path, false, &mut size_changed, None, None, None));
+        // .collect::<Vec<_>>();
     }
-    // todo  remove the files
+    // @TODO summary
     Ok(())
 }
 
