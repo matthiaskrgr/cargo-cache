@@ -158,10 +158,17 @@ fn main() {
             config.is_present("dry-run"),
             &config.value_of("remove-dir"),
         );
-        eprintln!("res: {:?}", res);
-        // we can get the parameters of --remove-dir  to sort out what to delete
-        // don't run --remove-dir stuff
-        std::process::exit(0);
+        match res {
+            Err(error) => {
+                eprintln!("{}", error);
+                std::process::exit(1);
+            }
+            Ok(()) => {
+                // we can get the parameters of --remove-dir  to sort out what to delete
+                // don't run --remove-dir stuff
+                std::process::exit(0);
+            }
+        }
     }
 
     if config.is_present("top-cache-items") {
