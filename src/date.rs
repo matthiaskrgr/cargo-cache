@@ -88,7 +88,7 @@ fn filter_files_by_date<'a>(
 ) -> Result<Vec<&'a FileWithDate>, Error> {
     match date {
         DateComparison::NoDate => {
-            unreachable!("ERROR: no dates were supplied altough -o or -y were passed!");
+            unreachable!("ERROR: no dates were supplied although -o or -y were passed!");
         }
         DateComparison::Younger(younger_date) => {
             let younger_than = parse_date(younger_date)?;

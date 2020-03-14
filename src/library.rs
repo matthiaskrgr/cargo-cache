@@ -311,7 +311,7 @@ pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Compone
         return Err(Error::RemoveDirNoArg);
     };
 
-    // sort failed and successfull parses
+    // sort failed and successful parses
     #[allow(clippy::type_complexity)]
     let (dirs, errors): (
         Vec<Result<RemovableGroup, String>>,
