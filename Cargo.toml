@@ -13,7 +13,7 @@ build = "src/build.rs"
 edition = "2018"
 
 [features]
-default = ["cargo_metadata", "clap", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir"]
+default = ["cargo_metadata", "chrono", "clap", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir"]
 bench = [] # run benchmarks
 ci-autoclean = [] # minimal implementation that builds fast for CI
 offline_tests =  [] # only run tests that do not require internet connection
@@ -51,7 +51,7 @@ walkdir = { version = "2.2.9", optional = true } # walk content of directory/CAR
 cfg-if = { version = "0.1.10" } # if cfg(..)  { ...  }
 
 # https://github.com/chronotope/chrono
-chrono = "0.4.9" # compare dates etc
+chrono = { version = "0.4.9", optional = true } # compare dates etc
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
