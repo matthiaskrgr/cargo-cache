@@ -143,7 +143,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     let regex = Regex::new(&desired_output).unwrap();
 
     assert!(
-        regex.clone().is_match(&stdout),
+        regex.is_match(&stdout),
         "ERROR: regex did not match!\n\nregex:\n{:?}\n\ncc_output:\n{:?}",
         regex,
         stdout
@@ -211,7 +211,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     let regex = Regex::new(&desired_output).unwrap();
 
     assert!(
-        regex.clone().is_match(&stdout),
+        regex.is_match(&stdout),
         "ERROR: regex did not match!\n\nregex:\n{:?}\n\ncc_output:\n{:?}",
         regex,
         stdout
