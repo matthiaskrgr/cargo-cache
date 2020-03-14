@@ -253,8 +253,8 @@ FLAGS:
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: git-db,git-repos,
-                                           registry-sources,registry-crate-cache,registry-index,registry,all
+    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
+                                           registry-sources,registry-crate-cache,registry-index,registry
     -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM
                                            HH::MM::SS
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
@@ -299,8 +299,8 @@ FLAGS:
     -V, --version                Prints version information\n
 OPTIONS:
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: git-db,git-repos,
-                                           registry-sources,registry-crate-cache,registry-index,registry,all
+    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
+                                           registry-sources,registry-crate-cache,registry-index,registry
     -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM
                                            HH::MM::SS
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
