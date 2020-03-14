@@ -76,8 +76,6 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
     Ok(date_to_compare)
 }
 
-// use the same info as --remove-dir  to pass dirs to be processed
-
 #[derive(Debug, Clone)]
 struct FileWithDate {
     file: std::path::PathBuf,
@@ -136,7 +134,7 @@ pub(crate) fn remove_files_by_dates(
 
     // get the list of components that we want to check
     let components_to_remove_from = components_from_groups(dirs)?;
-    //println!("components: {:?}", components_to_remove_from);
+    // println!("components: {:?}", components_to_remove_from);
 
     let mut files_of_components: Vec<std::path::PathBuf> = Vec::new();
 
@@ -204,7 +202,9 @@ pub(crate) fn remove_files_by_dates(
             match date_comp {
                 DateComparison::Younger(date) => format!("younger than {}", date),
                 DateComparison::Older(date) => format!("older than {}", date),
-                _ => unreachable!("@HERE abc"),
+                _ => unreachable!(
+                    "DateComparisonOlder and Younger not supported right now (dry run)"
+                ),
             },
         );
     } else {
@@ -215,7 +215,9 @@ pub(crate) fn remove_files_by_dates(
             match date_comp {
                 DateComparison::Younger(date) => format!("younger than {}", date),
                 DateComparison::Older(date) => format!("older than {}", date),
-                _ => unreachable!("@HERE abc"),
+                _ => unreachable!(
+                    "DateComparisonOlder and Younger not supported right now (no dry run)"
+                ),
             },
         );
         filtered_files

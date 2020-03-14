@@ -6,9 +6,9 @@ Print message that we are clearing the cache when using autoclean after printing
 	take some time depending on hardware
 Add "offline_tests" feature which disables tests that would require internet connection
 	(to download crates/registry indices and initialize ${CARGO_HOMES})
-Add --remove-if-younger-than and --remove-if-older-than to remove files in the cache by date
-	This also requires --remove-dir to pass which files should be selected from.
-	You can pass a time or a date as parameter to --remove-if.. as YYYY.MM.DD or HH::MM::SS
+Add --remove-if-younger-than and --remove-if-older-than to remove files in the cache by date.
+	This requires the --remove-dir argument to know where files should be removed from.
+	You can pass a time or a date as formatted parameter to the flags for example YYYY.MM.DD or HH::MM::SS.
 	Example: cargo-cache --remove-dir=git-db --remove-if-younger-than 10:15:00
 
 Dependencies:
