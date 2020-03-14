@@ -601,9 +601,10 @@ pub(crate) fn size_diff_format(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn print_size_changed_summary(
     previous_total_size: u64,
-    cargo_cache: CargoCachePaths,
+    cargo_cache: &CargoCachePaths,
     mut bin_cache: &mut bin::BinaryCache,
     mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
@@ -627,7 +628,7 @@ pub(crate) fn print_size_changed_summary(
         &mut registry_pkgs_cache,
         &mut registry_index_caches,
         &mut registry_sources_caches,
-        &cargo_cache,
+        cargo_cache,
     )
     .total_size();
 

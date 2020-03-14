@@ -225,7 +225,7 @@ pub(crate) fn remove_files_by_dates(
             .for_each(|path| remove_file(path, false, &mut size_changed, None, None, None));
         // .collect::<Vec<_>>();
     }
-    // @TODO summary
+    // summary is printed from inside main()
     Ok(())
 }
 
