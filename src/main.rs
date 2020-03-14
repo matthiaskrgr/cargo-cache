@@ -244,7 +244,7 @@ fn main() {
             }
             Ok(()) => {
                 //@TODO we could perhaps optimize this by only querying the caches that changed
-                if !dry_run {
+                if !config.is_present("dry-run") {
                     print_size_changed_summary(
                         dir_sizes_total,
                         &cargo_cache,
