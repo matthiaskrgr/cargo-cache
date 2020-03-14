@@ -199,7 +199,7 @@ pub(crate) fn remove_files_by_dates(
     if dry_run {
         // dry run
         println!(
-            "dry-run: would delete {} items that are {}.",
+            "dry-run: would delete {} items that are {}...",
             filtered_files.len(),
             match date_comp {
                 DateComparison::Younger(date) => format!("younger than {}", date),
@@ -210,7 +210,7 @@ pub(crate) fn remove_files_by_dates(
     } else {
         // no dry run / actual run
         println!(
-            "Deleting {} items that are {}.",
+            "Deleting {} items that are {}...",
             filtered_files.len(),
             match date_comp {
                 DateComparison::Younger(date) => format!("younger than {}", date),
