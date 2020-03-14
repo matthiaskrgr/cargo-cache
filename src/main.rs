@@ -244,17 +244,18 @@ fn main() {
             }
             Ok(()) => {
                 //@TODO we could perhaps optimize this by only querying the caches that changed
-                print_size_changed_summary(
-                    dir_sizes_total,
-                    &cargo_cache,
-                    &mut bin_cache,
-                    &mut checkouts_cache,
-                    &mut bare_repos_cache,
-                    &mut registry_pkgs_cache,
-                    &mut registry_index_caches,
-                    &mut registry_sources_caches,
-                );
-
+                if !dry_run {
+                    print_size_changed_summary(
+                        dir_sizes_total,
+                        &cargo_cache,
+                        &mut bin_cache,
+                        &mut checkouts_cache,
+                        &mut bare_repos_cache,
+                        &mut registry_pkgs_cache,
+                        &mut registry_index_caches,
+                        &mut registry_sources_caches,
+                    );
+                }
                 // don't run --remove-dir stuff (since we also required that parameter)
                 std::process::exit(0);
             }
