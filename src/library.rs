@@ -12,7 +12,9 @@ use std::fmt;
 use std::fs;
 use std::path::PathBuf;
 
-use crate::dirsizes::*;
+use crate::cache::caches::{Cache, RegistrySuperCache};
+use crate::cache::*;
+use crate::dirsizes::DirSizes;
 
 use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
@@ -597,6 +599,46 @@ pub(crate) fn size_diff_format(
             size_after_human_readable, sign, size_diff_human_readable, percentage
         )
     }
+}
+
+pub(crate) fn print_size_changed_summary(
+    previous_total_size: u64,
+    cargo_cache: CargoCachePaths,
+    mut bin_cache: &mut bin::BinaryCache,
+    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+    mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
+    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+) {
+    // and invalidate the cache
+    bin_cache.invalidate();
+    checkouts_cache.invalidate();
+    bare_repos_cache.invalidate();
+    registry_pkgs_cache.invalidate();
+    registry_index_caches.invalidate();
+    registry_sources_caches.invalidate();
+
+    // and requery it to let it do its thing
+    let cache_size_new = DirSizes::new(
+        &mut bin_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_pkgs_cache,
+        &mut registry_index_caches,
+        &mut registry_sources_caches,
+        &cargo_cache,
+    )
+    .total_size();
+
+    let size_old_human_readable = previous_total_size
+        .file_size(file_size_opts::DECIMAL)
+        .unwrap();
+    println!(
+        "\nSize changed from {} to {}",
+        size_old_human_readable,
+        size_diff_format(previous_total_size, cache_size_new, false)
+    );
 }
 
 #[cfg(test)]

@@ -65,7 +65,6 @@ cfg_if::cfg_if! {
         mod date;
         use crate::cache::caches::{Cache, RegistrySuperCache};
         use clap::value_t;
-        use humansize::{file_size_opts, FileSize};
         use std::process;
         use std::time::SystemTime;
         use walkdir::WalkDir;
@@ -363,35 +362,17 @@ fn main() {
     }
 
     if size_changed && !config.is_present("dry-run") {
-        // size has changed
-        // in order to get a diff, save the old sizes
-        let cache_size_old = dir_sizes_total;
+        // size has changed, print summary of how size has changed
 
-        // and invalidate the cache
-        bin_cache.invalidate();
-        checkouts_cache.invalidate();
-        bare_repos_cache.invalidate();
-        registry_pkgs_cache.invalidate();
-        registry_index_caches.invalidate();
-        registry_sources_caches.invalidate();
-
-        // and requery it to let it do its thing
-        let cache_size_new = dirsizes::DirSizes::new(
+        print_size_changed_summary(
+            dir_sizes_total,
+            cargo_cache,
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_index_caches,
             &mut registry_sources_caches,
-            &cargo_cache,
-        )
-        .total_size();
-
-        let size_old_human_readable = cache_size_old.file_size(file_size_opts::DECIMAL).unwrap();
-        println!(
-            "\nSize changed from {} to {}",
-            size_old_human_readable,
-            size_diff_format(cache_size_old, cache_size_new, false)
         );
     }
 
