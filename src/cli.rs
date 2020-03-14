@@ -90,8 +90,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .value_name("date");
 
     let remove_if_younger = Arg::with_name("remove-if-younger-than").short("y").long("remove-if-younger-than")
-        .conflicts_with("remove-if-older-than") // fix later
         .help("Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM HH::MM::SS")
+        .conflicts_with("remove-if-older-than") // fix later
         .requires("remove-dir")
         .takes_value(true)
         .value_name("date");
