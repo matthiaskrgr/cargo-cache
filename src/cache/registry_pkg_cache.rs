@@ -151,7 +151,6 @@ pub(crate) struct RegistryPkgCaches {
     /// list of pkg caches (from alternative registries or so)
     caches: Vec<RegistryPkgCache>,
     /// number of pkg caches found
-    #[allow(unused)]
     number_of_caches: usize,
     /// total size of all indices combined
     total_size: Option<u64>,

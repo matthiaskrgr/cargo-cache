@@ -181,15 +181,11 @@ fn main() {
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
         );
-        #[allow(clippy::single_match_else)]
-        match query {
-            Err(e) => {
-                eprintln!("{}", e);
-                process::exit(1)
-            }
-            Ok(_) => {
-                process::exit(0);
-            }
+        if let Err(e) = query {
+            eprintln!("{}", e);
+            process::exit(1)
+        } else {
+            process::exit(0);
         }
     } else if config.is_present("local") || config.is_present("l") {
         // this is not actually not needed and was previously passed into local_subcmd()
