@@ -1,4 +1,9 @@
-## Version 0.4.1
+## Git
+````
+
+````
+
+## Version 0.4.1 (2a446ea)
 ````
 Fix wrong date format string in readme, --help and tests
 ````
