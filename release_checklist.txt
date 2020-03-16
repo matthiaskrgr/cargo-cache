@@ -27,8 +27,8 @@ cargo fmt --all
 #
 git log `git tag | tail -n1`..HEAD
 
-make sure changelog is up to date
-make sure readme is up to date
+make sure changelog is up to date ^cmd
+make sure readme is up to date ( check --help extract in readme!)
 make sure CI catches up and everything is green
 update version
 write release notes
