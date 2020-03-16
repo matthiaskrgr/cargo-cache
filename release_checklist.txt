@@ -41,4 +41,4 @@ post release:
 add git tag
 add hash of tag to changelog
 make sure tag is pushed! // git push origin HEAD --tags
-readd changlog git section
+re-add changelog git section
