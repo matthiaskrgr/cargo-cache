@@ -1,7 +1,7 @@
 ## Git
 ````
 local: ignore crate deps when using the local subcommand
-	this cargo-cache local "freezing" when being run while a different process was already writing to the $CARGO_HOME
+	this fixes "cargo-cache local" "freezing" when being run while a different process was already writing to the $CARGO_HOME
 Print message that we are clearing the cache when using autoclean after printing the before-stats since clearing can
 	take some time depending on hardware
 Add "offline_tests" feature which disables tests that would require internet connection
@@ -11,7 +11,7 @@ Add --remove-if-younger-than and --remove-if-older-than to remove files in the c
 	You can pass a time or a date as formatted parameter to the flags for example YYYY.MM.DD or HH::MM::SS.
 	Example: cargo-cache --remove-dir=git-db --remove-if-younger-than 10:15:00
 
-Dependencies:
+Updated dependencies:
 	chrono: new
 	git2: 0.11.0 -> 0.13.0
 ````
