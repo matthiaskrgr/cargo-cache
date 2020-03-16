@@ -1,6 +1,6 @@
-## Git
+## Version 0.4.1
 ````
-
+Fix wrong date format string in readme, --help and tests
 ````
 
 ## Version 0.4.0 (0d92713)

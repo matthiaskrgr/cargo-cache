@@ -67,10 +67,10 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
                                            registry-sources,registry-crate-cache,registry-index,registry
-    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.HH.MM
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.MM.DD
                                            HH::MM::SS
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
-                                           YYYY.HH.MM HH::MM::SS
+                                           YYYY.MM.DD HH::MM::SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache
 
 SUBCOMMANDS:
