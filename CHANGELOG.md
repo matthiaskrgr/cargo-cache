@@ -1,4 +1,4 @@
-## Git
+## Version 0.4.0
 ````
 local: ignore crate deps when using the local subcommand
 	this fixes "cargo-cache local" "freezing" when being run while a different process was already writing to the $CARGO_HOME
