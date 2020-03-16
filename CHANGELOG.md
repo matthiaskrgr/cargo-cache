@@ -1,4 +1,9 @@
-## Version 0.4.0
+## Git
+````
+
+````
+
+## Version 0.4.0 (0d92713)
 ````
 local: ignore crate deps when using the local subcommand
 	this fixes "cargo-cache local" "freezing" when being run while a different process was already writing to the $CARGO_HOME
@@ -15,6 +20,7 @@ Updated dependencies:
 	chrono: new
 	git2: 0.11.0 -> 0.13.0
 ````
+
 ## Version 0.3.4 (650849a)
 ````
 Fix bug where `cargo cache local` would panic on crates with workspaces

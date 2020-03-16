@@ -38,7 +38,7 @@ cargo publish
 
 post release:
 
-add git tag
+add git tag # git tag 1.2.3 HEAD
 add hash of tag to changelog
 make sure tag is pushed! // git push origin HEAD --tags
 re-add changelog git section
