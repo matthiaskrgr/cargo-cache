@@ -21,6 +21,7 @@ enum DateComparison<'a> {
 }
 
 fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
+    // @TODO handle yyyyy.mm.dd hh:mm:ss
     // @TODO  handle dd.mm.yy if yy is yy and not yyyy
     let date_to_compare: NaiveDateTime = {
         // xxxx.xx.xx => yyyy.mm.dd

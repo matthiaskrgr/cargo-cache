@@ -82,15 +82,19 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("N");
 
-    let remove_if_older = Arg::with_name("remove-if-older-than").short("o").long("remove-if-older-than")
-        .help("Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.MM.DD HH::MM::SS")
-        .conflicts_with("remove-if-younger-than")  // fix later
+    let remove_if_older = Arg::with_name("remove-if-older-than")
+        .short("o")
+        .long("remove-if-older-than")
+        .help("Removes items older than specified date: YYYY.MM.DD or HH:MM:SS")
+        .conflicts_with("remove-if-younger-than") // fix later
         .requires("remove-dir")
         .takes_value(true)
         .value_name("date");
 
-    let remove_if_younger = Arg::with_name("remove-if-younger-than").short("y").long("remove-if-younger-than")
-        .help("Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or YYYY.MM.DD HH::MM::SS")
+    let remove_if_younger = Arg::with_name("remove-if-younger-than")
+        .short("y")
+        .long("remove-if-younger-than")
+        .help("Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS")
         .conflicts_with("remove-if-older-than") // fix later
         .requires("remove-dir")
         .takes_value(true)
@@ -255,10 +259,8 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
                                            registry-sources,registry-crate-cache,registry-index,registry
-    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.MM.DD
-                                           HH::MM::SS
-    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
-                                           YYYY.MM.DD HH::MM::SS
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
+    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help        Prints this message or the help of the given subcommand(s)
@@ -301,10 +303,8 @@ OPTIONS:
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
     -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
                                            registry-sources,registry-crate-cache,registry-index,registry
-    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS or YYYY.MM.DD
-                                           HH::MM::SS
-    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS or
-                                           YYYY.MM.DD HH::MM::SS
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
+    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
     help        Prints this message or the help of the given subcommand(s)

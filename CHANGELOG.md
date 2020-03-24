@@ -1,6 +1,6 @@
 ## Git
 ````
-
+Fix readme and --help mentioning unimplemented features. Sorry about that!
 ````
 
 ## Version 0.4.1 (2a446ea)
