@@ -1,4 +1,9 @@
-## Version 0.4.2
+## Git
+````
+
+````
+
+## Version 0.4.2 (79a2f8a)
 ````
 Fix readme and --help mentioning unimplemented features. Sorry about that!
 ````
