@@ -1,4 +1,4 @@
-## Git
+## Version 0.4.2
 ````
 Fix readme and --help mentioning unimplemented features. Sorry about that!
 ````
