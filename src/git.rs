@@ -147,13 +147,13 @@ pub(crate) fn git_gc_everything(
     let mut total_size_before: u64 = 0;
     let mut total_size_after: u64 = 0;
 
-    println!("\nRecompressing repositories. Please be patient...");
+    println!("\nRecompressing repositories. This may take some time...");
     // gc git repos of crates
     let (repos_before, repos_after) = gc_subdirs(git_repos_bare_dir, dry_run)?;
     total_size_before += repos_before;
     total_size_after += repos_after;
 
-    println!("\nRecompressing registries. Please be patient...");
+    println!("\nRecompressing registries. This may take some time...");
     let mut repo_index = registry_pkg_cache_dir.clone();
     // cd "../index"
     let _ = repo_index.pop();
@@ -247,11 +247,11 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
         }
     } // fn fsck_subdirs
 
-    println!("\nFscking repositories. Please be patient...");
+    println!("\nFscking repositories. This may take some time...");
     // fsck git repos of crates
     fsck_subdirs(git_repos_bare_dir);
 
-    println!("\nFscking registries. Please be patient...");
+    println!("\nFscking registries. This may take some time...");
     let mut repo_index = registry_pkg_cache_dir.clone();
     // cd "../index"
     let _ = repo_index.pop();
