@@ -1,6 +1,13 @@
 ## Git
 ````
-
+Updated dependencies:
+	cargo_metadata: 0.9.0 -> 0.9.1
+	git2: 0.13.0 -> 0.13.2
+	home: 0.5.1 -> 0.5.3
+	rayon: 1.2.0 -> 1.3.0
+	regex: 1.3.1 -> 1.3.6
+	walkdir: 2.2.9 -> 2.3.1
+	chrono: 0.4.9 -> 0.4.11
 ````
 
 ## Version 0.4.2 (79a2f8a)
