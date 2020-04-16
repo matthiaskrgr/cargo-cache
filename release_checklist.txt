@@ -2,6 +2,8 @@ git grep TODO
 git grep FIXME
 # check for unused deps
 cargo udeps # check for unused deps
+cargo about init
+cargo about generate about.hbs > license.html # make sure all dep licences are ok
 # check build times
 cargo build --release -Ztimings
 cargo clean
