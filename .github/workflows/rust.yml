@@ -39,7 +39,7 @@ jobs:
       # end commit range 90931d9b31e8b854522fed00916504a3ac6d8619
 
       - name: install cargo git
-        run: cargo install --force --git https://github.com/rust-lang/cargo cargo --rev 8751eb3010d4cdb5329b5a6bd2b6d765c95b0dca
+        run: cargo install --debug --force --git https://github.com/rust-lang/cargo cargo --rev 8751eb3010d4cdb5329b5a6bd2b6d765c95b0dca
 
       # build
       - name: cargo build
