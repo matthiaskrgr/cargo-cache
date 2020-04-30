@@ -21,50 +21,9 @@ jobs:
             linux-nightly-debug,
           ]
         include:
-          - build: linux-nightly-release
-            os: ubuntu-latest
-            toolchain: nightly
-            release: true
           - build: linux-nightly-debug
             os: ubuntu-latest
             toolchain: nightly
-            debug: true
-
-          - build: macos-nightly-release
-            os: macos-latest
-            toolchain: nightly
-            mode: release
-            release: true
-          - build: macos-nightly-debug
-            os: macos-latest
-            toolchain: nightly
-            debug: true
-
-          - build: windows-nightly-release
-            os: windows-latest
-            toolchain: nightly
-            release: true
-          - build: windows-nightly-debug
-            os: windows-latest
-            toolchain: nightly
-            debug: true
-
-          - build: linux-beta-release
-            os: ubuntu-latest
-            toolchain: beta
-            release: true
-          - build: linux-beta-debug
-            os: ubuntu-latest
-            toolchain: beta
-            debug: true
-
-          - build: linux-stable-release
-            os: ubuntu-latest
-            toolchain: stable
-            release: true
-          - build: linux-stable-debug
-            os: ubuntu-latest
-            toolchain: stable
             debug: true
 
     steps:
@@ -150,55 +109,3 @@ jobs:
         run: cargo install --force --git https://github.com/matthiaskrgr/cargo-cache --no-default-features --features ci-autoclean cargo-cache
       - name: run ci_autoclean
         run: cargo-cache
-  # check for vulns in deps with cargo-audit
-  cargo-audit:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          profile: minimal
-      - name: install cargo-audit
-        run: cargo install cargo-audit --debug
-      - name: run cargo-audit
-        run: cargo audit
-
-  # check code with clippy
-  run_clippy:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      - name: install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          profile: default
-      - name: clippy all targets all features
-        run: cargo clippy --all-targets --all-features
-      - name: clippy ci_autoclean
-        run: cargo clippy --no-default-features --features ci-autoclean
-      - name: clippy default features
-        run: cargo clippy --all-targets --features default
-  # make sure code formatting is consistent
-  rustfmt:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      - name: install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          profile: default
-      - name: rustfmt check formatting
-        run: cargo fmt --all -- --check
