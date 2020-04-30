@@ -36,7 +36,7 @@ jobs:
           profile: minimal
 
       - name: install cargo git
-        run: cargo install --git cargo https://github.com/rust-lang/cargo
+        run: cargo install --force --git https://github.com/rust-lang/cargo cargo
 
       # build
       - name: cargo build
