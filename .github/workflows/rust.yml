@@ -35,6 +35,9 @@ jobs:
           override: true
           profile: minimal
 
+      - name: install cargo git
+        run: cargo install --git cargo https://github.com/rust-lang/cargo
+
       # build
       - name: cargo build
         run: cargo build --verbose --all
