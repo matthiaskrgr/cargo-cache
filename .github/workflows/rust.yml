@@ -18,16 +18,7 @@ jobs:
       matrix:
         build:
           [
-            linux-nightly-release,
             linux-nightly-debug,
-            linux-stable-release,
-            linux-stable-debug,
-            linux-beta-release,
-            linux-beta-debug,
-            macos-nightly-release,
-            macos-nightly-debug,
-            windows-nightly-release,
-            windows-nightly-debug,
           ]
         include:
           - build: linux-nightly-release
