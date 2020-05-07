@@ -13,10 +13,10 @@ use regex::Regex;
 
 // check how to query files
 #[derive(Debug, Clone)]
-enum DateComparison<'a> {
+enum AgeRelation<'a> {
     NoDate,
-    Older(&'a str),
-    Younger(&'a str),
+    ItemOlderThanDate(&'a str),
+    ItemYoungerThanDate(&'a str),
     // OlderOrYounger(&'a str, &'a str),
 }
 
@@ -84,21 +84,21 @@ struct FileWithDate {
 }
 
 fn filter_files_by_date<'a>(
-    date: &DateComparison<'_>,
+    date: &AgeRelation<'_>,
     files: &'a [FileWithDate],
 ) -> Result<Vec<&'a FileWithDate>, Error> {
     match date {
-        DateComparison::NoDate => {
+        AgeRelation::NoDate => {
             unreachable!("ERROR: no dates were supplied although -o or -y were passed!");
         }
-        DateComparison::Younger(younger_date) => {
+        AgeRelation::ItemYoungerThanDate(younger_date) => {
             let younger_than = parse_date(younger_date)?;
             Ok(files
                 .iter()
                 .filter(|file| file.access_date < younger_than)
                 .collect())
         }
-        DateComparison::Older(older_date) => {
+        AgeRelation::ItemOlderThanDate(older_date) => {
             let older_than = parse_date(older_date)?;
             Ok(files
                 .iter()
@@ -168,10 +168,10 @@ pub(crate) fn remove_files_by_dates(
     });
 
     // try to find out how to compare dates
-    let date_comp: DateComparison<'_> = match (arg_older, arg_younger) {
-        (None, None) => DateComparison::NoDate,
-        (None, Some(younger)) => DateComparison::Younger(younger),
-        (Some(older), None) => DateComparison::Older(older),
+    let date_comp: AgeRelation<'_> = match (arg_older, arg_younger) {
+        (None, None) => AgeRelation::NoDate,
+        (None, Some(younger)) => AgeRelation::ItemYoungerThanDate(younger),
+        (Some(older), None) => AgeRelation::ItemOlderThanDate(older),
         (Some(_older), Some(_younger)) => {
             unreachable!("passing both, --remove-if-{older,younger}-than was temporarily disabled!")
         } // (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
@@ -201,8 +201,8 @@ pub(crate) fn remove_files_by_dates(
             "dry-run: would delete {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                DateComparison::Younger(date) => format!("younger than {}", date),
-                DateComparison::Older(date) => format!("older than {}", date),
+                AgeRelation::ItemYoungerThanDate(date) => format!("younger than {}", date),
+                AgeRelation::ItemOlderThanDate(date) => format!("older than {}", date),
                 _ => unreachable!(
                     "DateComparisonOlder and Younger not supported right now (dry run)"
                 ),
@@ -214,8 +214,8 @@ pub(crate) fn remove_files_by_dates(
             "Deleting {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                DateComparison::Younger(date) => format!("younger than {}", date),
-                DateComparison::Older(date) => format!("older than {}", date),
+                AgeRelation::ItemYoungerThanDate(date) => format!("younger than {}", date),
+                AgeRelation::ItemOlderThanDate(date) => format!("older than {}", date),
                 _ => unreachable!(
                     "DateComparisonOlder and Younger not supported right now (no dry run)"
                 ),
