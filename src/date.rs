@@ -14,7 +14,7 @@ use regex::Regex;
 // check how to query files
 #[derive(Debug, Clone)]
 enum AgeRelation<'a> {
-    NoDate,
+    None,
     ItemOlderThanDate(&'a str),
     ItemYoungerThanDate(&'a str),
     // OlderOrYounger(&'a str, &'a str),
@@ -88,7 +88,7 @@ fn filter_files_by_date<'a>(
     files: &'a [FileWithDate],
 ) -> Result<Vec<&'a FileWithDate>, Error> {
     match date {
-        AgeRelation::NoDate => {
+        AgeRelation::None => {
             unreachable!("ERROR: no dates were supplied although -o or -y were passed!");
         }
         AgeRelation::ItemYoungerThanDate(younger_date) => {
@@ -169,7 +169,7 @@ pub(crate) fn remove_files_by_dates(
 
     // try to find out how to compare dates
     let date_comp: AgeRelation<'_> = match (arg_older, arg_younger) {
-        (None, None) => AgeRelation::NoDate,
+        (None, None) => AgeRelation::None,
         (None, Some(younger)) => AgeRelation::ItemYoungerThanDate(younger),
         (Some(older), None) => AgeRelation::ItemOlderThanDate(older),
         (Some(_older), Some(_younger)) => {
