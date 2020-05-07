@@ -15,8 +15,8 @@ use regex::Regex;
 #[derive(Debug, Clone)]
 enum AgeRelation<'a> {
     None,
-    ItemOlderThanDate(&'a str),
-    ItemYoungerThanDate(&'a str),
+    FileOlderThanDate(&'a str),
+    FileYoungerThanDate(&'a str),
     // OlderOrYounger(&'a str, &'a str),
 }
 
@@ -91,18 +91,20 @@ fn filter_files_by_date<'a>(
         AgeRelation::None => {
             unreachable!("ERROR: no dates were supplied although -o or -y were passed!");
         }
-        AgeRelation::ItemYoungerThanDate(younger_date) => {
-            let younger_than = parse_date(younger_date)?;
+        AgeRelation::FileYoungerThanDate(younger_date) => {
+            // file is younger than date if file.date > date_param
+            let date_parameter = parse_date(younger_date)?;
             Ok(files
                 .iter()
-                .filter(|file| file.access_date < younger_than)
+                .filter(|file| file.access_date > date_parameter)
                 .collect())
         }
-        AgeRelation::ItemOlderThanDate(older_date) => {
-            let older_than = parse_date(older_date)?;
+        AgeRelation::FileOlderThanDate(older_date) => {
+            // file is older than date if file.date < date_param
+            let date_parameter = parse_date(older_date)?;
             Ok(files
                 .iter()
-                .filter(|file| file.access_date > older_than)
+                .filter(|file| file.access_date < date_parameter)
                 .collect())
         } /*   DateComparison::OlderOrYounger(older_date, younger_date) => {
               let younger_than = parse_date(younger_date)?;
@@ -110,6 +112,7 @@ fn filter_files_by_date<'a>(
 
               Ok(files
                   .iter()
+                  // this may be bugged
                   .filter(|file| file.access_date < younger_than || file.access_date > older_than)
                   .collect())
           } */
@@ -170,8 +173,8 @@ pub(crate) fn remove_files_by_dates(
     // try to find out how to compare dates
     let date_comp: AgeRelation<'_> = match (arg_older, arg_younger) {
         (None, None) => AgeRelation::None,
-        (None, Some(younger)) => AgeRelation::ItemYoungerThanDate(younger),
-        (Some(older), None) => AgeRelation::ItemOlderThanDate(older),
+        (None, Some(younger)) => AgeRelation::FileYoungerThanDate(younger),
+        (Some(older), None) => AgeRelation::FileOlderThanDate(older),
         (Some(_older), Some(_younger)) => {
             unreachable!("passing both, --remove-if-{older,younger}-than was temporarily disabled!")
         } // (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
@@ -201,8 +204,8 @@ pub(crate) fn remove_files_by_dates(
             "dry-run: would delete {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                AgeRelation::ItemYoungerThanDate(date) => format!("younger than {}", date),
-                AgeRelation::ItemOlderThanDate(date) => format!("older than {}", date),
+                AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
+                AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
                 _ => unreachable!(
                     "DateComparisonOlder and Younger not supported right now (dry run)"
                 ),
@@ -214,8 +217,8 @@ pub(crate) fn remove_files_by_dates(
             "Deleting {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                AgeRelation::ItemYoungerThanDate(date) => format!("younger than {}", date),
-                AgeRelation::ItemOlderThanDate(date) => format!("older than {}", date),
+                AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
+                AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
                 _ => unreachable!(
                     "DateComparisonOlder and Younger not supported right now (no dry run)"
                 ),
