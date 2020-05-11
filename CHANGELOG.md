@@ -1,5 +1,7 @@
 ## Git
 ````
+Fix bug where functionality of --remove-if-older-than and --remove-if-younger-than was swapped by accident (#80)
+
 Updated dependencies:
 	cargo_metadata: 0.9.0 -> 0.9.1
 	git2: 0.13.0 -> 0.13.2
