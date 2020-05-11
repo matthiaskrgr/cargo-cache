@@ -1,4 +1,9 @@
-## Version 0.4.3
+## Git
+````
+
+````
+
+## Version 0.4.3 (79a2f8a)
 ````
 Fix bug where functionality of --remove-if-older-than and --remove-if-younger-than was swapped by accident (#80)
 
