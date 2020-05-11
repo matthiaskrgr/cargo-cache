@@ -1,6 +1,6 @@
 [package]
 name = "cargo-cache"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
 description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively"
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
@@ -69,9 +69,6 @@ tempfile = "3.1.0" # create and rm temporary directories for tests
 [build-dependencies]
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = "0.2.0" # git version information
-
-
-
 
 [[bin]]
 name = "cargo-cache"
