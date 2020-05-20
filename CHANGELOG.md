@@ -1,7 +1,10 @@
 ## Git
 ````
-add "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows number of files last accessed on a given date
-
+add "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows number of files last accessed on a given date: cargo cache sc
+    Files         Day
+    304    2020-05-15
+    1097   2020-05-16
+    1665   2020-05-17
 
 Updated dependencies:
 	dirs: new
