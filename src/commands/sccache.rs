@@ -23,20 +23,17 @@ struct File {
 }
 
 fn sccache_dir() -> Option<PathBuf> {
-    match env::var_os("SCCACHE_DIR").map(PathBuf::from) {
-        Some(path) => Some(path),
-        // if SCCACHE_DIR variable is not present,
-        None => {
-            // get the cache dir from "dirs" crate
-            let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
+    if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
+        Some(path)
+    } else {
+        // if SCCACHE_DIR variable is not present, get the cache dir from "dirs" crate
+        let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
 
-            if cache_dir.is_some() {
-                let mut cache = cache_dir.unwrap();
-                cache.push("sccache");
-                return Some(cache);
-            } else {
-                return None;
-            }
+        if let Some(cache_dir) = cache_dir.as_mut() {
+            cache_dir.push("sccache");
+            Some(cache_dir.to_path_buf())
+        } else {
+            cache_dir
         }
     }
 }
