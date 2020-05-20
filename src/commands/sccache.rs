@@ -73,32 +73,29 @@ pub(crate) fn sccache_stats() {
     };
 
     // get unique access dates, the dates which we have files accessed at
-    let unique_access_dates = {
+    let unique_access_dates: Vec<File> = {
         let mut unique = files_sorted.clone();
         unique.dedup_by_key(|f| f.access_date);
         unique
     };
 
-    let unique: Vec<NaiveDate> = unique_access_dates
+    // extract the unique dates from the unique vec
+    let date_occurrences = unique_access_dates
         .into_iter()
-        .map(|f| f.access_date)
-        .collect();
-
-    let date_occurrences: Vec<(usize, &NaiveDate)> = unique
-        .iter()
+        .map(|file| file.access_date)
+        // dates extracted, now..
         .map(|unique_date| {
+            // ..count how often each date is contained inside the files_sorted() array and return that
+            // together with the date
             let count = files_sorted
                 .iter()
-                .filter(|f| f.access_date == *unique_date)
+                .filter(|file| file.access_date == unique_date)
                 .count();
 
             (count, unique_date)
-        })
-        .collect();
+        });
 
     date_occurrences
-        .iter()
-        .map(|x| x)
         // .filter(|x| x.access_time != x.creation_time)
         .for_each(|x| {
             println!("{:?}", x);
