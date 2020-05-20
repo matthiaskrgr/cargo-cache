@@ -74,7 +74,7 @@ cfg_if::cfg_if! {
         use std::time::SystemTime;
         use walkdir::WalkDir;
         use crate::cache::*;
-        use crate::commands::{local, query};
+        use crate::commands::{local, query, sccache};
         use crate::git::*;
         use crate::library::*;
         use crate::remove::*;
@@ -112,6 +112,11 @@ fn main() {
     } else {
         None
     };
+
+    if config.is_present("sc") || config.is_present("sccache") {
+        sccache::sccache_stats();
+        process::exit(0);
+    }
 
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;

@@ -1,4 +1,4 @@
-// Copyright 2017-2020 Matthias Krüger. See the COPYRIGHT
+// Copyright 2020 Matthias Krüger. See the COPYRIGHT
 // file at the top-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -7,7 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// code related to subcommands is located here
-pub(crate) mod local;
-pub(crate) mod query;
-pub(crate) mod sccache;
+// find ~/.cache/sccache -type f -printf "\n%AD %AT %p"  | cut -d' ' -f1 | sort -n | uniq -c
+
+pub(crate) fn sccache_stats() {
+    unimplemented!();
+}

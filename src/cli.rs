@@ -155,6 +155,13 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .settings(&[AppSettings::Hidden]);
     //</registry>
 
+    //<sccache>
+    // local subcommand
+    let sccache = SubCommand::with_name("sccache").about("gather stats on a local sccache cache");
+    // shorter local subcommand (l)
+    let sccache_short = SubCommand::with_name("sc").about("gather stats on a local sccache cache");
+    //</sccache>
+
     // "version" subcommand which is also hidden, prints crate version
     let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
 
@@ -177,6 +184,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(registry.clone())
         .subcommand(registry_short.clone())
         .subcommand(registries_hidden.clone())
+        .subcommand(sccache.clone())
+        .subcommand(sccache_short.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -206,6 +215,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(registry)
         .subcommand(registry_short)
         .subcommand(registries_hidden)
+        .subcommand(sccache.clone())
+        .subcommand(sccache_short.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -269,7 +280,9 @@ SUBCOMMANDS:
     q           run a query
     query       run a query
     r           query each package registry separately
-    registry    query each package registry separately\n");
+    registry    query each package registry separately
+    sc          gather stats on a local sccache cache
+    sccache     gather stats on a local sccache cache\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -313,8 +326,9 @@ SUBCOMMANDS:
     q           run a query
     query       run a query
     r           query each package registry separately
-    registry    query each package registry separately\n");
-
+    registry    query each package registry separately
+    sc          gather stats on a local sccache cache
+    sccache     gather stats on a local sccache cache\n");
         assert_eq!(help_desired, help_real);
     }
 
