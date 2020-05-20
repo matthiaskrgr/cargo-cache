@@ -22,6 +22,7 @@ struct File {
     access_date: NaiveDate,
 }
 
+// get the location of a local sccache path
 fn sccache_dir() -> Option<PathBuf> {
     if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
         Some(path)
@@ -41,27 +42,21 @@ fn sccache_dir() -> Option<PathBuf> {
 pub(crate) fn sccache_stats() {
     let sccache_path: PathBuf = sccache_dir()
         .expect("Failed to get a valid sccache cache dir such as \"~/.cache/sccache\"");
+    //@TODO ^ turn this into a proper error message ^ !
 
-    // we need to get all the files in the cache
-    // get path, creation time and access time
+    // of all the files inside the sccache cache, gather last access time and path
     let files = WalkDir::new(sccache_path.display().to_string())
         .into_iter()
-        .filter_map(|f| {
-            if let Ok(direntry) = f {
+        .filter_map(|direntry| {
+            if let Ok(direntry) = direntry {
                 let path = direntry.path().to_path_buf();
                 if path.is_file() {
                     if let Ok(metadata) = fs::metadata(&path) {
                         if let Ok(access_time) = metadata.accessed() {
-                            // let creation_time =
-                            //   chrono::DateTime::<Local>::from(create_time).naive_local();
                             let access_time =
                                 chrono::DateTime::<Local>::from(access_time).naive_local();
                             let access_date = access_time.date();
-                            return Some(File {
-                                path,
-                                // creation_time,
-                                access_date,
-                            });
+                            return Some(File { path, access_date });
                         }
                     }
                 }
@@ -70,16 +65,24 @@ pub(crate) fn sccache_stats() {
             None
         });
 
+    // sort files by access date (date, not time!)
     let files_sorted = {
         let mut v: Vec<File> = files.collect();
         v.sort_by_key(|file| file.access_date);
         v
     };
 
-    let mut unique = files_sorted.clone();
-    unique.dedup_by_key(|f| f.access_date);
+    // get unique access dates, the dates which we have files accessed at
+    let unique_access_dates = {
+        let mut unique = files_sorted.clone();
+        unique.dedup_by_key(|f| f.access_date);
+        unique
+    };
 
-    let unique: Vec<NaiveDate> = unique.into_iter().map(|f| f.access_date).collect();
+    let unique: Vec<NaiveDate> = unique_access_dates
+        .into_iter()
+        .map(|f| f.access_date)
+        .collect();
 
     let date_occurrences: Vec<(usize, &NaiveDate)> = unique
         .iter()
