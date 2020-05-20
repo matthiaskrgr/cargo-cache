@@ -91,12 +91,12 @@ pub(crate) fn sccache_stats() {
                 .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
-            (count, unique_date)
+            (count, unique_date.access_date)
         });
 
     date_occurrences
         // .filter(|x| x.access_time != x.creation_time)
         .for_each(|x| {
-            println!("{:?}", x);
+            println!("{} {}", x.0, x.1);
         });
 }
