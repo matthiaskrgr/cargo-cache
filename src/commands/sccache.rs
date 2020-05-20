@@ -16,6 +16,8 @@ use std::path::PathBuf;
 use chrono::prelude::*;
 use walkdir::WalkDir;
 
+use crate::display::{format_2_row_table, TableLine};
+
 #[derive(Debug, Clone)]
 struct File {
     path: PathBuf,
@@ -80,7 +82,7 @@ pub(crate) fn sccache_stats() {
     };
 
     // extract the unique dates from the unique vec
-    let date_occurrences = unique_access_dates
+    let date_occurrences: Vec<TableLine> = unique_access_dates
         .into_iter()
         // dates extracted, now..
         .map(|unique_date| {
@@ -91,12 +93,10 @@ pub(crate) fn sccache_stats() {
                 .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
-            (count, unique_date.access_date)
-        });
+            TableLine::new(2, count, unique_date.access_date)
+        })
+        .collect();
 
-    date_occurrences
-        // .filter(|x| x.access_time != x.creation_time)
-        .for_each(|x| {
-            println!("{} {}", x.0, x.1);
-        });
+    let table = format_2_row_table(2, date_occurrences, true);
+    print!("{}", table);
 }

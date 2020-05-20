@@ -22,17 +22,22 @@ pub(crate) struct TableLine {
 }
 
 impl TableLine {
+    #![allow(clippy::needless_pass_by_value)] // @TODO FIXME
     /// creates a new `TableLine` struct
     /// if the right column ends with " B", we pad it to "  B" to align with " MB", " GB" etc
-    pub(crate) fn new(indent_front: usize, left_column: String, right_column: String) -> Self {
-        let mut right_column = right_column;
+    pub(crate) fn new<LC: ToString, RC: ToString>(
+        indent_front: usize,
+        left_column: LC,
+        right_column: RC,
+    ) -> Self {
+        let mut right_column = right_column.to_string();
         if right_column.ends_with(" B") {
             right_column = right_column.replace(" B", "  B"); // align with "x xB"
         }
 
         Self {
             indent_front,
-            left_column,
+            left_column: left_column.to_string(),
             right_column,
         }
     }
