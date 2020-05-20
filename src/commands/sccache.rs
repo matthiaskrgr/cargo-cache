@@ -9,6 +9,7 @@
 
 // find ~/.cache/sccache -type f -printf "\n%AD %AT %p"  | cut -d' ' -f1 | sort -n | uniq -c
 
+use std::env;
 use std::fs;
 use std::path::PathBuf;
 
@@ -21,8 +22,28 @@ struct File {
     access_date: NaiveDate,
 }
 
+fn sccache_dir() -> Option<PathBuf> {
+    match env::var_os("SCCACHE_DIR").map(PathBuf::from) {
+        Some(path) => Some(path),
+        // if SCCACHE_DIR variable is not present,
+        None => {
+            // get the cache dir from "dirs" crate
+            let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
+
+            if cache_dir.is_some() {
+                let mut cache = cache_dir.unwrap();
+                cache.push("sccache");
+                return Some(cache);
+            } else {
+                return None;
+            }
+        }
+    }
+}
+
 pub(crate) fn sccache_stats() {
-    let sccache_path: PathBuf = unimplemented!();
+    let sccache_path: PathBuf = sccache_dir()
+        .expect("Failed to get a valid sccache cache dir such as \"~/.cache/sccache\"");
 
     // we need to get all the files in the cache
     // get path, creation time and access time
