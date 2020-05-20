@@ -1,6 +1,10 @@
 ## Git
 ````
+add "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows number of files last accessed on a given date
 
+
+Updated dependencies:
+	dirs: new
 ````
 
 ## Version 0.4.3 (79a2f8a)
