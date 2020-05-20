@@ -82,14 +82,13 @@ pub(crate) fn sccache_stats() {
     // extract the unique dates from the unique vec
     let date_occurrences = unique_access_dates
         .into_iter()
-        .map(|file| file.access_date)
         // dates extracted, now..
         .map(|unique_date| {
             // ..count how often each date is contained inside the files_sorted() array and return that
             // together with the date
             let count = files_sorted
                 .iter()
-                .filter(|file| file.access_date == unique_date)
+                .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
             (count, unique_date)
