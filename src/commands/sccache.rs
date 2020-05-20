@@ -97,6 +97,10 @@ pub(crate) fn sccache_stats() {
         })
         .collect();
 
-    let table = format_2_row_table(2, date_occurrences, true);
+    let mut tab_columns: Vec<TableLine> = Vec::with_capacity(date_occurrences.len() + 1);
+    tab_columns.push(TableLine::new(2, "Files", "Day"));
+    tab_columns.extend(date_occurrences);
+
+    let table = format_2_row_table(2, tab_columns, true);
     print!("{}", table);
 }
