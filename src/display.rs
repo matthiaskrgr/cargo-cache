@@ -22,7 +22,6 @@ pub(crate) struct TableLine {
 }
 
 impl TableLine {
-    #![allow(clippy::needless_pass_by_value)] // @TODO FIXME
     /// creates a new `TableLine` struct
     /// if the right column ends with " B", we pad it to "  B" to align with " MB", " GB" etc
     pub(crate) fn new<LC: ToString, RC: ToString>(
