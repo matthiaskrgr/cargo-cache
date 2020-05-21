@@ -123,6 +123,11 @@ fn main() {
         process::exit(0);
     }
 
+    if config.is_present("remove-unref") {
+        let _ = clear_unref();
+        process::exit(0);
+    }
+
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 

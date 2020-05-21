@@ -100,6 +100,10 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
+    let remove_unref = Arg::with_name("remove-unref")
+        .long("remove-unref")
+        .help("Remove crates that are not referenced in a Cargo.toml from the cache");
+
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -198,6 +202,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
+        .arg(&remove_unref)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -229,6 +234,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
+        .arg(&remove_unref)
         .arg(&debug)
         .get_matches()
 }

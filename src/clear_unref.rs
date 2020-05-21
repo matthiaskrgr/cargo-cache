@@ -41,3 +41,14 @@ fn get_deps() -> Result<impl Iterator<Item = Dep>, Error> {
 
     Ok(deps)
 }
+
+pub(crate) fn clear_unref() -> Result<(), Error> {
+    let deps = get_deps()?;
+    // @TODO: check the cache for any crates that are not these and remove them
+    deps.for_each(|dep| {
+        let fmt = format!("{}-{}", dep.name, dep.version);
+        println!("{}", fmt);
+    });
+
+    Ok(())
+}
