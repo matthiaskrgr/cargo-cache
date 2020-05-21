@@ -199,13 +199,14 @@ impl<'a> DirSizes<'a> {
         vec![
             TableLine::new(
                 0,
-                format!("Cargo cache '{}':\n\n", &self.root_path().display()),
-                String::new(),
+                &format!("Cargo cache '{}':\n\n", &self.root_path().display()),
+                &String::new(),
             ),
             TableLine::new(
                 0,
-                "Total: ".to_string(),
-                self.total_size()
+                &"Total: ".to_string(),
+                &self
+                    .total_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
@@ -216,8 +217,9 @@ impl<'a> DirSizes<'a> {
     fn bin(&self) -> Vec<TableLine> {
         vec![TableLine::new(
             1,
-            format!("{} installed binaries: ", self.numb_bins()),
-            self.total_bin_size()
+            &format!("{} installed binaries: ", self.numb_bins()),
+            &self
+                .total_bin_size()
                 .file_size(file_size_opts::DECIMAL)
                 .unwrap(),
         )]
@@ -228,22 +230,25 @@ impl<'a> DirSizes<'a> {
         vec![
             TableLine::new(
                 1,
-                "Git db: ".to_string(),
-                self.total_git_db_size()
+                &"Git db: ".to_string(),
+                &self
+                    .total_git_db_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} bare git repos: ", self.numb_git_repos_bare_repos()),
-                self.total_git_repos_bare_size()
+                &format!("{} bare git repos: ", self.numb_git_repos_bare_repos()),
+                &self
+                    .total_git_repos_bare_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
             TableLine::new(
                 2,
-                format!("{} git repo checkouts: ", self.numb_git_checkouts()),
-                self.total_git_chk_size()
+                &format!("{} git repo checkouts: ", self.numb_git_checkouts()),
+                &self
+                    .total_git_chk_size()
                     .file_size(file_size_opts::DECIMAL)
                     .unwrap(),
             ),
@@ -252,41 +257,48 @@ impl<'a> DirSizes<'a> {
 
     /// returns summary of sizes of registry indices and registries (both, .crate archives and the extracted sources)
     fn registries_summary(&self) -> Vec<TableLine> {
-        vec![
-            TableLine::new(
-                1,
-                "Registry: ".to_string(),
-                self.total_reg_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                // check how many indices there are
-                if let 1 = self.total_reg_index_num {
-                    String::from("Registry index: ")
-                } else {
-                    format!("{} registry indices: ", &self.total_reg_index_num())
-                },
-                self.total_reg_index_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} crate archives: ", self.numb_reg_cache_entries()),
-                self.total_reg_cache_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-            TableLine::new(
-                2,
-                format!("{} crate source checkouts: ", self.numb_reg_src_checkouts()),
-                self.total_reg_src_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
-            ),
-        ]
+        let tl1 = TableLine::new(
+            1,
+            &"Registry: ".to_string(),
+            &self
+                .total_reg_size()
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap(),
+        );
+
+        let left = if let 1 = self.total_reg_index_num {
+            String::from("Registry index: ")
+        } else {
+            format!("{} registry indices: ", &self.total_reg_index_num())
+        };
+        let tl2 = TableLine::new(
+            2,
+            &left,
+            &self
+                .total_reg_index_size()
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap(),
+        );
+
+        let tl3 = TableLine::new(
+            2,
+            &format!("{} crate archives: ", self.numb_reg_cache_entries()),
+            &self
+                .total_reg_cache_size()
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap(),
+        );
+
+        let tl4 = TableLine::new(
+            2,
+            &format!("{} crate source checkouts: ", self.numb_reg_src_checkouts()),
+            &self
+                .total_reg_src_size()
+                .file_size(file_size_opts::DECIMAL)
+                .unwrap(),
+        );
+
+        vec![tl1, tl2, tl3, tl4]
     }
 
     /// returns more detailed summary about each registry
@@ -360,8 +372,8 @@ impl<'a> DirSizes<'a> {
             }) {
                 temp_vec.push(TableLine::new(
                     2,
-                    String::from("Registry index:"),
-                    index
+                    &String::from("Registry index:"),
+                    &index
                         .total_size()
                         .file_size(file_size_opts::DECIMAL)
                         .unwrap(),
@@ -377,8 +389,8 @@ impl<'a> DirSizes<'a> {
             }) {
                 temp_vec.push(TableLine::new(
                     2,
-                    format!("{} crate archives: ", pkg_cache.number_of_files()),
-                    pkg_cache
+                    &format!("{} crate archives: ", pkg_cache.number_of_files()),
+                    &pkg_cache
                         .total_size()
                         .file_size(file_size_opts::DECIMAL)
                         .unwrap(),
@@ -394,11 +406,11 @@ impl<'a> DirSizes<'a> {
             }) {
                 temp_vec.push(TableLine::new(
                     2,
-                    format!(
+                    &format!(
                         "{} crate source checkouts: ",
                         registry_source.number_of_source_checkout_folders()
                     ),
-                    registry_source
+                    &registry_source
                         .total_size()
                         .file_size(file_size_opts::DECIMAL)
                         .unwrap(),
@@ -411,8 +423,8 @@ impl<'a> DirSizes<'a> {
 
             let header_line = TableLine::new(
                 1,
-                format!("Registry: {}", registry_name.unwrap_or_default()),
-                total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+                &format!("Registry: {}", registry_name.unwrap_or_default()),
+                &total_size.file_size(file_size_opts::DECIMAL).unwrap(),
             );
 
             v.push(header_line);

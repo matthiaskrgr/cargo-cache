@@ -128,7 +128,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     }
 
     stdout.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
-    lines.push(TableLine::new(0, "Total Size: ".to_string(), size_hr));
+    lines.push(TableLine::new(0, &"Total Size: ", &size_hr));
 
     // we are going to check these directories:
     let p = &target_dir; // path
@@ -143,8 +143,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_debug > 0 {
         lines.push(TableLine::new(
             0,
-            "debug: ".to_string(),
-            size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"debug: ".to_string(),
+            &size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
@@ -152,8 +152,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_rls > 0 {
         lines.push(TableLine::new(
             0,
-            "rls: ".to_string(),
-            size_rls.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"rls: ".to_string(),
+            &size_rls.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
@@ -161,8 +161,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_release > 0 {
         lines.push(TableLine::new(
             0,
-            "release: ".to_string(),
-            size_release.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"release: ".to_string(),
+            &size_release.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
@@ -170,8 +170,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_package > 0 {
         lines.push(TableLine::new(
             0,
-            "package: ".to_string(),
-            size_package.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"package: ".to_string(),
+            &size_package.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
@@ -179,8 +179,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_doc > 0 {
         lines.push(TableLine::new(
             0,
-            "doc: ".to_string(),
-            size_doc.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"doc: ".to_string(),
+            &size_doc.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 
@@ -219,8 +219,8 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     if size_other > 0 {
         lines.push(TableLine::new(
             0,
-            "other: ".to_string(),
-            size_other.file_size(file_size_opts::DECIMAL).unwrap(),
+            &"other: ".to_string(),
+            &size_other.file_size(file_size_opts::DECIMAL).unwrap(),
         ));
     }
 

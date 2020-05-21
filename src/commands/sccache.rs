@@ -93,12 +93,12 @@ pub(crate) fn sccache_stats() {
                 .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
-            TableLine::new(2, count, unique_date.access_date)
+            TableLine::new(2, &count, &unique_date.access_date)
         })
         .collect();
 
     let mut tab_columns: Vec<TableLine> = Vec::with_capacity(date_occurrences.len() + 1);
-    tab_columns.push(TableLine::new(2, "Files", "Day"));
+    tab_columns.push(TableLine::new(2, &"Files".to_string(), &"Day".to_string()));
     tab_columns.extend(date_occurrences);
 
     let table = format_2_row_table(2, tab_columns, true);

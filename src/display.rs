@@ -27,8 +27,8 @@ impl TableLine {
     /// if the right column ends with " B", we pad it to "  B" to align with " MB", " GB" etc
     pub(crate) fn new<LC: ToString, RC: ToString>(
         indent_front: usize,
-        left_column: LC,
-        right_column: RC,
+        left_column: &LC,
+        right_column: &RC,
     ) -> Self {
         let mut right_column = right_column.to_string();
         if right_column.ends_with(" B") {
