@@ -57,6 +57,7 @@
 // for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "ci-autoclean"))] {
+        // mods
         mod cache;
         mod cli;
         mod commands;
@@ -68,6 +69,9 @@ cfg_if::cfg_if! {
         mod top_items;
         mod top_items_summary;
         mod date;
+        mod clear_unref;
+
+        // use
         use crate::cache::caches::{Cache, RegistrySuperCache};
         use clap::value_t;
         use std::process;
@@ -79,6 +83,7 @@ cfg_if::cfg_if! {
         use crate::library::*;
         use crate::remove::*;
         use crate::top_items_summary::*;
+        use crate::clear_unref::*;
     }
 }
 
