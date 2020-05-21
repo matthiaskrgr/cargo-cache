@@ -175,8 +175,10 @@ cargo-cache # no further arguments required
 ````
 
 #### FAQ
-Q: Is this project related to [sccache](https://github.com/mozilla/sccache)?  
-A: Nope, this project does not interact with sccaches cache.
+Q: Is this project related to [sccache](https://github.com/mozilla/sccache)?
+A: Not really.
+   `cargo cache sccache` prints a little summary of the local(!) sccache-cache and shows how many files were last accessed on a given date but
+   it does not modify sccaches cache. It also does not act as a compiler cache such as (s)ccache.
 
 
 #### License:
