@@ -17,6 +17,7 @@ use cargo_metadata::{CargoOpt, MetadataCommand};
 struct Dep {
     name: String,
     version: String,
+    is_git: bool,
 }
 
 fn get_deps() -> Result<impl Iterator<Item = Dep>, Error> {
@@ -34,9 +35,16 @@ fn get_deps() -> Result<impl Iterator<Item = Dep>, Error> {
             )
         });
 
-    let deps = metadata.packages.into_iter().map(|p| Dep {
-        name: p.name.clone(),
-        version: p.version.to_string(),
+    let deps = metadata.packages.into_iter().map(|p| {
+        let is_git: bool = p.id.repr.contains("(git+");
+        let path_in_cacheb = p.manifest_path;
+
+        return Dep {
+            version: p.version.to_string(),
+            name: p.name,
+            is_git,
+            // @TODO get the source path
+        };
     });
 
     Ok(deps)
@@ -49,6 +57,29 @@ pub(crate) fn clear_unref() -> Result<(), Error> {
         let fmt = format!("{}-{}", dep.name, dep.version);
         println!("{}", fmt);
     });
+
+    let deps = get_deps()?; //@TODO remove
+
+    // we have acquired a list of all dependencies needed by a project.
+
+    let manifest = crate::local::get_manifest().unwrap();
+
+    let metadata = MetadataCommand::new()
+        .manifest_path(&manifest)
+        .features(CargoOpt::AllFeatures)
+        .exec()
+        .unwrap_or_else(|error| {
+            panic!(
+                "Failed to parse manifest: '{}'\nError: '{:?}'",
+                &manifest.display(),
+                error
+            )
+        });
+
+    let pkgs = metadata.packages;
+    for pkg in pkgs {
+        println!("{:?}\n\n\n", pkg);
+    }
 
     Ok(())
 }
