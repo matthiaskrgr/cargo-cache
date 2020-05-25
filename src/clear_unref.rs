@@ -16,14 +16,24 @@ use crate::library::Error;
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
 
+// data we need on a crate dependency
 #[derive(Debug, Clone)]
 struct Dep {
     name: String,
     version: String,
-    is_git: bool,
+    source: SourceKind,
 }
 
-fn get_deps() -> Result<impl Iterator<Item = Dep>, Error> {
+// the source of a crate inside the cargo cache can be represented in form of
+// an extracted .crate or a checked out git repository
+// the path is the absolute path to the source inside the ${CARGO_HOME}
+#[derive(Debug, Clone)]
+enum SourceKind {
+    Crate(PathBuf),
+    Git(PathBuf),
+}
+
+fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
     let manifest = crate::local::get_manifest()?;
 
     let metadata = MetadataCommand::new()
@@ -38,30 +48,37 @@ fn get_deps() -> Result<impl Iterator<Item = Dep>, Error> {
             )
         });
 
-    let deps = metadata.packages.into_iter().map(|p| {
+    let cargo_home = cargo_home.clone();
+
+    let deps = metadata.packages.into_iter().map(move |p| {
         let is_git: bool = p.id.repr.contains("(git+");
-        let path_in_cacheb = p.manifest_path;
+        let toml_path = p.manifest_path;
+
+        let source = if is_git {
+            SourceKind::Git(find_crate_name_git(&toml_path, &cargo_home))
+        } else {
+            SourceKind::Crate(find_crate_name_crate(&toml_path, &cargo_home))
+        };
 
         return Dep {
             version: p.version.to_string(),
             name: p.name,
-            is_git,
-            // @TODO get the source path
+            source, // @TODO get the source path
         };
     });
 
     Ok(deps)
 }
 
-pub(crate) fn clear_unref() -> Result<(), Error> {
-    let deps = get_deps()?;
+pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
+    let deps = get_deps(&cargo_home)?;
     // @TODO: check the cache for any crates that are not these and remove them
     deps.for_each(|dep| {
         let fmt = format!("{}-{}", dep.name, dep.version);
         println!("{}", fmt);
     });
 
-    let deps = get_deps()?; //@TODO remove
+    let deps = get_deps(&cargo_home)?; //@TODO remove
 
     // we have acquired a list of all dependencies needed by a project.
 

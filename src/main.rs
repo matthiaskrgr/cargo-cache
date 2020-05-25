@@ -123,11 +123,6 @@ fn main() {
         process::exit(0);
     }
 
-    if config.is_present("remove-unref") {
-        let _ = clear_unref();
-        process::exit(0);
-    }
-
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 
@@ -138,6 +133,11 @@ fn main() {
             process::exit(1);
         }
     };
+
+    if config.is_present("remove-unref") {
+        let _ = clear_unref::clear_unref(&cargo_cache.cargo_home);
+        process::exit(0);
+    }
 
     if config.is_present("list-dirs") {
         // only print the directories and exit, don't calculate anything else
