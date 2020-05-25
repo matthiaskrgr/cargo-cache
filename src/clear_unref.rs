@@ -33,6 +33,7 @@ enum SourceKind {
     Git(PathBuf),
 }
 
+// get a list of all dependencies that we have
 fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
     let manifest = crate::local::get_manifest()?;
 
@@ -50,22 +51,29 @@ fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
 
     let cargo_home = cargo_home.clone();
 
-    let deps = metadata.packages.into_iter().map(move |p| {
-        let is_git: bool = p.id.repr.contains("(git+");
-        let toml_path = p.manifest_path;
+    #[allow(clippy::filter_map)]
+    let deps = metadata
+        .packages
+        .into_iter()
+        // skip local packages, only check packages that come from the cargo-cache
+        //https://docs.rs/cargo_metadata/0.10.0/cargo_metadata/struct.Package.html#structfield.source
+        .filter(|package| package.source.is_some())
+        .map(move |p| {
+            let is_git: bool = p.id.repr.contains("(git+");
+            let toml_path = p.manifest_path;
 
-        let source = if is_git {
-            SourceKind::Git(find_crate_name_git(&toml_path, &cargo_home))
-        } else {
-            SourceKind::Crate(find_crate_name_crate(&toml_path, &cargo_home))
-        };
+            let source = if is_git {
+                SourceKind::Git(find_crate_name_git(&toml_path, &cargo_home))
+            } else {
+                SourceKind::Crate(find_crate_name_crate(&toml_path, &cargo_home))
+            };
 
-        Dep {
-            version: p.version.to_string(),
-            name: p.name,
-            source, // @TODO get the source path
-        }
-    });
+            Dep {
+                version: p.version.to_string(),
+                name: p.name,
+                source, // @TODO get the source path
+            }
+        });
 
     Ok(deps)
 }
@@ -88,12 +96,12 @@ pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
         .exec()
         .unwrap_or_else(|error| {
             panic!(
+                //@FIXME
                 "Failed to parse manifest: '{}'\nError: '{:?}'",
                 &manifest.display(),
                 error
             )
         });
-
     let pkgs = metadata.packages;
     for pkg in pkgs {
         println!("{:?}\n\n\n", pkg);
@@ -101,6 +109,8 @@ pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
 
     Ok(())
 }
+
+// NOTE we need to skip the toml of the root project
 
 fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
@@ -111,10 +121,10 @@ fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     let checkouts_pos = v
         .iter()
         .position(|i| i == &"checkouts")
-        .expect("failed to parse! 1");
+        .unwrap_or_else(|| panic!("failed to parse! 1: {:?}", v)); //@FIXME
+
     // assuming git:
     // git checkouts repo-name ref
-
     let path_segments = &v[(checkouts_pos - 1)..(checkouts_pos + 3)];
 
     let mut path = cargo_home.clone();
@@ -130,7 +140,7 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     let registry_pos = v
         .iter()
         .position(|i| i == &"registry")
-        .expect("failed to parse! 2");
+        .unwrap_or_else(|| panic!("failed to parse! 2: {:?}", v)); //@FIXME
 
     let path_segments = &v[(registry_pos)..(registry_pos + 4)];
     let mut path = cargo_home.clone();
