@@ -9,6 +9,9 @@
 
 // remove all crates from a cache that are not referenced by a Cargo lockfile
 
+use std::ffi::OsStr;
+use std::path::PathBuf;
+
 use crate::library::Error;
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
@@ -82,4 +85,43 @@ pub(crate) fn clear_unref() -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+pub fn find_crate_name_git(toml_path: &PathBuf) {
+    //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
+    let cargo_home = PathBuf::from("/home/matthias/.cargo/");
+
+    // get the segments of the path
+    let v: Vec<&OsStr> = toml_path.iter().collect();
+
+    let checkouts_pos = v
+        .iter()
+        .position(|i| i == &"checkouts")
+        .expect("failed to parse! 1");
+    // assuming git:
+    // git checkouts repo-name ref
+
+    let path_segments = &v[(checkouts_pos - 1)..(checkouts_pos + 3)];
+
+    let mut path = cargo_home;
+    path_segments.iter().for_each(|p| path.push(p));
+
+    dbg!(path);
+}
+
+fn find_crate_name_crate(toml_path: &PathBuf) {
+    // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
+
+    let cargo_home = PathBuf::from("/home/matthias/.cargo/");
+
+    let v: Vec<&OsStr> = toml_path.iter().collect();
+    let registry_pos = v
+        .iter()
+        .position(|i| i == &"registry")
+        .expect("failed to parse! 2");
+
+    let path_segments = &v[(registry_pos)..(registry_pos + 4)];
+    let mut path = cargo_home;
+    path_segments.iter().for_each(|p| path.push(p));
+    dbg!(path);
 }
