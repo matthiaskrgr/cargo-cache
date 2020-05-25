@@ -87,9 +87,8 @@ pub(crate) fn clear_unref() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn find_crate_name_git(toml_path: &PathBuf) {
+fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
-    let cargo_home = PathBuf::from("/home/matthias/.cargo/");
 
     // get the segments of the path
     let v: Vec<&OsStr> = toml_path.iter().collect();
@@ -103,16 +102,14 @@ pub fn find_crate_name_git(toml_path: &PathBuf) {
 
     let path_segments = &v[(checkouts_pos - 1)..(checkouts_pos + 3)];
 
-    let mut path = cargo_home;
+    let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
 
-    dbg!(path);
+    path
 }
 
-fn find_crate_name_crate(toml_path: &PathBuf) {
+fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
-
-    let cargo_home = PathBuf::from("/home/matthias/.cargo/");
 
     let v: Vec<&OsStr> = toml_path.iter().collect();
     let registry_pos = v
@@ -121,7 +118,7 @@ fn find_crate_name_crate(toml_path: &PathBuf) {
         .expect("failed to parse! 2");
 
     let path_segments = &v[(registry_pos)..(registry_pos + 4)];
-    let mut path = cargo_home;
+    let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
-    dbg!(path);
+    path
 }
