@@ -60,25 +60,23 @@ fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
             SourceKind::Crate(find_crate_name_crate(&toml_path, &cargo_home))
         };
 
-        return Dep {
+        Dep {
             version: p.version.to_string(),
             name: p.name,
             source, // @TODO get the source path
-        };
+        }
     });
 
     Ok(deps)
 }
 
 pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
-    let deps = get_deps(&cargo_home)?;
+    let deps = get_deps(cargo_home)?;
     // @TODO: check the cache for any crates that are not these and remove them
     deps.for_each(|dep| {
         let fmt = format!("{}-{}", dep.name, dep.version);
         println!("{}", fmt);
     });
-
-    let deps = get_deps(&cargo_home)?; //@TODO remove
 
     // we have acquired a list of all dependencies needed by a project.
 
