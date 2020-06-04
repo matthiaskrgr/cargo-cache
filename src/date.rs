@@ -215,8 +215,8 @@ pub(crate) fn remove_files_by_dates(
             match date_comp {
                 AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
                 AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
-                _ => unreachable!(
-                    "DateComparisonOlder and Younger not supported right now (dry run)"
+                AgeRelation::None => unreachable!(
+                    "DateComparisonOlder and Younger or None not supported right now (dry run)"
                 ),
             },
         );
@@ -228,8 +228,8 @@ pub(crate) fn remove_files_by_dates(
             match date_comp {
                 AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
                 AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
-                _ => unreachable!(
-                    "DateComparisonOlder and Younger not supported right now (no dry run)"
+                AgeRelation::None => unreachable!(
+                    "DateComparisonOlder and Younger or None not supported right now (no dry run)"
                 ),
             },
         );
