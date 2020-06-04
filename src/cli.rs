@@ -100,8 +100,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
-    let remove_unref = Arg::with_name("remove-unref")
-        .long("remove-unref")
+    let clean_unref = Arg::with_name("clean-unref")
+        .long("clean-unref")
         .help("Remove crates that are not referenced in a Cargo.toml from the cache");
 
     let debug = Arg::with_name("debug")
@@ -202,7 +202,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&remove_unref)
+        .arg(&clean_unref)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -234,7 +234,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&remove_unref)
+        .arg(&clean_unref)
         .arg(&debug)
         .get_matches()
 }
@@ -265,6 +265,7 @@ USAGE:
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
+        --clean-unref            Remove crates that are not referenced in a Cargo.toml from the cache
     -d, --dry-run                Don't remove anything, just pretend
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
@@ -311,6 +312,7 @@ USAGE:
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
+        --clean-unref            Remove crates that are not referenced in a Cargo.toml from the cache
     -d, --dry-run                Don't remove anything, just pretend
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
