@@ -47,7 +47,7 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
 
     // get the path inside the CARGO_HOME of the source of the dependency
     #[allow(clippy::filter_map)]
-    let packages = dependencies
+    let required_packages = dependencies
         .iter()
         .map(|pkg| &pkg.manifest_path)
         // we only care about tomls that are not local, i.e. tomls that are inside the $CARGO_HOME
@@ -59,6 +59,7 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
             } else if toml_path.starts_with(&cargo_cache_paths.registry_sources) {
                 find_crate_name_crate(toml_path, cargo_home)
             } else {
+                // if we find a source path that is neither a git nor a crate dep, this probably indicates a bug
                 unreachable!(
                     "ERROR: did not recognize toml path: '{}'",
                     toml_path.display()
@@ -66,8 +67,11 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
             }
         });
 
+    // now we have a list of all cargo-home-entries a crate needs to build
+    // we can walk the cargo-cache and remove everything that is not referenced
+
     // debug
-    packages.for_each(|toml| println!("{:?}", toml));
+    required_packages.for_each(|toml| println!("{:?}", toml));
 
     Ok(())
 }
