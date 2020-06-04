@@ -12,7 +12,7 @@
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
-use crate::library::Error;
+use crate::library::{CargoCachePaths, Error};
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
 
@@ -78,13 +78,16 @@ fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
     Ok(deps)
 }
 
-pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
-    let deps = get_deps(cargo_home)?;
+pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Error> {
+    let cargo_home = &cargo_cache_paths.cargo_home;
+    let deps = get_deps(&cargo_cache_paths.cargo_home)?;
     // @TODO: check the cache for any crates that are not these and remove them
+    /*
     deps.for_each(|dep| {
         let fmt = format!("{}-{}", dep.name, dep.version);
         println!("{}", fmt);
     });
+    */
 
     // we have acquired a list of all dependencies needed by a project.
 
@@ -103,14 +106,32 @@ pub(crate) fn clear_unref(cargo_home: &PathBuf) -> Result<(), Error> {
             )
         });
     let pkgs = metadata.packages;
-    for pkg in pkgs {
-        println!("{:?}\n\n\n", pkg);
-    }
+
+    #[allow(clippy::filter_map)]
+    let packages = pkgs
+        .iter()
+        .map(|pkg| &pkg.manifest_path)
+        // we only care about tomls that are not local, i.e. tomls that are inside the $CARGO_HOME
+        .filter(|toml_path| toml_path.starts_with(&cargo_home))
+        // map the manifest paths to paths to the roots of the crates inside the cargo_home
+        .map(|toml_path| {
+            if toml_path.starts_with(&cargo_cache_paths.git_checkouts) {
+                find_crate_name_git(toml_path, cargo_home)
+            } else if toml_path.starts_with(&cargo_cache_paths.registry_sources) {
+                find_crate_name_crate(toml_path, cargo_home)
+            } else {
+                unreachable!(
+                    "ERROR: did not recognize toml path: '{}'",
+                    toml_path.display()
+                );
+            }
+        });
+
+    // debug
+    packages.for_each(|toml| println!("{:?}", toml));
 
     Ok(())
 }
-
-// NOTE we need to skip the toml of the root project
 
 fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
@@ -137,6 +158,7 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
 
     let v: Vec<&OsStr> = toml_path.iter().collect();
+
     let registry_pos = v
         .iter()
         .position(|i| i == &"registry")

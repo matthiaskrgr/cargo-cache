@@ -135,7 +135,7 @@ fn main() {
     };
 
     if config.is_present("remove-unref") {
-        let _ = clear_unref(&cargo_cache.cargo_home);
+        let _ = clear_unref(&cargo_cache);
         process::exit(0);
     }
 
