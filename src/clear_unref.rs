@@ -63,9 +63,9 @@ fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
             let toml_path = p.manifest_path;
 
             let source = if is_git {
-                SourceKind::Git(find_crate_name_git(&toml_path, &cargo_home))
+                find_crate_name_git(&toml_path, &cargo_home)
             } else {
-                SourceKind::Crate(find_crate_name_crate(&toml_path, &cargo_home))
+                find_crate_name_crate(&toml_path, &cargo_home)
             };
 
             Dep {
@@ -133,7 +133,7 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
     Ok(())
 }
 
-fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
+fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKind {
     //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
 
     // get the segments of the path
@@ -151,10 +151,10 @@ fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
 
-    path
+    SourceKind::Git(path)
 }
 
-fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
+fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKind {
     // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
 
     let v: Vec<&OsStr> = toml_path.iter().collect();
@@ -167,5 +167,5 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> PathBuf {
     let path_segments = &v[(registry_pos)..(registry_pos + 4)];
     let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
-    path
+    SourceKind::Crate(path)
 }
