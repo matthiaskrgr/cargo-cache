@@ -16,14 +16,6 @@ use crate::library::{CargoCachePaths, Error};
 
 use cargo_metadata::{CargoOpt, MetadataCommand};
 
-// data we need on a crate dependency
-#[derive(Debug, Clone)]
-struct Dep {
-    name: String,
-    version: String,
-    source: SourceKind,
-}
-
 // the source of a crate inside the cargo cache can be represented in form of
 // an extracted .crate or a checked out git repository
 // the path is the absolute path to the source inside the ${CARGO_HOME}
@@ -33,64 +25,10 @@ enum SourceKind {
     Git(PathBuf),
 }
 
-// get a list of all dependencies that we have
-fn get_deps(cargo_home: &PathBuf) -> Result<impl Iterator<Item = Dep>, Error> {
-    let manifest = crate::local::get_manifest()?;
-
-    let metadata = MetadataCommand::new()
-        .manifest_path(&manifest)
-        .features(CargoOpt::AllFeatures)
-        .exec()
-        .unwrap_or_else(|error| {
-            panic!(
-                "Failed to parse manifest: '{}'\nError: '{:?}'",
-                &manifest.display(),
-                error
-            )
-        });
-
-    let cargo_home = cargo_home.clone();
-
-    #[allow(clippy::filter_map)]
-    let deps = metadata
-        .packages
-        .into_iter()
-        // skip local packages, only check packages that come from the cargo-cache
-        //https://docs.rs/cargo_metadata/0.10.0/cargo_metadata/struct.Package.html#structfield.source
-        .filter(|package| package.source.is_some())
-        .map(move |p| {
-            let is_git: bool = p.id.repr.contains("(git+");
-            let toml_path = p.manifest_path;
-
-            let source = if is_git {
-                find_crate_name_git(&toml_path, &cargo_home)
-            } else {
-                find_crate_name_crate(&toml_path, &cargo_home)
-            };
-
-            Dep {
-                version: p.version.to_string(),
-                name: p.name,
-                source, // @TODO get the source path
-            }
-        });
-
-    Ok(deps)
-}
-
 pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Error> {
     let cargo_home = &cargo_cache_paths.cargo_home;
-    let deps = get_deps(&cargo_cache_paths.cargo_home)?;
-    // @TODO: check the cache for any crates that are not these and remove them
-    /*
-    deps.for_each(|dep| {
-        let fmt = format!("{}-{}", dep.name, dep.version);
-        println!("{}", fmt);
-    });
-    */
 
-    // we have acquired a list of all dependencies needed by a project.
-
+    // get a list of all dependencies of the project
     let manifest = crate::local::get_manifest().unwrap();
 
     let metadata = MetadataCommand::new()
@@ -105,10 +43,11 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
                 error
             )
         });
-    let pkgs = metadata.packages;
+    let dependencies = metadata.packages;
 
+    // get the path inside the CARGO_HOME of the source of the dependency
     #[allow(clippy::filter_map)]
-    let packages = pkgs
+    let packages = dependencies
         .iter()
         .map(|pkg| &pkg.manifest_path)
         // we only care about tomls that are not local, i.e. tomls that are inside the $CARGO_HOME
