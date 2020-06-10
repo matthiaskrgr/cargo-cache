@@ -15,6 +15,7 @@ use std::path::PathBuf;
 use crate::cache::caches::*;
 use crate::cache::*;
 use crate::library::{CargoCachePaths, Error};
+use crate::remove::*;
 use cargo_metadata::{CargoOpt, MetadataCommand};
 
 // the source of a crate inside the cargo cache can be represented in form of
@@ -66,10 +67,12 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKin
 
 pub(crate) fn clear_unref(
     cargo_cache_paths: &CargoCachePaths,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
-    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    dry_run: bool,
+    size_changed: &mut bool,
 ) -> Result<(), Error> {
     let cargo_home = &cargo_cache_paths.cargo_home;
 
@@ -149,11 +152,38 @@ pub(crate) fn clear_unref(
             }
         });
 
-
     // debug
     println!("required packages:");
     required_packages.for_each(|toml| println!("{:?}", toml));
 
+    let remove = false;
+    if remove {
+        // remove the git checkout cache since it is not needed
+        remove_file(
+            &cargo_cache_paths.git_checkouts,
+            dry_run,
+            size_changed,
+            None,
+            None, // fixme
+            Some(checkouts_cache.total_size()),
+        );
+        // invalidate cache
+        let _ = &checkouts_cache.invalidate();
+
+        // remove the registry_sources_cache as well
+        remove_file(
+            &cargo_cache_paths.registry_sources,
+            dry_run,
+            size_changed,
+            None,
+            None, // fixme
+            Some(registry_sources_caches.total_size()),
+        );
+        // invalidate cache
+        let _ = &registry_sources_caches.invalidate();
+
+        // for the bare_repos_cache and registry_package_cache, remove all items but the ones we found referenced
+    }
 
     // now we have a list of all cargo-home-entries a crate needs to build
     // we can walk the cargo-cache and remove everything that is not referenced;

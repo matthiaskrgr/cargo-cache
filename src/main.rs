@@ -167,6 +167,8 @@ fn main() {
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
+            config.is_present("dry-run"),
+            &mut size_changed,
         ) {
             Ok(_) => {
                 process::exit(0);
