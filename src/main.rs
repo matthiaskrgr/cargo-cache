@@ -134,11 +134,6 @@ fn main() {
         }
     };
 
-    if config.is_present("clean-unref") {
-        let _ = clear_unref(&cargo_cache);
-        process::exit(0);
-    }
-
     if config.is_present("list-dirs") {
         // only print the directories and exit, don't calculate anything else
         println!("{}", cargo_cache);
@@ -164,6 +159,24 @@ fn main() {
 
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
+
+    if config.is_present("clean-unref") {
+        match clear_unref(
+            &cargo_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_sources_caches,
+        ) {
+            Ok(_) => {
+                process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("{:?}", e);
+                process::exit(1);
+            }
+        }
+    }
 
     if config.is_present("top-cache-items") {
         let limit =

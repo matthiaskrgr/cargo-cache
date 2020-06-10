@@ -116,18 +116,6 @@ pub(crate) fn remove_dir_via_cmdline(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Error> {
     // @TODO the passing of the cache is really a mess here... :(
-    fn rm(
-        dir: &PathBuf,
-        dry_run: bool,
-        size_changed: &mut bool,
-        total_size_from_cache: Option<u64>,
-    ) -> Result<(), Error> {
-        // remove a specified subdirectory from cargo cache
-        let msg = Some(format!("removing: '{}'", dir.display()));
-
-        remove_file(dir, dry_run, size_changed, msg, None, total_size_from_cache);
-        Ok(())
-    }
 
     let dirs_to_remove = components_from_groups(&directory)?;
 
@@ -183,6 +171,19 @@ pub(crate) fn remove_dir_via_cmdline(
         );
     }
 
+    Ok(())
+}
+
+pub(crate) fn rm(
+    dir: &PathBuf,
+    dry_run: bool,
+    size_changed: &mut bool,
+    total_size_from_cache: Option<u64>,
+) -> Result<(), Error> {
+    // remove a specified subdirectory from cargo cache
+    let msg = Some(format!("removing: '{}'", dir.display()));
+
+    remove_file(dir, dry_run, size_changed, msg, None, total_size_from_cache);
     Ok(())
 }
 

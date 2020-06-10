@@ -12,8 +12,9 @@
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
+use crate::cache::caches::*;
+use crate::cache::*;
 use crate::library::{CargoCachePaths, Error};
-
 use cargo_metadata::{CargoOpt, MetadataCommand};
 
 // the source of a crate inside the cargo cache can be represented in form of
@@ -63,11 +64,17 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKin
     SourceKind::Crate(path)
 }
 
-pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Error> {
+pub(crate) fn clear_unref(
+    cargo_cache_paths: &CargoCachePaths,
+    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+) -> Result<(), Error> {
     let cargo_home = &cargo_cache_paths.cargo_home;
 
     // get a list of all dependencies of the project
-    let manifest = crate::local::get_manifest().unwrap();
+    let manifest = crate::local::get_manifest()?;
 
     let metadata = MetadataCommand::new()
         .manifest_path(&manifest)
@@ -142,13 +149,33 @@ pub(crate) fn clear_unref(cargo_cache_paths: &CargoCachePaths) -> Result<(), Err
             }
         });
 
+
+    // debug
+    println!("required packages:");
+    required_packages.for_each(|toml| println!("{:?}", toml));
+
+
     // now we have a list of all cargo-home-entries a crate needs to build
     // we can walk the cargo-cache and remove everything that is not referenced;
     // remove: git checkouts, registry sources
     // keep, if referenced: registry pkg cache, bare git repos
 
-    // debug
-    required_packages.for_each(|toml| println!("{:?}", toml));
+    /*
+        mut checkouts_cache: &mut git_checkouts::GitCheckoutCache, // remove
+        mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+        mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+        mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches, // remove
+    */
+
+    let mut bare_repos = bare_repos_cache.bare_repo_folders();
+
+    // all .crates found in the cache
+    // @TODO add method to get all .crates of all caches via single method?
+    let mut crates = Vec::new();
+
+    for cache in registry_pkg_caches.caches() {
+        crates.extend(cache.files());
+    }
 
     Ok(())
 }
