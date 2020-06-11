@@ -171,82 +171,85 @@ pub(crate) fn clear_unref(
     // println!("required packages:");
     // required_packages.inspect(|toml| println!("{:?}", toml));
 
-    let remove = false;
-    if remove {
-        let dry_run = true;
+    let dry_run = true;
 
-        // remove the git checkout cache since it is not needed
-        remove_file(
-            &cargo_cache_paths.git_checkouts,
-            dry_run,
-            size_changed,
-            None,
-            None, // fixme
-            Some(checkouts_cache.total_size()),
-        );
-        // invalidate cache
-        let _ = &checkouts_cache.invalidate();
+    // remove the git checkout cache since it is not needed
+    remove_file(
+        &cargo_cache_paths.git_checkouts,
+        dry_run,
+        size_changed,
+        None,
+        None, // fixme
+        Some(checkouts_cache.total_size()),
+    );
+    // invalidate cache
+    let _ = &checkouts_cache.invalidate();
 
-        // remove the registry_sources_cache as well
-        remove_file(
-            &cargo_cache_paths.registry_sources,
-            dry_run,
-            size_changed,
-            None,
-            None, // fixme
-            Some(registry_sources_caches.total_size()),
-        );
-        // invalidate cache
-        let _ = &registry_sources_caches.invalidate();
+    // remove the registry_sources_cache as well
+    remove_file(
+        &cargo_cache_paths.registry_sources,
+        dry_run,
+        size_changed,
+        None,
+        None, // fixme
+        Some(registry_sources_caches.total_size()),
+    );
+    // invalidate cache
+    let _ = &registry_sources_caches.invalidate();
 
-        let (required_crates, required_git_repos): (Vec<SourceKind>, Vec<SourceKind>) =
-            required_packages.partition(|dep| match dep {
-                SourceKind::Crate(_) => true,
-                SourceKind::Git(_) => false,
-            });
+    let (required_crates, required_git_repos): (Vec<SourceKind>, Vec<SourceKind>) =
+        required_packages.partition(|dep| match dep {
+            SourceKind::Crate(_) => true,
+            SourceKind::Git(_) => false,
+        });
 
-        // map SourceKinds to the contained paths
-        let required_crates = required_crates
-            .into_iter()
-            .map(|sk| sk.inner())
-            .collect::<Vec<PathBuf>>();
-        let required_git_repos = required_git_repos
-            .into_iter()
-            .map(|sk| sk.inner())
-            .collect::<Vec<PathBuf>>();
-        // for the bare_repos_cache and registry_package_cache,
-        // remove all items but the ones that are referenced
+    // map SourceKinds to the contained paths
+    let required_crates = required_crates
+        .into_iter()
+        .map(|sk| sk.inner())
+        .collect::<Vec<PathBuf>>();
+    let required_git_repos = required_git_repos
+        .into_iter()
+        .map(|sk| sk.inner())
+        .collect::<Vec<PathBuf>>();
+    // for the bare_repos_cache and registry_package_cache,
+    // remove all items but the ones that are referenced
 
-        let bare_repos = bare_repos_cache.bare_repo_folders();
+    let bare_repos = bare_repos_cache.bare_repo_folders();
 
-        // all .crates found in the cache
-        // @TODO add method to get all .crates of all caches via single method?
-        let mut crates = Vec::new();
+    // all .crates found in the cache
+    // @TODO add method to get all .crates of all caches via single method?
+    let mut crates = Vec::new();
 
-        for cache in registry_pkg_caches.caches() {
-            crates.extend(cache.files());
-        }
+    for cache in registry_pkg_caches.caches() {
+        crates.extend(cache.files());
+    }
 
-        // filter and remove git repos
-        bare_repos
-            .iter()
-            .filter(|repo_in_cache| 
+    // filter and remove git repos
+    bare_repos
+        .iter()
+        .filter(|repo_in_cache|
             // in the iterator, only keep crates that are not contained in
             // our dependency list and remove them
 
             !required_git_repos.contains(repo_in_cache))
-            .for_each(|repo| { /* remove the repo */ });
+        .for_each(|repo| {
+            /* remove the repo */
+            println!("remove bare repo: {:?}", repo)
+        });
 
-        // filter and remove crate archives
-        crates
-            .iter()
-            .filter(|crate_in_cache| 
+    // filter and remove crate archives
+    crates
+        .iter()
+        .filter(|crate_in_cache|
             // in the iterator, only keep crates that are not contained in
             // our dependency list and remove them
 
             !required_crates.contains(crate_in_cache))
-            .for_each(|repo| { /* remove the repo */ });
-    }
+        .for_each(|krate| {
+            /* remove the crate */
+            println!("remove crate archive: {:?}", krate)
+        });
 
     Ok(())
 }
