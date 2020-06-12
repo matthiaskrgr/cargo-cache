@@ -81,7 +81,7 @@ pub(crate) fn clear_unref(
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-    dry_run: bool,
+    _______dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
     let cargo_home = &cargo_cache_paths.cargo_home;
