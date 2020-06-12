@@ -31,8 +31,7 @@ enum SourceKind {
 impl SourceKind {
     fn inner(self) -> PathBuf {
         match self {
-            SourceKind::Crate(p) => p,
-            SourceKind::Git(p) => p,
+            SourceKind::Crate(p) | SourceKind::Git(p) => p,
         }
     }
 }
@@ -203,21 +202,21 @@ pub(crate) fn clear_unref(
             SourceKind::Git(_) => false,
         });
 
-    // map SourceKinds to the contained paths
+    // extract the paths from the SouceKinds
     let required_crates = required_crates
         .into_iter()
-        .map(|sk| sk.inner())
+        .map(SourceKind::inner)
         .collect::<Vec<PathBuf>>();
     let required_git_repos = required_git_repos
         .into_iter()
-        .map(|sk| sk.inner())
+        .map(SourceKind::inner)
         .collect::<Vec<PathBuf>>();
     // for the bare_repos_cache and registry_package_cache,
     // remove all items but the ones that are referenced
 
     let bare_repos = bare_repos_cache.bare_repo_folders();
 
-    // all .crates found in the cache
+    // get all .crates found in the cache (we need to check all subcaches)
     // @TODO add method to get all .crates of all caches via single method?
     let mut crates = Vec::new();
 
