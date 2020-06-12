@@ -202,6 +202,7 @@ pub(crate) fn remove_file(
     // size of the file according to cache
     total_size_from_cache: Option<u64>,
 ) {
+    // None: actually means "Default" here, make this more clear! (use enum type?)
     if dry_run {
         if let Some(dryrun_msg) = dry_run_msg {
             println!("{}", dryrun_msg)

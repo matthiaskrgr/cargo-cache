@@ -387,6 +387,18 @@ pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Compone
     Ok(mapped_dirs)
 }
 
+/// get the total size of a directory or a file
+pub(crate) fn size_of_path(path: &PathBuf) -> u64 {
+    // if the path is a directory, use cumulative_dir_size
+    if path.is_dir() {
+        cumulative_dir_size(&path).dir_size
+    } else {
+        fs::metadata(&path)
+            .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
+            .len()
+    }
+}
+
 /// get the total size and number of files of a directory
 pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise

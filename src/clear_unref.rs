@@ -14,6 +14,7 @@ use std::path::PathBuf;
 
 use crate::cache::caches::*;
 use crate::cache::*;
+use crate::library::*;
 use crate::library::{CargoCachePaths, Error};
 use crate::remove::*;
 use cargo_metadata::{CargoOpt, MetadataCommand};
@@ -178,7 +179,7 @@ pub(crate) fn clear_unref(
         dry_run,
         size_changed,
         None,
-        None, // fixme
+        None, // default
         Some(checkouts_cache.total_size()),
     );
     // invalidate cache
@@ -190,7 +191,7 @@ pub(crate) fn clear_unref(
         dry_run,
         size_changed,
         None,
-        None, // fixme
+        None, // default
         Some(registry_sources_caches.total_size()),
     );
     // invalidate cache
@@ -234,7 +235,15 @@ pub(crate) fn clear_unref(
             !required_git_repos.contains(repo_in_cache))
         .for_each(|repo| {
             /* remove the repo */
-            println!("remove bare repo: {:?}", repo)
+            println!("remove bare repo: {:?}", repo);
+            remove_file(
+                repo,
+                dry_run,
+                size_changed,
+                None,
+                None,
+                Some(size_of_path(repo)),
+            );
         });
 
     // filter and remove crate archives
@@ -247,7 +256,15 @@ pub(crate) fn clear_unref(
             !required_crates.contains(crate_in_cache))
         .for_each(|krate| {
             /* remove the crate */
-            println!("remove crate archive: {:?}", krate)
+            println!("remove crate archive: {:?}", krate);
+            remove_file(
+                krate,
+                dry_run,
+                size_changed,
+                None,
+                None,
+                Some(size_of_path(krate)),
+            );
         });
 
     Ok(())
