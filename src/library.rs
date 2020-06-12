@@ -391,7 +391,7 @@ pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Compone
 pub(crate) fn size_of_path(path: &PathBuf) -> u64 {
     // if the path is a directory, use cumulative_dir_size
     if path.is_dir() {
-        cumulative_dir_size(&path).dir_size
+        cumulative_dir_size(path).dir_size
     } else {
         fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
