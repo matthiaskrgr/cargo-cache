@@ -81,7 +81,7 @@ pub(crate) fn clear_unref(
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-    _______dry_run: bool,
+    dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
     let cargo_home = &cargo_cache_paths.cargo_home;
@@ -171,7 +171,7 @@ pub(crate) fn clear_unref(
     // println!("required packages:");
     // required_packages.inspect(|toml| println!("{:?}", toml));
 
-    let dry_run = true;
+    //let dry_run = true;
 
     // remove the git checkout cache since it is not needed
     remove_file(
@@ -235,7 +235,6 @@ pub(crate) fn clear_unref(
             !required_git_repos.contains(repo_in_cache))
         .for_each(|repo| {
             /* remove the repo */
-            println!("remove bare repo: {:?}", repo);
             remove_file(
                 repo,
                 dry_run,
@@ -256,7 +255,6 @@ pub(crate) fn clear_unref(
             !required_crates.contains(crate_in_cache))
         .for_each(|krate| {
             /* remove the crate */
-            println!("remove crate archive: {:?}", krate);
             remove_file(
                 krate,
                 dry_run,
