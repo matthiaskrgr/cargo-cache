@@ -100,10 +100,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
-    let clean_unref = Arg::with_name("clean-unref")
-        .long("clean-unref")
-        .help("Remove crates that are not referenced in a Cargo.toml from the cache");
-
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -166,6 +162,25 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let sccache_short = SubCommand::with_name("sc").about("gather stats on a local sccache cache");
     //</sccache>
 
+    //<clear-unref>
+    // from cargo
+    //
+    //fn arg_manifest_path(self) -> Self {
+    //    self._arg(opt("manifest-path", "Path to Cargo.toml").value_name("PATH"))
+    //}
+    //
+    // try to emulate this:
+    let manifest_path = Arg::with_name("manifest-path")
+        .long("manifest-path")
+        .help("Path to Cargo.toml")
+        .takes_value(true)
+        .value_name("PATH");
+
+    let clean_unref = SubCommand::with_name("clean-unref")
+        .about("Remove crates that are not referenced in a Cargo.toml from the cache")
+        .arg(&manifest_path);
+    //</clear-unref>
+
     // "version" subcommand which is also hidden, prints crate version
     let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
 
@@ -190,6 +205,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(registries_hidden.clone())
         .subcommand(sccache.clone())
         .subcommand(sccache_short.clone())
+        .subcommand(clean_unref.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -202,7 +218,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&clean_unref)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -220,8 +235,9 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(registry)
         .subcommand(registry_short)
         .subcommand(registries_hidden)
-        .subcommand(sccache.clone())
-        .subcommand(sccache_short.clone())
+        .subcommand(sccache)
+        .subcommand(sccache_short)
+        .subcommand(clean_unref)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -234,7 +250,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&clean_unref)
         .arg(&debug)
         .get_matches()
 }
@@ -265,7 +280,6 @@ USAGE:
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
-        --clean-unref            Remove crates that are not referenced in a Cargo.toml from the cache
     -d, --dry-run                Don't remove anything, just pretend
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
@@ -281,15 +295,16 @@ OPTIONS:
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    help        Prints this message or the help of the given subcommand(s)
-    l           check local build cache (target) of a rust project
-    local       check local build cache (target) of a rust project
-    q           run a query
-    query       run a query
-    r           query each package registry separately
-    registry    query each package registry separately
-    sc          gather stats on a local sccache cache
-    sccache     gather stats on a local sccache cache\n");
+    clean-unref    Remove crates that are not referenced in a Cargo.toml from the cache
+    help           Prints this message or the help of the given subcommand(s)
+    l              check local build cache (target) of a rust project
+    local          check local build cache (target) of a rust project
+    q              run a query
+    query          run a query
+    r              query each package registry separately
+    registry       query each package registry separately
+    sc             gather stats on a local sccache cache
+    sccache        gather stats on a local sccache cache\n");
 
         assert_eq!(help_desired, help_real);
     }
@@ -312,7 +327,6 @@ USAGE:
 FLAGS:
     -a, --autoclean              Removes crate source checkouts and git repo checkouts
     -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
-        --clean-unref            Remove crates that are not referenced in a Cargo.toml from the cache
     -d, --dry-run                Don't remove anything, just pretend
     -f, --fsck                   Fsck git repositories
     -g, --gc                     Recompress git repositories (may take some time)
@@ -328,15 +342,16 @@ OPTIONS:
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    help        Prints this message or the help of the given subcommand(s)
-    l           check local build cache (target) of a rust project
-    local       check local build cache (target) of a rust project
-    q           run a query
-    query       run a query
-    r           query each package registry separately
-    registry    query each package registry separately
-    sc          gather stats on a local sccache cache
-    sccache     gather stats on a local sccache cache\n");
+    clean-unref    Remove crates that are not referenced in a Cargo.toml from the cache
+    help           Prints this message or the help of the given subcommand(s)
+    l              check local build cache (target) of a rust project
+    local          check local build cache (target) of a rust project
+    q              run a query
+    query          run a query
+    r              query each package registry separately
+    registry       query each package registry separately
+    sc             gather stats on a local sccache cache
+    sccache        gather stats on a local sccache cache\n");
         assert_eq!(help_desired, help_real);
     }
 
