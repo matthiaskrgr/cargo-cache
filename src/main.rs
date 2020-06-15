@@ -160,9 +160,10 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    if config.is_present("clean-unref") {
+    if let Some(clear_unref_cfg) = config.subcommand_matches("clean-unref") {
         match clear_unref(
             &cargo_cache,
+            &clear_unref_cfg.value_of("manifest-path"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,

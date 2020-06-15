@@ -75,8 +75,10 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKin
     SourceKind::Crate(path)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn clear_unref(
     cargo_cache_paths: &CargoCachePaths,
+    manifest_path: &Option<&str>,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_repos_bare::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
@@ -84,10 +86,16 @@ pub(crate) fn clear_unref(
     dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
+    // first get a list of all dependencies of the project
+
     let cargo_home = &cargo_cache_paths.cargo_home;
 
-    // get a list of all dependencies of the project
-    let manifest = crate::local::get_manifest()?;
+    // if "--manifest-path" is passed to the subcommand, take this
+    // if it is not passed, try to find a close manifest somewhere
+    let manifest = match manifest_path {
+        Some(path_str) => PathBuf::from(path_str),
+        None => crate::local::get_manifest()?,
+    };
 
     let metadata = MetadataCommand::new()
         .manifest_path(&manifest)
