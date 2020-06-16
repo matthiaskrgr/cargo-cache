@@ -97,14 +97,8 @@ pub(crate) fn clear_unref(
         .manifest_path(&manifest)
         .features(CargoOpt::AllFeatures)
         .exec()
-        .unwrap_or_else(|error| {
-            panic!(
-                //@FIXME
-                "Failed to parse manifest: '{}'\nError: '{:?}'",
-                &manifest.display(),
-                error
-            )
-        });
+        .map_err(|e| Error::UnparsableManifest(manifest, e))?;
+
     let dependencies = metadata.packages;
 
     // get the path inside the CARGO_HOME of the source of the dependency

@@ -88,6 +88,8 @@ pub(crate) enum Error {
     LocalNoTargetDir(PathBuf),
     // failed to parse date given to younger or older
     DateParseFailure(String, String),
+    // cargo metadata failed to parse a cargo manifest
+    UnparsableManifest(PathBuf, cargo_metadata::Error),
 }
 
 impl fmt::Display for Error {
@@ -179,6 +181,8 @@ impl fmt::Display for Error {
                 f, "ERROR failed to parse {} as date {}",
                 date, error
             ),
+            Self::UnparsableManifest(path, error) => write!(f,
+            "Failed to parse Cargo.toml at '{}': '{:?}'", path.display(), error),
         }
     }
 }
