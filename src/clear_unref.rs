@@ -37,16 +37,14 @@ impl SourceKind {
     }
 }
 
-fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKind {
+fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<SourceKind> {
     //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
 
     // get the segments of the path
     let v: Vec<&OsStr> = toml_path.iter().collect();
 
-    let checkouts_pos = v
-        .iter()
-        .position(|i| i == &"checkouts")
-        .unwrap_or_else(|| panic!("failed to parse! 1: {:?}", v)); //@FIXME
+    // if we could not find a position, return None
+    let checkouts_pos = v.iter().position(|i| i == &"checkouts")?;
 
     // assuming git:
     // git checkouts repo-name ref
@@ -55,24 +53,22 @@ fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKind 
     let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
 
-    SourceKind::Git(path)
+    Some(SourceKind::Git(path))
 }
 
-fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> SourceKind {
+fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<SourceKind> {
     // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/cargo.toml  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
 
     let v: Vec<&OsStr> = toml_path.iter().collect();
 
-    let registry_pos = v
-        .iter()
-        .position(|i| i == &"registry")
-        .unwrap_or_else(|| panic!("failed to parse! 2: {:?}", v)); //@FIXME
+    // if we could not find a position, return None
+    let registry_pos = v.iter().position(|i| i == &"registry")?;
 
     let path_segments = &v[(registry_pos)..(registry_pos + 4)];
     let mut path = cargo_home.clone();
     path_segments.iter().for_each(|p| path.push(p));
 
-    SourceKind::Crate(path)
+    Some(SourceKind::Crate(path))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -121,15 +117,16 @@ pub(crate) fn clear_unref(
         // map the manifest paths to paths to the roots of the crates inside the cargo_home
         .map(|toml_path| {
             if toml_path.starts_with(&cargo_cache_paths.git_checkouts) {
-                find_crate_name_git(toml_path, cargo_home)
+                find_crate_name_git(toml_path, cargo_home).unwrap_or_else(|| {
+                    panic!("Failed to find 'checkouts' in {} ", toml_path.display())
+                })
             } else if toml_path.starts_with(&cargo_cache_paths.registry_sources) {
-                find_crate_name_crate(toml_path, cargo_home)
+                find_crate_name_crate(toml_path, cargo_home).unwrap_or_else(|| {
+                    panic!("Failed to find 'registry' in {} ", toml_path.display())
+                })
             } else {
                 // if we find a source path that is neither a git nor a crate dep, this probably indicates a bug
-                unreachable!(
-                    "ERROR: did not recognize toml path: '{}'",
-                    toml_path.display()
-                );
+                panic!("Failed to parse toml path: '{}'", toml_path.display());
             }
         })
         // we need to map the git repo checkouts to bare git repos
