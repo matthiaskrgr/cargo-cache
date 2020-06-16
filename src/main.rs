@@ -168,7 +168,7 @@ fn main() {
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-            config.is_present("dry-run"),
+            config.is_present("dry-run") || clear_unref_cfg.is_present("dry-run"),
             &mut size_changed,
         ) {
             Ok(_) => {

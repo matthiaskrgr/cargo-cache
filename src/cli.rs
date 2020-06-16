@@ -178,7 +178,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
     let clean_unref = SubCommand::with_name("clean-unref")
         .about("Remove crates that are not referenced in a Cargo.toml from the cache")
-        .arg(&manifest_path);
+        .arg(&manifest_path)
+        .arg(&dry_run);
     //</clear-unref>
 
     // "version" subcommand which is also hidden, prints crate version
