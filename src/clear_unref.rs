@@ -170,15 +170,13 @@ pub(crate) fn clear_unref(
     // println!("required packages:");
     // required_packages.inspect(|toml| println!("{:?}", toml));
 
-    //let dry_run = true;
-
     // remove the git checkout cache since it is not needed
     remove_file(
         &cargo_cache_paths.git_checkouts,
         dry_run,
         size_changed,
         None,
-        None, // default
+        &DryRunMessage::Default,
         Some(checkouts_cache.total_size()),
     );
     // invalidate cache
@@ -190,7 +188,7 @@ pub(crate) fn clear_unref(
         dry_run,
         size_changed,
         None,
-        None, // default
+        &DryRunMessage::Default,
         Some(registry_sources_caches.total_size()),
     );
     // invalidate cache
@@ -239,7 +237,7 @@ pub(crate) fn clear_unref(
                 dry_run,
                 size_changed,
                 None,
-                None,
+                &DryRunMessage::Default,
                 Some(size_of_path(repo)),
             );
         });
@@ -259,7 +257,7 @@ pub(crate) fn clear_unref(
                 dry_run,
                 size_changed,
                 None,
-                None,
+                &DryRunMessage::Default,
                 Some(size_of_path(krate)),
             );
         });

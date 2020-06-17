@@ -10,7 +10,7 @@
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
 use crate::library::*;
-use crate::remove::remove_file;
+use crate::remove::*;
 
 use chrono::{prelude::*, NaiveDateTime};
 use regex::Regex;
@@ -237,7 +237,16 @@ pub(crate) fn remove_files_by_dates(
             .into_iter()
             .map(|fwd| &fwd.file)
             //.inspect(|p| println!("{}", p.display()))
-            .for_each(|path| remove_file(path, false, &mut size_changed, None, None, None));
+            .for_each(|path| {
+                remove_file(
+                    path,
+                    false,
+                    &mut size_changed,
+                    None,
+                    &DryRunMessage::Default,
+                    None,
+                )
+            });
         // .collect::<Vec<_>>();
     }
     // summary is printed from inside main()

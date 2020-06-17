@@ -371,7 +371,7 @@ fn main() {
                     config.is_present("dry-run"),
                     &mut size_changed,
                     None,
-                    None,
+                    &DryRunMessage::Default,
                     Some(size.dir_size),
                 );
             }
