@@ -22,7 +22,7 @@ use cargo_metadata::{CargoOpt, MetadataCommand};
 // the source of a crate inside the cargo cache can be represented in form of
 // an extracted .crate or a checked out git repository
 // the path is the absolute path to the source inside the ${CARGO_HOME}
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum SourceKind {
     Crate(PathBuf),
     Git(PathBuf),
@@ -38,7 +38,7 @@ impl SourceKind {
 }
 
 fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<SourceKind> {
-    //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
+    // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/cargo.toml  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
 
     // get the segments of the path
     let v: Vec<&OsStr> = toml_path.iter().collect();
@@ -57,7 +57,7 @@ fn find_crate_name_git(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<Sour
 }
 
 fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<SourceKind> {
-    // ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/cargo.toml  => ~/.cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/
+    //  ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml => ~/.cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/
 
     let v: Vec<&OsStr> = toml_path.iter().collect();
 
@@ -263,4 +263,80 @@ pub(crate) fn clear_unref(
         });
 
     Ok(())
+}
+
+#[cfg(test)]
+mod clitests {
+    use super::*;
+    //use crate::test_helpers::bin_path;
+    use pretty_assertions::assert_eq;
+    //use rustc_tools_util::*;
+    //use std::process::Command;
+
+    #[test]
+    fn sourcekind_inner() {
+        let sk_crate = SourceKind::Crate(PathBuf::from("abc"));
+        assert_eq!(sk_crate.inner(), PathBuf::from("abc"));
+
+        let sk_git = SourceKind::Git(PathBuf::from("def"));
+        assert_eq!(sk_git.inner(), PathBuf::from("def"));
+    }
+
+    #[test]
+    fn crate_name_git_some() {
+        let toml_path =
+            PathBuf::from(".cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/Cargo.toml");
+        let cargo_home = PathBuf::from(".cargo/");
+
+        let name = find_crate_name_git(&toml_path, &cargo_home);
+
+        assert_eq!(
+            name,
+            Some(SourceKind::Git(PathBuf::from(
+                ".cargo/git/checkouts/home-fb9469891e5cfbe6/3a6eccd/",
+            ))),
+        );
+    }
+
+    #[test]
+    fn crate_name_git_none() {
+        // pare failure should return None
+        let toml_path =
+            PathBuf::from(".cargo/git/failuretoparse/home-fb9469891e5cfbe6/3a6eccd/Cargo.toml");
+        let cargo_home = PathBuf::from(".cargo/");
+
+        let name = find_crate_name_git(&toml_path, &cargo_home);
+
+        assert_eq!(name, None);
+    }
+
+    #[test]
+    fn crate_name_crate_some() {
+        let toml_path = PathBuf::from(
+            ".cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml",
+        );
+        let cargo_home = PathBuf::from(".cargo/");
+
+        let name = find_crate_name_crate(&toml_path, &cargo_home);
+
+        assert_eq!(
+            name,
+            Some(SourceKind::Crate(PathBuf::from(
+                ".cargo/registry/src/github.com-1ecc6299db9ec823/winapi-0.3.8/",
+            ))),
+        );
+    }
+
+    #[test]
+    fn crate_name_crate_none() {
+        // parse failure should return None
+        let toml_path = PathBuf::from(
+            ".cargo/AAAAAAHH/src/github.com-1ecc6299db9ec823/winapi-0.3.8/Cargo.toml",
+        );
+        let cargo_home = PathBuf::from(".cargo/");
+
+        let name = find_crate_name_crate(&toml_path, &cargo_home);
+
+        assert_eq!(name, None,);
+    }
 }
