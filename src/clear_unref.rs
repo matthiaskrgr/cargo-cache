@@ -268,10 +268,7 @@ pub(crate) fn clear_unref(
 #[cfg(test)]
 mod clitests {
     use super::*;
-    //use crate::test_helpers::bin_path;
     use pretty_assertions::assert_eq;
-    //use rustc_tools_util::*;
-    //use std::process::Command;
 
     #[test]
     fn sourcekind_inner() {
