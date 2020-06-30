@@ -72,7 +72,7 @@ fn find_crate_name_crate(toml_path: &PathBuf, cargo_home: &PathBuf) -> Option<So
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(crate) fn clear_unref(
+pub(crate) fn clean_unref(
     cargo_cache_paths: &CargoCachePaths,
     manifest_path: &Option<&str>,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,

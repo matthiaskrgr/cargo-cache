@@ -69,7 +69,7 @@ cfg_if::cfg_if! {
         mod top_items;
         mod top_items_summary;
         mod date;
-        mod clear_unref;
+        mod clean_unref;
 
         // use
         use crate::cache::caches::{Cache, RegistrySuperCache};
@@ -83,7 +83,7 @@ cfg_if::cfg_if! {
         use crate::library::*;
         use crate::remove::*;
         use crate::top_items_summary::*;
-        use crate::clear_unref::*;
+        use crate::clean_unref::*;
     }
 }
 
@@ -160,15 +160,16 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    if let Some(clear_unref_cfg) = config.subcommand_matches("clean-unref") {
-        match clear_unref(
+qgit status
+    if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
+        match clean_unref(
             &cargo_cache,
-            &clear_unref_cfg.value_of("manifest-path"),
+            &clean_unref_cfg.value_of("manifest-path"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-            config.is_present("dry-run") || clear_unref_cfg.is_present("dry-run"),
+            config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
             &mut size_changed,
         ) {
             Ok(_) => {

@@ -19,12 +19,12 @@ use crate::test_helpers::bin_path;
 
 #[test]
 #[cfg_attr(feature = "offline_tests", ignore)]
-fn clear_unref() {
+fn clean_unref() {
     // this tests makes cargo create a new CARGO_HOME and tests the --clear-unref features
-    const CARGO_HOME: &str = "target/clear_unref_CARGO_HOME/";
+    const CARGO_HOME: &str = "target/clean_unref_CARGO_HOME/";
 
-    const INITIAL_TOML: &str = "tests/clear_unref/crate_to_populate_cache/Cargo.toml";
-    const ACTUAL_TOML: &str = "tests/clear_unref/actual_crate/Cargo.toml";
+    const INITIAL_TOML: &str = "tests/clean_unref/crate_to_populate_cache/Cargo.toml";
+    const ACTUAL_TOML: &str = "tests/clean_unref/actual_crate/Cargo.toml";
 
     // download some stuff into the new cargo home
     let command = Command::new("cargo")
@@ -66,7 +66,7 @@ fn clear_unref() {
     println!("ERR {:?}", stderr);
     println!("OUT {:?}", stdout);
 
-    // now call cargo-cache inside `actual_crate` and clear_unref with --dry run
+    // now call cargo-cache inside `actual_crate` and clean_unref with --dry run
 
     let cargo_cache_command = Command::new(bin_path())
         .arg("clean-unref")
@@ -87,7 +87,7 @@ fn clear_unref() {
     // make sure we would remove something
     assert!(stdout.matches("would remove").count() > 10);
 
-    // now call cargo-cache inside `actual_crate` and clear_unref WITHOUT --dry run
+    // now call cargo-cache inside `actual_crate` and clean_unref WITHOUT --dry run
 
     let cargo_cache_command = Command::new(bin_path())
         .arg("clean-unref")
@@ -140,7 +140,7 @@ fn clear_unref() {
     assert!(cargo_cache.is_ok(), "cargo cache failed to run");
     let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
     // we need to get the actual path to fake cargo home dir and make it an absolute path
-    let mut desired_output = String::from("Cargo cache .*clear_unref_CARGO_HOME.*:\n\n");
+    let mut desired_output = String::from("Cargo cache .*clean_unref_CARGO_HOME.*:\n\n");
     desired_output.push_str(
         "Total:                          .* MB
   0 installed binaries:             0  B
