@@ -130,7 +130,7 @@ fn clear_unref() {
     let rm_count = stdout.matches("would remove").count();
     assert!(
         // differences between linux and windows for some reason?
-        rm_count == 3 || rm_count == 4
+        rm_count == 3
     );
 
     // run cargo-cache
