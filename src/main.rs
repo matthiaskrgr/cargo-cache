@@ -500,7 +500,7 @@ fn main() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         }
 
-        if path.is_dir() && std::fs::remove_dir_all(&path).is_err() {
+        if path.is_dir() && remove_dir_all::remove_dir_all(&path).is_err() {
             eprintln!(
                 "Warning: failed to recursively remove directory \"{}\".",
                 path.display()
