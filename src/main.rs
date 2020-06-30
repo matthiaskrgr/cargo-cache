@@ -160,7 +160,6 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-qgit status
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
         match clean_unref(
             &cargo_cache,
