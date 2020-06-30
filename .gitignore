@@ -3,6 +3,3 @@
 **/*.rs.bk
 tests/cloudsmith_registry_test/helloworld/target/*
 tests/cloudsmith_registry_test/use_cloudsmith_dep/target/*
-#?
-tests/clear_unref/crate_to_populate_cache/Cargo.lock
-tests/clear_unref/actual_crate/Cargo.lock
