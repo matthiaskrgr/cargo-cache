@@ -20,7 +20,7 @@ use crate::test_helpers::bin_path;
 #[test]
 #[cfg_attr(feature = "offline_tests", ignore)]
 fn clean_unref() {
-    // this tests makes cargo create a new CARGO_HOME and tests the --clear-unref features
+    // this tests makes cargo create a new CARGO_HOME and tests the --clean-unref features
     const CARGO_HOME: &str = "target/clean_unref_CARGO_HOME/";
 
     const INITIAL_TOML: &str = "tests/clean_unref/crate_to_populate_cache/Cargo.toml";

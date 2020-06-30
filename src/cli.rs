@@ -162,7 +162,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let sccache_short = SubCommand::with_name("sc").about("gather stats on a local sccache cache");
     //</sccache>
 
-    //<clear-unref>
+    //<clean-unref>
     // from cargo
     //
     //fn arg_manifest_path(self) -> Self {
@@ -180,7 +180,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .about("Remove crates that are not referenced in a Cargo.toml from the cache")
         .arg(&manifest_path)
         .arg(&dry_run);
-    //</clear-unref>
+    //</clean-unref>
 
     // "version" subcommand which is also hidden, prints crate version
     let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
