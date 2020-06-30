@@ -57,6 +57,7 @@
 // for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "ci-autoclean"))] {
+        // mods
         mod cache;
         mod cli;
         mod commands;
@@ -68,6 +69,9 @@ cfg_if::cfg_if! {
         mod top_items;
         mod top_items_summary;
         mod date;
+        mod clean_unref;
+
+        // use
         use crate::cache::caches::{Cache, RegistrySuperCache};
         use clap::value_t;
         use std::process;
@@ -79,6 +83,7 @@ cfg_if::cfg_if! {
         use crate::library::*;
         use crate::remove::*;
         use crate::top_items_summary::*;
+        use crate::clean_unref::*;
     }
 }
 
@@ -154,6 +159,27 @@ fn main() {
 
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
+
+    if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
+        match clean_unref(
+            &cargo_cache,
+            &clean_unref_cfg.value_of("manifest-path"),
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_sources_caches,
+            config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
+            &mut size_changed,
+        ) {
+            Ok(_) => {
+                process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("{:?}", e);
+                process::exit(1);
+            }
+        }
+    }
 
     if config.is_present("top-cache-items") {
         let limit =
@@ -345,7 +371,7 @@ fn main() {
                     config.is_present("dry-run"),
                     &mut size_changed,
                     None,
-                    None,
+                    &DryRunMessage::Default,
                     Some(size.dir_size),
                 );
             }
@@ -474,7 +500,7 @@ fn main() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         }
 
-        if path.is_dir() && std::fs::remove_dir_all(&path).is_err() {
+        if path.is_dir() && remove_dir_all::remove_dir_all(&path).is_err() {
             eprintln!(
                 "Warning: failed to recursively remove directory \"{}\".",
                 path.display()

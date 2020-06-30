@@ -16,6 +16,14 @@ use crate::library::*;
 
 use humansize::{file_size_opts, FileSize};
 
+/// dry run message setting
+pub(crate) enum DryRunMessage<'a> {
+    Custom(&'a str), // use the message that is passed
+    Default,         // use the default message
+    #[allow(dead_code)]
+    None, // no message
+}
+
 pub(crate) fn rm_old_crates(
     amount_to_keep: u64,
     dry_run: bool,
@@ -65,7 +73,14 @@ pub(crate) fn rm_old_crates(
                     pkgver,
                     pkgpath.display()
                 );
-                remove_file(pkgpath, dry_run, size_changed, None, Some(dryrun_msg), None);
+                remove_file(
+                    pkgpath,
+                    dry_run,
+                    size_changed,
+                    None,
+                    &DryRunMessage::Custom(&dryrun_msg),
+                    None,
+                );
 
                 continue;
             }
@@ -87,7 +102,14 @@ pub(crate) fn rm_old_crates(
                         pkgver,
                         pkgpath.display()
                     );
-                    remove_file(pkgpath, dry_run, size_changed, None, Some(dryrun_msg), None);
+                    remove_file(
+                        pkgpath,
+                        dry_run,
+                        size_changed,
+                        None,
+                        &DryRunMessage::Custom(&dryrun_msg),
+                        None,
+                    );
                 }
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
@@ -116,18 +138,6 @@ pub(crate) fn remove_dir_via_cmdline(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Error> {
     // @TODO the passing of the cache is really a mess here... :(
-    fn rm(
-        dir: &PathBuf,
-        dry_run: bool,
-        size_changed: &mut bool,
-        total_size_from_cache: Option<u64>,
-    ) -> Result<(), Error> {
-        // remove a specified subdirectory from cargo cache
-        let msg = Some(format!("removing: '{}'", dir.display()));
-
-        remove_file(dir, dry_run, size_changed, msg, None, total_size_from_cache);
-        Ok(())
-    }
 
     let dirs_to_remove = components_from_groups(&directory)?;
 
@@ -142,13 +152,23 @@ pub(crate) fn remove_dir_via_cmdline(
             Component::RegistryCrateCache => {
                 let size = registry_pkgs_cache.total_size();
                 size_removed += size;
-                rm(&ccd.registry_pkg_cache, dry_run, size_changed, Some(size))?;
+                remove_with_default_message(
+                    &ccd.registry_pkg_cache,
+                    dry_run,
+                    size_changed,
+                    Some(size),
+                )?;
             }
 
             Component::RegistrySources => {
                 let size = registry_sources_caches.total_size();
                 size_removed += size;
-                rm(&ccd.registry_sources, dry_run, size_changed, Some(size))?;
+                remove_with_default_message(
+                    &ccd.registry_sources,
+                    dry_run,
+                    size_changed,
+                    Some(size),
+                )?;
             }
             Component::RegistryIndex => {
                 // sum the sizes of the separate indices
@@ -156,7 +176,7 @@ pub(crate) fn remove_dir_via_cmdline(
 
                 size_removed += size_of_all_indices;
                 // @TODO only remove specified index
-                rm(
+                remove_with_default_message(
                     &ccd.registry_index,
                     dry_run,
                     size_changed,
@@ -166,12 +186,17 @@ pub(crate) fn remove_dir_via_cmdline(
             Component::GitRepos => {
                 let size = checkouts_cache.total_size();
                 size_removed += size;
-                rm(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
+                remove_with_default_message(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
             }
             Component::GitDB => {
                 let size = bare_repos_cache.total_size();
                 size_removed += size;
-                rm(&ccd.git_repos_bare, dry_run, size_changed, Some(size))?;
+                remove_with_default_message(
+                    &ccd.git_repos_bare,
+                    dry_run,
+                    size_changed,
+                    Some(size),
+                )?;
             }
         }
     }
@@ -186,6 +211,28 @@ pub(crate) fn remove_dir_via_cmdline(
     Ok(())
 }
 
+/// remove a file with a default "removing: {file}" message
+pub(crate) fn remove_with_default_message(
+    dir: &PathBuf,
+    dry_run: bool,
+    size_changed: &mut bool,
+    total_size_from_cache: Option<u64>,
+) -> Result<(), Error> {
+    // remove a specified subdirectory from cargo cache
+    let msg = Some(format!("removing: '{}'", dir.display()));
+
+    remove_file(
+        dir,
+        dry_run,
+        size_changed,
+        msg,
+        &DryRunMessage::Default,
+        total_size_from_cache,
+    );
+    Ok(())
+}
+
+/// remove a file with a custom message
 pub(crate) fn remove_file(
     // path of the file to be deleted
     path: &PathBuf,
@@ -196,20 +243,33 @@ pub(crate) fn remove_file(
     // print a custom deletion message
     deletion_msg: Option<String>,
     // print a custom dryrun message
-    dry_run_msg: Option<String>,
+    dry_run_msg: &DryRunMessage<'_>,
     // size of the file according to cache
     total_size_from_cache: Option<u64>,
 ) {
     if dry_run {
-        if let Some(dr_msg) = dry_run_msg {
-            println!("{}", dr_msg)
-        } else if let Some(size) = total_size_from_cache {
-            let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
-            println!("dry-run: would remove: '{}' ({})", path.display(), size_hr);
-        } else {
-            println!("dry-run: would remove: '{}'", path.display());
+        match dry_run_msg {
+            DryRunMessage::Custom(msg) => {
+                println!("{}", msg);
+            }
+            DryRunMessage::Default => {
+                #[allow(clippy::single_match_else)]
+                match total_size_from_cache {
+                    Some(size) => {
+                        // print the size that is saved from the cache before removing
+                        let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
+                        println!("dry-run: would remove: '{}' ({})", path.display(), size_hr);
+                    }
+                    None => {
+                        // default case: print this message
+                        println!("dry-run: would remove: '{}'", path.display());
+                    }
+                }
+            }
+            DryRunMessage::None => {}
         }
     } else {
+        // no dry run
         // print deletion message if we have one
         if let Some(msg) = deletion_msg {
             println!("{}", msg);
@@ -221,13 +281,16 @@ pub(crate) fn remove_file(
             *size_changed = true;
         }
 
-        if path.is_dir() && fs::remove_dir_all(&path).is_err() {
-            eprintln!(
-                "Warning: failed to recursively remove directory \"{}\".",
-                path.display()
-            );
-        } else {
-            *size_changed = true;
+        if path.is_dir() {
+            if let Err(error) = remove_dir_all::remove_dir_all(&path) {
+                eprintln!(
+                    "Warning: failed to recursively remove directory \"{}\".",
+                    path.display()
+                );
+                eprintln!("error: {:?}", error);
+            } else {
+                *size_changed = true;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
 
 use std::path::PathBuf;
 
+// TODO: add remove() and remove_item()? methods
 pub(crate) trait Cache {
     // creates a new cache object
     fn new(path: PathBuf) -> Self;

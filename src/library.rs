@@ -88,6 +88,8 @@ pub(crate) enum Error {
     LocalNoTargetDir(PathBuf),
     // failed to parse date given to younger or older
     DateParseFailure(String, String),
+    // cargo metadata failed to parse a cargo manifest
+    UnparsableManifest(PathBuf, cargo_metadata::Error),
 }
 
 impl fmt::Display for Error {
@@ -179,6 +181,8 @@ impl fmt::Display for Error {
                 f, "ERROR failed to parse {} as date {}",
                 date, error
             ),
+            Self::UnparsableManifest(path, error) => write!(f,
+            "Failed to parse Cargo.toml at '{}': '{:?}'", path.display(), error),
         }
     }
 }
@@ -385,6 +389,18 @@ pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Compone
     mapped_dirs.dedup();
 
     Ok(mapped_dirs)
+}
+
+/// get the total size of a directory or a file
+pub(crate) fn size_of_path(path: &PathBuf) -> u64 {
+    // if the path is a directory, use cumulative_dir_size
+    if path.is_dir() {
+        cumulative_dir_size(path).dir_size
+    } else {
+        fs::metadata(&path)
+            .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
+            .len()
+    }
 }
 
 /// get the total size and number of files of a directory

@@ -1,0 +1,9 @@
+[package]
+name = "actual_crate"
+version = "0.1.0"
+authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
+
+[dependencies]
+# some packages that don't have any dependencies so we can know their exact sizes
+clippy_travis_test = { git =  "https://github.com/matthiaskrgr/clippy_travis_test"}
+rustc_tools_util = "0.2.0"

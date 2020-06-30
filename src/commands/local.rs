@@ -48,7 +48,7 @@ fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
 }
 
 /// start at the cwd, walk downwards and check if we encounter a Cargo.toml somewhere
-fn get_manifest() -> Result<PathBuf, Error> {
+pub(crate) fn get_manifest() -> Result<PathBuf, Error> {
     // get the cwd
     let mut cwd: PathBuf = if let Ok(cwd) = env::current_dir() {
         cwd
