@@ -12,6 +12,7 @@ This command helps minimizing the ci-cache of travis/azure-ci/github-actions etc
 
 Updated dependencies:
 	dirs: new
+	remove_dir_all: new
 ````
 
 ## Version 0.4.3 (79a2f8a)
