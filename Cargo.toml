@@ -13,7 +13,7 @@ build = "src/build.rs"
 edition = "2018"
 
 [features]
-default = ["cargo_metadata", "chrono", "clap", "dirs", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir", "remove_dir_all"]
+default = ["cargo_metadata", "chrono", "clap", "dirs", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir"]
 bench = [] # run benchmarks
 ci-autoclean = [] # minimal implementation that builds fast for CI
 offline_tests =  [] # only run tests that do not require internet connection
@@ -57,7 +57,7 @@ chrono = { version = "0.4.11", optional = true } # compare dates etc
 dirs = { version = "2.0.2", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = { version = "0.5.3", optional = true} # remove_dir_all on windows
+remove_dir_all = { version = "0.5.3" } # remove_dir_all on windows
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
