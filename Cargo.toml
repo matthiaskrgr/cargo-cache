@@ -59,6 +59,9 @@ dirs = { version = "2.0.2", optional = true } # get cache dirs to look for sccac
 # https://github.com/XAMPPRocky/remove_dir_all
 remove_dir_all = { version = "0.5.3" } # remove_dir_all on windows
 
+# https://github.com/steveklabnik/semver
+semver = "0.10.0" # parse version strings
+
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
 path-slash = "0.1.1" # normalize windows paths
