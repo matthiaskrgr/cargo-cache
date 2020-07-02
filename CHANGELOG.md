@@ -1,13 +1,15 @@
 ## Git
 ````
-Added "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows number of files last accessed on a given date: cargo cache sc
-    Files         Day
-    304    2020-05-15
-    1097   2020-05-16
-    1665   2020-05-17
-Added new clean-unref subcommand which removes all crates that are not referenced in the dependency-tree of a crate from the cache.
-By default it will check if it can find a Cargo.toml nearby, alternatively, you can pass the --manifest-path <path/to/Cargo.toml> to 
-specify a Cargo.toml.
+Added "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows the
+	number of files last accessed on a given date: cargo cache sc
+       Files         Day
+       304    2020-05-15
+       1097   2020-05-16
+       1665   2020-05-17
+Added new clean-unref subcommand which removes all crates that are not referenced in the 
+dependency-tree of a crate from the cache.
+By default it will check if it can find a Cargo.toml nearby, alternatively,
+you can pass the --manifest-path <path/to/Cargo.toml> to specify a Cargo.toml.
 This command helps minimizing the ci-cache of travis/azure-ci/github-actions etc.
 
 Updated dependencies:
