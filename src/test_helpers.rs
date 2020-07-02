@@ -11,24 +11,41 @@ use std::path::PathBuf;
 
 #[allow(dead_code)] // only used in tests
 pub(crate) fn bin_path() -> String {
+    let target_dir = cargo_metadata::MetadataCommand::new()
+        .exec()
+        .unwrap()
+        .target_directory;
+
     // check if we have a release or debug binary to run tests with
     // we need to take into account that linux and windows have different paths to the executable
     let path_release = if cfg!(windows) {
-        "target\\release\\cargo-cache.exe"
+        let mut td = target_dir.clone();
+        td.push("release");
+        td.push("cargo-cache.exe");
+        td
     } else {
-        "target/release/cargo-cache"
+        let mut td = target_dir.clone();
+        td.push("release");
+        td.push("cargo-cache");
+        td
     };
 
     let path_debug = if cfg!(windows) {
-        "target\\debug\\cargo-cache.exe"
+        let mut td = target_dir;
+        td.push("debug");
+        td.push("cargo-cache.exe");
+        td
     } else {
-        "target/debug/cargo-cache"
+        let mut td = target_dir;
+        td.push("debug");
+        td.push("cargo-cache");
+        td
     };
 
-    if PathBuf::from(path_release).is_file() {
-        String::from(path_release)
-    } else if PathBuf::from(path_debug).is_file() {
-        String::from(path_debug)
+    if path_release.is_file() {
+        path_release.display().to_string()
+    } else if path_debug.is_file() {
+        path_debug.display().to_string()
     } else {
         panic!("No cargo-cache executable found!");
     }
