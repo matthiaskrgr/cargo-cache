@@ -10,7 +10,7 @@ Added new clean-unref subcommand which removes all crates that are not reference
     dependency-tree of a crate from the cache.
     By default it will check if it can find a Cargo.toml nearby, alternatively,
     you can pass the --manifest-path <path/to/Cargo.toml> to specify a Cargo.toml.
-    This command helps minimizing the ci-cache of travis/azure-ci/github-actions etc.
+    This command helps minimizing the ci-cache of travis/azure-ci/github-actions etc. (#76)
 --keep-duplicates: fix parsing of packages with alpha/beta/pre versions (#81)
 
 Updated dependencies:
