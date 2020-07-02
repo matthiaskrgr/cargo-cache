@@ -24,6 +24,43 @@ pub(crate) enum DryRunMessage<'a> {
     None, // no message
 }
 
+fn parse_version(path: &PathBuf) -> Result<(String, String), Error> {
+    #[allow(clippy::single_match_else)]
+    let filename = match path.file_stem() {
+        Some(name) => name.to_str().unwrap().to_string(),
+        None => {
+            return Err(Error::MalformedPackageName(path.display().to_string()));
+        }
+    };
+
+    let mut name = Vec::new();
+    let mut version = Vec::new();
+    let mut found_version = false;
+
+    filename.split('-').for_each(|seg| {
+        let first_char = seg.chars().next();
+        if let Some(char) = first_char {
+            if char.is_numeric() {
+                // the first char of the segment is a number
+                // conclude that this segment is the version string
+                version.push(seg);
+                // if we have found the first version, everything afterwards will be version info
+                found_version = true;
+            } else if found_version {
+                version.push(seg);
+            } else {
+                // if char is not numeric
+                name.push(seg);
+            }
+        }
+    });
+
+    let name = name.join("-");
+    let version = version.join("-");
+
+    Ok((name, version))
+}
+
 pub(crate) fn rm_old_crates(
     amount_to_keep: u64,
     dry_run: bool,
@@ -46,19 +83,10 @@ pub(crate) fn rm_old_crates(
 
         let mut versions_of_this_package = 0;
         let mut last_pkgname = String::new();
+
         // iterate over all crates and extract name and version
         for pkgpath in &crate_list {
-            let path_end = match pkgpath.iter().last() {
-                Some(path_end) => path_end,
-                None => return Err(Error::MalformedPackageName(pkgpath.display().to_string())),
-            };
-
-            let mut vec = path_end.to_str().unwrap().split('-').collect::<Vec<&str>>();
-            let pkgver = match vec.pop() {
-                Some(pkgver) => pkgver,
-                None => return Err(Error::MalformedPackageName(pkgpath.display().to_string())),
-            };
-            let pkgname = vec.join("-");
+            let (pkgname, pkgver) = parse_version(pkgpath)?;
 
             if amount_to_keep == 0 {
                 removed_size += fs::metadata(pkgpath)
