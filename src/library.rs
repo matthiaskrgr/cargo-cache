@@ -666,6 +666,7 @@ pub(crate) fn print_size_changed_summary(
 mod libtests {
     use super::*;
 
+    use cargo_metadata;
     use pretty_assertions::assert_eq;
     use regex::Regex;
     use std::env;
@@ -724,20 +725,25 @@ mod libtests {
     #[allow(non_snake_case)]
     #[test]
     fn test_CargoCachePaths_paths() {
+        // create a new directory
+
         // get cargo target dir
-        let mut target_dir = std::env::current_dir().unwrap();
-        // note: this may fail if CARGO_TARGET_DIR is set
-        target_dir.push("target");
+        let target_dir = cargo_metadata::MetadataCommand::new()
+            .exec()
+            .unwrap()
+            .target_directory;
+
         let mut cargo_home = target_dir;
         cargo_home.push("cargo_home_cargo_cache_paths");
         // make sure this worked
         let CH_string = format!("{}", cargo_home.display());
+        // assert that cargo_home var is cargo-cache/target/cargo_home_cargo_cache_paths
         assert_path_end(
             &cargo_home,
             &["cargo-cache", "target", "cargo_home_cargo_cache_paths"],
         );
 
-        // create the directory
+        // create the directory: cargo-cache/target/cargo_home_cargo_cache_paths
         if !std::path::PathBuf::from(&CH_string).is_dir() {
             std::fs::DirBuilder::new().create(&CH_string).unwrap();
         }
@@ -785,8 +791,11 @@ mod libtests {
         // test --list-dirs output
 
         // get cargo target dir
-        let mut target_dir = std::env::current_dir().unwrap();
-        target_dir.push("target");
+        let target_dir = cargo_metadata::MetadataCommand::new()
+            .exec()
+            .unwrap()
+            .target_directory;
+
         let mut cargo_home = target_dir;
         cargo_home.push("cargo_home_cargo_cache_paths_print");
         //make sure this worked
