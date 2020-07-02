@@ -322,3 +322,25 @@ pub(crate) fn remove_file(
         }
     }
 }
+
+#[cfg(test)]
+mod libtests {
+    use super::*;
+
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_parse_version() {
+        let (name, version): (String, String) =
+            parse_version(&PathBuf::from("heim-runtime-0.1.0-beta.1.crate")).unwrap();
+
+        assert_eq!(name, "heim-runtime");
+        assert_eq!(version, "0.1.0-beta.1");
+
+        let (name, version): (String, String) =
+            parse_version(&PathBuf::from("cargo-cache-0.4.3.crate")).unwrap();
+
+        assert_eq!(name, "cargo-cache");
+        assert_eq!(version, "0.4.3");
+    }
+}
