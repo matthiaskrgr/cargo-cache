@@ -19,6 +19,7 @@ fn run_tests() {
     // we need this fake harness to make sure the two tests don't modify CARGO_HOME at the same time
     // which would be a race condition
     CARGO_HOME_is_nonexisting_dir();
+
     CARGO_HOME_is_empty();
 }
 
@@ -50,12 +51,15 @@ fn CARGO_HOME_is_empty() {
     // we will fall back to default "~/.cargo"
     let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", "").output();
     // make sure we failed
-    let _cmd = cargo_cache.unwrap();
+    #[allow(unused_variables)] // unused if offline_tests is not enabled
+    let cmd = cargo_cache.unwrap();
+
     // WARNING
     // this test incorrectly assumes that there always is a .cargo home.
     // When run in a sandboxed env, there might not be a cargo-home which we can fall back to
 
-    /*
+    #[cfg(feature = "offline_tests")]
+    {
         assert!(cmd.status.success(), "bad exit status!");
 
         // no stdout
@@ -66,5 +70,5 @@ fn CARGO_HOME_is_empty() {
         assert!(stderr.is_empty());
         let re = Regex::new(r"Cargo cache.*\.cargo.*:").unwrap();
         assert!(re.is_match(&stdout));
-    */
+    }
 }
