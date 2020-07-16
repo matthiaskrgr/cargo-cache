@@ -14,6 +14,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use chrono::prelude::*;
+use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 use crate::display::{format_2_row_table, TableLine};
@@ -93,7 +94,19 @@ pub(crate) fn sccache_stats() {
                 .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
-            TableLine::new(2, &count, &unique_date.access_date)
+            #[allow(clippy::filter_map)]
+            let total_size_bytes: u64 = files_sorted
+                .iter()
+                .filter(|file| file.access_date == unique_date.access_date)
+                .filter_map(|file| fs::metadata(&file.path).ok())
+                .map(|metadata| metadata.len())
+                .sum();
+
+            let size_human_readable = total_size_bytes.file_size(file_size_opts::DECIMAL).unwrap();
+
+            let count_and_size = format!("{}  {}", count, size_human_readable);
+
+            TableLine::new(2, &count_and_size, &unique_date.access_date)
         })
         .collect();
 
