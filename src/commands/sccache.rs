@@ -17,7 +17,7 @@ use chrono::prelude::*;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
-use crate::tables::{two_row_table, TableLine};
+use crate::tables::format_table;
 
 #[derive(Debug, Clone)]
 struct File {
@@ -83,7 +83,7 @@ pub(crate) fn sccache_stats() {
     };
 
     // extract the unique dates from the unique vec
-    let date_occurrences: Vec<TableLine> = unique_access_dates
+    let table_matrix: Vec<Vec<String>> = unique_access_dates
         .into_iter()
         // dates extracted, now..
         .map(|unique_date| {
@@ -104,16 +104,27 @@ pub(crate) fn sccache_stats() {
 
             let size_human_readable = total_size_bytes.file_size(file_size_opts::DECIMAL).unwrap();
 
-            let count_and_size = format!("{}  {}", count, size_human_readable);
-
-            TableLine::new(2, &count_and_size, &unique_date.access_date)
+            vec![
+                count.to_string(),
+                unique_date.access_date.to_string(),
+                size_human_readable,
+            ]
         })
         .collect();
 
-    let mut tab_columns: Vec<TableLine> = Vec::with_capacity(date_occurrences.len() + 1);
-    tab_columns.push(TableLine::new(2, &"Files".to_string(), &"Day".to_string()));
-    tab_columns.extend(date_occurrences);
+    // add column descriptions
+    let mut table_vec = Vec::with_capacity(table_matrix.len() + 1);
+    table_vec.push(vec![
+        "Files".to_string(),
+        "Day".to_string(),
+        "Total size".to_string(),
+    ]);
+    table_vec.extend(table_matrix);
 
-    let table = two_row_table(2, tab_columns, true);
+    //let mut tab_columns: Vec<TableLine> = Vec::with_capacity(date_occurrences.len() + 1);
+    //tab_columns.push(TableLine::new(2, &"Files".to_string(), &"Day".to_string()));
+    //tab_columns.extend(date_occurrences);
+
+    let table = format_table(&table_vec);
     print!("{}", table);
 }
