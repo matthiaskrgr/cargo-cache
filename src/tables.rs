@@ -126,6 +126,15 @@ pub(crate) fn two_row_table(
     table
 }
 
+/*
+structures the table as follows:
+ vec![
+    vec![line1_word1, line1_word2, line1_word3],
+    vec![line2_word1, line2_word2, line2_word3],
+    vec![line3_word1, line3_word2, line3_word3]
+]
+
+*/
 pub(crate) fn format_table(table: &[Vec<String>]) -> String {
     const SEPARATOR: &str = " ";
     let mut out = String::new();
@@ -245,6 +254,12 @@ mod format_table_tests {
             "wasdwasdwasd word word\noh           why  this\nAAAAAA            I don\'t get it\n",
         );
         // println!("{}", output);
+
+        /*
+        wasdwasdwasd word word
+        oh           why  this
+        AAAAAA            I don't get it
+         */
         assert_eq!(t, output);
     }
 }
