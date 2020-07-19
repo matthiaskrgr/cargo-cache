@@ -225,7 +225,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     }
 
     // add the formatted table to the output
-    stdout.push_str(&format_2_row_table(MIN_PADDING, lines, true));
+    stdout.push_str(&two_row_table(MIN_PADDING, lines, true));
     // and finally print it
     println!("{}", stdout);
     Ok(())

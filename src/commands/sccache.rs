@@ -17,7 +17,7 @@ use chrono::prelude::*;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
-use crate::tables::{format_2_row_table, TableLine};
+use crate::tables::{two_row_table, TableLine};
 
 #[derive(Debug, Clone)]
 struct File {
@@ -114,6 +114,6 @@ pub(crate) fn sccache_stats() {
     tab_columns.push(TableLine::new(2, &"Files".to_string(), &"Day".to_string()));
     tab_columns.extend(date_occurrences);
 
-    let table = format_2_row_table(2, tab_columns, true);
+    let table = two_row_table(2, tab_columns, true);
     print!("{}", table);
 }

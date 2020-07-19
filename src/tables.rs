@@ -43,7 +43,7 @@ impl TableLine {
 }
 
 /// creates a formatted 2 row table (String) from a `Vec` of `TableLines`
-pub(crate) fn format_2_row_table(
+pub(crate) fn two_row_table(
     // minimal padding between left and right column
     min_padding_middle: usize,
     // List of TableLine lines to format
