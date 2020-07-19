@@ -31,4 +31,3 @@ pub(crate) fn dir_exists(path: &PathBuf) -> bool {
         false
     }
 }
-
