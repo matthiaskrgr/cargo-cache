@@ -12,7 +12,9 @@ use std::path::PathBuf;
 
 use crate::cache::caches::Cache;
 use crate::cache::*;
-use crate::top_items::common::{dir_exists, format_table, FileDesc, Pair};
+use crate::top_items::common::{dir_exists,  FileDesc, Pair};
+use crate::tables::format_table;
+
 
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;

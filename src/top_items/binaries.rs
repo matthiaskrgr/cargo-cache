@@ -12,6 +12,7 @@ use std::path::PathBuf;
 
 use crate::cache::caches::Cache;
 use crate::cache::*;
+use crate::tables::format_table;
 use crate::top_items::common::*;
 
 use humansize::{file_size_opts, FileSize};
