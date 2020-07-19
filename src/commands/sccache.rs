@@ -25,7 +25,14 @@ struct File {
     access_date: NaiveDate,
 }
 
-// get the location of a local sccache path
+/// calculate percentage (what % is X of Y)
+fn percentage_of_as_string(fraction: u64, total: u64) -> String {
+    let percentage: f32 = (fraction * 100) as f32 / (total) as f32;
+
+    format!("{:.*} %", 2, percentage)
+}
+
+/// get the location of a local sccache path
 fn sccache_dir() -> Option<PathBuf> {
     if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
         Some(path)
@@ -82,6 +89,13 @@ pub(crate) fn sccache_stats() {
         unique
     };
 
+    #[allow(clippy::filter_map)]
+    let total_size_entire_cache: u64 = files_sorted
+        .iter()
+        .filter_map(|file| fs::metadata(&file.path).ok())
+        .map(|metadata| metadata.len())
+        .sum();
+
     // extract the unique dates from the unique vec
     let table_matrix: Vec<Vec<String>> = unique_access_dates
         .into_iter()
@@ -104,10 +118,13 @@ pub(crate) fn sccache_stats() {
 
             let size_human_readable = total_size_bytes.file_size(file_size_opts::DECIMAL).unwrap();
 
+            let percentage = percentage_of_as_string(total_size_bytes, total_size_entire_cache);
+
             vec![
                 count.to_string(),
                 unique_date.access_date.to_string(),
                 size_human_readable,
+                percentage,
             ]
         })
         .collect();
@@ -118,6 +135,7 @@ pub(crate) fn sccache_stats() {
         "Files".to_string(),
         "Day".to_string(),
         "Total size".to_string(),
+        "Percentage".to_string(),
     ]);
     table_vec.extend(table_matrix);
 
