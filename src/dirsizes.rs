@@ -17,8 +17,8 @@ use crate::cache::caches::RegistrySubCache;
 use crate::cache::caches::RegistrySuperCache;
 
 use crate::cache::*;
-use crate::display::*;
 use crate::library::*;
+use crate::tables::*;
 
 use humansize::{file_size_opts, FileSize};
 

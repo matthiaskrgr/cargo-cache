@@ -17,7 +17,7 @@ use chrono::prelude::*;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
-use crate::display::{format_2_row_table, TableLine};
+use crate::tables::{format_2_row_table, TableLine};
 
 #[derive(Debug, Clone)]
 struct File {

@@ -32,9 +32,9 @@ use cargo_metadata::MetadataCommand;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
-use crate::display::*;
 use crate::library;
 use crate::library::Error;
+use crate::tables::*;
 
 /// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
 /// If yes, return a path to it, if not, return None

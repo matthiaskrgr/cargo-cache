@@ -62,7 +62,7 @@ cfg_if::cfg_if! {
         mod cli;
         mod commands;
         mod dirsizes;
-        mod display;
+        mod tables;
         mod git;
         mod library;
         mod remove;
