@@ -66,7 +66,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
         table_matrix.push(vec![bininfo.name, size]);
     }
 
-    format_table(&table_matrix)
+    format_table(&table_matrix, 0)
 }
 
 #[inline] // only called in one place

@@ -216,7 +216,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
             total_size,
         ])
     }
-    format_table(&table_matrix)
+    format_table(&table_matrix, 0)
 }
 
 // registry cache

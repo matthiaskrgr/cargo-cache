@@ -27,6 +27,8 @@ struct File {
 
 /// calculate percentage (what % is X of Y)
 fn percentage_of_as_string(fraction: u64, total: u64) -> String {
+    // loss of precision is ok here since we trim down to 2 decimal places
+    #[allow(clippy::cast_precision_loss)]
     let percentage: f32 = (fraction * 100) as f32 / (total) as f32;
 
     format!("{:.*} %", 2, percentage)
@@ -139,10 +141,6 @@ pub(crate) fn sccache_stats() {
     ]);
     table_vec.extend(table_matrix);
 
-    //let mut tab_columns: Vec<TableLine> = Vec::with_capacity(date_occurrences.len() + 1);
-    //tab_columns.push(TableLine::new(2, &"Files".to_string(), &"Day".to_string()));
-    //tab_columns.extend(date_occurrences);
-
-    let table = format_table(&table_vec);
-    print!("{}", table);
+    let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
+    println!("{}", table.trim());
 }

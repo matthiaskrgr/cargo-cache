@@ -242,7 +242,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
         ]);
     }
 
-    format_table(&table_matrix)
+    format_table(&table_matrix, 0)
 }
 
 #[inline]

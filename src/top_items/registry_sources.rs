@@ -229,7 +229,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
             total_size,
         ]);
     }
-    format_table(&table_matrix)
+    format_table(&table_matrix, 0)
 }
 
 pub(crate) fn registry_source_stats(

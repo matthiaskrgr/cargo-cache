@@ -2,13 +2,12 @@
 ````
 Added "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows the
 	number of files last accessed on a given date: cargo cache sc
-Files Day        Total size Percentage
-1751  2020-07-15 738.84 MB  13.76 %
-2206  2020-07-16 1.23 GB    22.82 %
-3876  2020-07-17 1.67 GB    31.09 %
-1061  2020-07-18 727.39 MB  13.55 %
-2075  2020-07-19 972.26 MB  18.11 %
-55    2020-07-20 35.68 MB   0.66 %
+Files  Day         Size       Percentage
+2203   2020-07-16  1.21 GB    22.59 %
+3813   2020-07-17  1.63 GB    30.41 %
+1061   2020-07-18  727.39 MB  13.56 %
+1592   2020-07-19  831.35 MB  15.50 %
+1873   2020-07-20  962.11 MB  17.94 %
 Added new clean-unref subcommand which removes all crates that are not referenced in the 
     dependency-tree of a crate from the cache.
     By default it will check if it can find a Cargo.toml nearby, alternatively,

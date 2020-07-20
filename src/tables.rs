@@ -135,7 +135,7 @@ structures the table as follows:
 ]
 
 */
-pub(crate) fn format_table(table: &[Vec<String>]) -> String {
+pub(crate) fn format_table(table: &[Vec<String>], padding: usize) -> String {
     const SEPARATOR: &str = " ";
     let mut out = String::new();
 
@@ -165,10 +165,13 @@ pub(crate) fn format_table(table: &[Vec<String>]) -> String {
                 let diff = max_lengths[idx] - cell.len();
                 let mut cell_new = cell.clone();
                 cell_new.push_str(&" ".repeat(diff)); // pad the string
+                cell_new.push_str(&" ".repeat(padding));
                 new_row.push_str(&cell_new);
             } else {
                 // just add the new cell
-                new_row.push_str(cell);
+                let mut cell = cell.clone();
+                cell.push_str(&" ".repeat(padding));
+                new_row.push_str(&cell);
             }
             // add space between each cell
             new_row.push_str(SEPARATOR);
@@ -190,7 +193,7 @@ mod format_table_tests {
     #[test]
     fn empty() {
         let v = vec![Vec::new()];
-        let t = format_table(&v);
+        let t = format_table(&v, 0);
         let output = String::from("\n");
         assert_eq!(t, output);
     }
@@ -198,7 +201,7 @@ mod format_table_tests {
     #[test]
     fn one_cell() {
         let v = vec![vec!["hello".into()]];
-        let t = format_table(&v);
+        let t = format_table(&v, 0);
         let output = String::from("hello\n");
         assert_eq!(t, output);
     }
@@ -211,7 +214,7 @@ mod format_table_tests {
             "shrt".into(),
             "very long perhaps a few words".into(),
         ]];
-        let t = format_table(&v);
+        let t = format_table(&v, 0);
         let output = String::from("hello a shrt very long perhaps a few words\n");
         assert_eq!(t, output);
     }
@@ -224,7 +227,7 @@ mod format_table_tests {
             vec!["shrt".into()],
             vec!["very long perhaps a few words".into()],
         ];
-        let t = format_table(&v);
+        let t = format_table(&v, 0);
         let output = String::from("hello\na\nshrt\nvery long perhaps a few words\n");
         assert_eq!(t, output);
     }
@@ -249,7 +252,7 @@ mod format_table_tests {
                 String::from("I don't get it"),
             ],
         ];
-        let t = format_table(&v);
+        let t = format_table(&v, 0);
         let output = String::from(
             "wasdwasdwasd word word\noh           why  this\nAAAAAA            I don\'t get it\n",
         );
