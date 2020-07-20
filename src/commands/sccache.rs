@@ -134,7 +134,7 @@ pub(crate) fn sccache_stats() {
     table_vec.push(vec![
         "Files".to_string(),
         "Day".to_string(),
-        "Total size".to_string(),
+        "Size".to_string(),
         "Percentage".to_string(),
     ]);
     table_vec.extend(table_matrix);
