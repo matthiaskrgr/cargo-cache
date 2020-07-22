@@ -98,6 +98,8 @@ pub(crate) fn sccache_stats() {
         .map(|metadata| metadata.len())
         .sum();
 
+    let mut total_size: u64 = 0;
+
     // extract the unique dates from the unique vec
     let table_matrix: Vec<Vec<String>> = unique_access_dates
         .into_iter()
@@ -118,6 +120,9 @@ pub(crate) fn sccache_stats() {
                 .map(|metadata| metadata.len())
                 .sum();
 
+            // calculate total file size sum for the summary
+            total_size += total_size_bytes;
+
             let size_human_readable = total_size_bytes.file_size(file_size_opts::DECIMAL).unwrap();
 
             let percentage = percentage_of_as_string(total_size_bytes, total_size_entire_cache);
@@ -132,7 +137,8 @@ pub(crate) fn sccache_stats() {
         .collect();
 
     // add column descriptions
-    let mut table_vec = Vec::with_capacity(table_matrix.len() + 1);
+    let mut table_vec =
+        Vec::with_capacity(table_matrix.len() + 2 /* header column + summary */);
     table_vec.push(vec![
         "Files".to_string(),
         "Day".to_string(),
@@ -141,6 +147,33 @@ pub(crate) fn sccache_stats() {
     ]);
     table_vec.extend(table_matrix);
 
+    // add a final summary
+    // newline
+    table_vec.push(vec![
+        String::new(),
+        String::new(),
+        String::new(),
+        String::new(),
+    ]);
+    // Total:
+    table_vec.push(vec![
+        String::from("Total"),
+        String::new(),
+        String::new(),
+        String::new(),
+    ]);
+
+    let number_of_files = files_sorted.len();
+    // summary
+    table_vec.push(vec![
+        number_of_files.to_string(),
+        String::new(),
+        total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+        "100 %".into(),
+    ]);
+
+    // generate the table and print it
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
-    println!("{}", table.trim());
+    let table_trimmed = table.trim();
+    println!("{}", table_trimmed);
 }
