@@ -119,8 +119,15 @@ fn main() {
     };
 
     if config.is_present("sc") || config.is_present("sccache") {
-        sccache::sccache_stats();
-        process::exit(0);
+        match sccache::sccache_stats() {
+            Ok(()) => {
+                process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("{}", e);
+                process::exit(1);
+            }
+        }
     }
 
     // indicates if size changed and whether we should print a before/after size diff

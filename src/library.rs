@@ -90,6 +90,8 @@ pub(crate) enum Error {
     DateParseFailure(String, String),
     // cargo metadata failed to parse a cargo manifest
     UnparsableManifest(PathBuf, cargo_metadata::Error),
+    // could not find sccache cache dir
+    NoSccacheDir,
 }
 
 impl fmt::Display for Error {
@@ -183,6 +185,8 @@ impl fmt::Display for Error {
             ),
             Self::UnparsableManifest(path, error) => write!(f,
             "Failed to parse Cargo.toml at '{}': '{:?}'", path.display(), error),
+            Self::NoSccacheDir => write!(f,
+                "Could not find sccache cache directory at ~/.cache/sccache or ${{SCCACHE_DIR}}"),
         }
     }
 }

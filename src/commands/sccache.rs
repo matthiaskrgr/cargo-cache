@@ -17,6 +17,7 @@ use chrono::prelude::*;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
+use crate::library;
 use crate::tables::format_table;
 
 #[derive(Debug, Clone)]
@@ -35,26 +36,24 @@ fn percentage_of_as_string(fraction: u64, total: u64) -> String {
 }
 
 /// get the location of a local sccache path
-fn sccache_dir() -> Option<PathBuf> {
+fn sccache_dir() -> Result<PathBuf, library::Error> {
     if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
-        Some(path)
+        Ok(path)
     } else {
         // if SCCACHE_DIR variable is not present, get the cache dir from "dirs" crate
         let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
 
         if let Some(cache_dir) = cache_dir.as_mut() {
             cache_dir.push("sccache");
-            Some(cache_dir.to_path_buf())
+            Ok(cache_dir.to_path_buf())
         } else {
-            cache_dir
+            Err(library::Error::NoSccacheDir)
         }
     }
 }
 
-pub(crate) fn sccache_stats() {
-    let sccache_path: PathBuf = sccache_dir()
-        .expect("Failed to get a valid sccache cache dir such as \"~/.cache/sccache\"");
-    //@TODO ^ turn this into a proper error message ^ !
+pub(crate) fn sccache_stats() -> Result<(), library::Error> {
+    let sccache_path: PathBuf = sccache_dir()?;
 
     // of all the files inside the sccache cache, gather last access time and path
     let files = WalkDir::new(sccache_path.display().to_string())
@@ -176,4 +175,5 @@ pub(crate) fn sccache_stats() {
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
     let table_trimmed = table.trim();
     println!("{}", table_trimmed);
+    Ok(())
 }
