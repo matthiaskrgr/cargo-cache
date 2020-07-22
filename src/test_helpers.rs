@@ -67,3 +67,28 @@ pub(crate) fn assert_path_end(path: &PathBuf, wanted_vector: &[&str]) {
 
     assert_eq!(is, wanted);
 }
+
+#[allow(dead_code)] // only used in tests
+pub(crate) fn is_nixos() -> bool {
+    let os_rel = PathBuf::from("/etc/os-release");
+
+    if os_rel.is_file() {
+        if let Ok(file_content) = std::fs::read_to_string(os_rel) {
+            let mut lines = file_content.lines();
+            // get the second line:
+
+            /*
+            NAME=NixOS
+            ID=nixos
+            VERSION="20.09pre-git (Nightingale)"
+            ...
+            https://github.com/matthiaskrgr/cargo-cache/issues/84#issuecomment-662708610
+            */
+            if Some("ID=nixos") == lines.nth(1) {
+                return true;
+            }
+        }
+    }
+
+    false
+}
