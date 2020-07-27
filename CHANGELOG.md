@@ -16,6 +16,7 @@ Added new clean-unref subcommand which removes all crates that are not reference
 --keep-duplicates: fix parsing of packages with alpha/beta/pre versions (#81)
 
 Updated dependencies:
+	cargo-metadata: 0.10.0 -> 0.11.0
 	dirs: new
 	remove_dir_all: new
 ````
