@@ -53,6 +53,7 @@
 // #![allow(clippy::redundant_pub_crate)] // conflicts with unreachable_pub
 #![allow(clippy::too_many_lines, clippy::unused_self)] // I don't care
 #![allow(clippy::wildcard_imports)] // breaks code, false positives
+#![allow(clippy::option_if_let_else)] // too pedantic, not that useful...
 
 // for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {
