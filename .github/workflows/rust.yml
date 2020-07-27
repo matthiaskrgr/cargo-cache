@@ -191,11 +191,11 @@ jobs:
           override: true
           profile: default
       - name: clippy all targets all features
-        run: cargo clippy --all-targets --all-features
+        run: cargo clippy --all-targets --all-features -- -Dwarnings
       - name: clippy ci_autoclean
-        run: cargo clippy --no-default-features --features ci-autoclean
+        run: cargo clippy --no-default-features --features ci-autoclean -- -Dwarnings
       - name: clippy default features
-        run: cargo clippy --all-targets --features default
+        run: cargo clippy --all-targets --features default -- -Dwarnings
   # make sure code formatting is consistent
   rustfmt:
     runs-on: ubuntu-latest
