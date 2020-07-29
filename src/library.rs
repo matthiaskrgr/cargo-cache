@@ -666,7 +666,6 @@ pub(crate) fn print_size_changed_summary(
 mod libtests {
     use super::*;
 
-    use cargo_metadata;
     use pretty_assertions::assert_eq;
     use regex::Regex;
     use std::env;
