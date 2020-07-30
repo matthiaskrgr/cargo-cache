@@ -162,7 +162,7 @@ impl fmt::Display for Error {
             Self::NoCWD => write!(f, "Failed to find current working directory!",),
             Self::NoCargoManifest(dir) => write!(
                 f,
-                "Failed to Cargo.toml manifest in {} or upwards.",
+                "Failed to Cargo.toml manifest in {} or downwards.",
                 dir.display()
             ),
             Self::QueryRegexFailedParsing(regex) => write!(

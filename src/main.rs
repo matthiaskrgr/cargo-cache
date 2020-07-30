@@ -183,7 +183,7 @@ fn main() {
                 process::exit(0);
             }
             Err(e) => {
-                eprintln!("{:?}", e);
+                eprintln!("{}", e.to_string());
                 process::exit(1);
             }
         }
