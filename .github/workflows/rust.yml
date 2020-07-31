@@ -93,6 +93,11 @@ jobs:
         run: cargo build --verbose --release
         if: matrix.release
 
+      #failure
+      - name: post failure
+        run: find target/spurious_files_test/
+        if: ${{ failure() }}
+
       # run tests
       - name: test
         run: cargo test --verbose --all -- --nocapture
