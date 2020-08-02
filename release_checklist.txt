@@ -10,7 +10,7 @@ cargo clean
 cargo build --release -Ztimings --all-targets --all-features
 #
 codespell -L mut,crate src tests -i 3 -w
-cargo rustdoc --open -- --document-private-items
+cargo rustdoc --open
 update dependencies
 cargo check
 cargo build
