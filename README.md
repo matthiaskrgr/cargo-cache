@@ -20,6 +20,8 @@ Display information on the cargo cache (`~/.cargo/` or `$CARGO_HOME`). Optional 
 * alternative registries supported
 * remove files older or younger than X (`--remove-if-{older,younger}-than`)
 * builds and runs on `stable`, `beta` and `nightly` channel
+* purge cache entries not unused to build a specified crate (`cargo cache clean-unref`)
+* print size stats on a local sccache build cache  (`cargo cache sc`)
 
 #### Installation:
 ```cargo install cargo-cache```
