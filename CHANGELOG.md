@@ -1,3 +1,8 @@
+## Git
+````
+
+````
+
 ## Version 0.5.0
 ````
 Added "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows the
