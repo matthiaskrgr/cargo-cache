@@ -44,7 +44,11 @@ fn sccache_dir() -> Result<PathBuf, library::Error> {
         let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
 
         if let Some(cache_dir) = cache_dir.as_mut() {
-            cache_dir.push("sccache");
+            if cfg!(target_os = "macos") {
+                cache_dir.push("Mozilla.sccache");
+            } else {
+                cache_dir.push("sccache");
+            }
             Ok(cache_dir.to_path_buf())
         } else {
             Err(library::Error::NoSccacheDir)
