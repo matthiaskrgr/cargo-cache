@@ -1,5 +1,6 @@
 ## Git
 ````
+Fix "sccache" subcommand not finding sccache cache dir on macos (#87)
 
 ````
 
