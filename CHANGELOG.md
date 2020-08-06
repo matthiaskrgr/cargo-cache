@@ -1,10 +1,15 @@
-## Version 0.5.1
+## Git
+````
+
+````
+
+## Version 0.5.1 (bb1b58e)
 ````
 Fix "sccache" subcommand not finding sccache cache dir on macos (#87)
 
 ````
 
-## Version 0.5.0
+## Version 0.5.0 (b0af676)
 ````
 Added "scache"/"sc" subcommand which prints a summary for a local(!) sccache cache and shows the
 	number of files last accessed on a given date: cargo cache sc
