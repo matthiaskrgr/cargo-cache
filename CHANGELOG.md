@@ -1,4 +1,4 @@
-## Git
+## Version 0.5.1
 ````
 Fix "sccache" subcommand not finding sccache cache dir on macos (#87)
 

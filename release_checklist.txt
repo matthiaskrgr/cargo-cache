@@ -32,7 +32,7 @@ git log `git tag | tail -n1`..HEAD
 make sure changelog is up to date ^cmd
 make sure readme is up to date ( check --help extract in readme!)
 make sure CI catches up and everything is green
-update version
+update version / Cargo.toml Cargo.lock CHANGELOG.md
 write release notes
 cargo publish --dry-run
 cargo publish
