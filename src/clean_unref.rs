@@ -201,14 +201,9 @@ pub(crate) fn clean_unref(
         });
 
     // extract the paths from the SouceKinds
-    let required_crates = required_crates
-        .into_iter()
-        .map(SourceKind::inner)
-        .collect::<Vec<PathBuf>>();
-    let required_git_repos = required_git_repos
-        .into_iter()
-        .map(SourceKind::inner)
-        .collect::<Vec<PathBuf>>();
+    let mut required_crates = required_crates.into_iter().map(SourceKind::inner);
+
+    let mut required_git_repos = required_git_repos.into_iter().map(SourceKind::inner);
     // for the bare_repos_cache and registry_package_cache,
     // remove all items but the ones that are referenced
 
@@ -229,7 +224,7 @@ pub(crate) fn clean_unref(
             // in the iterator, only keep crates that are not contained in
             // our dependency list and remove them
 
-            !required_git_repos.contains(repo_in_cache))
+            !required_git_repos.any(|repo| repo == **repo_in_cache))
         .for_each(|repo| {
             /* remove the repo */
             remove_file(
@@ -249,7 +244,7 @@ pub(crate) fn clean_unref(
             // in the iterator, only keep crates that are not contained in
             // our dependency list and remove them
 
-            !required_crates.contains(crate_in_cache))
+            !required_crates.any(|repo| &repo == **crate_in_cache))
         .for_each(|krate| {
             /* remove the crate */
             remove_file(
