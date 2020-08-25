@@ -93,7 +93,7 @@ fn remove_dirs() {
         let copy_options = dir::CopyOptions::new();
         let source = cargo_home_src.clone();
         println!("SOURCE: {:?}, DEST: {:?}", source, tmp_cargo_home);
-        fs_extra::copy_items(&vec![source], &tmp_cargo_home, &copy_options).unwrap();
+        fs_extra::copy_items(&[source], &tmp_cargo_home, &copy_options).unwrap();
         // run cargo cache and --rm-dir the cache and make sure cargo cache does not crash
 
         let size_before = dir_size(&PathBuf::from(&dir));
