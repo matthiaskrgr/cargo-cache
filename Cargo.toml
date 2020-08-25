@@ -57,7 +57,7 @@ chrono = { version = "0.4.11", optional = true } # compare dates etc
 dirs = { version = "3.0.1", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = { version = "0.5.3" } # remove_dir_all on windows
+remove_dir_all = { version = "0.6.0" } # remove_dir_all on windows
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash

@@ -87,7 +87,7 @@ dependencies = [
  "pretty_assertions",
  "rayon",
  "regex",
- "remove_dir_all",
+ "remove_dir_all 0.6.0",
  "rustc_tools_util",
  "tempfile",
  "walkdir",
@@ -595,6 +595,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "remove_dir_all"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f43c8c593a759eb8eae137a1ad7b9ed881453a942ac3ce58b87b6e5c2364779"
+dependencies = [
+ "log",
+ "num_cpus",
+ "rayon",
+ "winapi",
+]
+
+[[package]]
 name = "rust-argon2"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -707,7 +719,7 @@ dependencies = [
  "libc",
  "rand",
  "redox_syscall",
- "remove_dir_all",
+ "remove_dir_all 0.5.3",
  "winapi",
 ]
 

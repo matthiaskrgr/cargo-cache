@@ -1,6 +1,8 @@
 ## Git
 ````
 
+Updated dependencies:
+	remove_dir_all: 0.5.3 -> 0.6.0
 ````
 
 ## Version 0.5.1 (bb1b58e)
