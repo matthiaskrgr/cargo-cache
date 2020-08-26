@@ -471,7 +471,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
         ));
     };
 
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&format!(
         "Total cache size: {}\n\n",
@@ -479,7 +479,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     ));
 
     strn.push_str(&c.bin_dir.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\t{} binaries installed in binary directory, total size: {}\n",
         s.numb_bins(),
@@ -489,10 +489,10 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     ));
     strn.push_str("\tThese are the binaries installed via 'cargo install'.\n");
     strn.push_str("\tUse 'cargo uninstall' to remove binaries if needed.\n");
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&c.registry.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\tRegistry root dir, size: {}\n",
         s.total_reg_size()
@@ -500,10 +500,10 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
             .unwrap()
     ));
     strn.push_str("\tCrate registries are stored here.\n");
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&c.registry_index.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\tRegistry index, size: {}\n",
         s.total_reg_index_size()
@@ -513,11 +513,11 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str("\tA git repo holding information on what crates are available.\n");
     strn.push_str("\tWill be recloned as needed.\n");
 
-    strn.push_str("\n");
+    strn.push('\n');
 
     // source archives are extracted here, will be reextracted from the downloaded source if removed
     strn.push_str(&c.registry_pkg_cache.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\tCrate source package archive, size: {}\n",
         s.total_reg_cache_size()
@@ -527,10 +527,10 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
 
     strn.push_str("\tCrates source packages of the registries are downloaded into this folder.\n");
     strn.push_str("\tThey will be redownloaded as needed.\n");
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&c.registry_sources.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&format!(
         "\tCrate sources, size: {}\n",
@@ -540,10 +540,10 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     ));
     strn.push_str("\tSource archives are extracted into this dir.\n");
     strn.push_str("\tThey will be reextracted from the package archive as needed.\n");
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&c.git_repos_bare.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\tGit database, size: {}\n",
         s.total_git_repos_bare_size()
@@ -552,10 +552,10 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     ));
     strn.push_str("\tBare repos of git dependencies are stored here.\n");
     strn.push_str("\tRemoved git repositories will be recloned as needed.\n");
-    strn.push_str("\n");
+    strn.push('\n');
 
     strn.push_str(&c.git_checkouts.display().to_string());
-    strn.push_str("\n");
+    strn.push('\n');
     strn.push_str(&format!(
         "\tGit repo checkouts, size: {}\n",
         s.total_git_chk_size()

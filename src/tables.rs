@@ -120,7 +120,7 @@ pub(crate) fn two_row_table(
                 + line.right_column.len());
         table.push_str(&" ".repeat(min_padding_middle + spaces));
         table.push_str(&line.right_column);
-        table.push_str("\n");
+        table.push('\n');
     }
 
     table
@@ -177,7 +177,7 @@ pub(crate) fn format_table(table: &[Vec<String>], padding: usize) -> String {
             new_row.push_str(SEPARATOR);
         }
         let mut row = new_row.trim().to_string();
-        row.push_str("\n");
+        row.push('\n');
         out.push_str(&row);
         // move on to the next cell
     }
