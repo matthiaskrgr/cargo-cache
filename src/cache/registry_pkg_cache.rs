@@ -144,11 +144,13 @@ impl RegistrySubCache for RegistryPkgCache {
     }
 
     fn items(&mut self) -> &[PathBuf] {
-        todo!()
+        // we can use files() here
+        self.files()
     }
 
     fn number_of_items(&mut self) -> usize {
-        todo!()
+        // we can use number_of_files() here
+        self.number_of_files()
     }
 }
 /// holds several `RegistryPkgCaches` (supercache)
