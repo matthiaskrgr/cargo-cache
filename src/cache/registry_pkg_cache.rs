@@ -142,6 +142,14 @@ impl RegistrySubCache for RegistryPkgCache {
         self.files.sort();
         self.files()
     }
+
+    fn items(&mut self) -> &[PathBuf] {
+        todo!()
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        todo!()
+    }
 }
 /// holds several `RegistryPkgCaches` (supercache)
 pub(crate) struct RegistryPkgCaches {

@@ -111,6 +111,14 @@ impl Cache for GitCheckoutCache {
         self.files.sort();
         self.files()
     }
+
+    fn items(&mut self) -> &[PathBuf] {
+        todo!()
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        todo!()
+    }
 }
 
 impl GitCheckoutCache {

@@ -103,4 +103,13 @@ impl Cache for BinaryCache {
         self.files.sort();
         self.files()
     }
+
+    fn items(&mut self) -> &[PathBuf] {
+        // shell out to files() here
+        self.files()
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        self.files().len()
+    }
 }

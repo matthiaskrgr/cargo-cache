@@ -138,6 +138,14 @@ impl RegistrySubCache for RegistrySourceCache {
             }
         }
     }
+
+    fn items(&mut self) -> &[PathBuf] {
+        todo!()
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        todo!()
+    }
 }
 
 impl RegistrySourceCache {
@@ -274,9 +282,12 @@ impl RegistrySuperCache for RegistrySourceCaches {
             total_size
         }
     }
+
+    /// number of caches this supercache holds, should be equal to the number of registries
     fn number_of_subcaches(&mut self) -> usize {
         self.caches.len()
     }
+
     fn total_number_of_files(&mut self) -> usize {
         if let Some(number) = self.total_number_of_files {
             number
