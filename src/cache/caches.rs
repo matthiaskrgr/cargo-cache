@@ -56,7 +56,7 @@ pub(crate) trait RegistrySuperCache {
     /// invalidates all contained subcaches
     fn invalidate(&mut self);
 
-    /// returns a list of subcaches, (items that impls RegistrySubCache trait)
+    /// returns a list of subcaches, (items that impl `RegistrySubCache` trait)
     fn caches(&mut self) -> &mut Vec<Self::SubCache>;
 
     /// total size of the cache
