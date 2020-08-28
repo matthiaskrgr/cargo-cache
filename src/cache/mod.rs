@@ -9,8 +9,8 @@
 
 pub(crate) mod bin;
 pub(crate) mod caches;
+pub(crate) mod git_bare_repos;
 pub(crate) mod git_checkouts;
-pub(crate) mod git_repos_bare;
 pub(crate) mod registry_index;
 pub(crate) mod registry_pkg_cache;
 pub(crate) mod registry_sources;

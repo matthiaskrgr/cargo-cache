@@ -160,7 +160,7 @@ pub(crate) fn remove_dir_via_cmdline(
     ccd: &CargoCachePaths,
     size_changed: &mut bool,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_index_caches: &mut registry_index::RegistryIndicesCache,
     registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,

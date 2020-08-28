@@ -627,7 +627,7 @@ pub(crate) fn print_size_changed_summary(
     cargo_cache: &CargoCachePaths,
     mut bin_cache: &mut bin::BinaryCache,
     mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
     mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,

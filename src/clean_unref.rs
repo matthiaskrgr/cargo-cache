@@ -76,7 +76,7 @@ pub(crate) fn clean_unref(
     cargo_cache_paths: &CargoCachePaths,
     manifest_path: &Option<&str>,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,

@@ -10,8 +10,8 @@
 use crate::cache::*;
 use crate::library::CargoCachePaths;
 use crate::top_items::binaries::*;
+use crate::top_items::git_bare_repos::*;
 use crate::top_items::git_checkouts::*;
-use crate::top_items::git_repos_bare::*;
 use crate::top_items::registry_pkg_cache::*;
 use crate::top_items::registry_sources::*;
 
@@ -21,7 +21,7 @@ pub(crate) fn get_top_crates(
     ccd: &CargoCachePaths,
     mut bin_cache: &mut bin::BinaryCache,
     mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> String {

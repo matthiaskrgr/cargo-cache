@@ -93,7 +93,7 @@ impl RepoInfo {
     }
 }
 
-fn file_desc_from_path(bare_repos_cache: &mut git_repos_bare::GitRepoCache) -> Vec<FileDesc> {
+fn file_desc_from_path(bare_repos_cache: &mut git_bare_repos::GitRepoCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     bare_repos_cache
         .items_sorted() // bad
@@ -235,7 +235,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
 pub(crate) fn git_repos_bare_stats(
     path: &PathBuf,
     limit: u32,
-    mut bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
 ) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)

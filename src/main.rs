@@ -153,7 +153,7 @@ fn main() {
 
     let mut bin_cache = bin::BinaryCache::new(p.bin_dir);
     let mut checkouts_cache = git_checkouts::GitCheckoutCache::new(p.git_checkouts);
-    let mut bare_repos_cache = git_repos_bare::GitRepoCache::new(p.git_repos_bare);
+    let mut bare_repos_cache = git_bare_repos::GitRepoCache::new(p.git_repos_bare);
 
     let mut registry_pkgs_cache =
         registry_pkg_cache::RegistryPkgCaches::new(p.registry_pkg_cache.clone());

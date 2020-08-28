@@ -132,7 +132,7 @@ fn filter_files_by_date<'a>(
 pub(crate) fn remove_files_by_dates(
     // we need to know which part of the cargo-cache we need to clear out!
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
     arg_younger: &Option<&str>,

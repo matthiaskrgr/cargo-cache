@@ -146,7 +146,7 @@ pub(crate) fn run_query(
     query_config: &ArgMatches<'_>,
     bin_cache: &mut bin::BinaryCache,
     checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Error> {
