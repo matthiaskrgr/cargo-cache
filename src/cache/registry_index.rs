@@ -146,12 +146,19 @@ impl RegistrySubCache for RegistryIndex {
         self.files()
     }
 
+    // note: it does not really make sense to have
+    // items()
+    // and
+    // number_of_items()
+    // here since the registry index does not contain any items besides "files"
+    // and these are already covered
     fn items(&mut self) -> &[PathBuf] {
-        todo!()
+        &[]
     }
 
+    // see above
     fn number_of_items(&mut self) -> usize {
-        todo!()
+        0
     }
 }
 
