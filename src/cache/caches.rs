@@ -11,23 +11,30 @@ use std::path::PathBuf;
 
 // TODO: add remove() and remove_item()? methods
 pub(crate) trait Cache {
-    // creates a new cache object
+    /// creates a new cache object
     fn new(path: PathBuf) -> Self;
-    // returns reference to the root path of the cache
+
+    /// returns reference to the root path of the cache
     fn path(&self) -> &PathBuf;
-    // checks if the path to the directory of an object exists
+
+    /// checks if the path to the directory of an object exists
     fn path_exists(&self) -> bool {
         self.path().exists()
     }
-    // invalidates the cache
+
+    /// invalidates the cache
     fn invalidate(&mut self);
-    // total size of the cache
+
+    /// total size of the cache
     fn total_size(&mut self) -> u64;
-    // list of files of the cache
+
+    /// list of files of the cache
     fn files(&mut self) -> &[PathBuf];
-    // list of files of the cache, sorted
+
+    /// list of files of the cache, sorted
     fn files_sorted(&mut self) -> &[PathBuf];
-    // the cache is known to be empty because it was just cleared / the directory removed
+
+    /// the cache is known to be empty because it was just cleared / the directory removed
     fn known_to_be_empty(&mut self);
 }
 
@@ -38,18 +45,25 @@ pub(crate) trait RegistrySuperCache {
 
     /// creates a new supercache object
     fn new(path: PathBuf) -> Self;
+
     /// invalidates all contained subcaches
     fn invalidate(&mut self);
-    // returns a list of subcaches, (items that impls RegistrySubCache trait)
+
+    /// returns a list of subcaches, (items that impls RegistrySubCache trait)
     fn caches(&mut self) -> &mut Vec<Self::SubCache>;
+
     /// total size of the cache
     fn files(&mut self) -> Vec<PathBuf>;
+
     /// list of files of the cache, sorted
     fn files_sorted(&mut self) -> Vec<PathBuf>;
+
     /// number of files in total
     fn total_size(&mut self) -> u64;
+
     /// number of subcaches
     fn number_of_items(&mut self) -> usize;
+
     /// total number of files over all subcaches
     fn total_number_of_files(&mut self) -> usize;
 }
@@ -57,25 +71,34 @@ pub(crate) trait RegistrySuperCache {
 pub(crate) trait RegistrySubCache {
     /// create a new subcache
     fn new(path: PathBuf) -> Self;
-    // returns the name of the registry
+
+    /// /returns the name of the registry
     fn name(&self) -> &str;
+
     /// check if the root path of the Cache exists
     fn path_exists(&self) -> bool {
         self.path().exists()
     }
+
     /// invalidates the cache
     fn invalidate(&mut self);
+
     /// total size of the cache
     fn total_size(&mut self) -> u64;
+
     /// list of files contained in the cache
     fn files(&mut self) -> &[PathBuf];
+
     /// number of files in the cache
     fn number_of_files(&mut self) -> usize;
+
     /// sorted list of the files
     fn files_sorted(&mut self) -> &[PathBuf];
-    // path of the cache
+
+    /// path of the cache
     fn path(&self) -> &PathBuf;
-    // the cache is known to be empty because it was just cleared / the directory removed
+
+    /// the cache is known to be empty because it was just cleared / the directory removed
     fn known_to_be_empty(&mut self);
 }
 
