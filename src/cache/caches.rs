@@ -39,7 +39,8 @@ pub(crate) trait Cache {
 }
 
 /// this is a super cache that is used to hold and access multiple multiple subcaches
-/// example: `RegistrySuperCache`: `RegistryIndices`, `RegistrySubCache`: `RegistryIndex`
+/// example: `RegistrySuperCache`: `RegistryIndices`
+/// or `RegistrySubCache`: `RegistryIndex`
 pub(crate) trait RegistrySuperCache {
     type SubCache;
 
@@ -61,8 +62,8 @@ pub(crate) trait RegistrySuperCache {
     /// number of files in total
     fn total_size(&mut self) -> u64;
 
-    /// number of subcaches
-    fn number_of_items(&mut self) -> usize;
+    /// number of subcaches the supercache holds
+    fn number_of_subcaches(&mut self) -> usize;
 
     /// total number of files over all subcaches
     fn total_number_of_files(&mut self) -> usize;
@@ -99,7 +100,17 @@ pub(crate) trait RegistrySubCache {
     fn path(&self) -> &PathBuf;
 
     /// the cache is known to be empty because it was just cleared / the directory removed
+    /// this method sets the caches state back to 0 basically if we know we just cleared it
     fn known_to_be_empty(&mut self);
+    /*
+    /// the items we care about, for registry pkg cache, this is foo.crate,
+    /// for registry src cache this is the foo-1.2.3 directory
+    /// unsorted!
+    fn items(&mut self) -> &[PathBuf];
+
+    // number of items
+    fn number_of_items(&mut self) -> usize;
+    */
 }
 
 /// get the name of a cache directory from a path.

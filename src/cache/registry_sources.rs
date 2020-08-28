@@ -274,7 +274,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
             total_size
         }
     }
-    fn number_of_items(&mut self) -> usize {
+    fn number_of_subcaches(&mut self) -> usize {
         self.caches.len()
     }
     fn total_number_of_files(&mut self) -> usize {

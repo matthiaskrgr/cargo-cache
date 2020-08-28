@@ -245,7 +245,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
             total_size
         }
     }
-    fn number_of_items(&mut self) -> usize {
+    fn number_of_subcaches(&mut self) -> usize {
         self.indices.len()
     }
 

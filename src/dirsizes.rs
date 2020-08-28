@@ -135,7 +135,7 @@ impl<'a> DirSizes<'a> {
             total_reg_cache_size: total_reg_cache_size.unwrap(), // registry cache size
             total_reg_src_size: total_reg_src_size.unwrap(), // registry sources size
             total_reg_index_size: reg_index_size.unwrap(), // registry index size
-            total_reg_index_num: registry_index_caches.number_of_items() as u64, // number  of indices //@TODO parallelize like the rest
+            total_reg_index_num: registry_index_caches.number_of_subcaches() as u64, // number  of indices //@TODO parallelize like the rest
             numb_reg_cache_entries: total_reg_cache_entries.unwrap(), // number of source archives
             numb_reg_src_checkouts: numb_reg_src_checkouts.unwrap(),  // number of source checkouts
             root_path,
