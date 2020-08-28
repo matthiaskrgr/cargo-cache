@@ -22,7 +22,7 @@ pub(crate) struct RegistrySourceCache {
     name: String,
     /// the path of the root dir of the index, this is unique
     path: PathBuf,
-    /// total size of the index, computed on-demand
+    /// total size of the cache, computed on-demand
     size: Option<u64>,
     /// number of files of the cache
     number_of_files: Option<usize>,
@@ -31,9 +31,9 @@ pub(crate) struct RegistrySourceCache {
     /// list of files contained in the index
     files: Vec<PathBuf>,
     /// have we calculated the checkout folders
-    checkouts_calculated: bool,
+    items_calculated: bool,
     /// the source checkout folders
-    checkout_folders: Vec<PathBuf>,
+    items: Vec<PathBuf>,
 }
 
 impl RegistrySubCache for RegistrySourceCache {
@@ -45,8 +45,8 @@ impl RegistrySubCache for RegistrySourceCache {
             number_of_files: None,
             files_calculated: false,
             files: vec![],
-            checkouts_calculated: false,
-            checkout_folders: vec![],
+            items_calculated: false,
+            items: vec![],
         }
     }
 
@@ -66,8 +66,8 @@ impl RegistrySubCache for RegistrySourceCache {
         self.files_calculated = false;
         self.number_of_files = None;
         self.files = vec![];
-        self.checkouts_calculated = false;
-        self.checkout_folders = vec![];
+        self.items_calculated = false;
+        self.items = vec![];
     }
 
     fn known_to_be_empty(&mut self) {
@@ -75,8 +75,8 @@ impl RegistrySubCache for RegistrySourceCache {
         self.files_calculated = true;
         self.number_of_files = Some(0);
         self.files = Vec::new();
-        self.checkouts_calculated = true;
-        self.checkout_folders = Vec::new();
+        self.items_calculated = true;
+        self.items = Vec::new();
     }
 
     fn files(&mut self) -> &[PathBuf] {
@@ -140,30 +140,13 @@ impl RegistrySubCache for RegistrySourceCache {
     }
 
     fn items(&mut self) -> &[PathBuf] {
-        todo!()
-    }
-
-    fn number_of_items(&mut self) -> usize {
-        todo!()
-    }
-}
-
-impl RegistrySourceCache {
-    pub(crate) fn number_of_source_checkout_folders(&mut self) -> usize {
-        // initialize the cache
-        let _ = self.checkout_folders();
-        // return the number of files
-        self.checkout_folders.len()
-    }
-
-    fn checkout_folders(&mut self) -> &[PathBuf] {
-        if self.checkouts_calculated {
-            &self.checkout_folders
+        if self.items_calculated {
+            &self.items
         } else {
             if !&self.path.exists() {
-                self.checkout_folders = vec![];
-                self.checkouts_calculated = true;
-                return &self.checkout_folders;
+                self.items = vec![];
+                self.items_calculated = true;
+                return &self.items;
             }
             let folders = std::fs::read_dir(&self.path)
                 .unwrap_or_else(|_| panic!("Failed to read {:?}", self.path.display()))
@@ -178,10 +161,17 @@ impl RegistrySourceCache {
                             .contains('-')
                 })
                 .collect::<Vec<PathBuf>>();
-            self.checkout_folders = folders;
-            self.checkouts_calculated = true;
-            &self.checkout_folders
+            self.items = folders;
+            self.items_calculated = true;
+            &self.items
         }
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        // initialize the cache
+        let _ = self.items();
+        // return the number of files
+        self.items.len()
     }
 }
 
@@ -198,8 +188,9 @@ pub(crate) struct RegistrySourceCaches {
     /// number of files of all indices combined
     total_number_of_files: Option<usize>,
     /// all source checkout folders
-    total_checkout_folders: Vec<PathBuf>,
-    total_checkout_folders_calculated: bool,
+    items_calculated: bool,
+    // items
+    items: Vec<PathBuf>,
 }
 
 impl RegistrySuperCache for RegistrySourceCaches {
@@ -217,8 +208,8 @@ impl RegistrySuperCache for RegistrySourceCaches {
                 caches: vec![],
                 total_number_of_files: None,
                 total_size: None,
-                total_checkout_folders: vec![],
-                total_checkout_folders_calculated: false,
+                items_calculated: false,
+                items: Vec::new(),
             };
         }
 
@@ -245,16 +236,16 @@ impl RegistrySuperCache for RegistrySourceCaches {
             caches: registry_folders,
             total_number_of_files: None,
             total_size: None,
-            total_checkout_folders: vec![],
-            total_checkout_folders_calculated: false,
+            items_calculated: false,
+            items: Vec::new(),
         }
     }
 
     fn invalidate(&mut self) {
         self.total_number_of_files = None;
         self.total_size = None;
-        self.total_checkout_folders = vec![];
-        self.total_checkout_folders_calculated = false;
+        self.items = vec![];
+        self.items_calculated = false;
         self.caches.iter_mut().for_each(|cache| cache.invalidate());
     }
 
@@ -304,41 +295,25 @@ impl RegistrySuperCache for RegistrySourceCaches {
     }
 
     fn items(&mut self) -> &[PathBuf] {
-        unimplemented!()
+        self.items = self
+            .caches()
+            .iter_mut()
+            .flat_map(|cache| cache.items())
+            .cloned()
+            .collect::<Vec<PathBuf>>();
+        &self.items
     }
 
     fn number_of_items(&mut self) -> usize {
-        unimplemented!()
+        self.items().len()
     }
 }
 
 impl RegistrySourceCaches {
-    pub(crate) fn total_number_of_source_checkout_folders(&mut self) -> usize {
-        self.caches
-            .iter_mut()
-            .map(RegistrySourceCache::number_of_source_checkout_folders)
-            .sum()
-    }
-
-    pub(crate) fn total_checkout_folders(&mut self) -> &[PathBuf] {
-        let mut all_checkout_folders = Vec::new();
-
-        self.caches.iter_mut().for_each(|registry| {
-            registry
-                .checkout_folders()
-                .iter()
-                .for_each(|folder| all_checkout_folders.push(folder.clone()))
-        });
-
-        self.total_checkout_folders = all_checkout_folders;
-        self.total_checkout_folders_calculated = true;
-        &self.total_checkout_folders
-    }
-
     pub(crate) fn total_checkout_folders_sorted(&mut self) -> &[PathBuf] {
         // prime cache
-        let _ = self.total_checkout_folders();
-        self.total_checkout_folders.sort();
-        &self.total_checkout_folders
+        let _ = self.items();
+        self.items.sort();
+        self.items()
     }
 }

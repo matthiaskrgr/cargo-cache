@@ -108,8 +108,7 @@ impl<'a> DirSizes<'a> {
 
             s.spawn(|_| {
                 total_reg_src_size = Some(registry_sources_caches.total_size());
-                numb_reg_src_checkouts =
-                    Some(registry_sources_caches.total_number_of_source_checkout_folders());
+                numb_reg_src_checkouts = Some(registry_sources_caches.number_of_items());
             });
         });
 
@@ -407,7 +406,7 @@ impl<'a> DirSizes<'a> {
                     2,
                     &format!(
                         "{} crate source checkouts: ",
-                        registry_source.number_of_source_checkout_folders()
+                        registry_source.number_of_items()
                     ),
                     &registry_source
                         .total_size()

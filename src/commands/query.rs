@@ -193,7 +193,7 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
 
     let mut registry_source_caches_matches: Vec<_> = registry_sources_caches
-        .total_checkout_folders()
+        .items()
         .iter()
         .map(|path| registry_source_cache_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
