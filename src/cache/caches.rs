@@ -7,9 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+// TODO: add remove_all() and remove_item() method?
+
 use std::path::PathBuf;
 
-// TODO: add remove() and remove_item()? methods
+// this  is impl'd by the bin, git_bare_repos and git_checkouts cache
 pub(crate) trait Cache {
     /// creates a new cache object
     fn new(path: PathBuf) -> Self;
@@ -44,7 +46,10 @@ pub(crate) trait Cache {
     fn number_of_items(&mut self) -> usize;
 }
 
-/// this is a super cache that is used to hold and access multiple multiple subcaches
+// the following two traits deal with the registry caches:
+// registry indices, registry pkg source and registry sources
+
+/// this is a super cache that is used to hold and access multiple subcaches
 /// example: `RegistrySuperCache`: `RegistryIndices`
 /// or `RegistrySubCache`: `RegistryIndex`
 pub(crate) trait RegistrySuperCache {
