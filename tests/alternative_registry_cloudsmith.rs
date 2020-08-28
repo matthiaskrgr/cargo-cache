@@ -109,6 +109,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     // run cargo cache on the new cargo_home
     let cargo_cache_cmd = Command::new(bin_path())
         .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
+        .env("RUST_BACKTRACE", "1")
         .output()
         .unwrap();
 
