@@ -207,7 +207,7 @@ pub(crate) fn clean_unref(
     // for the bare_repos_cache and registry_package_cache,
     // remove all items but the ones that are referenced
 
-    let bare_repos = bare_repos_cache.bare_repo_folders();
+    let bare_repos = bare_repos_cache.items();
 
     // get all .crates found in the cache (we need to check all subcaches)
     // @TODO add method to get all .crates of all caches via single method?

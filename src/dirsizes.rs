@@ -93,8 +93,7 @@ impl<'a> DirSizes<'a> {
 
             s.spawn(|_| {
                 total_git_repos_bare_size = Some(bare_repos_cache.total_size());
-                numb_git_repos_bare_repos =
-                    Some(bare_repos_cache.number_of_checkout_repos().unwrap());
+                numb_git_repos_bare_repos = Some(bare_repos_cache.number_of_items());
             });
 
             s.spawn(|_| {

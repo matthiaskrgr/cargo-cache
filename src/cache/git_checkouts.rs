@@ -96,6 +96,7 @@ impl Cache for GitCheckoutCache {
                     .collect::<Vec<PathBuf>>();
                 self.files = v;
             } else {
+                // if there is no such directory, we know the cache is empty
                 self.total_size = Some(0);
                 self.files = Vec::new();
                 self.files_calculated = true;
@@ -113,7 +114,7 @@ impl Cache for GitCheckoutCache {
         self.files()
     }
 
-    // all "items" inside the cache
+    // all "items" inside the cache (item == a git checkout)
     fn items(&mut self) -> &[PathBuf] {
         if self.items_calculated {
             &self.items
@@ -132,6 +133,7 @@ impl Cache for GitCheckoutCache {
                 .filter(|f| f.is_dir())
                 .collect();
             self.items = crate_list;
+            self.items_calculated = true;
             &self.items
         }
     }

@@ -96,7 +96,7 @@ impl RepoInfo {
 fn file_desc_from_path(bare_repos_cache: &mut git_repos_bare::GitRepoCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     bare_repos_cache
-        .bare_repo_folders_sorted() // bad
+        .items_sorted() // bad
         .iter()
         .map(|path| FileDesc::new_from_git_bare(path))
         .collect::<Vec<_>>()

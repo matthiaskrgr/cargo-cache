@@ -164,12 +164,8 @@ pub(crate) fn remove_files_by_dates(
                 files_of_components.extend(checkouts_cache.items().iter().map(|p| p.to_path_buf()));
             }
             Component::GitDB => {
-                files_of_components.extend(
-                    bare_repos_cache
-                        .bare_repo_folders()
-                        .iter()
-                        .map(|p| p.to_path_buf()),
-                );
+                files_of_components
+                    .extend(bare_repos_cache.items().iter().map(|p| p.to_path_buf()));
             }
         }
     });

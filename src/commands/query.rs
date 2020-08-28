@@ -179,7 +179,7 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
 
     let mut bare_repos_matches: Vec<_> = bare_repos_cache
-        .bare_repo_folders()
+        .items()
         .iter()
         .map(|path| bare_repo_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex

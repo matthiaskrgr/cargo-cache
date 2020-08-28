@@ -18,12 +18,11 @@ use walkdir::WalkDir;
 pub(crate) struct GitRepoCache {
     path: PathBuf,
     total_size: Option<u64>,
-    number_of_repos: Option<usize>,
     files_calculated: bool,
     files: Vec<PathBuf>,
-    // number_of_files: Option<usize>,
-    repos_calculated: bool,
-    bare_repos_folders: Vec<PathBuf>,
+    items_calculated: bool,
+    items: Vec<PathBuf>,
+    number_of_items: Option<usize>,
 }
 
 impl Cache for GitRepoCache {
@@ -31,14 +30,12 @@ impl Cache for GitRepoCache {
         // calculate as needed
         Self {
             path,
-            // number_of_files_recursively: None,
             total_size: None,
-            // number_of_files: None,
             files_calculated: false,
             files: Vec::new(),
-            repos_calculated: false,
-            bare_repos_folders: Vec::new(),
-            number_of_repos: None,
+            items_calculated: false,
+            items: Vec::new(),
+            number_of_items: None,
         }
     }
 
@@ -49,20 +46,20 @@ impl Cache for GitRepoCache {
     fn invalidate(&mut self) {
         self.total_size = None;
         self.files_calculated = false;
-        self.repos_calculated = false;
-        self.number_of_repos = None;
+        self.items_calculated = false;
+        self.number_of_items = None;
     }
 
     fn known_to_be_empty(&mut self) {
         self.total_size = Some(0);
         self.files = Vec::new();
         self.files_calculated = true;
-        self.repos_calculated = true;
-        self.number_of_repos = Some(0);
+        self.items_calculated = true;
+        self.number_of_items = Some(0);
     }
 
     fn total_size(&mut self) -> u64 {
-        if Self::bare_repo_folders(self).is_empty() {
+        if Self::items(self).is_empty() {
             return 0;
         }
 
@@ -84,6 +81,7 @@ impl Cache for GitRepoCache {
         }
     }
 
+    // all files of this cache
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
             &self.files
@@ -109,93 +107,43 @@ impl Cache for GitRepoCache {
         self.files()
     }
 
+    // list of bare git repos
     fn items(&mut self) -> &[PathBuf] {
-        todo!()
-    }
-
-    fn number_of_items(&mut self) -> usize {
-        todo!()
-    }
-}
-
-impl GitRepoCache {
-    pub(crate) fn number_of_checkout_repos(&mut self) -> Option<usize> {
-        if self.number_of_repos.is_some() {
-            self.number_of_repos
-        } else {
-            let c = self
-                .bare_repo_folders()
-                .iter()
-                .filter(|p| p.is_dir())
-                .count();
-            // println!("{:?}", self.checkout_folders().iter());
-            self.number_of_repos = Some(c);
-            self.number_of_repos
-        }
-    }
-
-    pub(crate) fn bare_repo_folders(&mut self) -> &[PathBuf] {
-        if self.repos_calculated {
-            &self.bare_repos_folders
+        if self.items_calculated {
+            &self.items
         } else {
             if self.path_exists() {
-                let crate_list = fs::read_dir(&self.path)
+                let repo_list = fs::read_dir(&self.path)
                     .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                     .map(|cratepath| cratepath.unwrap().path())
                     .filter(|p| p.is_dir())
                     .collect::<Vec<PathBuf>>();
 
-                self.repos_calculated = true;
-                self.bare_repos_folders = crate_list;
+                self.items_calculated = true;
+                self.items = repo_list;
             } else {
                 self.known_to_be_empty();
             }
-            &self.bare_repos_folders
+            &self.items
         }
     }
 
-    pub(crate) fn bare_repo_folders_sorted(&mut self) -> &[PathBuf] {
-        let _ = self.bare_repo_folders(); // prime cache
-        self.bare_repos_folders.sort();
-        &self.bare_repos_folders
+    // number of bare git repos
+    fn number_of_items(&mut self) -> usize {
+        if let Some(items_count) = &self.number_of_items {
+            return *items_count;
+        }
+
+        let count = self.items().len();
+        self.number_of_items = Some(count);
+        count
     }
+}
 
-    /*
-        pub(crate) fn number_of_files(&mut self) -> usize {
-            if self.number_of_repos.is_some() {
-                self.number_of_repos.unwrap()
-            } else {
-                // we don't have the value cached
-                if self.path_exists() {
-                    let count = self.files().len();
-                    self.number_of_repos = Some(count);
-                    count
-                } else {
-                    0
-                }
-            }
-        }
-
-        pub(crate) fn number_of_files_at_depth_2(&mut self) -> usize {
-            let root_dir_depth = self.path.iter().count();
-            if self.number_of_repos.is_some() {
-                self.number_of_repos.unwrap()
-            } else {
-                // we don't have the value cached
-                if self.path_exists() {
-                    // dir must exist, dir must be as depth ${path}+2
-                    let count = self
-                        .files
-                        .iter()
-                        .filter(|p| p.is_dir())
-                        .filter(|p| p.iter().count() == root_dir_depth + 2)
-                        .count();
-                    self.number_of_repos = Some(count);
-                    count
-                } else {
-                    0
-                }
-            }
-        }
-    */
+impl GitRepoCache {
+    pub(crate) fn items_sorted(&mut self) -> &[PathBuf] {
+        let _ = self.items(); // prime cache
+        self.items.sort();
+        &self.items
+    }
 }
