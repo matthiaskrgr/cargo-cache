@@ -12,7 +12,7 @@ jobs:
   test:
     name: Test
     env:
-      RUSTC_BACKTRACE: full
+      RUST_BACKTRACE: full
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
