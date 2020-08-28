@@ -302,6 +302,14 @@ impl RegistrySuperCache for RegistrySourceCaches {
             total
         }
     }
+
+    fn items(&mut self) -> &[PathBuf] {
+        unimplemented!()
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        unimplemented!()
+    }
 }
 
 impl RegistrySourceCaches {

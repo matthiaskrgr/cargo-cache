@@ -174,6 +174,8 @@ pub(crate) struct RegistryIndicesCache {
     total_size: Option<u64>,
     /// number of files of all indices combined
     total_number_of_files: Option<usize>,
+    /// indices but as paths
+    indices_paths: Vec<PathBuf>,
 }
 
 impl RegistrySuperCache for RegistryIndicesCache {
@@ -188,6 +190,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
                 indices: vec![],
                 total_number_of_files: None,
                 total_size: None,
+                indices_paths: Vec::new(),
             };
         }
 
@@ -216,6 +219,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
             indices,
             total_number_of_files: None,
             total_size: None,
+            indices_paths: Vec::new(),
         }
     }
 
@@ -276,5 +280,20 @@ impl RegistrySuperCache for RegistryIndicesCache {
                     .sum()
             }
         }
+    }
+
+    fn items(&mut self) -> &[PathBuf] {
+        let v: Vec<PathBuf> = self
+            .caches()
+            .iter()
+            .map(|index| index.path().clone())
+            .collect();
+        self.indices_paths = v;
+        &self.indices_paths
+    }
+
+    // see above
+    fn number_of_items(&mut self) -> usize {
+        self.caches().len()
     }
 }

@@ -166,6 +166,8 @@ pub(crate) struct RegistryPkgCaches {
     total_size: Option<u64>,
     /// number of files of all indices combined
     total_number_of_files: Option<usize>,
+    // items @TODO
+    items: Vec<PathBuf>,
 }
 
 impl RegistrySuperCache for RegistryPkgCaches {
@@ -180,6 +182,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
                 caches: vec![],
                 total_number_of_files: None,
                 total_size: None,
+                items: Vec::new(),
             };
         }
 
@@ -208,6 +211,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
             caches,
             total_number_of_files: None,
             total_size: None,
+            items: Vec::new(),
         }
     }
 
@@ -263,5 +267,19 @@ impl RegistrySuperCache for RegistryPkgCaches {
             self.total_number_of_files = Some(number);
             number
         }
+    }
+
+    fn items(&mut self) -> &[PathBuf] {
+        self.items = self
+            .caches()
+            .iter_mut()
+            .flat_map(|cache| cache.items())
+            .cloned()
+            .collect::<Vec<PathBuf>>();
+        &self.items
+    }
+
+    fn number_of_items(&mut self) -> usize {
+        self.items().len()
     }
 }

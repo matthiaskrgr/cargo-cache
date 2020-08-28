@@ -11,7 +11,7 @@
 
 use std::path::PathBuf;
 
-// this  is impl'd by the bin, git_bare_repos and git_checkouts cache
+// this is impl'd by the bin, git_bare_repos and git_checkouts cache
 pub(crate) trait Cache {
     /// creates a new cache object
     fn new(path: PathBuf) -> Self;
@@ -78,6 +78,12 @@ pub(crate) trait RegistrySuperCache {
 
     /// total number of files over all subcaches
     fn total_number_of_files(&mut self) -> usize;
+
+    /// items, for example git repos or checkouts
+    fn items(&mut self) -> &[PathBuf];
+
+    // number of items
+    fn number_of_items(&mut self) -> usize;
 }
 
 /// a subcache, each registry is represented as a subcache
