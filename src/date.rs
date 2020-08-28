@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::caches::RegistrySuperCache;
+use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
 use crate::library::*;
 use crate::remove::*;
@@ -161,12 +161,7 @@ pub(crate) fn remove_files_by_dates(
             }
             Component::RegistryIndex => { /* ignore this case */ }
             Component::GitRepos => {
-                files_of_components.extend(
-                    checkouts_cache
-                        .checkout_folders()
-                        .iter()
-                        .map(|p| p.to_path_buf()),
-                );
+                files_of_components.extend(checkouts_cache.items().iter().map(|p| p.to_path_buf()));
             }
             Component::GitDB => {
                 files_of_components.extend(

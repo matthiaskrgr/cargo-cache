@@ -37,7 +37,7 @@ pub(crate) trait Cache {
     /// the cache is known to be empty because it was just cleared / the directory removed
     fn known_to_be_empty(&mut self);
 
-    /// items for example git repos or checkouts
+    /// items, for example git repos or checkouts
     fn items(&mut self) -> &[PathBuf];
 
     // number of items

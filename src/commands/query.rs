@@ -172,7 +172,7 @@ pub(crate) fn run_query(
         .collect::<Vec<_>>();
 
     let mut git_checkout_matches: Vec<_> = checkouts_cache
-        .checkout_folders()
+        .items()
         .iter()
         .map(|path| git_checkout_to_file(path))
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex

@@ -99,7 +99,7 @@ impl<'a> DirSizes<'a> {
 
             s.spawn(|_| {
                 total_git_chk_size = Some(checkouts_cache.total_size());
-                numb_git_checkouts = Some(checkouts_cache.number_of_files_at_depth_2());
+                numb_git_checkouts = Some(checkouts_cache.number_of_items());
             });
 
             s.spawn(|_| {

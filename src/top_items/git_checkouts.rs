@@ -109,7 +109,7 @@ impl ChkInfo {
 fn file_desc_from_path(git_checkouts_cache: &mut git_checkouts::GitCheckoutCache) -> Vec<FileDesc> {
     // get list of package all "...\.crate$" files and sort it
     git_checkouts_cache
-        .checkout_folders_sorted()
+        .items_sorted()
         .iter()
         .map(|path| FileDesc::new_from_git_checkouts(path))
         .collect::<Vec<_>>()
