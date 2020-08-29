@@ -23,23 +23,23 @@ use cargo_metadata::{CargoOpt, MetadataCommand};
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
-use rayon::prelude::*;
 
-use regex::Regex;
-use walkdir::WalkDir;
-
-/*
 fn gather_all_cache_items(
     cargo_cache_paths: &CargoCachePaths,
     manifest_path: &Option<&str>,
-    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_repos_bare::GitRepoCache,
-    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
-    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
 ) -> () {
+    let mut all_items: Vec<&PathBuf> = Vec::new();
+    all_items.extend(git_checkouts_cache.items());
+    all_items.extend(bare_repos_cache.items());
+    all_items.extend(registry_pkg_cache.items());
+    all_items.extend(registry_sources_cache.items());
 
+    all_items.sort_by_key(|path| std::fs::metadata(path).unwrap().accessed().unwrap());
+    
 }
-
-*/
