@@ -119,21 +119,32 @@ impl Cache for GitCheckoutCache {
         if self.items_calculated {
             &self.items
         } else {
-            #[allow(clippy::filter_map)]
-            let crate_list: Vec<PathBuf> = fs::read_dir(&self.path)
-                .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
-                .map(|cratepath| cratepath.unwrap().path())
-                .filter(|p| p.is_dir())
-                // get the second level for each dir and flatten everything down into one iterator
-                .flat_map(|dir| {
-                    std::fs::read_dir(&dir)
-                        .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &dir))
-                        .map(|p| p.unwrap().path())
-                })
-                .filter(|f| f.is_dir())
-                .collect();
-            self.items = crate_list;
-            self.items_calculated = true;
+            if self.path_exists() {
+                let mut collection = Vec::new();
+
+                let crate_list = fs::read_dir(&self.path)
+                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+                    .map(|cratepath| cratepath.unwrap().path())
+                    .filter(|p| p.is_dir())
+                    .collect::<Vec<PathBuf>>();
+                // need to take 2 levels into account
+                let mut both_levels_vec: Vec<PathBuf> = Vec::new();
+                for repo in crate_list {
+                    for i in fs::read_dir(&repo)
+                        .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &repo))
+                        .map(|cratepath| cratepath.unwrap().path())
+                        .filter(|f| f.is_dir())
+                    {
+                        both_levels_vec.push(i);
+                    }
+                }
+                collection.extend_from_slice(&both_levels_vec);
+
+                self.items_calculated = true;
+                self.items = collection;
+            } else {
+                self.items = Vec::new();
+            }
             &self.items
         }
     }
