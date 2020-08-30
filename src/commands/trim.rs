@@ -9,8 +9,6 @@
 
 // "cargo cache trim" command
 
-// except according to those terms.
-
 use std::fs;
 use std::path::PathBuf;
 
@@ -23,10 +21,10 @@ use cargo_metadata::{CargoOpt, MetadataCommand};
 
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
+use walkdir::WalkDir;
 
-fn gather_all_cache_items(
+pub(crate) fn gather_all_cache_items(
     cargo_cache_paths: &CargoCachePaths,
-    manifest_path: &Option<&str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
@@ -40,6 +38,26 @@ fn gather_all_cache_items(
     all_items.extend(registry_pkg_cache.items());
     all_items.extend(registry_sources_cache.items());
 
-    all_items.sort_by_key(|path| std::fs::metadata(path).unwrap().accessed().unwrap());
-    
+    all_items.sort_by_key(|path| get_last_access_of_file(path));
+
+    let first = all_items[0];
+    let last = all_items.len() - 1;
+    let last = all_items[last];
+    println!("first {:?}", first);
+    println!("last {:?}", last);
+}
+
+fn get_last_access_of_file(path: &PathBuf) -> std::time::SystemTime {
+    if path.is_file() {
+        std::fs::metadata(path).unwrap().accessed().unwrap()
+    } else {
+        // directory, get the latest access of all files of that directory
+        // get the max time / the file with the youngest access date / most recently accessed
+        WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|e| e.unwrap().path().to_owned())
+            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap())
+            .max()
+            .unwrap()
+    }
 }

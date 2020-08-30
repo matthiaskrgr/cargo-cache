@@ -79,7 +79,7 @@ cfg_if::cfg_if! {
         use std::time::SystemTime;
         use walkdir::WalkDir;
         use crate::cache::*;
-        use crate::commands::{local, query, sccache};
+        use crate::commands::{local, query, sccache, trim};
         use crate::git::*;
         use crate::library::*;
         use crate::remove::*;
@@ -168,6 +168,15 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
+    commands::trim::gather_all_cache_items(
+        &cargo_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_pkgs_cache,
+        &mut registry_sources_caches,
+        config.is_present("dry-run"),
+        &mut size_changed,
+    );
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
         match clean_unref(
             &cargo_cache,
