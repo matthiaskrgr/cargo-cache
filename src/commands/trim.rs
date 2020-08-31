@@ -23,14 +23,15 @@ use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
-pub(crate) fn gather_all_cache_items(
-    git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
-    registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
+// get a list of all cache items, sorted by file access time (young to old)
+pub(crate) fn gather_all_cache_items<'a>(
+    git_checkouts_cache: &'a mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &'a mut git_bare_repos::GitRepoCache,
+    registry_pkg_cache: &'a mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_cache: &'a mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
-) -> () {
+) -> Vec<&'a PathBuf> {
     let mut all_items: Vec<&PathBuf> = Vec::new();
     all_items.extend(git_checkouts_cache.items());
     all_items.extend(bare_repos_cache.items());
@@ -39,11 +40,13 @@ pub(crate) fn gather_all_cache_items(
 
     all_items.sort_by_key(|path| get_last_access_of_item(path));
 
-    let first = all_items[0];
+    /* let first = all_items[0];
     let last_idx = all_items.len() - 1;
     let last = all_items[last_idx];
     //println!("first {:?}", first);
     //println!("last {:?}", last);
+    */
+    all_items
 }
 
 fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
@@ -59,4 +62,47 @@ fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
             .max()
             .unwrap()
     }
+}
+
+pub(crate) fn trim_cache(
+    size_limit: &Option<&str>,
+    git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
+    dry_run: bool,
+    size_changed: &mut bool,
+) -> Result<(), ()> {
+    Ok(())
+}
+
+fn parse_size_limit(limit: &Option<&str>) -> usize {
+    match limit {
+        None => 0,
+        Some(limit) => {
+            // figure out the unit
+            let unit_multiplicator: usize = match limit.chars().last() {
+                // limit is empty
+                None => 0,
+                // we expect a unit such as B, K, M, G, T...
+                Some(c) => {
+                    if c.is_alphabetic() {
+                        match c {
+                            'B' => 1,
+                            'K' => 1024,
+                            'M' => 1024 * 1024,
+                            'G' => 1024 * 1024 * 1024,
+                            'T' => 1024 * 1024 * 1024 * 1024,
+                            _ => panic!("failed to parse unit, please use one of B K M G or T"),
+                        }
+                    } else {
+                        panic!("failed to parse")
+                    }
+                }
+            };
+            let value: usize = limit[0..=limit.len()].parse().unwrap();
+            return value * unit_multiplicator;
+        }
+    };
+    0
 }
