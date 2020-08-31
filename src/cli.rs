@@ -190,7 +190,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     //</clean-unref>
 
     //<trim>
-    let size_limit = Arg::with_name("limit")
+    let size_limit = Arg::with_name("trim_limit")
         .long("limit")
         .short("l")
         .help("size that the cache will be reduced to")

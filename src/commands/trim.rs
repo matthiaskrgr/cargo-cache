@@ -23,6 +23,21 @@ use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
+fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
+    if path.is_file() {
+        std::fs::metadata(path).unwrap().accessed().unwrap()
+    } else {
+        // directory, get the latest access of all files of that directory
+        // get the max time / the file with the youngest access date / most recently accessed
+        WalkDir::new(path.display().to_string())
+            .into_iter()
+            .map(|e| e.unwrap().path().to_owned())
+            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap())
+            .max()
+            .unwrap()
+    }
+}
+
 // get a list of all cache items, sorted by file access time (young to old)
 pub(crate) fn gather_all_cache_items<'a>(
     git_checkouts_cache: &'a mut git_checkouts::GitCheckoutCache,
@@ -40,49 +55,18 @@ pub(crate) fn gather_all_cache_items<'a>(
 
     all_items.sort_by_key(|path| get_last_access_of_item(path));
 
-    /* let first = all_items[0];
-    let last_idx = all_items.len() - 1;
-    let last = all_items[last_idx];
-    //println!("first {:?}", first);
-    //println!("last {:?}", last);
-    */
     all_items
 }
 
-fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
-    if path.is_file() {
-        std::fs::metadata(path).unwrap().accessed().unwrap()
-    } else {
-        // directory, get the latest access of all files of that directory
-        // get the max time / the file with the youngest access date / most recently accessed
-        WalkDir::new(path.display().to_string())
-            .into_iter()
-            .map(|e| e.unwrap().path().to_owned())
-            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap())
-            .max()
-            .unwrap()
-    }
-}
-
-pub(crate) fn trim_cache(
-    size_limit: &Option<&str>,
-    git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
-    registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
-    dry_run: bool,
-    size_changed: &mut bool,
-) -> Result<(), ()> {
-    Ok(())
-}
-
+/// figure how big the cache should remain after trimming
+/// 0 = no limit, don't delete anything
 fn parse_size_limit(limit: &Option<&str>) -> usize {
     match limit {
         None => 0,
         Some(limit) => {
             // figure out the unit
             let unit_multiplicator: usize = match limit.chars().last() {
-                // limit is empty
+                // we have no limit
                 None => 0,
                 // we expect a unit such as B, K, M, G, T...
                 Some(c) => {
@@ -101,8 +85,39 @@ fn parse_size_limit(limit: &Option<&str>) -> usize {
                 }
             };
             let value: usize = limit[0..=limit.len()].parse().unwrap();
-            return value * unit_multiplicator;
+            if value == 0 {
+                return 0;
+            }
+            value * unit_multiplicator
         }
-    };
-    0
+    }
+}
+
+pub(crate) fn trim_cache(
+    size_limit: &Option<&str>,
+    git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
+    dry_run: bool,
+    size_changed: &mut bool,
+) -> Result<(), ()> {
+    // parse the size limit
+    let size_limit = parse_size_limit(size_limit);
+    // get all the items of the cache
+    let all_cache_items = gather_all_cache_items(
+        git_checkouts_cache,
+        bare_repos_cache,
+        registry_pkg_cache,
+        registry_sources_cache,
+        dry_run,
+        size_changed,
+    );
+
+    let mut cache_size = 0;
+
+    // delete everything that is unneeded
+    all_cache_items.iter().for_each(|_| ());
+
+    unimplemented!();
 }

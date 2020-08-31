@@ -168,15 +168,18 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    commands::trim::gather_all_cache_items(
-        // &cargo_cache,
-        &mut checkouts_cache,
-        &mut bare_repos_cache,
-        &mut registry_pkgs_cache,
-        &mut registry_sources_caches,
-        config.is_present("dry-run"),
-        &mut size_changed,
-    );
+    if let Some(trim_config) = config.subcommand_matches("trim") {
+        let res = commands::trim::trim_cache(
+            &trim_config.value_of("trim_limit"),
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_sources_caches,
+            config.is_present("dry-run"),
+            &mut size_changed,
+        );
+    }
+
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
         match clean_unref(
             &cargo_cache,
