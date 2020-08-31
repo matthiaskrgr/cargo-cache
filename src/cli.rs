@@ -105,6 +105,13 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .help("print some debug stats")
         .hidden(true);
 
+    // "version" subcommand which is also hidden, prints crate version
+    let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
+
+    /***************************
+     *       Subcommands        *
+     ****************************/
+
     // <query>
     // arg of query sbcmd
     let query_order = Arg::with_name("sort")
@@ -182,9 +189,20 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&dry_run);
     //</clean-unref>
 
-    // "version" subcommand which is also hidden, prints crate version
-    let version_subcmd = SubCommand::with_name("version").settings(&[AppSettings::Hidden]);
+    //<trim>
+    let size_limit = Arg::with_name("limit")
+        .long("limit")
+        .short("l")
+        .help("size that the cache will be reduced to")
+        .takes_value(true)
+        .value_name("LIMIT");
 
+    let trim = SubCommand::with_name("trim")
+        .about("Trim old items from the cache until maximum cache size limit is reached")
+        .arg(&size_limit)
+        .arg(&dry_run);
+
+    // </trim>
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
@@ -207,6 +225,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(sccache.clone())
         .subcommand(sccache_short.clone())
         .subcommand(clean_unref.clone())
+        .subcommand(trim.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -239,6 +258,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(sccache)
         .subcommand(sccache_short)
         .subcommand(clean_unref)
+        .subcommand(trim)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)

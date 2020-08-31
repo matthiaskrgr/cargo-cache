@@ -24,7 +24,6 @@ use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 pub(crate) fn gather_all_cache_items(
-    cargo_cache_paths: &CargoCachePaths,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
@@ -38,16 +37,16 @@ pub(crate) fn gather_all_cache_items(
     all_items.extend(registry_pkg_cache.items());
     all_items.extend(registry_sources_cache.items());
 
-    all_items.sort_by_key(|path| get_last_access_of_file(path));
+    all_items.sort_by_key(|path| get_last_access_of_item(path));
 
     let first = all_items[0];
-    let last = all_items.len() - 1;
-    let last = all_items[last];
-    println!("first {:?}", first);
-    println!("last {:?}", last);
+    let last_idx = all_items.len() - 1;
+    let last = all_items[last_idx];
+    //println!("first {:?}", first);
+    //println!("last {:?}", last);
 }
 
-fn get_last_access_of_file(path: &PathBuf) -> std::time::SystemTime {
+fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
     if path.is_file() {
         std::fs::metadata(path).unwrap().accessed().unwrap()
     } else {

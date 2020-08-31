@@ -169,7 +169,7 @@ fn main() {
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
     commands::trim::gather_all_cache_items(
-        &cargo_cache,
+        // &cargo_cache,
         &mut checkouts_cache,
         &mut bare_repos_cache,
         &mut registry_pkgs_cache,
