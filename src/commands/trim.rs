@@ -60,7 +60,7 @@ pub(crate) fn gather_all_cache_items<'a>(
 
 /// figure how big the cache should remain after trimming
 /// 0 = no limit, don't delete anything
-fn parse_size_limit(limit: &Option<&str>) -> usize {
+fn parse_size_limit_to_bytes(limit: &Option<&str>) -> usize {
     match limit {
         None => 0,
         Some(limit) => {
@@ -84,7 +84,7 @@ fn parse_size_limit(limit: &Option<&str>) -> usize {
                     }
                 }
             };
-            let value: usize = limit[0..=limit.len()].parse().unwrap();
+            let value: usize = limit[0..(limit.len() - 1)].parse().unwrap();
             if value == 0 {
                 return 0;
             }
@@ -103,7 +103,7 @@ pub(crate) fn trim_cache(
     size_changed: &mut bool,
 ) -> Result<(), ()> {
     // parse the size limit
-    let size_limit = parse_size_limit(size_limit);
+    let size_limit = parse_size_limit_to_bytes(size_limit);
     // get all the items of the cache
     let all_cache_items = gather_all_cache_items(
         git_checkouts_cache,
@@ -120,4 +120,33 @@ pub(crate) fn trim_cache(
     all_cache_items.iter().for_each(|_| ());
 
     unimplemented!();
+}
+
+#[cfg(test)]
+mod parse_size_limit {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn size_limit() {
+        // shorter function name
+        fn p(limit: Option<&str>) -> usize {
+            parse_size_limit_to_bytes(&limit)
+        }
+        assert_eq!(p(None), 0);
+
+        assert_eq!(p(Some("1B")), 1);
+
+        assert_eq!(p(Some("1K")), 1024);
+
+        assert_eq!(p(Some("1M")), 1_048_576);
+
+        assert_eq!(p(Some("1G")), 1_073_741_824);
+
+        assert_eq!(p(Some("1T")), 1_099_511_627_776);
+
+        assert_eq!(p(Some("4M")), 4_194_304);
+        assert_eq!(p(Some("42M")), 44_040_192);
+        assert_eq!(p(Some("1337M")), 1_401_946_112);
+    }
 }
