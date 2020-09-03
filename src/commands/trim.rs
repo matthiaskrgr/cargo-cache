@@ -25,14 +25,15 @@ use walkdir::WalkDir;
 
 fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
     if path.is_file() {
+        // if we have a file, simply get the accesss time
         std::fs::metadata(path).unwrap().accessed().unwrap()
     } else {
-        // directory, get the latest access of all files of that directory
+        // if we have a directory, get the latest access of all files of that directory
         // get the max time / the file with the youngest access date / most recently accessed
-        WalkDir::new(path.display().to_string())
+        WalkDir::new(path)
             .into_iter()
             .map(|e| e.unwrap().path().to_owned())
-            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap())
+            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap()) //@TODO make this an reusable function/method to simplify code
             .max()
             .unwrap()
     }
@@ -43,6 +44,7 @@ pub(crate) fn gather_all_cache_items<'a>(
     git_checkouts_cache: &'a mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &'a mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &'a mut registry_pkg_cache::RegistryPkgCaches,
+
     registry_sources_cache: &'a mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
@@ -53,7 +55,12 @@ pub(crate) fn gather_all_cache_items<'a>(
     all_items.extend(registry_pkg_cache.items());
     all_items.extend(registry_sources_cache.items());
 
-    all_items.sort_by_key(|path| get_last_access_of_item(path));
+    // use caching, calculating the last access for each path ever time is not cheap
+    // sort from youngest to oldest
+    all_items.sort_by_cached_key(|path| get_last_access_of_item(path));
+    // reverse the vec so that youngest access dates come first
+    // [2020, 2019, 2018, ....]
+    all_items.reverse();
 
     all_items
 }
@@ -62,7 +69,7 @@ pub(crate) fn gather_all_cache_items<'a>(
 /// 0 = no limit, don't delete anything
 fn parse_size_limit_to_bytes(limit: &Option<&str>) -> usize {
     match limit {
-        None => 0,
+        None => 0, //@TODO throw error here?
         Some(limit) => {
             // figure out the unit
             let unit_multiplicator: usize = match limit.chars().last() {
@@ -80,7 +87,7 @@ fn parse_size_limit_to_bytes(limit: &Option<&str>) -> usize {
                             _ => panic!("failed to parse unit, please use one of B K M G or T"),
                         }
                     } else {
-                        panic!("failed to parse")
+                        panic!("failed to parse, no unit supplied") // @TODO return error here
                     }
                 }
             };
@@ -102,10 +109,12 @@ pub(crate) fn trim_cache(
     dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), ()> {
-    // parse the size limit
+    // the cache should not exceed this limit
     let size_limit = parse_size_limit_to_bytes(size_limit);
-    // get all the items of the cache
-    let all_cache_items = gather_all_cache_items(
+    //FIXME
+    let size_limit: u64 = 1000 * 1024 * 1024; // 1 GB
+                                              // get all the items of the cache
+    let all_cache_items: Vec<&PathBuf> = gather_all_cache_items(
         git_checkouts_cache,
         bare_repos_cache,
         registry_pkg_cache,
@@ -114,12 +123,23 @@ pub(crate) fn trim_cache(
         size_changed,
     );
 
+    // delete everything that is unneeded
     let mut cache_size = 0;
 
-    // delete everything that is unneeded
-    all_cache_items.iter().for_each(|_| ());
-
-    unimplemented!();
+    // walk the items and collect items until we have reached the size limit
+    all_cache_items
+        // walk through the files, youngest item comes first, oldest item comes last
+        .iter()
+        .filter(|path| {
+            let item_size = cumulative_dir_size(&path).dir_size;
+            // add the item size to the cache size
+            cache_size += item_size;
+            // keep all items (for deletion) once we have exceeded the cache size
+            cache_size > size_limit as u64
+        })
+        .for_each(|path| println!("{}", path.display().to_string()));
+    // for debugging: the smaller the size limit is, the more items we keep for deletion
+    Ok(())
 }
 
 #[cfg(test)]
