@@ -195,7 +195,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .short("l")
         .help("size that the cache will be reduced to")
         .takes_value(true)
-        .value_name("LIMIT");
+        .value_name("LIMIT")
+        .required(true);
 
     let trim = SubCommand::with_name("trim")
         .about("Trim old items from the cache until maximum cache size limit is reached")
