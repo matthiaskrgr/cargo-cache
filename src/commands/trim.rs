@@ -93,6 +93,7 @@ fn parse_size_limit_to_bytes(limit: &Option<&str>) -> usize {
     }
 }
 
+// this is the function that trim sthe cache to a given limit
 pub(crate) fn trim_cache(
     size_limit: &Option<&str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
