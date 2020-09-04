@@ -169,13 +169,14 @@ fn main() {
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
     if let Some(trim_config) = config.subcommand_matches("trim") {
-        let res = commands::trim::trim_cache(
+        let _res = commands::trim::trim_cache(
             &trim_config.value_of("trim_limit"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-            config.is_present("dry-run"),
+            //config.is_present("dry-run"),
+            true,
             &mut size_changed,
         );
     }

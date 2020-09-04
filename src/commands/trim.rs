@@ -14,6 +14,7 @@ use std::path::PathBuf;
 use crate::cache::caches::*;
 use crate::cache::*;
 use crate::library::*;
+use crate::remove::*;
 
 use walkdir::WalkDir;
 
@@ -127,8 +128,18 @@ pub(crate) fn trim_cache(
             // keep all items (for deletion) once we have exceeded the cache size
             cache_size > size_limit
         })
-        .for_each(|path| println!("{}", path.display().to_string()));
-    // for debugging: the smaller the size limit is, the more items we keep for deletion
+        // .for_each(|path| println!("{}", path.display().to_string()));
+        // for debugging: the smaller the size limit is, the more items we keep for deletion
+        .for_each(|path| {
+            remove_file(
+                path,
+                dry_run,
+                size_changed,
+                None,
+                &DryRunMessage::Default,
+                None,
+            )
+        });
     Ok(())
 }
 
