@@ -9,18 +9,12 @@
 
 // "cargo cache trim" command
 
-use std::fs;
 use std::path::PathBuf;
 
 use crate::cache::caches::*;
 use crate::cache::*;
 use crate::library::*;
-use crate::library::{CargoCachePaths, Error};
-use crate::remove::*;
-use cargo_metadata::{CargoOpt, MetadataCommand};
 
-use clap::ArgMatches;
-use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
@@ -46,8 +40,6 @@ pub(crate) fn gather_all_cache_items<'a>(
     registry_pkg_cache: &'a mut registry_pkg_cache::RegistryPkgCaches,
 
     registry_sources_cache: &'a mut registry_sources::RegistrySourceCaches,
-    dry_run: bool,
-    size_changed: &mut bool,
 ) -> Vec<&'a PathBuf> {
     let mut all_items: Vec<&PathBuf> = Vec::new();
     all_items.extend(git_checkouts_cache.items());
@@ -110,7 +102,7 @@ pub(crate) fn trim_cache(
     size_changed: &mut bool,
 ) -> Result<(), ()> {
     // the cache should not exceed this limit
-    let size_limit = parse_size_limit_to_bytes(size_limit);
+    let size_limit = parse_size_limit_to_bytes(size_limit) as u64;
     //FIXME
     let size_limit: u64 = 1000 * 1024 * 1024; // 1 GB
                                               // get all the items of the cache
@@ -119,8 +111,6 @@ pub(crate) fn trim_cache(
         bare_repos_cache,
         registry_pkg_cache,
         registry_sources_cache,
-        dry_run,
-        size_changed,
     );
 
     // delete everything that is unneeded
@@ -131,11 +121,11 @@ pub(crate) fn trim_cache(
         // walk through the files, youngest item comes first, oldest item comes last
         .iter()
         .filter(|path| {
-            let item_size = cumulative_dir_size(&path).dir_size;
+            let item_size = cumulative_dir_size(path).dir_size;
             // add the item size to the cache size
             cache_size += item_size;
             // keep all items (for deletion) once we have exceeded the cache size
-            cache_size > size_limit as u64
+            cache_size > size_limit
         })
         .for_each(|path| println!("{}", path.display().to_string()));
     // for debugging: the smaller the size limit is, the more items we keep for deletion
