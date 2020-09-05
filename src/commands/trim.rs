@@ -9,6 +9,7 @@
 
 // "cargo cache trim" command
 
+use std::fmt;
 use std::path::PathBuf;
 
 use crate::cache::caches::*;
@@ -17,6 +18,22 @@ use crate::library::*;
 use crate::remove::*;
 
 use walkdir::WalkDir;
+
+#[derive(Debug)]
+pub(crate) enum TrimError<'a> {
+    // failed to parse the unit of a `cargo cache trim --limit 123G` argument
+    TrimLimitUnitParseFailure(&'a str),
+}
+
+impl fmt::Display for TrimError<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Self::TrimLimitUnitParseFailure(limit) => {
+                write!(f, "Failed to parse limit: \"{}\". Should be of the form 123X where X is one of B,K,M,G or T.", limit)
+            }
+        }
+    }
+}
 
 fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
     if path.is_file() {
@@ -58,56 +75,53 @@ pub(crate) fn gather_all_cache_items<'a>(
     all_items
 }
 
-/// figure how big the cache should remain after trimming
-/// 0 = no limit, don't delete anything
-fn parse_size_limit_to_bytes(limit: &Option<&str>) -> usize {
+/// figure out how big the cache should remain after trimming
+fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
     match limit {
-        None => 0, //@TODO throw error here?
+        None => unreachable!("No trim --limit was supplied altough clap should enfource that!"),
         Some(limit) => {
             // figure out the unit
-            let unit_multiplicator: usize = match limit.chars().last() {
+            let unit_multiplicator = match limit.chars().last() {
                 // we have no limit
-                None => 0,
+                None => Ok(0),
                 // we expect a unit such as B, K, M, G, T...
                 Some(c) => {
                     if c.is_alphabetic() {
                         match c {
-                            'B' => 1,
-                            'K' => 1024,
-                            'M' => 1024 * 1024,
-                            'G' => 1024 * 1024 * 1024,
-                            'T' => 1024 * 1024 * 1024 * 1024,
-                            _ => panic!("failed to parse unit, please use one of B K M G or T"),
+                            'B' => Ok(1),
+                            'K' => Ok(1024),
+                            'M' => Ok(1024 * 1024),
+                            'G' => Ok(1024 * 1024 * 1024),
+                            'T' => Ok(1024 * 1024 * 1024 * 1024),
+                            _ => Err(TrimError::TrimLimitUnitParseFailure(limit)),
                         }
                     } else {
-                        panic!("failed to parse, no unit supplied") // @TODO return error here
+                        Err(TrimError::TrimLimitUnitParseFailure(limit))
                     }
                 }
             };
-            let value: usize = limit[0..(limit.len() - 1)].parse().unwrap();
+            let value: u64 = limit[0..(limit.len() - 1)].parse().unwrap();
             if value == 0 {
-                return 0;
+                return Ok(0);
             }
-            value * unit_multiplicator
+            Ok(value * unit_multiplicator?)
         }
     }
 }
 
 // this is the function that trim sthe cache to a given limit
-pub(crate) fn trim_cache(
-    size_limit: &Option<&str>,
+pub(crate) fn trim_cache<'a>(
+    size_limit: &Option<&'a str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
-) -> Result<(), ()> {
+) -> Result<(), TrimError<'a>> {
     // the cache should not exceed this limit
-    let size_limit = parse_size_limit_to_bytes(size_limit) as u64;
-    //FIXME
-    let size_limit: u64 = 1000 * 1024 * 1024; // 1 GB
-                                              // get all the items of the cache
+    let size_limit = parse_size_limit_to_bytes(size_limit)?;
+    // get all the items of the cache
     let all_cache_items: Vec<&PathBuf> = gather_all_cache_items(
         git_checkouts_cache,
         bare_repos_cache,
