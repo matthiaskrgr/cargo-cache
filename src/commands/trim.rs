@@ -111,7 +111,7 @@ fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimErr
 
 // this is the function that trim sthe cache to a given limit
 pub(crate) fn trim_cache<'a>(
-    size_limit: &Option<&'a str>,
+    unparsed_size_limit: &Option<&'a str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
@@ -120,7 +120,7 @@ pub(crate) fn trim_cache<'a>(
     size_changed: &mut bool,
 ) -> Result<(), TrimError<'a>> {
     // the cache should not exceed this limit
-    let size_limit = parse_size_limit_to_bytes(size_limit)?;
+    let size_limit = parse_size_limit_to_bytes(unparsed_size_limit)?;
     // get all the items of the cache
     let all_cache_items: Vec<&PathBuf> = gather_all_cache_items(
         git_checkouts_cache,
