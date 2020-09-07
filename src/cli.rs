@@ -326,8 +326,8 @@ SUBCOMMANDS:
     r              query each package registry separately
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
-    sccache        gather stats on a local sccache cache\n");
-
+    sccache        gather stats on a local sccache cache
+    trim           Trim old items from the cache until maximum cache size limit is reached\n");
         assert_eq!(help_desired, help_real);
     }
     #[test]
@@ -373,7 +373,9 @@ SUBCOMMANDS:
     r              query each package registry separately
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
-    sccache        gather stats on a local sccache cache\n");
+    sccache        gather stats on a local sccache cache
+    trim           Trim old items from the cache until maximum cache size limit is reached\n");
+
         assert_eq!(help_desired, help_real);
     }
 
