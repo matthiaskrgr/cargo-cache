@@ -19,7 +19,7 @@ use crate::remove::*;
 
 use walkdir::WalkDir;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub(crate) enum TrimError<'a> {
     // failed to parse the unit of a `cargo cache trim --limit 123G` argument
     TrimLimitUnitParseFailure(&'a str),
@@ -166,23 +166,23 @@ mod parse_size_limit {
     #[test]
     fn size_limit() {
         // shorter function name
-        fn p(limit: Option<&str>) -> usize {
+        fn p<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
             parse_size_limit_to_bytes(&limit)
         }
-        assert_eq!(p(None), 0);
+        assert_eq!(p(&None), Ok(0));
 
-        assert_eq!(p(Some("1B")), 1);
+        assert_eq!(p(&Some("1B")), Ok(1));
 
-        assert_eq!(p(Some("1K")), 1024);
+        assert_eq!(p(&Some("1K")), Ok(1024));
 
-        assert_eq!(p(Some("1M")), 1_048_576);
+        assert_eq!(p(&Some("1M")), Ok(1_048_576));
 
-        assert_eq!(p(Some("1G")), 1_073_741_824);
+        assert_eq!(p(&Some("1G")), Ok(1_073_741_824));
 
-        assert_eq!(p(Some("1T")), 1_099_511_627_776);
+        assert_eq!(p(&Some("1T")), Ok(1_099_511_627_776));
 
-        assert_eq!(p(Some("4M")), 4_194_304);
-        assert_eq!(p(Some("42M")), 44_040_192);
-        assert_eq!(p(Some("1337M")), 1_401_946_112);
+        assert_eq!(p(&Some("4M")), Ok(4_194_304));
+        assert_eq!(p(&Some("42M")), Ok(44_040_192));
+        assert_eq!(p(&Some("1337M")), Ok(1_401_946_112));
     }
 }
