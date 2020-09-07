@@ -184,7 +184,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .value_name("PATH");
 
     let clean_unref = SubCommand::with_name("clean-unref")
-        .about("Remove crates that are not referenced in a Cargo.toml from the cache")
+        .about("remove crates that are not referenced in a Cargo.toml from the cache")
         .arg(&manifest_path)
         .arg(&dry_run);
     //</clean-unref>
@@ -199,7 +199,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .required(true);
 
     let trim = SubCommand::with_name("trim")
-        .about("Trim old items from the cache until maximum cache size limit is reached")
+        .about("trim old items from the cache until maximum cache size limit is reached")
         .arg(&size_limit)
         .arg(&dry_run);
 
@@ -317,7 +317,7 @@ OPTIONS:
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    clean-unref    Remove crates that are not referenced in a Cargo.toml from the cache
+    clean-unref    remove crates that are not referenced in a Cargo.toml from the cache
     help           Prints this message or the help of the given subcommand(s)
     l              check local build cache (target) of a rust project
     local          check local build cache (target) of a rust project
@@ -327,7 +327,7 @@ SUBCOMMANDS:
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
-    trim           Trim old items from the cache until maximum cache size limit is reached\n");
+    trim           trim old items from the cache until maximum cache size limit is reached\n");
         assert_eq!(help_desired, help_real);
     }
     #[test]
@@ -364,7 +364,7 @@ OPTIONS:
     -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
 SUBCOMMANDS:
-    clean-unref    Remove crates that are not referenced in a Cargo.toml from the cache
+    clean-unref    remove crates that are not referenced in a Cargo.toml from the cache
     help           Prints this message or the help of the given subcommand(s)
     l              check local build cache (target) of a rust project
     local          check local build cache (target) of a rust project
@@ -374,7 +374,7 @@ SUBCOMMANDS:
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
-    trim           Trim old items from the cache until maximum cache size limit is reached\n");
+    trim           trim old items from the cache until maximum cache size limit is reached\n");
 
         assert_eq!(help_desired, help_real);
     }
