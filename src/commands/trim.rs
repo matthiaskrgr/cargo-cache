@@ -167,7 +167,7 @@ mod parse_size_limit {
     fn size_limit() {
         // shorter function name
         fn p<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
-            parse_size_limit_to_bytes(&limit)
+            parse_size_limit_to_bytes(limit)
         }
         // not possible, @TODO add negative test to make sure that this panics
         //assert_eq!(p(&None), Ok(0));
