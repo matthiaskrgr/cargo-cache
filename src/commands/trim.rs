@@ -56,7 +56,6 @@ pub(crate) fn gather_all_cache_items<'a>(
     git_checkouts_cache: &'a mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &'a mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &'a mut registry_pkg_cache::RegistryPkgCaches,
-
     registry_sources_cache: &'a mut registry_sources::RegistrySourceCaches,
 ) -> Vec<&'a PathBuf> {
     let mut all_items: Vec<&PathBuf> = Vec::new();
@@ -65,7 +64,7 @@ pub(crate) fn gather_all_cache_items<'a>(
     all_items.extend(registry_pkg_cache.items());
     all_items.extend(registry_sources_cache.items());
 
-    // use caching, calculating the last access for each path ever time is not cheap
+    // calculating the last access for each path ever time is not cheap, so use caching
     // sort from youngest to oldest
     all_items.sort_by_cached_key(|path| get_last_access_of_item(path));
     // reverse the vec so that youngest access dates come first
@@ -78,7 +77,7 @@ pub(crate) fn gather_all_cache_items<'a>(
 /// figure out how big the cache should remain after trimming
 fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
     match limit {
-        None => unreachable!("No trim --limit was supplied altough clap should enfource that!"),
+        None => unreachable!("No trim --limit was supplied altough clap should enforce that!"),
         Some(limit) => {
             // figure out the unit
             let unit_multiplicator = match limit.chars().last() {
@@ -169,8 +168,6 @@ mod parse_size_limit {
         fn p<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
             parse_size_limit_to_bytes(limit)
         }
-        // not possible, @TODO add negative test to make sure that this panics
-        //assert_eq!(p(&None), Ok(0));
 
         assert_eq!(p(&Some("1B")), Ok(1));
 
@@ -185,5 +182,12 @@ mod parse_size_limit {
         assert_eq!(p(&Some("4M")), Ok(4_194_304));
         assert_eq!(p(&Some("42M")), Ok(44_040_192));
         assert_eq!(p(&Some("1337M")), Ok(1_401_946_112));
+    }
+
+    // make sure Size limit None panicss
+    #[test]
+    #[should_panic(expected = "No trim --limit was supplied altough clap should enforce that!")]
+    fn size_limit_none_panics() {
+        let _ = parse_size_limit_to_bytes(&None);
     }
 }
