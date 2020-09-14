@@ -8,6 +8,8 @@
 // except according to those terms.
 
 // "cargo cache trim" command
+// trim the size of the cargo cache down to a certain limit.
+// note that this does not take account the registry indices and the installed binaries in calculations
 
 use std::fmt;
 use std::path::PathBuf;
