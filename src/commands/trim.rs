@@ -19,6 +19,7 @@ use crate::cache::*;
 use crate::library::*;
 use crate::remove::*;
 
+use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 #[derive(Debug, Eq, PartialEq)]
@@ -151,16 +152,25 @@ pub(crate) fn trim_cache<'a>(
 
     // delete everything that is unneeded
     let mut cache_size = 0;
+    let mut removed_size: u64 = 0;
+    let mut removed_item_count = 0;
+
     // walk the items and collect items until we have reached the size limit
     all_cache_items
         // walk through the files, youngest item comes first, oldest item comes last
         .iter()
         .filter(|path| {
+            //@TODO query cache for size!
             let item_size = size_of_path(path);
             // add the item size to the cache size
             cache_size += item_size;
             // keep all items (for deletion) once we have exceeded the cache size
-            cache_size > size_limit
+            let keep_file = cache_size > size_limit;
+            if keep_file {
+                removed_size += item_size;
+                removed_item_count += 1;
+            }
+            keep_file
         })
         // .for_each(|path| println!("{}", path.display().to_string()));
         // for debugging: the smaller the size limit is, the more items we keep for deletion
@@ -174,6 +184,11 @@ pub(crate) fn trim_cache<'a>(
                 None,
             )
         });
+    println!(
+        "Removed {} items totalling {}",
+        removed_item_count,
+        removed_size.file_size(file_size_opts::DECIMAL).unwrap()
+    );
     Ok(())
 }
 
