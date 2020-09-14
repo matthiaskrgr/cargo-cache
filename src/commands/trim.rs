@@ -80,7 +80,7 @@ fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimErr
         None => unreachable!("No trim --limit was supplied altough clap should enforce that!"),
         Some(limit) => {
             // figure out the unit
-            let unit_multiplicator = match limit.chars().last() {
+            let unit_multiplicator: Result<u64, TrimError<'a>> = match limit.chars().last() {
                 // we have no limit
                 None => Ok(0),
                 // we expect a unit such as B, K, M, G, T...
@@ -99,11 +99,16 @@ fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimErr
                     }
                 }
             };
-            let value: u64 = limit[0..(limit.len() - 1)].parse().unwrap();
-            if value == 0 {
+            let value: f64 = limit[0..(limit.len() - 1)].parse().unwrap();
+            if value == 0.0 {
                 return Ok(0);
             }
-            Ok(value * unit_multiplicator?)
+            // we may truncate the value here but that's ok
+            #[allow(clippy::cast_lossless)]
+            #[allow(clippy::cast_sign_loss)]
+            #[allow(clippy::cast_possible_truncation)]
+            #[allow(clippy::cast_precision_loss)]
+            Ok((value * unit_multiplicator? as f64) as u64)
         }
     }
 }
@@ -200,6 +205,8 @@ mod parse_size_limit {
         assert_eq!(p(&Some("4M")), Ok(4_194_304));
         assert_eq!(p(&Some("42M")), Ok(44_040_192));
         assert_eq!(p(&Some("1337M")), Ok(1_401_946_112));
+
+        assert_eq!(p(&Some("1.5k")), Ok(1_536));
 
         assert_eq!(
             p(&Some("1_")),
