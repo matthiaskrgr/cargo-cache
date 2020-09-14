@@ -120,6 +120,19 @@ pub(crate) fn trim_cache<'a>(
 ) -> Result<(), TrimError<'a>> {
     // the cache should not exceed this limit
     let size_limit = parse_size_limit_to_bytes(unparsed_size_limit)?;
+
+    // fast path:
+    // if the  limit is bigger than the cache size, we can return
+    // because we know we won't have to delete anything
+    let total_cache_size: u64 = git_checkouts_cache.total_size()
+        + bare_repos_cache.total_size()
+        + registry_pkg_cache.total_size()
+        + registry_sources_cache.total_size();
+
+    if size_limit > total_cache_size {
+        return Ok(());
+    }
+
     // get all the items of the cache
     let all_cache_items: Vec<&PathBuf> = gather_all_cache_items(
         git_checkouts_cache,
