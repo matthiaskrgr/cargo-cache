@@ -87,11 +87,11 @@ fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimErr
                 Some(c) => {
                     if c.is_alphabetic() {
                         match c {
-                            'B' => Ok(1),
-                            'K' => Ok(1024),
-                            'M' => Ok(1024 * 1024),
-                            'G' => Ok(1024 * 1024 * 1024),
-                            'T' => Ok(1024 * 1024 * 1024 * 1024),
+                            'b' | 'B' => Ok(1),
+                            'k' | 'K' => Ok(1024),
+                            'm' | 'M' => Ok(1024 * 1024),
+                            'g' | 'G' => Ok(1024 * 1024 * 1024),
+                            't' | 'T' => Ok(1024 * 1024 * 1024 * 1024),
                             _ => Err(TrimError::TrimLimitUnitParseFailure(limit)),
                         }
                     } else {
@@ -130,6 +130,7 @@ pub(crate) fn trim_cache<'a>(
         + registry_sources_cache.total_size();
 
     if size_limit > total_cache_size {
+        //println!("trim: limit exceeds cache-limit, doing nothing");
         return Ok(());
     }
 
@@ -143,13 +144,12 @@ pub(crate) fn trim_cache<'a>(
 
     // delete everything that is unneeded
     let mut cache_size = 0;
-
     // walk the items and collect items until we have reached the size limit
     all_cache_items
         // walk through the files, youngest item comes first, oldest item comes last
         .iter()
         .filter(|path| {
-            let item_size = cumulative_dir_size(path).dir_size;
+            let item_size = size_of_path(path);
             // add the item size to the cache size
             cache_size += item_size;
             // keep all items (for deletion) once we have exceeded the cache size
@@ -184,7 +184,7 @@ mod parse_size_limit {
 
         assert_eq!(p(&Some("1B")), Ok(1));
 
-        assert_eq!(p(&Some("1K")), Ok(1024));
+        assert_eq!(p(&Some("1K")), Ok(1_024));
 
         assert_eq!(p(&Some("1M")), Ok(1_048_576));
 
@@ -195,6 +195,11 @@ mod parse_size_limit {
         assert_eq!(p(&Some("4M")), Ok(4_194_304));
         assert_eq!(p(&Some("42M")), Ok(44_040_192));
         assert_eq!(p(&Some("1337M")), Ok(1_401_946_112));
+
+        assert_eq!(
+            p(&Some("1_")),
+            Err(TrimError::TrimLimitUnitParseFailure("1_"))
+        );
     }
 
     // make sure Size limit None panicss
