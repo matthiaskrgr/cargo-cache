@@ -182,14 +182,19 @@ mod parse_size_limit {
             parse_size_limit_to_bytes(limit)
         }
 
+        assert_eq!(p(&Some("1b")), Ok(1));
         assert_eq!(p(&Some("1B")), Ok(1));
 
+        assert_eq!(p(&Some("1k")), Ok(1_024));
         assert_eq!(p(&Some("1K")), Ok(1_024));
 
+        assert_eq!(p(&Some("1m")), Ok(1_048_576));
         assert_eq!(p(&Some("1M")), Ok(1_048_576));
 
+        assert_eq!(p(&Some("1g")), Ok(1_073_741_824));
         assert_eq!(p(&Some("1G")), Ok(1_073_741_824));
 
+        assert_eq!(p(&Some("1t")), Ok(1_099_511_627_776));
         assert_eq!(p(&Some("1T")), Ok(1_099_511_627_776));
 
         assert_eq!(p(&Some("4M")), Ok(4_194_304));
