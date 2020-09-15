@@ -1,5 +1,7 @@
 ## Git
 ````
+Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.
+	While calculating the cache size, registry indices and installed binaries are skipped.
 
 Updated dependencies:
 	remove_dir_all: 0.5.3 -> 0.6.0
