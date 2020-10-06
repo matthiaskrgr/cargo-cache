@@ -53,7 +53,7 @@ cfg-if = { version = "0.1.10" } # if cfg(..)  { ...  }
 # https://github.com/chronotope/chrono
 chrono = { version = "0.4.11", optional = true } # compare dates etc
 
-# https://github.com/soc/dirs-rs
+# https://github.com/xdg-rs/dirs
 dirs-next = { version = "1.0.1", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/XAMPPRocky/remove_dir_all
