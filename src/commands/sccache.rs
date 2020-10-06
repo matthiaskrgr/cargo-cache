@@ -40,8 +40,8 @@ fn sccache_dir() -> Result<PathBuf, library::Error> {
     if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
         Ok(path)
     } else {
-        // if SCCACHE_DIR variable is not present, get the cache dir from "dirs" crate
-        let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
+        // if SCCACHE_DIR variable is not present, get the cache dir from "dirs-next" crate
+        let mut cache_dir: Option<PathBuf> = dirs_next::cache_dir();
 
         if let Some(cache_dir) = cache_dir.as_mut() {
             if cfg!(target_os = "macos") {
