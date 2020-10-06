@@ -41,18 +41,14 @@ fn sccache_dir() -> Result<PathBuf, library::Error> {
         Ok(path)
     } else {
         // if SCCACHE_DIR variable is not present, get the cache dir from "dirs-next" crate
-        let mut cache_dir: Option<PathBuf> = dirs_next::cache_dir();
+        let mut cache_dir = dirs_next::cache_dir().ok_or(library::Error::NoSccacheDir)?;
 
-        if let Some(cache_dir) = cache_dir.as_mut() {
-            if cfg!(target_os = "macos") {
-                cache_dir.push("Mozilla.sccache");
-            } else {
-                cache_dir.push("sccache");
-            }
-            Ok(cache_dir.to_path_buf())
+        if cfg!(target_os = "macos") {
+            cache_dir.push("Mozilla.sccache");
         } else {
-            Err(library::Error::NoSccacheDir)
+            cache_dir.push("sccache");
         }
+        Ok(cache_dir)
     }
 }
 
