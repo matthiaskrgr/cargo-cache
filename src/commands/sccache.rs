@@ -37,23 +37,18 @@ fn percentage_of_as_string(fraction: u64, total: u64) -> String {
 
 /// get the location of a local sccache path
 fn sccache_dir() -> Result<PathBuf, library::Error> {
-    if let Some(path) = env::var_os("SCCACHE_DIR").map(PathBuf::from) {
-        Ok(path)
-    } else {
-        // if SCCACHE_DIR variable is not present, get the cache dir from "dirs" crate
-        let mut cache_dir: Option<PathBuf> = dirs::cache_dir();
-
-        if let Some(cache_dir) = cache_dir.as_mut() {
-            if cfg!(target_os = "macos") {
-                cache_dir.push("Mozilla.sccache");
+    env::var_os("SCCACHE_DIR")
+        .map(PathBuf::from)
+        .or_else(|| {
+            const CACHE_DIR_NAME: &str = if cfg!(target_os = "macos") {
+                "Mozilla.sccache"
             } else {
-                cache_dir.push("sccache");
-            }
-            Ok(cache_dir.to_path_buf())
-        } else {
-            Err(library::Error::NoSccacheDir)
-        }
-    }
+                "sccache"
+            };
+
+            Some(dirs_next::cache_dir()?.join(CACHE_DIR_NAME))
+        })
+        .ok_or(library::Error::NoSccacheDir)
 }
 
 pub(crate) fn sccache_stats() -> Result<(), library::Error> {

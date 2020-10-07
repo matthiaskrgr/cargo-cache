@@ -1,5 +1,7 @@
 ## Git
 ````
+Changed dependency `dirs` to `dirs-next`, as `dirs` is no longer maintained.
+
 Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.
 	While calculating the cache size, registry indices and installed binaries are skipped.
 
