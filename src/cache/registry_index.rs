@@ -206,7 +206,6 @@ impl RegistrySuperCache for RegistryIndicesCache {
                         .unwrap()
                         .to_str()
                         .unwrap()
-                        .to_string()
                         .contains('-')
             })
             //.inspect(|p| println!("p: {:?}", p))

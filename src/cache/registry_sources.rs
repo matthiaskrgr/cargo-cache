@@ -157,7 +157,6 @@ impl RegistrySubCache for RegistrySourceCache {
                             .unwrap()
                             .to_str()
                             .unwrap()
-                            .to_string()
                             .contains('-')
                 })
                 .collect::<Vec<PathBuf>>();
@@ -224,7 +223,6 @@ impl RegistrySuperCache for RegistrySourceCaches {
                         .unwrap()
                         .to_str()
                         .unwrap()
-                        .to_string()
                         .contains('-')
             })
             .map(RegistrySourceCache::new)

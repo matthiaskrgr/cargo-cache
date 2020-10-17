@@ -198,7 +198,6 @@ impl RegistrySuperCache for RegistryPkgCaches {
                         .unwrap()
                         .to_str()
                         .unwrap()
-                        .to_string()
                         .contains('-')
             })
             //.inspect(|p| println!("p: {:?}", p))
