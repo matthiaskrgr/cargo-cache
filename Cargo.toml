@@ -23,8 +23,17 @@ offline_tests =  [] # only run tests that do not require internet connection
 # https://github.com/oli-obk/cargo_metadata
 cargo_metadata = { version = "0.12.0", optional = true } # get crate package name
 
+# https://github.com/alexcrichton/cfg-if
+cfg-if = { version = "1.0.0" } # if cfg(..)  { ...  }
+
+# https://github.com/chronotope/chrono
+chrono = { version = "0.4.19", optional = true } # compare dates etc
+
 # https://github.com/kbknapp/clap-rs
 clap = { version = "2.33.3", optional = true }  # cmdline arg parsing
+
+# https://github.com/xdg-rs/dirs
+dirs-next = { version = "1.0.2", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/alexcrichton/git2-rs
 git2 = { version = "0.13.12", default-features = false,  optional = true  } # check if repo is git repo
@@ -41,23 +50,15 @@ rayon = { version = "1.4.1", optional = true } # parallelize iterators
 # https://github.com/rust-lang/regex
 regex = { version = "1.4.1", optional = true } # use regex for matching
 
+# https://github.com/XAMPPRocky/remove_dir_all
+remove_dir_all = { version = "0.6.1" } # remove_dir_all on windows
+
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = { version = "0.2.0", optional = true } # git version information
 
 # https://github.com/BurntSushi/walkdir
 walkdir = { version = "2.3.1", optional = true } # walk content of directory/CARGO_HOME recursively
 
-# https://github.com/alexcrichton/cfg-if
-cfg-if = { version = "1.0.0" } # if cfg(..)  { ...  }
-
-# https://github.com/chronotope/chrono
-chrono = { version = "0.4.19", optional = true } # compare dates etc
-
-# https://github.com/xdg-rs/dirs
-dirs-next = { version = "1.0.2", optional = true } # get cache dirs to look for sccache cache
-
-# https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = { version = "0.6.1" } # remove_dir_all on windows
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
