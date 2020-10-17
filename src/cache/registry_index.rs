@@ -200,14 +200,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
         #[allow(clippy::filter_map)]
         let indices = indices_dirs
             .map(|direntry| direntry.unwrap().path())
-            .filter(|p| {
-                p.is_dir()
-                    && p.file_name()
-                        .unwrap()
-                        .to_str()
-                        .unwrap()
-                        .contains('-')
-            })
+            .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))
             //.inspect(|p| println!("p: {:?}", p))
             .map(RegistryIndex::new)
             .collect::<Vec<RegistryIndex>>();

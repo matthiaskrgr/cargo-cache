@@ -192,14 +192,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
         #[allow(clippy::filter_map)]
         let caches = cache_dirs
             .map(|direntry| direntry.unwrap().path())
-            .filter(|p| {
-                p.is_dir()
-                    && p.file_name()
-                        .unwrap()
-                        .to_str()
-                        .unwrap()
-                        .contains('-')
-            })
+            .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))
             //.inspect(|p| println!("p: {:?}", p))
             .map(RegistryPkgCache::new)
             .collect::<Vec<RegistryPkgCache>>();

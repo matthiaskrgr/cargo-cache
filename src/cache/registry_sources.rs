@@ -151,14 +151,7 @@ impl RegistrySubCache for RegistrySourceCache {
             let folders = std::fs::read_dir(&self.path)
                 .unwrap_or_else(|_| panic!("Failed to read {:?}", self.path.display()))
                 .map(|direntry| direntry.unwrap().path())
-                .filter(|p| {
-                    p.is_dir()
-                        && p.file_name()
-                            .unwrap()
-                            .to_str()
-                            .unwrap()
-                            .contains('-')
-                })
+                .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))
                 .collect::<Vec<PathBuf>>();
             self.items = folders;
             self.items_calculated = true;
@@ -217,14 +210,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
         #[allow(clippy::filter_map)]
         let registry_folders = registries
             .map(|direntry| direntry.unwrap().path())
-            .filter(|p| {
-                p.is_dir()
-                    && p.file_name()
-                        .unwrap()
-                        .to_str()
-                        .unwrap()
-                        .contains('-')
-            })
+            .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))
             .map(RegistrySourceCache::new)
             .collect::<Vec<RegistrySourceCache>>();
 
