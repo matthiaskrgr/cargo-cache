@@ -6,6 +6,16 @@ Add "trim" subcommand which gets a --limit param and trims the cache down to tha
 	While calculating the cache size, registry indices and installed binaries are skipped.
 
 Updated dependencies:
+	cargo-metadata: 0.11.0 -> 0.12.0
+	clap: 2.33.1 -> 2.33.3
+	git2: 0.13.5-> 0.13.12
+	rayon: 1.3.0 -> 1.4.1
+	regex: 1.3.7 -> 1.4.1
+	cfg-if: 0.1.10 -> 1.0.0
+	chrono: 0.4.11 -> 0.4.19
+	dirs-next: 1.0.1 -> 1.0.2
+	path-slash: 0.1.1 -> 0.1.3
+	fx-extra 1.1.0: -> 1.2.0
 	remove_dir_all: 0.5.3 -> 0.6.0
 ````
 
