@@ -11,4 +11,5 @@
 pub(crate) mod local;
 pub(crate) mod query;
 pub(crate) mod sccache;
+pub(crate) mod toolchains;
 pub(crate) mod trim;

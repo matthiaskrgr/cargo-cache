@@ -79,7 +79,7 @@ cfg_if::cfg_if! {
         use std::time::SystemTime;
         use walkdir::WalkDir;
         use crate::cache::*;
-        use crate::commands::{local, query, sccache, trim};
+        use crate::commands::{local, query, sccache, trim, toolchains};
         use crate::git::*;
         use crate::library::*;
         use crate::remove::*;
@@ -98,6 +98,9 @@ extern crate test; //hack
 #[allow(clippy::cognitive_complexity)]
 #[cfg(not(feature = "ci-autoclean"))]
 fn main() {
+    let x = toolchains::toolchain_stats();
+    return;
+
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
     let config = cli::gen_clap();
