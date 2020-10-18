@@ -84,70 +84,20 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
     let toolchains = toolchains()
         .unwrap()
         .map(|dir| dir.unwrap().path())
-        .map(|p| Toolchain::new(p));
+        .map(Toolchain::new)
+        .collect::<Vec<_>>();
 
-    toolchains.for_each(|x| println!("{:?}", x));
-
-    panic!();
-    /*
-    // of all the files inside the sccache cache, gather last access time and path
-    let files = vec![PathBuf::new()].into_iter();
-
-    // sort files by access date (date, not time!)
-    let files_sorted = {
-        let mut v: Vec<File> = files.collect();
-        v.sort_by_key(|file| file.access_date);
-        v
-    };
-
-    // get unique access dates, the dates which we have files accessed at
-    let unique_access_dates: Vec<File> = {
-        let mut unique = files_sorted.clone();
-        unique.dedup_by_key(|f| f.access_date);
-        unique
-    };
-
-    #[allow(clippy::filter_map)]
-    let total_size_entire_cache: u64 = files_sorted
-        .iter()
-        .filter_map(|file| fs::metadata(&file.path).ok())
-        .map(|metadata| metadata.len())
-        .sum();
-
-    let mut total_size: u64 = 0;
+    let total_size: u64 = toolchains.iter().map(|toolchain| toolchain.size).sum();
 
     // extract the unique dates from the unique vec
-    let table_matrix: Vec<Vec<String>> = unique_access_dates
-        .into_iter()
-        // dates extracted, now..
-        .map(|unique_date| {
-            // ..count how often each date is contained inside the files_sorted() array and return that
-            // together with the date
-            let count = files_sorted
-                .iter()
-                .filter(|file| file.access_date == unique_date.access_date)
-                .count();
-
-            #[allow(clippy::filter_map)]
-            let total_size_bytes: u64 = files_sorted
-                .iter()
-                .filter(|file| file.access_date == unique_date.access_date)
-                .filter_map(|file| fs::metadata(&file.path).ok())
-                .map(|metadata| metadata.len())
-                .sum();
-
-            // calculate total file size sum for the summary
-            total_size += total_size_bytes;
-
-            let size_human_readable = total_size_bytes.file_size(file_size_opts::DECIMAL).unwrap();
-
-            let percentage = percentage_of_as_string(total_size_bytes, total_size_entire_cache);
-
+    let table_matrix: Vec<Vec<String>> = toolchains
+        .iter()
+        .map(|toolchain| {
             vec![
-                count.to_string(),
-                unique_date.access_date.to_string(),
-                size_human_readable,
-                percentage,
+                toolchain.name.clone(),
+                toolchain.number_files.to_string(),
+                toolchain.size.file_size(file_size_opts::DECIMAL).unwrap(),
+                percentage_of_as_string(toolchain.size, total_size),
             ]
         })
         .collect();
@@ -156,8 +106,8 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
     let mut table_vec =
         Vec::with_capacity(table_matrix.len() + 2 /* header column + summary */);
     table_vec.push(vec![
+        "Toolchain Name".to_string(),
         "Files".to_string(),
-        "Day".to_string(),
         "Size".to_string(),
         "Percentage".to_string(),
     ]);
@@ -179,7 +129,10 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
         String::new(),
     ]);
 
-    let number_of_files = files_sorted.len();
+    let number_of_files: usize = toolchains
+        .iter()
+        .map(|toolchain| toolchain.number_files)
+        .sum();
     // summary
     table_vec.push(vec![
         number_of_files.to_string(),
@@ -192,7 +145,5 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
     let table_trimmed = table.trim();
     println!("{}", table_trimmed);
-    Ok(())
-    */
     Ok(())
 }
