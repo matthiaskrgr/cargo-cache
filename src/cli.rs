@@ -100,6 +100,11 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
+        let toolchains = Arg::with_name("toolchains")
+        .long("toolchains")
+        .help("print stats on installed toolchains")
+        .hidden(true);
+
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -239,6 +244,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
+        .arg(&toolchains)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -272,6 +278,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
+        .arg(&toolchains)
         .arg(&debug)
         .get_matches()
 }

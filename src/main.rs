@@ -98,9 +98,6 @@ extern crate test; //hack
 #[allow(clippy::cognitive_complexity)]
 #[cfg(not(feature = "ci-autoclean"))]
 fn main() {
-    let x = toolchains::toolchain_stats();
-    return;
-
     // parse args
     // dummy subcommand:  https://github.com/clap-rs/clap/issues/937
     let config = cli::gen_clap();
@@ -124,6 +121,18 @@ fn main() {
 
     if config.is_present("sc") || config.is_present("sccache") {
         match sccache::sccache_stats() {
+            Ok(()) => {
+                process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("{}", e);
+                process::exit(1);
+            }
+        }
+    }
+
+    if config.is_present("toolchains") {
+        match toolchains::toolchain_stats() {
             Ok(()) => {
                 process::exit(0);
             }

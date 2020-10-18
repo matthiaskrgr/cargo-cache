@@ -79,16 +79,19 @@ impl<'a> Toolchain {
 }
 
 pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
-    let toolchains = {let mut tcs = toolchains()
-        .unwrap()
-        .map(|dir| dir.unwrap().path())
-        .map(Toolchain::new)
-        .collect::<Vec<_>>();
-    tcs.sort_by_key(|tc| tc.size);
-    tcs.reverse();
-    tcs
+    // get a list of toolchains, sorted by size
+    let toolchains = {
+        let mut tcs = toolchains()
+            .unwrap()
+            .map(|dir| dir.unwrap().path())
+            .map(Toolchain::new)
+            .collect::<Vec<_>>();
+        tcs.sort_by_key(|tc| tc.size);
+        tcs.reverse();
+        tcs
     };
 
+    // get the size
     let total_size: u64 = toolchains.iter().map(|toolchain| toolchain.size).sum();
 
     // extract the unique dates from the unique vec
