@@ -10,12 +10,9 @@
 // dir: ~/.rustup/toolchains
 // display:   toolchain name, number of files,  size
 
-use std::env;
-use std::fs;
 use std::path::PathBuf;
 
 use chrono::prelude::*;
-use home;
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
@@ -60,6 +57,7 @@ impl<'a> Toolchain {
     fn new(path: PathBuf) -> Self {
         let name = path.file_name().unwrap().to_owned().into_string().unwrap();
         let number_files = WalkDir::new(&path).into_iter().count();
+        #[allow(clippy::filter_map)]
         let size: u64 = WalkDir::new(&path)
             .into_iter()
             .map(|f| {
@@ -73,7 +71,7 @@ impl<'a> Toolchain {
 
         Toolchain {
             name,
-            path: path.clone(),
+            path,
             number_files,
             size,
         }
@@ -81,11 +79,15 @@ impl<'a> Toolchain {
 }
 
 pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
-    let toolchains = toolchains()
+    let toolchains = {let mut tcs = toolchains()
         .unwrap()
         .map(|dir| dir.unwrap().path())
         .map(Toolchain::new)
         .collect::<Vec<_>>();
+    tcs.sort_by_key(|tc| tc.size);
+    tcs.reverse();
+    tcs
+    };
 
     let total_size: u64 = toolchains.iter().map(|toolchain| toolchain.size).sum();
 
