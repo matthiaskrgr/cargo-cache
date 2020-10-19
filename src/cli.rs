@@ -100,7 +100,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
-        let toolchains = Arg::with_name("toolchains")
+    let toolchains = Arg::with_name("toolchains")
         .long("toolchains")
         .help("print stats on installed toolchains")
         .hidden(true);
