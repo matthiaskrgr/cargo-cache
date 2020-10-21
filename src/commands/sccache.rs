@@ -27,7 +27,7 @@ struct File {
 }
 
 /// calculate percentage (what % is X of Y)
-fn percentage_of_as_string(fraction: u64, total: u64) -> String {
+pub(crate) fn percentage_of_as_string(fraction: u64, total: u64) -> String {
     // loss of precision is ok here since we trim down to 2 decimal places
     #[allow(clippy::cast_precision_loss)]
     let percentage: f32 = (fraction * 100) as f32 / (total) as f32;

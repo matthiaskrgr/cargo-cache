@@ -17,21 +17,13 @@ use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
 
 use crate::library;
+use crate::sccache::percentage_of_as_string;
 use crate::tables::format_table;
 
 #[derive(Debug, Clone)]
 struct File {
     path: PathBuf,
     access_date: NaiveDate,
-}
-
-/// calculate percentage (what % is X of Y)
-fn percentage_of_as_string(fraction: u64, total: u64) -> String {
-    // loss of precision is ok here since we trim down to 2 decimal places
-    #[allow(clippy::cast_precision_loss)]
-    let percentage: f32 = (fraction * 100) as f32 / (total) as f32;
-
-    format!("{:.*} %", 2, percentage)
 }
 
 /// return a list of toolchains (subdirs in the toolchain directory)
