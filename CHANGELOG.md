@@ -5,6 +5,8 @@ Changed dependency `dirs` to `dirs-next`, as `dirs` is no longer maintained.
 Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.
 	While calculating the cache size, registry indices and installed binaries are skipped.
 
+Add a "toolchain" subcommand which displays stats on rustup-installed toolchains
+
 Updated dependencies:
 	cargo-metadata: 0.11.0 -> 0.12.0
 	clap: 2.33.1 -> 2.33.3
