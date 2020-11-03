@@ -205,7 +205,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
 
     // </trim>
     let toolchain = SubCommand::with_name("toolchain")
-    .help("print stats on installed toolchains");
+    .about("print stats on installed toolchains");
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
@@ -331,6 +331,7 @@ SUBCOMMANDS:
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
+    toolchain      print stats on installed toolchains
     trim           trim old items from the cache until maximum cache size limit is reached\n");
         assert_eq!(help_desired, help_real);
     }
@@ -378,6 +379,7 @@ SUBCOMMANDS:
     registry       query each package registry separately
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
+    toolchain      print stats on installed toolchains
     trim           trim old items from the cache until maximum cache size limit is reached\n");
 
         assert_eq!(help_desired, help_real);
