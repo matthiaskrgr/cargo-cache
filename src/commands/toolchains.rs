@@ -7,9 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-// dir: ~/.rustup/toolchains
-// display:   toolchain name, number of files,  size
-
 use std::path::PathBuf;
 
 use chrono::prelude::*;
@@ -100,8 +97,9 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
         .collect();
 
     // add column descriptions
-    let mut table_vec =
-        Vec::with_capacity(table_matrix.len() + 2 /* header column + summary */);
+    let mut table_vec = Vec::with_capacity(
+        table_matrix.len() + 3, /* header column + summary stats */
+    );
     table_vec.push(vec![
         "Toolchain Name".to_string(),
         "Files".to_string(),
@@ -119,21 +117,15 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
         String::new(),
     ]);
     // Total:
-    table_vec.push(vec![
-        String::from("Total"),
-        String::new(),
-        String::new(),
-        String::new(),
-    ]);
-
     let number_of_files: usize = toolchains
         .iter()
         .map(|toolchain| toolchain.number_files)
         .sum();
+
     // summary
     table_vec.push(vec![
+        String::from("Total"),
         number_of_files.to_string(),
-        String::new(),
         total_size.file_size(file_size_opts::DECIMAL).unwrap(),
         "100 %".into(),
     ]);
