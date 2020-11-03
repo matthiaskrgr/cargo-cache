@@ -204,8 +204,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&dry_run);
 
     // </trim>
-    let toolchain = SubCommand::with_name("toolchain")
-    .about("print stats on installed toolchains");
+    let toolchain = SubCommand::with_name("toolchain").about("print stats on installed toolchains");
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
