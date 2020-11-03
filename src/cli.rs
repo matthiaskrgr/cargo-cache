@@ -100,11 +100,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .takes_value(true)
         .value_name("date");
 
-    let toolchains = Arg::with_name("toolchains")
-        .long("toolchains")
-        .help("print stats on installed toolchains")
-        .hidden(true);
-
     let debug = Arg::with_name("debug")
         .long("debug")
         .help("print some debug stats")
@@ -209,6 +204,8 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&dry_run);
 
     // </trim>
+    let toolchain = SubCommand::with_name("toolchain")
+    .help("print stats on installed toolchains");
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
@@ -231,6 +228,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(sccache.clone())
         .subcommand(sccache_short.clone())
         .subcommand(clean_unref.clone())
+        .subcommand(toolchain.clone())
         .subcommand(trim.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
@@ -244,7 +242,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&toolchains)
         .arg(&debug)
         .setting(AppSettings::Hidden);
 
@@ -265,6 +262,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .subcommand(sccache)
         .subcommand(sccache_short)
         .subcommand(clean_unref)
+        .subcommand(toolchain.clone())
         .subcommand(trim)
         .arg(&list_dirs)
         .arg(&remove_dir)
@@ -278,7 +276,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&list_top_cache_items)
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
-        .arg(&toolchains)
         .arg(&debug)
         .get_matches()
 }

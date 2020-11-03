@@ -131,7 +131,7 @@ fn main() {
         }
     }
 
-    if config.is_present("toolchains") {
+    if config.subcommand_matches("toolchain").is_some() {
         match toolchains::toolchain_stats() {
             Ok(()) => {
                 process::exit(0);
