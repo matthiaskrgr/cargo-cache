@@ -182,7 +182,7 @@ fn main() {
 
     if let Some(trim_config) = config.subcommand_matches("trim") {
         match trim::trim_cache(
-            &trim_config.value_of("trim_limit"),
+            trim_config.value_of("trim_limit"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
@@ -203,7 +203,7 @@ fn main() {
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
         match clean_unref(
             &cargo_cache,
-            &clean_unref_cfg.value_of("manifest-path"),
+            clean_unref_cfg.value_of("manifest-path"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
@@ -303,10 +303,10 @@ fn main() {
             &mut registry_pkgs_cache,
             /* &mut registry_index_cache, */
             &mut registry_sources_caches,
-            &config.value_of("remove-if-younger-than"),
-            &config.value_of("remove-if-older-than"),
+            config.value_of("remove-if-younger-than"),
+            config.value_of("remove-if-older-than"),
             config.is_present("dry-run"),
-            &config.value_of("remove-dir"),
+            config.value_of("remove-dir"),
             &mut size_changed,
         );
         match res {

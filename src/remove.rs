@@ -167,7 +167,7 @@ pub(crate) fn remove_dir_via_cmdline(
 ) -> Result<(), Error> {
     // @TODO the passing of the cache is really a mess here... :(
 
-    let dirs_to_remove = components_from_groups(&directory)?;
+    let dirs_to_remove = components_from_groups(directory)?;
 
     let mut size_removed: u64 = 0;
 

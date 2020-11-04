@@ -78,7 +78,7 @@ pub(crate) fn gather_all_cache_items<'a>(
 }
 
 /// figure out how big the cache should remain after trimming
-fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
+fn parse_size_limit_to_bytes<'a>(limit: Option<&'a str>) -> Result<u64, TrimError<'a>> {
     match limit {
         None => unreachable!("No trim --limit was supplied altough clap should enforce that!"),
         Some(limit) => {
@@ -118,7 +118,7 @@ fn parse_size_limit_to_bytes<'a>(limit: &Option<&'a str>) -> Result<u64, TrimErr
 
 // this is the function that trim sthe cache to a given limit
 pub(crate) fn trim_cache<'a>(
-    unparsed_size_limit: &Option<&'a str>,
+    unparsed_size_limit: Option<&'a str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
@@ -200,33 +200,33 @@ mod parse_size_limit {
     #[test]
     fn size_limit() {
         // shorter function name
-        fn p<'a>(limit: &Option<&'a str>) -> Result<u64, TrimError<'a>> {
+        fn p(limit: Option<&str>) -> Result<u64, TrimError<'_>> {
             parse_size_limit_to_bytes(limit)
         }
 
-        assert_eq!(p(&Some("1b")), Ok(1));
-        assert_eq!(p(&Some("1B")), Ok(1));
+        assert_eq!(p(Some("1b")), Ok(1));
+        assert_eq!(p(Some("1B")), Ok(1));
 
-        assert_eq!(p(&Some("1k")), Ok(1_024));
-        assert_eq!(p(&Some("1K")), Ok(1_024));
+        assert_eq!(p(Some("1k")), Ok(1_024));
+        assert_eq!(p(Some("1K")), Ok(1_024));
 
-        assert_eq!(p(&Some("1m")), Ok(1_048_576));
-        assert_eq!(p(&Some("1M")), Ok(1_048_576));
+        assert_eq!(p(Some("1m")), Ok(1_048_576));
+        assert_eq!(p(Some("1M")), Ok(1_048_576));
 
-        assert_eq!(p(&Some("1g")), Ok(1_073_741_824));
-        assert_eq!(p(&Some("1G")), Ok(1_073_741_824));
+        assert_eq!(p(Some("1g")), Ok(1_073_741_824));
+        assert_eq!(p(Some("1G")), Ok(1_073_741_824));
 
-        assert_eq!(p(&Some("1t")), Ok(1_099_511_627_776));
-        assert_eq!(p(&Some("1T")), Ok(1_099_511_627_776));
+        assert_eq!(p(Some("1t")), Ok(1_099_511_627_776));
+        assert_eq!(p(Some("1T")), Ok(1_099_511_627_776));
 
-        assert_eq!(p(&Some("4M")), Ok(4_194_304));
-        assert_eq!(p(&Some("42M")), Ok(44_040_192));
-        assert_eq!(p(&Some("1337M")), Ok(1_401_946_112));
+        assert_eq!(p(Some("4M")), Ok(4_194_304));
+        assert_eq!(p(Some("42M")), Ok(44_040_192));
+        assert_eq!(p(Some("1337M")), Ok(1_401_946_112));
 
-        assert_eq!(p(&Some("1.5k")), Ok(1_536));
+        assert_eq!(p(Some("1.5k")), Ok(1_536));
 
         assert_eq!(
-            p(&Some("1_")),
+            p(Some("1_")),
             Err(TrimError::TrimLimitUnitParseFailure("1_"))
         );
     }
@@ -235,6 +235,6 @@ mod parse_size_limit {
     #[test]
     #[should_panic(expected = "No trim --limit was supplied altough clap should enforce that!")]
     fn size_limit_none_panics() {
-        let _ = parse_size_limit_to_bytes(&None);
+        let _ = parse_size_limit_to_bytes(None);
     }
 }

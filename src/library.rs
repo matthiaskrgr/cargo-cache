@@ -312,7 +312,7 @@ pub(crate) enum Component {
 // map a String to a list of RemovableGroups to actual Components
 // returns either a group of successfully converted Components or a list of unrecognized
 // RemovableGroups as Error
-pub(crate) fn components_from_groups(input: &Option<&str>) -> Result<Vec<Component>, Error> {
+pub(crate) fn components_from_groups(input: Option<&str>) -> Result<Vec<Component>, Error> {
     let input_string = if let Some(value) = input {
         value
     } else {

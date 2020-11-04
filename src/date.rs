@@ -135,10 +135,10 @@ pub(crate) fn remove_files_by_dates(
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-    arg_younger: &Option<&str>,
-    arg_older: &Option<&str>,
+    arg_younger: Option<&str>,
+    arg_older: Option<&str>,
     dry_run: bool,
-    dirs: &Option<&str>,
+    dirs: Option<&str>,
     mut size_changed: &mut bool,
 ) -> Result<(), Error> {
     if dirs.is_none() {
