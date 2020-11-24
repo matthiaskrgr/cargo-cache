@@ -506,7 +506,7 @@ fn main() {
 
     impl CargoCachePaths {
         /// returns `CargoCachePaths` object which makes all the subpaths accessible to the crate
-        pub(crate) fn default() -> Result<Self, ()> {
+        pub(crate) fn default() -> Self {
             let cargo_home = if let Ok(cargo_home) = home::cargo_home() {
                 cargo_home
             } else {
@@ -521,10 +521,10 @@ fn main() {
             let reg_src = registry.join("src");
             let git_checkouts = cargo_home.join("git").join("checkouts");
 
-            Ok(Self {
+            Self {
                 registry_sources: reg_src,
                 git_checkouts,
-            })
+            }
         }
     } // impl CargoCachePaths
 
@@ -541,12 +541,7 @@ fn main() {
         }
     }
 
-    let cargo_cache = match CargoCachePaths::default() {
-        Ok(cargo_cache) => cargo_cache,
-        Err(_e) => {
-            std::process::exit(1);
-        }
-    };
+    let cargo_cache = CargoCachePaths::default();
 
     println!("cargo-cache: running \"cargo cache --autoclean\"");
 
