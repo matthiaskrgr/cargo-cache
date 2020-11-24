@@ -185,7 +185,7 @@ pub(crate) fn remove_dir_via_cmdline(
                     dry_run,
                     size_changed,
                     Some(size),
-                )?;
+                );
             }
 
             Component::RegistrySources => {
@@ -196,7 +196,7 @@ pub(crate) fn remove_dir_via_cmdline(
                     dry_run,
                     size_changed,
                     Some(size),
-                )?;
+                );
             }
             Component::RegistryIndex => {
                 // sum the sizes of the separate indices
@@ -209,22 +209,17 @@ pub(crate) fn remove_dir_via_cmdline(
                     dry_run,
                     size_changed,
                     Some(size_of_all_indices),
-                )?
+                )
             }
             Component::GitRepos => {
                 let size = checkouts_cache.total_size();
                 size_removed += size;
-                remove_with_default_message(&ccd.git_checkouts, dry_run, size_changed, Some(size))?;
+                remove_with_default_message(&ccd.git_checkouts, dry_run, size_changed, Some(size));
             }
             Component::GitDB => {
                 let size = bare_repos_cache.total_size();
                 size_removed += size;
-                remove_with_default_message(
-                    &ccd.git_repos_bare,
-                    dry_run,
-                    size_changed,
-                    Some(size),
-                )?;
+                remove_with_default_message(&ccd.git_repos_bare, dry_run, size_changed, Some(size));
             }
         }
     }
@@ -245,7 +240,7 @@ pub(crate) fn remove_with_default_message(
     dry_run: bool,
     size_changed: &mut bool,
     total_size_from_cache: Option<u64>,
-) -> Result<(), Error> {
+) {
     // remove a specified subdirectory from cargo cache
     let msg = Some(format!("removing: '{}'", dir.display()));
 
@@ -257,7 +252,6 @@ pub(crate) fn remove_with_default_message(
         &DryRunMessage::Default,
         total_size_from_cache,
     );
-    Ok(())
 }
 
 /// remove a file with a custom message

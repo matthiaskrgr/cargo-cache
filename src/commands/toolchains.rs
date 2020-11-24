@@ -26,7 +26,9 @@ struct File {
 /// return a list of toolchains (subdirs in the toolchain directory)
 fn toolchains() -> Result<std::fs::ReadDir, library::Error> {
     let toolchain_root = {
-        let mut p = home::rustup_home().unwrap();
+        // intentionally map the Err to our own type
+        #[allow(clippy::map_err_ignore)]
+        let mut p = home::rustup_home().map_err(|_| library::Error::NoRustupHome)?;
         p.push("toolchains");
         p
     };
@@ -67,7 +69,7 @@ impl<'a> Toolchain {
     }
 }
 
-pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
+pub(crate) fn toolchain_stats() {
     // get a list of toolchains, sorted by size
     let toolchains = {
         let mut tcs = toolchains()
@@ -134,5 +136,4 @@ pub(crate) fn toolchain_stats() -> Result<(), library::Error> {
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
     let table_trimmed = table.trim();
     println!("{}", table_trimmed);
-    Ok(())
 }

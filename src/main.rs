@@ -132,15 +132,8 @@ fn main() {
     }
 
     if config.subcommand_matches("toolchain").is_some() {
-        match toolchains::toolchain_stats() {
-            Ok(()) => {
-                process::exit(0);
-            }
-            Err(e) => {
-                eprintln!("{}", e);
-                process::exit(1);
-            }
-        }
+        toolchains::toolchain_stats();
+        process::exit(0);
     }
 
     // indicates if size changed and whether we should print a before/after size diff

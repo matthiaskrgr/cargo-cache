@@ -92,6 +92,8 @@ pub(crate) enum Error {
     UnparsableManifest(PathBuf, cargo_metadata::Error),
     // could not find sccache cache dir
     NoSccacheDir,
+    // could not get rustup home
+    NoRustupHome,
 }
 
 impl fmt::Display for Error {
@@ -187,6 +189,8 @@ impl fmt::Display for Error {
             "Failed to parse Cargo.toml at '{}': '{:?}'", path.display(), error),
             Self::NoSccacheDir => write!(f,
                 "Could not find sccache cache directory at ~/.cache/sccache or ${{SCCACHE_DIR}}"),
+                Self::NoRustupHome => write!(f,
+                    "Failed to determine rustup home directory"),
         }
     }
 }
