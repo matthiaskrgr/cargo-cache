@@ -63,14 +63,13 @@ pub(crate) fn get_manifest() -> Result<PathBuf, Error> {
         if let Some(manifest_path) = seeing_manifest(&cwd) {
             // if the manifest is seen, return it
             return Ok(manifest_path);
-        } else {
-            // otherwise continue walking down and check again
-            let fs_root_reached = !cwd.pop();
+        }
+        // otherwise continue walking down and check again
+        let fs_root_reached = !cwd.pop();
 
-            if fs_root_reached {
-                // we have reached the file system root without finding anything
-                return Err(Error::NoCargoManifest(orig_cwd));
-            }
+        if fs_root_reached {
+            // we have reached the file system root without finding anything
+            return Err(Error::NoCargoManifest(orig_cwd));
         }
     }
 }
