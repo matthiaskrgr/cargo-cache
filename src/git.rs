@@ -214,7 +214,7 @@ fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
 }
 
 #[allow(clippy::module_name_repetitions)]
-pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cache_dir: &PathBuf) {
+pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cache_dir: &PathBuf) -> Result<(), Error> {
     // gc repos and registries inside cargo cache
 
     fn fsck_subdirs(path: &PathBuf) {
@@ -253,6 +253,11 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
         }
     } // fn fsck_subdirs
 
+    // make sure git is actually installed (#94), throw clean error if it's not
+    if Command::new("git").arg("help").output().is_err() {
+        return Err(Error::GitNotInstalled);
+    }
+
     println!("\nFscking repositories. This may take some time...");
     // fsck git repos of crates
     fsck_subdirs(git_repos_bare_dir);
@@ -264,6 +269,7 @@ pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cac
     repo_index.push("index");
     // fsck registries
     fsck_subdirs(&repo_index);
+    Ok(())
 }
 
 #[cfg(test)]
