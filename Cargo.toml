@@ -33,7 +33,7 @@ chrono = { version = "0.4.19", optional = true } # compare dates etc
 clap = { version = "2.33.3", optional = true }  # cmdline arg parsing
 
 # https://github.com/xdg-rs/dirs
-dirs-next = { version = "1.0.2", optional = true } # get cache dirs to look for sccache cache
+dirs-next = { version = "2.0.0", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/alexcrichton/git2-rs
 git2 = { version = "0.13.12", default-features = false,  optional = true  } # check if repo is git repo

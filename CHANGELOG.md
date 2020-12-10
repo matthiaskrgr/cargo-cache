@@ -18,7 +18,7 @@ Updated dependencies:
 	regex: 1.3.7 -> 1.4.1
 	cfg-if: 0.1.10 -> 1.0.0
 	chrono: 0.4.11 -> 0.4.19
-	dirs-next: 1.0.1 -> 1.0.2
+	dirs-next: 1.0.1 -> 2.0.0
 	path-slash: 0.1.1 -> 0.1.3
 	fx-extra 1.1.0: -> 1.2.0
 	remove_dir_all: 0.5.3 -> 0.6.0
