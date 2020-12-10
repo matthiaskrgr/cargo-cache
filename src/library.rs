@@ -66,6 +66,8 @@ pub(crate) enum Error {
     GitReflogFailed(PathBuf, std::io::Error),
     /// git fsck errored
     GitFsckFailed(PathBuf, std::io::Error),
+    /// git seems to be missing from the system
+    GitNotInstalled,
     /// a package name inside the cache failed to parse
     MalformedPackageName(String),
     /// could not get the cargo home directory
@@ -136,6 +138,13 @@ impl fmt::Display for Error {
                 "Failed to git fsck repository \"{}\":\n{:?}",
                 path.display(),
                 error
+            ),
+
+
+            Self::GitNotInstalled => write!(
+                f,
+                "Could not find 'git' binary. Is 'git' installed?",
+    
             ),
 
             Self::MalformedPackageName(pkgname) => {
