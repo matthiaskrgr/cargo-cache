@@ -127,6 +127,7 @@ pub(crate) fn git_gc_everything(
                 // run gc
                 Ok((before, after)) => (before, after),
                 Err(error) => match error {
+                    // Error::GitNotInstalled  should be handled before this function is called
                     Error::GitGCFailed(_, _)
                     | Error::GitRepoDirNotFound(_)
                     | Error::GitRepoNotOpened(_) => {
@@ -142,6 +143,11 @@ pub(crate) fn git_gc_everything(
         }
         Ok((size_sum_before, size_sum_after))
     } // fn gc_subdirs
+
+    // make sure git is actually installed (#94), throw clean error if it's not
+    if Command::new("git").arg("help").output().is_err() {
+        return Err(Error::GitNotInstalled);
+    }
 
     // gc cloned git repos of crates and registries
     let mut total_size_before: u64 = 0;
