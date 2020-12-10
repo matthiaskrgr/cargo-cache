@@ -11,11 +11,11 @@ Add a "toolchain" subcommand which displays stats on rustup-installed toolchains
 
 
 Updated dependencies:
-	cargo-metadata: 0.11.0 -> 0.12.0
+	cargo-metadata: 0.11.0 -> 0.12.1
 	clap: 2.33.1 -> 2.33.3
 	git2: 0.13.5-> 0.13.12
-	rayon: 1.3.0 -> 1.4.1
-	regex: 1.3.7 -> 1.4.1
+	rayon: 1.3.0 -> 1.5.0
+	regex: 1.3.7 -> 1.4.2
 	cfg-if: 0.1.10 -> 1.0.0
 	chrono: 0.4.11 -> 0.4.19
 	dirs-next: 1.0.1 -> 2.0.0
