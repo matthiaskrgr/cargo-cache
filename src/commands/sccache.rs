@@ -42,6 +42,8 @@ fn sccache_dir() -> Result<PathBuf, library::Error> {
         .or_else(|| {
             const CACHE_DIR_NAME: &str = if cfg!(target_os = "macos") {
                 "Mozilla.sccache"
+            } else if cfg!(target_os = "windows") {
+                "Mozilla\\sccache"
             } else {
                 "sccache"
             };
