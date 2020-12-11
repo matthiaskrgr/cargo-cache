@@ -214,7 +214,10 @@ fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
 }
 
 #[allow(clippy::module_name_repetitions)]
-pub(crate) fn git_fsck_everything(git_repos_bare_dir: &PathBuf, registry_pkg_cache_dir: &PathBuf) -> Result<(), Error> {
+pub(crate) fn git_fsck_everything(
+    git_repos_bare_dir: &PathBuf,
+    registry_pkg_cache_dir: &PathBuf,
+) -> Result<(), Error> {
     // gc repos and registries inside cargo cache
 
     fn fsck_subdirs(path: &PathBuf) {

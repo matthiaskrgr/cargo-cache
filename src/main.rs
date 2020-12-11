@@ -372,7 +372,9 @@ fn main() {
     }
 
     if config.is_present("fsck-repos") {
-        if let Err(e) = git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache) {
+        if let Err(e) =
+            git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
+        {
             eprintln!("{}", e);
             process::exit(1);
         }
