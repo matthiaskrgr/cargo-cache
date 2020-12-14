@@ -86,10 +86,12 @@ impl RegistrySubCache for RegistryIndex {
                         .par_iter()
                         .filter(|f| f.is_file())
                         .map(|f| {
-                            fs::metadata(f)
+                            fs::symlink_metadata(f)
                                 .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
-                                .len()
                         })
+                        // ignore symlinks
+                        .filter(|m| !m.file_type().is_symlink())
+                        .map(|m| m.len())
                         .sum();
                     self.size = Some(total_size);
                     total_size

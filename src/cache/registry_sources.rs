@@ -107,7 +107,10 @@ impl RegistrySubCache for RegistrySourceCache {
                 .files()
                 .par_iter()
                 .filter(|f| f.is_file())
-                .map(|f| fs::metadata(f).unwrap().len())
+                .map(|f| fs::symlink_metadata(f).unwrap())
+                // ignore symlinks
+                .filter(|m| !m.file_type().is_symlink())
+                .map(|m| m.len())
                 .sum();
             self.size = Some(size);
             self.size.unwrap()

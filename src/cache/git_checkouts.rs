@@ -70,10 +70,12 @@ impl Cache for GitCheckoutCache {
                 .files()
                 .par_iter()
                 .map(|f| {
-                    fs::metadata(f)
+                    fs::symlink_metadata(f)
                         .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
-                        .len()
                 })
+                // ignore symlinks
+                .filter(|m| !m.file_type().is_symlink())
+                .map(|m| m.len())
                 .sum();
             self.total_size = Some(total_size);
             total_size
