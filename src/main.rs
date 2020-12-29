@@ -498,7 +498,7 @@ fn main() {
 // compile within a couple of seconds in order to be used on CI to clean the cargo-home for caching on CI-cache (travis/azure etc)
 #[cfg(feature = "ci-autoclean")]
 fn main() {
-    use std::path::{PathBuf, Path};
+    use std::path::{Path, PathBuf};
 
     #[derive(Debug, Clone)]
     struct CargoCachePaths {

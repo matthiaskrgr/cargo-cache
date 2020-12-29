@@ -474,7 +474,7 @@ mod libtests {
     use super::*;
 
     use pretty_assertions::assert_eq;
-    use std::path::  PathBuf;
+    use std::path::PathBuf;
 
     impl<'a> DirSizes<'a> {
         #[allow(clippy::cast_possible_truncation, clippy::ptr_arg)]
