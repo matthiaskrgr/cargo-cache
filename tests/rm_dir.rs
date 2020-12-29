@@ -12,11 +12,11 @@ mod test_helpers;
 
 use crate::test_helpers::bin_path;
 use fs_extra::dir;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use walkdir::WalkDir;
 
-fn dir_size(path: &PathBuf) -> u64 {
+fn dir_size(path: &Path) -> u64 {
     WalkDir::new(&path)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())

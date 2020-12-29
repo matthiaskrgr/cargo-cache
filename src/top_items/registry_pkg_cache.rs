@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::registry_pkg_cache;
@@ -19,7 +19,7 @@ use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
 
 #[inline]
-fn name_from_pb(path: &PathBuf) -> String {
+fn name_from_path(path: &Path) -> String {
     // path:  .../xz2-0.1.4.crate
     let last_item = path.file_name().unwrap().to_str().unwrap().to_string();
     // last_item: xz2-0.1.4.crate
@@ -30,8 +30,8 @@ fn name_from_pb(path: &PathBuf) -> String {
 }
 
 impl FileDesc {
-    pub(crate) fn new_from_reg_cache(path: &PathBuf) -> Self {
-        let name = name_from_pb(path);
+    pub(crate) fn new_from_reg_cache(path: &Path) -> Self {
+        let name = name_from_path(path);
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
@@ -53,7 +53,7 @@ pub(crate) struct RgchInfo {
 }
 
 impl RgchInfo {
-    fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
+    fn new(path: &Path, counter: u32, total_size: u64) -> Self {
         let name: String;
         let size: u64;
         if path.exists() {
@@ -221,7 +221,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
 
 // registry cache
 pub(crate) fn registry_pkg_cache_stats(
-    path: &PathBuf,
+    path: &Path,
     limit: u32,
     mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
 ) -> String {
@@ -258,7 +258,7 @@ mod top_crates_registry_pkg_cache {
         let path = PathBuf::from(
             "/home/matthias/.cargo/registry/cache/github.com-1ecc6299db9ec823/cargo-cache-0.1.1.crate"
         );
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "cargo-cache");
     }
 
@@ -266,7 +266,7 @@ mod top_crates_registry_pkg_cache {
     fn name_from_pb_alacritty() {
         let path =
             PathBuf::from("/home/matthias/.cargo/registry/cache/github.com-1ecc6299db9ec823/alacritty-0.0.1.crate");
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "alacritty");
     }
 

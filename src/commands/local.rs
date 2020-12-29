@@ -26,7 +26,7 @@
 use std::env;
 use std::ffi::OsStr;
 use std::fs::read_dir;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use cargo_metadata::MetadataCommand;
 use humansize::{file_size_opts, FileSize};
@@ -38,7 +38,7 @@ use crate::tables::*;
 
 /// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
 /// If yes, return a path to it, if not, return None
-fn seeing_manifest(path: &PathBuf) -> Option<PathBuf> {
+fn seeing_manifest(path: &Path) -> Option<PathBuf> {
     #[allow(clippy::filter_map)]
     read_dir(&path)
         .unwrap()

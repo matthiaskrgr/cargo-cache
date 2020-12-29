@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub(crate) struct Pair<T> {
@@ -22,7 +22,7 @@ pub(crate) struct FileDesc {
     pub(crate) size: u64,
 }
 
-pub(crate) fn dir_exists(path: &PathBuf) -> bool {
+pub(crate) fn dir_exists(path: &Path) -> bool {
     // check if a directory exists and print an warning message if not
     if path.exists() {
         true

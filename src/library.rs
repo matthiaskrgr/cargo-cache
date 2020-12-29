@@ -10,7 +10,7 @@
 /// This file provides core logic of the crate
 use std::fmt;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
@@ -406,7 +406,7 @@ pub(crate) fn components_from_groups(input: Option<&str>) -> Result<Vec<Componen
 }
 
 /// get the total size of a directory or a file
-pub(crate) fn size_of_path(path: &PathBuf) -> u64 {
+pub(crate) fn size_of_path(path: &Path) -> u64 {
     // if the path is a directory, use cumulative_dir_size
     if path.is_dir() {
         cumulative_dir_size(path).dir_size
@@ -418,7 +418,7 @@ pub(crate) fn size_of_path(path: &PathBuf) -> u64 {
 }
 
 /// get the total size and number of files of a directory
-pub(crate) fn cumulative_dir_size(dir: &PathBuf) -> DirInfo {
+pub(crate) fn cumulative_dir_size(dir: &Path) -> DirInfo {
     // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
     if !dir.is_dir() {
         return DirInfo {

@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
 use crate::cache::caches::Cache;
 use crate::cache::*;
@@ -25,7 +25,7 @@ struct BinInfo {
 }
 
 impl BinInfo {
-    fn new(path: &PathBuf) -> Self {
+    fn new(path: &Path) -> Self {
         let name = path.file_name().unwrap().to_str().unwrap().to_string();
         let size = fs::metadata(&path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
@@ -71,7 +71,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
 
 #[inline] // only called in one place
 pub(crate) fn binary_stats(
-    path: &PathBuf,
+    path: &Path,
     limit: u32,
     mut bin_cache: &mut bin::BinaryCache,
 ) -> String {

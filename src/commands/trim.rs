@@ -12,7 +12,7 @@
 // note that this does not take account the registry indices and the installed binaries in calculations
 
 use std::fmt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::*;
 use crate::cache::*;
@@ -38,7 +38,7 @@ impl fmt::Display for TrimError<'_> {
     }
 }
 
-fn get_last_access_of_item(path: &PathBuf) -> std::time::SystemTime {
+fn get_last_access_of_item(path: &Path) -> std::time::SystemTime {
     if path.is_file() {
         // if we have a file, simply get the accesss time
         std::fs::metadata(path).unwrap().accessed().unwrap()

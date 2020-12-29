@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::Cache;
 use crate::cache::*;
@@ -20,7 +20,7 @@ use rayon::prelude::*;
 use walkdir::WalkDir;
 
 #[inline]
-fn name_from_pb(path: &PathBuf) -> String {
+fn name_from_path(path: &Path) -> String {
     // path: ~/.cargo/git/db/yaml-rust-07c50cf5815b3a80
     let filename = path.file_name().unwrap().to_str().unwrap().to_string();
     // filename: yaml-rust-07c50cf5815b3a80
@@ -31,8 +31,8 @@ fn name_from_pb(path: &PathBuf) -> String {
 }
 
 impl FileDesc {
-    fn new_from_git_bare(path: &PathBuf) -> Self {
-        let name = name_from_pb(path);
+    fn new_from_git_bare(path: &Path) -> Self {
+        let name = name_from_path(path);
         let walkdir = WalkDir::new(path.display().to_string());
         let size = walkdir
             .into_iter()
@@ -66,7 +66,7 @@ pub(crate) struct RepoInfo {
 }
 
 impl RepoInfo {
-    fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
+    fn new(path: &Path, counter: u32, total_size: u64) -> Self {
         let size: u64;
         let name: String;
         if path.exists() {
@@ -233,7 +233,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
 
 // bare git repos
 pub(crate) fn git_repos_bare_stats(
-    path: &PathBuf,
+    path: &Path,
     limit: u32,
     mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
 ) -> String {
@@ -269,14 +269,14 @@ mod top_crates_git_repos_bare {
     fn name_from_pb_cargo_cache() {
         let path =
             PathBuf::from("/home/matthias/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/");
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "cargo-cache");
     }
 
     #[test]
     fn name_from_pb_alacritty() {
         let path = PathBuf::from("/home/matthias/.cargo/git/checkouts/alacritty-de74975f496aa2c0/");
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "alacritty");
     }
 

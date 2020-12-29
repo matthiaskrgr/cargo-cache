@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
@@ -23,13 +23,13 @@ use walkdir::WalkDir;
 
 #[derive(Debug)]
 struct File<'a> {
-    path: &'a PathBuf,
+    path: &'a Path,
     name: String,
     size: u64,
 }
 
 #[inline]
-fn path_to_name_stemmed(path: &PathBuf) -> String {
+fn path_to_name_stemmed(path: &Path) -> String {
     path.file_stem()
         .unwrap()
         .to_str()
@@ -38,7 +38,7 @@ fn path_to_name_stemmed(path: &PathBuf) -> String {
 }
 
 #[inline]
-fn path_to_name_unstemmed(path: &PathBuf) -> String {
+fn path_to_name_unstemmed(path: &Path) -> String {
     path.file_name()
         .unwrap()
         .to_str()
@@ -46,7 +46,7 @@ fn path_to_name_unstemmed(path: &PathBuf) -> String {
         .to_string()
 }
 
-fn binary_to_file(path: &PathBuf) -> File<'_> {
+fn binary_to_file(path: &Path) -> File<'_> {
     File {
         path,
         name: path_to_name_unstemmed(path),
@@ -56,7 +56,7 @@ fn binary_to_file(path: &PathBuf) -> File<'_> {
     }
 }
 
-fn git_checkout_to_file(path: &PathBuf) -> File<'_> {
+fn git_checkout_to_file(path: &Path) -> File<'_> {
     File {
         path,
         name: path_to_name_unstemmed(path),
@@ -75,7 +75,7 @@ fn git_checkout_to_file(path: &PathBuf) -> File<'_> {
     }
 }
 
-fn bare_repo_to_file(path: &PathBuf) -> File<'_> {
+fn bare_repo_to_file(path: &Path) -> File<'_> {
     File {
         path,
         name: path_to_name_unstemmed(path),
@@ -94,7 +94,7 @@ fn bare_repo_to_file(path: &PathBuf) -> File<'_> {
     }
 }
 
-fn registry_pkg_cache_to_file(path: &PathBuf) -> File<'_> {
+fn registry_pkg_cache_to_file(path: &Path) -> File<'_> {
     File {
         // todo: sum up the versions
         path,
@@ -114,7 +114,7 @@ fn registry_pkg_cache_to_file(path: &PathBuf) -> File<'_> {
     }
 }
 
-fn registry_source_cache_to_file(path: &PathBuf) -> File<'_> {
+fn registry_source_cache_to_file(path: &Path) -> File<'_> {
     File {
         // todo: sum up the versions
         path,

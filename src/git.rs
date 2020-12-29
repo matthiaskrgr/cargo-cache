@@ -9,7 +9,7 @@
 
 use std::fs;
 use std::io::{stdout, Write};
-use std::path::PathBuf;
+use std::path::Path;
 use std::process::Command;
 
 use humansize::{file_size_opts, FileSize};
@@ -17,7 +17,7 @@ use humansize::{file_size_opts, FileSize};
 use crate::library::Error;
 use crate::library::*;
 
-fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
+fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -97,13 +97,13 @@ fn gc_repo(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
 
 #[allow(clippy::module_name_repetitions)]
 pub(crate) fn git_gc_everything(
-    git_repos_bare_dir: &PathBuf,
-    registry_pkg_cache_dir: &PathBuf,
+    git_repos_bare_dir: &Path,
+    registry_pkg_cache_dir: &Path,
     dry_run: bool,
 ) -> Result<(), Error> {
     // gc repos and registries inside cargo cache
 
-    fn gc_subdirs(path: &PathBuf, dry_run: bool) -> Result<(u64, u64), Error> {
+    fn gc_subdirs(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
         if path.is_file() {
             return Err(Error::GitGCFile(path.to_path_buf()));
         } else if !path.is_dir() {
@@ -160,7 +160,7 @@ pub(crate) fn git_gc_everything(
     total_size_after += repos_after;
 
     println!("\nRecompressing registries. This may take some time...");
-    let mut repo_index = registry_pkg_cache_dir.clone();
+    let mut repo_index = registry_pkg_cache_dir.to_path_buf();
     // cd "../index"
     let _ = repo_index.pop();
     repo_index.push("index");
@@ -179,7 +179,7 @@ pub(crate) fn git_gc_everything(
     Ok(())
 }
 
-fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
+fn fsck_repo(path: &Path) -> Result<(), Error> {
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -215,12 +215,12 @@ fn fsck_repo(path: &PathBuf) -> Result<(), Error> {
 
 #[allow(clippy::module_name_repetitions)]
 pub(crate) fn git_fsck_everything(
-    git_repos_bare_dir: &PathBuf,
-    registry_pkg_cache_dir: &PathBuf,
+    git_repos_bare_dir: &Path,
+    registry_pkg_cache_dir: &Path,
 ) -> Result<(), Error> {
     // gc repos and registries inside cargo cache
 
-    fn fsck_subdirs(path: &PathBuf) {
+    fn fsck_subdirs(path: &Path) {
         if path.is_file() {
             panic!(
                 "fsck_subdirs() tried to fsck file instead of directory: '{}'",
@@ -266,7 +266,7 @@ pub(crate) fn git_fsck_everything(
     fsck_subdirs(git_repos_bare_dir);
 
     println!("\nFscking registries. This may take some time...");
-    let mut repo_index = registry_pkg_cache_dir.clone();
+    let mut repo_index = registry_pkg_cache_dir.to_path_buf();
     // cd "../index"
     let _ = repo_index.pop();
     repo_index.push("index");

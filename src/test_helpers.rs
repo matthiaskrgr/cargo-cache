@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 #[allow(dead_code)] // only used in tests
 pub(crate) fn bin_path() -> String {
@@ -52,7 +52,7 @@ pub(crate) fn bin_path() -> String {
 }
 
 #[allow(dead_code)] // only used in tests
-pub(crate) fn assert_path_end(path: &PathBuf, wanted_vector: &[&str]) {
+pub(crate) fn assert_path_end(path: &Path, wanted_vector: &[&str]) {
     // because windows and linux represent paths differently ( /foo/bar vs C:\\foo\\bar)
     // we need to take this into account when running test on windows/linux
 

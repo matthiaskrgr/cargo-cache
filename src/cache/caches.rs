@@ -9,7 +9,7 @@
 
 // TODO: add remove_all() and remove_item() method?
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 // this is impl'd by the bin, git_bare_repos and git_checkouts cache
 pub(crate) trait Cache {
@@ -132,7 +132,7 @@ pub(crate) trait RegistrySubCache {
 
 /// get the name of a cache directory from a path.
 /// if the full path is bla/github.com-1ecc6299db9ec823, we return github.com
-pub(crate) fn get_cache_name(path: &PathBuf) -> String {
+pub(crate) fn get_cache_name(path: &Path) -> String {
     // save only the last path element bla/github.com-1ecc6299db9ec823 -> github.com-1ecc6299db9ec823
     let file_name = path.file_name();
     let last = file_name.unwrap().to_str().unwrap().to_string();

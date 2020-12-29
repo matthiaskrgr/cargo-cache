@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
@@ -24,7 +24,7 @@ pub(crate) enum DryRunMessage<'a> {
     None, // no message
 }
 
-fn parse_version(path: &PathBuf) -> Result<(String, String), Error> {
+fn parse_version(path: &Path) -> Result<(String, String), Error> {
     #[allow(clippy::single_match_else)]
     let filename = match path.file_stem() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -64,7 +64,7 @@ fn parse_version(path: &PathBuf) -> Result<(String, String), Error> {
 pub(crate) fn rm_old_crates(
     amount_to_keep: u64,
     dry_run: bool,
-    registry_src_path: &PathBuf,
+    registry_src_path: &Path,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
     println!();
@@ -236,7 +236,7 @@ pub(crate) fn remove_dir_via_cmdline(
 
 /// remove a file with a default "removing: {file}" message
 pub(crate) fn remove_with_default_message(
-    dir: &PathBuf,
+    dir: &Path,
     dry_run: bool,
     size_changed: &mut bool,
     total_size_from_cache: Option<u64>,
@@ -257,7 +257,7 @@ pub(crate) fn remove_with_default_message(
 /// remove a file with a custom message
 pub(crate) fn remove_file(
     // path of the file to be deleted
-    path: &PathBuf,
+    path: &Path,
     // is this only a dry run? if yes, remove nothing
     dry_run: bool,
     // did we actually remove anything?

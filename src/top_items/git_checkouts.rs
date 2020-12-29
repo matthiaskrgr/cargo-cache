@@ -9,7 +9,7 @@
 
 use crate::cache::*;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::cache::caches::Cache;
 use crate::tables::format_table;
@@ -20,7 +20,7 @@ use rayon::prelude::*;
 use walkdir::WalkDir;
 
 #[inline]
-fn name_from_pb(path: &PathBuf) -> String {
+fn name_from_path(path: &Path) -> String {
     // path:  ~/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/0f9966c
     let dir = path
         .iter()
@@ -39,8 +39,8 @@ fn name_from_pb(path: &PathBuf) -> String {
 }
 
 impl FileDesc {
-    fn new_from_git_checkouts(path: &PathBuf) -> Self {
-        let name = name_from_pb(path);
+    fn new_from_git_checkouts(path: &Path) -> Self {
+        let name = name_from_path(path);
 
         let walkdir = WalkDir::new(path.display().to_string());
 
@@ -78,14 +78,14 @@ pub(crate) struct ChkInfo {
 impl ChkInfo {
     // sorted by total_size!
 
-    fn new(path: &PathBuf, counter: u32, total_size: u64) -> Self {
+    fn new(path: &Path, counter: u32, total_size: u64) -> Self {
         let name: String;
         let size: u64;
         if path.exists() {
             size = fs::metadata(&path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
-            let mut p = path.clone();
+            let mut p = path.to_path_buf();
             let _ = p.pop();
             let name_tmp = p.file_name().unwrap().to_str().unwrap().to_string();
             let mut tmp = name_tmp.split('-').collect::<Vec<_>>();
@@ -247,7 +247,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
 
 #[inline]
 pub(crate) fn git_checkouts_stats(
-    path: &PathBuf,
+    path: &Path,
     limit: u32,
     mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
 ) -> String {
@@ -285,7 +285,7 @@ mod top_crates_git_checkouts {
         let path = PathBuf::from(
             "/home/matthias/.cargo/git/checkouts/cargo-cache-16826c8e13331adc/0f9966c",
         );
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "cargo-cache");
     }
 
@@ -293,7 +293,7 @@ mod top_crates_git_checkouts {
     fn name_from_pb_alacritty() {
         let path =
             PathBuf::from("/home/matthias/.cargo/git/checkouts/alacritty-de74975f496aa2c0/f4fc9eb");
-        let name = name_from_pb(&path);
+        let name = name_from_path(&path);
         assert_eq!(name, "alacritty");
     }
 

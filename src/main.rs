@@ -498,7 +498,7 @@ fn main() {
 // compile within a couple of seconds in order to be used on CI to clean the cargo-home for caching on CI-cache (travis/azure etc)
 #[cfg(feature = "ci-autoclean")]
 fn main() {
-    use std::path::PathBuf;
+    use std::path::{PathBuf, Path};
 
     #[derive(Debug, Clone)]
     struct CargoCachePaths {
@@ -533,7 +533,7 @@ fn main() {
         }
     } // impl CargoCachePaths
 
-    pub(crate) fn remove_file(path: &PathBuf) {
+    pub(crate) fn remove_file(path: &Path) {
         if path.is_file() && std::fs::remove_file(&path).is_err() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         }
