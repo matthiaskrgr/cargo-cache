@@ -99,8 +99,8 @@ impl RegistrySubCache for RegistrySourceCache {
     }
 
     fn total_size(&mut self) -> u64 {
-        if self.size.is_some() {
-            self.size.unwrap()
+        if let Some(size) = self.size {
+            size
         } else if self.path.is_dir() {
             // get the size of all files in path dir
             let size = self
@@ -124,8 +124,8 @@ impl RegistrySubCache for RegistrySourceCache {
     }
 
     fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
+        if let Some(number_of_files) = self.number_of_files {
+            number_of_files
         } else {
             // we don't have the value cached
             if self.path_exists() {

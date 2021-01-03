@@ -62,8 +62,8 @@ impl Cache for GitCheckoutCache {
             return 0;
         }
 
-        if self.total_size.is_some() {
-            self.total_size.unwrap()
+        if let Some(total_size) =  self.total_size {
+            total_size
         } else if self.path.is_dir() {
             // get the size of all files in path dir
             let total_size = self

@@ -24,8 +24,8 @@ pub(crate) struct BinaryCache {
 
 impl BinaryCache {
     pub(crate) fn number_of_files(&mut self) -> usize {
-        if self.number_of_files.is_some() {
-            self.number_of_files.unwrap()
+        if let Some(number_of_files) = self.number_of_files {
+            number_of_files
         } else if self.path_exists() {
             let count = self.files().len();
             self.number_of_files = Some(count);
@@ -64,8 +64,8 @@ impl Cache for BinaryCache {
     }
 
     fn total_size(&mut self) -> u64 {
-        if self.total_size.is_some() {
-            self.total_size.unwrap()
+        if let Some(total_size) = self.total_size {
+            total_size
         } else if self.path().is_dir() {
             let total_size = self
                 .files()
