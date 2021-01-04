@@ -189,7 +189,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
     // sort the RepoInfo Vec in reverse, biggest item first
     collections_vec.par_sort_by_key(|rpc| rpc.total_size);
     collections_vec.reverse();
-    let mut table_matrix: Vec<Vec<String>> = Vec::new();
+    let mut table_matrix: Vec<Vec<String>> = Vec::with_capacity(collections_vec.len() + 1);
 
     table_matrix.push(vec![
         String::from("Name"),
