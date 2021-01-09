@@ -266,6 +266,14 @@ pub(crate) fn clean_unref(
                 Some(size_of_path(krate)),
             );
         });
+
+    // don't forget to invalidate caches..!
+    bare_repos_cache.invalidate();
+    registry_pkg_caches.invalidate();
+    //bin_cache.invalidate();
+    //checkouts_cache.invalidate();
+    //registry_index_caches.invalidate();
+
     print_size_changed_summary(
         original_total_cache_size,
         cargo_cache_paths,
