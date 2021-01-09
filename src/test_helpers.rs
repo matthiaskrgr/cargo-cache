@@ -7,7 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fs;
 use std::path::Path;
+
+use rayon::iter::*;
+use walkdir::WalkDir;
 
 #[allow(dead_code)] // only used in tests
 pub(crate) fn bin_path() -> String {
@@ -66,4 +70,35 @@ pub(crate) fn assert_path_end(path: &Path, wanted_vector: &[&str]) {
     let wanted: &[&str] = &wanted_vector[..];
 
     assert_eq!(is, wanted);
+}
+
+#[allow(dead_code)] // only used in tests
+
+/// get the total size and number of files of a directory
+pub(crate) fn dir_size(dir: &Path) -> u64 {
+    // Note: using a hashmap to cache dirsizes does apparently not pay out performance-wise
+    if !dir.is_dir() {
+        return 0;
+    }
+
+    // traverse recursively and sum filesizes, parallelized by rayon
+    let walkdir_start = dir.display().to_string();
+
+    let dir_size = WalkDir::new(&walkdir_start)
+        .into_iter()
+        .map(|e| e.unwrap().path().to_owned())
+        .filter(|f| f.exists()) // avoid broken symlinks
+        .collect::<Vec<_>>() // @TODO perhaps WalkDir will impl ParallelIterator one day
+        .par_iter()
+        .filter(|f| f.exists()) // check if the file still exists. Since collecting and processing a
+        // path, some time may have passed and if we have a "cargo build" operation
+        // running in the directory, a temporary file may be gone already and failing to unwrap() (#43)
+        .map(|f| {
+            fs::metadata(f)
+                .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &f.display()))
+                .len()
+        })
+        .sum();
+
+    dir_size
 }
