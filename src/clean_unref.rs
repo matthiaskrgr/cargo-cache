@@ -75,15 +75,24 @@ fn find_crate_name_crate(toml_path: &Path, cargo_home: &Path) -> Option<SourceKi
 pub(crate) fn clean_unref(
     cargo_cache_paths: &CargoCachePaths,
     manifest_path: Option<&str>,
-    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
-    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    mut bin_cache: &mut bin::BinaryCache,
+    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
+    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
-    // first get a list of all dependencies of the project
+    // total cache size before removing, for the summary
+    let original_total_cache_size = bin_cache.total_size()
+        + checkouts_cache.total_size()
+        + bare_repos_cache.total_size()
+        + registry_pkg_caches.total_size()
+        + registry_index_caches.total_size()
+        + registry_sources_caches.total_size();
 
+    // first get a list of all dependencies of the project
     let cargo_home = &cargo_cache_paths.cargo_home;
 
     // if "--manifest-path" is passed to the subcommand, take this
@@ -227,6 +236,7 @@ pub(crate) fn clean_unref(
             !required_git_repos.any(|repo| repo == **repo_in_cache))
         .for_each(|repo| {
             /* remove the repo */
+
             remove_file(
                 repo,
                 dry_run,
@@ -256,7 +266,16 @@ pub(crate) fn clean_unref(
                 Some(size_of_path(krate)),
             );
         });
-
+    print_size_changed_summary(
+        original_total_cache_size,
+        cargo_cache_paths,
+        &mut bin_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_pkg_caches,
+        &mut registry_index_caches,
+        &mut registry_sources_caches,
+    );
     Ok(())
 }
 

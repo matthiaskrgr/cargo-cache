@@ -3,6 +3,8 @@
 Print a more informative error message when "git" is not installed and we run "cargo cache --gc" (#94)
 cargo cache sc: fix detection of `sccache` cache dir on windows (#90)
 
+cargo cache clean-unref: print same summary stats as in "cargo cache -a" (#95) 
+
 Changed dependency `dirs` to `dirs-next`, as `dirs` is no longer maintained.
 
 Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.

@@ -197,9 +197,11 @@ fn main() {
         match clean_unref(
             &cargo_cache,
             clean_unref_cfg.value_of("manifest-path"),
+            &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
+            &mut registry_index_caches,
             &mut registry_sources_caches,
             config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
             &mut size_changed,
