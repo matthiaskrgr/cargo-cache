@@ -13,6 +13,7 @@ mod test_helpers;
 use std::path::PathBuf;
 use std::process::Command;
 
+use pretty_assertions::assert_eq;
 use regex::Regex;
 
 use crate::test_helpers::bin_path;
@@ -39,8 +40,8 @@ fn clean_unref() {
     let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    dbg!(&stderr);
+    dbg!(&stdout);
 
     assert!(
         PathBuf::from(&CARGO_HOME).is_dir(),
@@ -63,8 +64,8 @@ fn clean_unref() {
     let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    dbg!(&stderr);
+    dbg!(&stdout);
 
     // now call cargo-cache inside `actual_crate` and clean_unref with --dry run
 
@@ -81,8 +82,8 @@ fn clean_unref() {
     let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    dbg!(&stderr);
+    dbg!(&stdout);
 
     // make sure we would remove something
     assert!(stdout.matches("would remove").count() > 10);
@@ -101,8 +102,8 @@ fn clean_unref() {
     let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    dbg!(&stderr);
+    dbg!(&stdout);
 
     // run with dry-run again, but this time make sure we would remove nothing
 
@@ -114,23 +115,25 @@ fn clean_unref() {
         .env("CARGO_HOME", CARGO_HOME)
         .output();
 
+    dbg!(&cargo_cache_command);
     let status = cargo_cache_command.unwrap();
 
-    let stderr = String::from_utf8_lossy(&status.stderr).to_string();
+    //let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    //dbg!(&stderr);
+    dbg!(&stdout);
 
-    // make sure we would remove
+    // make sure we would remove 3 items:
     // git checkouts,
     // registry srcs
     // clippy_travis_test checkout
 
     let rm_count = stdout.matches("would remove").count();
-    assert!(
+    assert_eq!(
         // differences between linux and windows for some reason?
-        rm_count == 3
+        rm_count,
+        3
     );
 
     // run cargo-cache
