@@ -23,6 +23,7 @@ use crate::tables::*;
 use humansize::{file_size_opts, FileSize};
 
 /// Holds the sizes and the number of files of the components of the cargo cache
+// usefull for saving a "snapshot" of the current state of the cache
 #[derive(Debug)]
 pub(crate) struct DirSizes<'a> {
     /// total size of the cache / .cargo rood directory
@@ -61,6 +62,7 @@ pub(crate) struct DirSizes<'a> {
 
 impl<'a> DirSizes<'a> {
     /// create a new `DirSize` object by querying the caches for their data, done in parallel
+
     pub(crate) fn new(
         bin_cache: &mut bin::BinaryCache,
         checkouts_cache: &mut git_checkouts::GitCheckoutCache,
@@ -179,7 +181,6 @@ impl<'a> DirSizes<'a> {
     pub(crate) fn total_reg_index_num(&self) -> u64 {
         self.total_reg_index_num
     }
-
     pub(crate) fn numb_reg_cache_entries(&self) -> usize {
         self.numb_reg_cache_entries
     }
@@ -430,6 +431,268 @@ impl<'a> DirSizes<'a> {
         }
 
         v
+    } // registries seperate
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn cmp_v2(
+        cargo_cache: &CargoCachePaths,
+        mut bin_cache: &mut bin::BinaryCache,
+        mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+        mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+        mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+        mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
+        mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+        modify_cache: &dyn Fn() -> (),
+    ) -> String {
+        // Total:           x Mb => y MB
+        fn cmp_total(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+            vec![
+                TableLine::new(
+                    0,
+                    &format!("Cargo cache '{}':\n\n", &old.root_path().display()),
+                    &String::new(),
+                ),
+                TableLine::new(
+                    0,
+                    &"Total: ".to_string(),
+                    &if old.total_size() == new.total_size() {
+                        old.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+                    } else {
+                        format!(
+                            "{} => {}",
+                            &old.total_size().file_size(file_size_opts::DECIMAL).unwrap(),
+                            &new.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+                        )
+                    },
+                ),
+            ]
+        }
+        // binars are not  supposed to change, we can use the ::bins  function here
+
+        fn git(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+            vec![
+                TableLine::new(
+                    1,
+                    &"Git db: ".to_string(),
+                    &if old.total_git_db_size() == new.total_git_db_size() {
+                        new.total_git_db_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap()
+                    } else {
+                        format!(
+                            "{} => {}",
+                            &old.total_git_db_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap(),
+                            &new.total_git_db_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap()
+                        )
+                    },
+                ),
+                TableLine::new(
+                    2,
+                    &if old.numb_git_repos_bare_repos() == new.numb_git_repos_bare_repos() {
+                        format!(
+                            "{} bare git repos:",
+                            new.numb_git_repos_bare_repos().to_string()
+                        )
+                    } else {
+                        format!(
+                            "{} => {} bare git repos: ",
+                            &old.numb_git_repos_bare_repos(),
+                            &new.numb_git_repos_bare_repos()
+                        )
+                    },
+                    &if old.total_git_repos_bare_size() == new.total_git_repos_bare_size() {
+                        new.total_git_repos_bare_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap()
+                    } else {
+                        format!(
+                            "{} => {}",
+                            &old.total_git_repos_bare_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap(),
+                            &new.total_git_repos_bare_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap()
+                        )
+                    },
+                ),
+                TableLine::new(
+                    2,
+                    &if old.numb_git_checkouts() == new.numb_git_checkouts() {
+                        format!(
+                            "{} git repo checkouts: ",
+                            new.numb_git_checkouts().to_string()
+                        )
+                    } else {
+                        format!(
+                            "{} => {} git repo checkouts: ",
+                            &old.numb_git_checkouts(),
+                            &new.numb_git_checkouts()
+                        )
+                    },
+                    &if old.total_git_chk_size() == new.total_git_chk_size() {
+                        new.total_git_chk_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap()
+                    } else {
+                        format!(
+                            "{} => {}",
+                            &old.total_git_chk_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap(),
+                            &new.total_git_chk_size()
+                                .file_size(file_size_opts::DECIMAL)
+                                .unwrap()
+                        )
+                    },
+                ),
+            ]
+        }
+
+        fn regs(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+            let tl1 = TableLine::new(
+                1,
+                &"Registry: ".to_string(),
+                &if old.total_reg_size() == new.total_reg_size() {
+                    new.total_reg_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap()
+                } else {
+                    format!(
+                        "{} => {}",
+                        &old.total_reg_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                        &new.total_reg_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap()
+                    )
+                },
+            );
+
+            let tl2 = TableLine::new(
+                2,
+                &if let 1 = &old.total_reg_index_num {
+                    String::from("Registry index: ")
+                } else {
+                    format!("{} registry indices: ", &old.total_reg_index_num())
+                },
+                &if old.total_reg_index_size() == new.total_reg_index_size() {
+                    old.total_reg_index_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap()
+                } else {
+                    format!(
+                        "{} => {}",
+                        &old.total_reg_index_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                        &new.total_reg_index_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap()
+                    )
+                },
+            );
+
+            let tl3 = TableLine::new(
+                2,
+                &if old.numb_reg_cache_entries() == new.numb_reg_cache_entries() {
+                    format!("{} crate archives: ", new.numb_reg_cache_entries())
+                } else {
+                    format!(
+                        "{} => {} crate archives: ",
+                        &old.numb_reg_cache_entries(),
+                        &new.numb_reg_cache_entries()
+                    )
+                },
+                &if old.total_reg_cache_size() == new.total_reg_cache_size() {
+                    new.total_reg_cache_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap()
+                } else {
+                    format!(
+                        "{} => {}",
+                        &old.total_reg_cache_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                        &new.total_reg_cache_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                    )
+                },
+            );
+
+            let tl4 = TableLine::new(
+                2,
+                &if old.numb_reg_src_checkouts() == new.numb_reg_src_checkouts() {
+                    format!("{} crate source checkouts: ", new.numb_reg_src_checkouts())
+                } else {
+                    format!(
+                        "{} => {} crate source checkouts: ",
+                        &old.numb_reg_src_checkouts(),
+                        &new.numb_reg_src_checkouts()
+                    )
+                },
+                &if old.total_reg_src_size() == new.total_reg_src_size() {
+                    old.total_reg_src_size()
+                        .file_size(file_size_opts::DECIMAL)
+                        .unwrap()
+                } else {
+                    format!(
+                        "{} => {}",
+                        &old.total_reg_src_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                        &new.total_reg_src_size()
+                            .file_size(file_size_opts::DECIMAL)
+                            .unwrap(),
+                    )
+                },
+            );
+
+            vec![tl1, tl2, tl3, tl4]
+        }
+
+        let cache_sizes_old = DirSizes::new(
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+            cargo_cache,
+        );
+
+        modify_cache();
+
+        bin_cache.invalidate();
+        checkouts_cache.invalidate();
+        bare_repos_cache.invalidate();
+        registry_pkgs_cache.invalidate();
+        registry_index_caches.invalidate();
+        registry_sources_caches.invalidate();
+
+        // and requery it to let it do its thing
+        let cache_sizes_new = DirSizes::new(
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+            cargo_cache,
+        );
+
+        let mut v = Vec::new();
+        v.extend(cmp_total(&cache_sizes_old, &cache_sizes_new));
+        v.extend(regs(&cache_sizes_old, &cache_sizes_new));
+        v.extend(git(&cache_sizes_old, &cache_sizes_new));
+
+        two_row_table(3, v, false)
     }
 }
 
