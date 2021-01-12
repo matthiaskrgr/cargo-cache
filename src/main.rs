@@ -248,6 +248,21 @@ fn main() {
         &mut registry_sources_caches,
         &cargo_cache,
     );
+    fn a() {}
+
+    // run fn  a on the cache and compare
+    let cmp_output = dirsizes::DirSizes::cmp_v2(
+        &cargo_cache,
+        &mut bin_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_pkgs_cache,
+        &mut registry_index_caches,
+        &mut registry_sources_caches,
+        &a,
+    );
+    println!("\n\n{}\n\n, ", cmp_output);
+
     let dir_sizes_total = dir_sizes.total_size();
 
     if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
