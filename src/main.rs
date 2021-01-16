@@ -139,13 +139,7 @@ fn main() {
     // indicates if size changed and whether we should print a before/after size diff
     let mut size_changed: bool = false;
 
-    let cargo_cache = match CargoCachePaths::default() {
-        Ok(cargo_cache) => cargo_cache,
-        Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-    };
+    let cargo_cache = CargoCachePaths::default().unwrap_or_fatal_error();
 
     if config.is_present("list-dirs") {
         // only print the directories and exit, don't calculate anything else
@@ -194,7 +188,7 @@ fn main() {
     }
 
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
-        match clean_unref(
+        clean_unref(
             &cargo_cache,
             clean_unref_cfg.value_of("manifest-path"),
             &mut bin_cache,
@@ -205,15 +199,8 @@ fn main() {
             &mut registry_sources_caches,
             config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
             &mut size_changed,
-        ) {
-            Ok(_) => {
-                process::exit(0);
-            }
-            Err(e) => {
-                eprintln!("{}", e.to_string());
-                process::exit(1);
-            }
-        }
+        )
+        .exit_or_fatal_error();
     }
 
     if config.is_present("top-cache-items") {
@@ -244,20 +231,15 @@ fn main() {
             config.subcommand_matches("q").expect("unwrap failed there")
         };
 
-        let query = query::run_query(
+        query::run_query(
             query_config,
             &mut bin_cache,
             &mut checkouts_cache,
             &mut bare_repos_cache,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-        );
-        if let Err(e) = query {
-            eprintln!("{}", e);
-            process::exit(1)
-        } else {
-            process::exit(0);
-        }
+        )
+        .exit_or_fatal_error();
     } else if config.is_present("local") || config.is_present("l") {
         // this is not actually not needed and was previously passed into local_subcmd()
         /*
@@ -269,15 +251,7 @@ fn main() {
             config.subcommand_matches("l").expect("unwrap failed there")
         }; */
 
-        match local::local_subcmd() {
-            Ok(_) => {
-                process::exit(0);
-            }
-            Err(error) => {
-                eprintln!("{}", error);
-                process::exit(1);
-            }
-        }
+        local::local_subcmd().exit_or_fatal_error();
     }
 
     let dir_sizes = dirsizes::DirSizes::new(
@@ -374,15 +348,9 @@ fn main() {
     }
 
     if config.is_present("fsck-repos") {
-        if let Err(e) =
-            git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
-        {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-        std::process::exit(0);
+        git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
+            .exit_or_fatal_error();
     }
-
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
         if let Err(e) = git_gc_everything(
             &cargo_cache.git_repos_bare,

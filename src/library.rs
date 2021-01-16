@@ -20,6 +20,38 @@ use humansize::{file_size_opts, FileSize};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
+// lets us call let z =  None.unwrap_oe_exit_with_error();
+pub(crate) type CargoCacheResult<T, E> = Result<T, E>;
+pub(crate) trait ErrorHandling<T, E: std::fmt::Display> {
+    fn unwrap_or_fatal_error(self) -> T;
+    fn exit_or_fatal_error(self);
+}
+
+impl<T, E: std::fmt::Display> ErrorHandling<T, E> for CargoCacheResult<T, E> {
+    // return the wrapped value or print the contained error and terminate cargo-cache
+    fn unwrap_or_fatal_error(self) -> T {
+        match self {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }
+        }
+    }
+
+    fn exit_or_fatal_error(self) {
+        match self {
+            Ok(_) => {
+                std::process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }
+        }
+    }
+}
+
 /// `DirInfo` is used so to be able to easily differentiate between size and number of files of a directory
 #[derive(Debug, Clone)]
 pub(crate) struct DirInfo {
