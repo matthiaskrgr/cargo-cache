@@ -657,13 +657,6 @@ impl<'a> DirSizes<'a> {
             vec![tl1, tl2, tl3, tl4]
         } // fn regs()
 
-        bin_cache.invalidate();
-        checkouts_cache.invalidate();
-        bare_repos_cache.invalidate();
-        registry_pkgs_cache.invalidate();
-        registry_index_caches.invalidate();
-        registry_sources_caches.invalidate();
-
         // and requery it to let it do its thing
         let cache_sizes_new = DirSizes::new(
             &mut bin_cache,
@@ -700,7 +693,7 @@ impl<'a> DirSizes<'a> {
 
         println!("{}", summary);
     }
-}
+} // print_size_difference()
 
 impl<'a> fmt::Display for DirSizes<'a> {
     /// returns the default summary of cargo-cache (cmd: "cargo cache")
