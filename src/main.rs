@@ -270,8 +270,6 @@ fn main() {
         local::local_subcmd().exit_or_fatal_error();
     }
 
-    let dir_sizes_total = dir_sizes_original.total_size();
-
     if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
         let res = crate::date::remove_files_by_dates(
             &mut checkouts_cache,
@@ -285,29 +283,20 @@ fn main() {
             config.value_of("remove-dir"),
             &mut size_changed,
         );
-        match res {
-            Err(error) => {
-                eprintln!("{}", error);
-                std::process::exit(1);
-            }
-            Ok(()) => {
-                //@TODO we could perhaps optimize this by only querying the caches that changed
-                if !config.is_present("dry-run") {
-                    print_size_changed_summary(
-                        dir_sizes_total,
-                        &cargo_cache,
-                        &mut bin_cache,
-                        &mut checkouts_cache,
-                        &mut bare_repos_cache,
-                        &mut registry_pkgs_cache,
-                        &mut registry_index_caches,
-                        &mut registry_sources_caches,
-                    );
-                }
-                // don't run --remove-dir stuff (since we also required that parameter)
-                std::process::exit(0);
-            }
-        }
+
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+        // don't run --remove-dir stuff (since we also required that parameter)
+
+        res.exit_or_fatal_error();
     }
 
     if config.is_present("info") {
