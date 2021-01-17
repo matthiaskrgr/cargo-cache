@@ -71,6 +71,7 @@ fn find_crate_name_crate(toml_path: &Path, cargo_home: &Path) -> Option<SourceKi
     Some(SourceKind::Crate(path))
 }
 
+/// look at a crate manifest and remove all items from the cargo cache that are not referenced, also run --autoclean and invalidate caches
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn clean_unref(
     cargo_cache_paths: &CargoCachePaths,
@@ -189,7 +190,7 @@ pub(crate) fn clean_unref(
         Some(checkouts_cache.total_size()),
     );
     // invalidate cache
-    let _ = &checkouts_cache.invalidate();
+    checkouts_cache.invalidate();
 
     // remove the registry_sources_cache as well
     remove_file(
@@ -201,7 +202,7 @@ pub(crate) fn clean_unref(
         Some(registry_sources_caches.total_size()),
     );
     // invalidate cache
-    let _ = &registry_sources_caches.invalidate();
+    registry_sources_caches.invalidate();
 
     let (required_crates, required_git_repos): (Vec<SourceKind>, Vec<SourceKind>) =
         required_packages.partition(|dep| match dep {
@@ -270,9 +271,6 @@ pub(crate) fn clean_unref(
     // don't forget to invalidate caches..!
     bare_repos_cache.invalidate();
     registry_pkg_caches.invalidate();
-    //bin_cache.invalidate();
-    //checkouts_cache.invalidate();
-    //registry_index_caches.invalidate();
 
     print_size_changed_summary(
         original_total_cache_size,

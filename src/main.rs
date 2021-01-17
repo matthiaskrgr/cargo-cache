@@ -171,7 +171,7 @@ fn main() {
     );
 
     if let Some(trim_config) = config.subcommand_matches("trim") {
-        let result = trim::trim_cache(
+        let trim_result = trim::trim_cache(
             trim_config.value_of("trim_limit"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
@@ -190,11 +190,11 @@ fn main() {
             &mut registry_index_caches,
             &mut registry_sources_caches,
         );
-        result.exit_or_fatal_error();
+        trim_result.exit_or_fatal_error();
     }
 
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
-        clean_unref(
+        let clean_unref_result = clean_unref(
             &cargo_cache,
             clean_unref_cfg.value_of("manifest-path"),
             &mut bin_cache,
@@ -205,8 +205,18 @@ fn main() {
             &mut registry_sources_caches,
             config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
             &mut size_changed,
-        )
-        .exit_or_fatal_error();
+        );
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+        clean_unref_result.exit_or_fatal_error();
     }
 
     if config.is_present("top-cache-items") {
