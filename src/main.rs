@@ -159,6 +159,7 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
+    // this should populate the entire cache, not very happy about this...
     let dir_sizes_original = dirsizes::DirSizes::new(
         &mut bin_cache,
         &mut checkouts_cache,
@@ -170,7 +171,7 @@ fn main() {
     );
 
     if let Some(trim_config) = config.subcommand_matches("trim") {
-        trim::trim_cache(
+        let result = trim::trim_cache(
             trim_config.value_of("trim_limit"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
@@ -178,8 +179,18 @@ fn main() {
             &mut registry_sources_caches,
             config.is_present("dry-run"),
             &mut size_changed,
-        )
-        .exit_or_fatal_error();
+        );
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+        result.exit_or_fatal_error();
     }
 
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
@@ -250,16 +261,17 @@ fn main() {
     }
 
     // run fn  a on the cache and compare
-    /*dirsizes::DirSizes::cmp_v2(
-        &dir_sizes_original,
-        &cargo_cache,
-        &mut bin_cache,
-        &mut checkouts_cache,
-        &mut bare_repos_cache,
-        &mut registry_pkgs_cache,
-        &mut registry_index_caches,
-        &mut registry_sources_caches,
-    ); */
+    /*   dirsizes::DirSizes::cmp_v2(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+    */
 
     let dir_sizes_total = dir_sizes_original.total_size();
 
@@ -418,8 +430,8 @@ fn main() {
     if size_changed && !config.is_present("dry-run") {
         // size has changed, print summary of how size has changed
 
-        print_size_changed_summary(
-            dir_sizes_total,
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
             &cargo_cache,
             &mut bin_cache,
             &mut checkouts_cache,

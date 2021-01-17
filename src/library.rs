@@ -677,6 +677,7 @@ pub(crate) fn size_diff_format(
     }
 }
 
+// @TODO make this function obsolete
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn print_size_changed_summary(
     previous_total_size: u64,
