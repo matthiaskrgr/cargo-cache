@@ -434,7 +434,7 @@ impl<'a> DirSizes<'a> {
     } // registries seperate
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn cmp_v2(
+    pub(crate) fn print_size_difference(
         cache_sizes_old: &DirSizes<'_>,
         cargo_cache: &CargoCachePaths,
         mut bin_cache: &mut bin::BinaryCache,
@@ -677,10 +677,28 @@ impl<'a> DirSizes<'a> {
 
         let mut v = Vec::new();
         v.extend(cmp_total(cache_sizes_old, &cache_sizes_new));
+        v.extend(cache_sizes_new.bin());
         v.extend(regs(cache_sizes_old, &cache_sizes_new));
         v.extend(git(cache_sizes_old, &cache_sizes_new));
 
-        println!("{}", two_row_table(3, v, false))
+        let mut summary = two_row_table(3, v, false);
+
+        let total_size_old = cache_sizes_old.total_size();
+        let total_size_new = cache_sizes_new.total_size();
+
+        // only show final summary if something changed
+        if total_size_old != total_size_new {
+            summary.push('\n');
+
+            // final summary line
+            let final_line = format!(
+                "\nSize changed {}",
+                size_diff_format(total_size_old, total_size_new, true)
+            );
+            summary.push_str(&final_line);
+        }
+
+        println!("{}", summary);
     }
 }
 
