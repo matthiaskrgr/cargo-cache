@@ -327,7 +327,7 @@ fn main() {
         && !(config.is_present("remove-if-younger-than")
             || config.is_present("remove-if-older-than"))
     {
-        if let Err(e) = remove_dir_via_cmdline(
+         let res  = remove_dir_via_cmdline(
             config.value_of("remove-dir"),
             config.is_present("dry-run"),
             &cargo_cache,
@@ -337,10 +337,20 @@ fn main() {
             &mut registry_index_caches,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-        ) {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
+        ) ;
+
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+        res.unwrap_or_fatal_error();
+
     }
 
     if config.is_present("fsck-repos") {
