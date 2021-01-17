@@ -172,9 +172,7 @@ impl fmt::Display for Error {
                 error
             ),
 
-            Self::GitNotInstalled => write!(
-                f, "Could not find 'git' binary. Is 'git' installed?",
-            ),
+            Self::GitNotInstalled => write!(f, "Could not find 'git' binary. Is 'git' installed?",),
 
             Self::MalformedPackageName(pkgname) => {
                 write!(f, "Error:  \"{}\" is not a valid package name", pkgname)
@@ -216,19 +214,25 @@ impl fmt::Display for Error {
                 path.display()
             ),
             Self::LocalNoTargetDir(path) => write!(
-                f, "error: \"local\" subcommand tried to read \"target\" directory that does not exist: \"{}\"",
+                f,
+                "error: \"local\" subcommand tried to read \"target\"\
+                directory that does not exist: \"{}\"",
                 path.display()
             ),
-            Self::DateParseFailure(date, error) => write!(
-                f, "ERROR failed to parse {} as date {}",
-                date, error
+            Self::DateParseFailure(date, error) => {
+                write!(f, "ERROR failed to parse {} as date {}", date, error)
+            }
+            Self::UnparsableManifest(path, error) => write!(
+                f,
+                "Failed to parse Cargo.toml at '{}': '{:?}'",
+                path.display(),
+                error
             ),
-            Self::UnparsableManifest(path, error) => write!(f,
-            "Failed to parse Cargo.toml at '{}': '{:?}'", path.display(), error),
-            Self::NoSccacheDir => write!(f,
-                "Could not find sccache cache directory at ~/.cache/sccache or ${{SCCACHE_DIR}}"),
-                Self::NoRustupHome => write!(f,
-                    "Failed to determine rustup home directory"),
+            Self::NoSccacheDir => {
+                write!(f,
+                "Could not find sccache cache directory at ~/.cache/sccache or ${{SCCACHE_DIR}}")
+            }
+            Self::NoRustupHome => write!(f, "Failed to determine rustup home directory"),
         }
     }
 }
