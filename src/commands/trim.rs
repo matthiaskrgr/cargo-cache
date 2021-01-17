@@ -183,35 +183,38 @@ mod parse_size_limit {
     #[test]
     fn size_limit() {
         // shorter function name
-        fn p(limit: Option<&str>) -> Result<u64, TrimError<'_>> {
+        fn p(limit: Option<&str>) -> Result<u64, Error> {
             parse_size_limit_to_bytes(limit)
         }
 
-        assert_eq!(p(Some("1b")), Ok(1));
-        assert_eq!(p(Some("1B")), Ok(1));
+        assert_eq!(p(Some("1b")).unwrap(), 1);
+        assert_eq!(p(Some("1B")).unwrap(), 1);
 
-        assert_eq!(p(Some("1k")), Ok(1_024));
-        assert_eq!(p(Some("1K")), Ok(1_024));
+        assert_eq!(p(Some("1k")).unwrap(), 1_024);
+        assert_eq!(p(Some("1K")).unwrap(), 1_024);
 
-        assert_eq!(p(Some("1m")), Ok(1_048_576));
-        assert_eq!(p(Some("1M")), Ok(1_048_576));
+        assert_eq!(p(Some("1m")).unwrap(), 1_048_576);
+        assert_eq!(p(Some("1M")).unwrap(), 1_048_576);
 
-        assert_eq!(p(Some("1g")), Ok(1_073_741_824));
-        assert_eq!(p(Some("1G")), Ok(1_073_741_824));
+        assert_eq!(p(Some("1g")).unwrap(), 1_073_741_824);
+        assert_eq!(p(Some("1G")).unwrap(), 1_073_741_824);
 
-        assert_eq!(p(Some("1t")), Ok(1_099_511_627_776));
-        assert_eq!(p(Some("1T")), Ok(1_099_511_627_776));
+        assert_eq!(p(Some("1t")).unwrap(), 1_099_511_627_776);
+        assert_eq!(p(Some("1T")).unwrap(), 1_099_511_627_776);
 
-        assert_eq!(p(Some("4M")), Ok(4_194_304));
-        assert_eq!(p(Some("42M")), Ok(44_040_192));
-        assert_eq!(p(Some("1337M")), Ok(1_401_946_112));
+        assert_eq!(p(Some("4M")).unwrap(), 4_194_304);
+        assert_eq!(p(Some("42M")).unwrap(), 44_040_192);
+        assert_eq!(p(Some("1337M")).unwrap(), 1_401_946_112);
 
-        assert_eq!(p(Some("1.5k")), Ok(1_536));
+        assert_eq!(p(Some("1.5k")).unwrap(), 1_536);
 
-        assert_eq!(
-            p(Some("1_")),
-            Err(TrimError::TrimLimitUnitParseFailure("1_"))
-        );
+        match p(Some("1_")) {
+            Ok(_) => panic!("expected error"),
+            Err(e) => match e {
+                Error::TrimLimitUnitParseFailure(string) => assert_eq!(string, "1_"),
+                _ => panic!("did not get enum variant TrimParseLimitUnitParseFailure"),
+            },
+        }
     }
 
     // make sure Size limit None panicss
