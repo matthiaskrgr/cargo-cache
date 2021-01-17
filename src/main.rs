@@ -358,14 +358,18 @@ fn main() {
             .exit_or_fatal_error();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
-        if let Err(e) = git_gc_everything(
+        let res =  git_gc_everything(
             &cargo_cache.git_repos_bare,
             &cargo_cache.registry_pkg_cache,
             config.is_present("dry-run"),
-        ) {
-            eprintln!("{}", e);
-            process::exit(2);
+        );
+
+        if !config.is_present("dry-run") {
+            bare_repos_cache.invalidate();
+            registry_index_caches.invalidate();
         }
+        // do not terminate cargo cache since gc is part of autoclean-expensive
+        res.unwrap_or_fatal_error();
         size_changed = true;
     }
 
@@ -390,6 +394,8 @@ fn main() {
                 );
             }
         }
+        registry_sources_caches.invalidate();
+        checkouts_cache.invalidate();
     }
 
     if config.is_present("keep-duplicate-crates") {
