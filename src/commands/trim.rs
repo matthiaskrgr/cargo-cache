@@ -210,10 +210,8 @@ mod parse_size_limit {
 
         match p(Some("1_")) {
             Ok(_) => panic!("expected error"),
-            Err(e) => match e {
-                Error::TrimLimitUnitParseFailure(string) => assert_eq!(string, "1_"),
-                _ => panic!("did not get enum variant TrimParseLimitUnitParseFailure"),
-            },
+            Err(Error::TrimLimitUnitParseFailure(string)) => assert_eq!(string, "1_"),
+            Err(..) => panic!("did not get enum variant TrimParseLimitUnitParseFailure"),
         }
     }
 
