@@ -128,6 +128,7 @@ fn filter_files_by_date<'a>(
     }
 }
 
+/// removes files from the cache that are older than X
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_files_by_dates(
     // we need to know which part of the cargo-cache we need to clear out!
@@ -199,7 +200,7 @@ pub(crate) fn remove_files_by_dates(
     let filtered_files: Vec<&FileWithDate> = filter_files_by_date(&date_comp, &dates)?;
 
     if dry_run {
-        // dry run
+        // if we dry run, we won't have to invalidate caches
         println!(
             "dry-run: would delete {} items that are {}...",
             filtered_files.len(),
@@ -238,7 +239,25 @@ pub(crate) fn remove_files_by_dates(
                     None,
                 )
             });
-        // .collect::<Vec<_>>();
+
+        // invalidate caches that we removed from
+        components_to_remove_from.iter().for_each(|component| {
+            match component {
+                Component::RegistryCrateCache => {
+                    registry_pkg_caches.invalidate();
+                }
+                Component::RegistrySources => {
+                    registry_sources_caches.invalidate();
+                }
+                Component::RegistryIndex => { /* ignore this case */ }
+                Component::GitRepos => {
+                    checkouts_cache.invalidate();
+                }
+                Component::GitDB => {
+                    bare_repos_cache.invalidate();
+                }
+            }
+        })
     }
     // summary is printed from inside main()
     Ok(())
