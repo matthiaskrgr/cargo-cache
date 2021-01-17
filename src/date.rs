@@ -128,7 +128,7 @@ fn filter_files_by_date<'a>(
     }
 }
 
-/// removes files from the cache that are older than X
+/// removes files that are older than $date from the cache, dirs can be specified
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_files_by_dates(
     // we need to know which part of the cargo-cache we need to clear out!
