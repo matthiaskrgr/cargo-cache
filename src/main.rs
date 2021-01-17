@@ -270,19 +270,6 @@ fn main() {
         local::local_subcmd().exit_or_fatal_error();
     }
 
-    // run fn  a on the cache and compare
-    /*   dirsizes::DirSizes::cmp_v2(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-    */
-
     let dir_sizes_total = dir_sizes_original.total_size();
 
     if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
