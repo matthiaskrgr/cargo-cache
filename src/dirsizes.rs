@@ -445,7 +445,7 @@ impl<'a> DirSizes<'a> {
         modify_cache: &dyn Fn() -> (),
     ) -> String {
         // Total:           x Mb => y MB
-        fn cmp_total(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+        fn cmp_total(old: &DirSizes<'_>, new: &DirSizes<'_>) -> Vec<TableLine> {
             vec![
                 TableLine::new(
                     0,
@@ -469,7 +469,7 @@ impl<'a> DirSizes<'a> {
         }
         // binars are not  supposed to change, we can use the ::bins  function here
 
-        fn git(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+        fn git(old: &DirSizes<'_>, new: &DirSizes<'_>) -> Vec<TableLine> {
             vec![
                 TableLine::new(
                     1,
@@ -553,7 +553,7 @@ impl<'a> DirSizes<'a> {
             ]
         }
 
-        fn regs(old: &DirSizes, new: &DirSizes) -> Vec<TableLine> {
+        fn regs(old: &DirSizes<'_>, new: &DirSizes<'_>) -> Vec<TableLine> {
             let tl1 = TableLine::new(
                 1,
                 &"Registry: ".to_string(),
