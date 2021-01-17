@@ -159,6 +159,16 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
+    let dir_sizes_original = dirsizes::DirSizes::new(
+        &mut bin_cache,
+        &mut checkouts_cache,
+        &mut bare_repos_cache,
+        &mut registry_pkgs_cache,
+        &mut registry_index_caches,
+        &mut registry_sources_caches,
+        &cargo_cache,
+    );
+
     if let Some(trim_config) = config.subcommand_matches("trim") {
         trim::trim_cache(
             trim_config.value_of("trim_limit"),
@@ -239,19 +249,9 @@ fn main() {
         local::local_subcmd().exit_or_fatal_error();
     }
 
-    let dir_sizes = dirsizes::DirSizes::new(
-        &mut bin_cache,
-        &mut checkouts_cache,
-        &mut bare_repos_cache,
-        &mut registry_pkgs_cache,
-        &mut registry_index_caches,
-        &mut registry_sources_caches,
-        &cargo_cache,
-    );
-    fn a() {}
-
     // run fn  a on the cache and compare
-    let cmp_output = dirsizes::DirSizes::cmp_v2(
+    /*dirsizes::DirSizes::cmp_v2(
+        &dir_sizes_original,
         &cargo_cache,
         &mut bin_cache,
         &mut checkouts_cache,
@@ -259,11 +259,9 @@ fn main() {
         &mut registry_pkgs_cache,
         &mut registry_index_caches,
         &mut registry_sources_caches,
-        &a,
-    );
-    println!("\n\n{}\n\n, ", cmp_output);
+    ); */
 
-    let dir_sizes_total = dir_sizes.total_size();
+    let dir_sizes_total = dir_sizes_original.total_size();
 
     if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
         let res = crate::date::remove_files_by_dates(
@@ -304,7 +302,7 @@ fn main() {
     }
 
     if config.is_present("info") {
-        println!("{}", get_info(&cargo_cache, &dir_sizes));
+        println!("{}", get_info(&cargo_cache, &dir_sizes_original));
         process::exit(0);
     }
 
@@ -316,14 +314,14 @@ fn main() {
     {
         // print per-registry summary
         dirsizes::per_registry_summary(
-            &dir_sizes,
+            &dir_sizes_original,
             &mut registry_index_caches,
             &mut registry_sources_caches,
             &mut registry_pkgs_cache,
         )
     } else {
         // print the default cache summary
-        dir_sizes.to_string()
+        dir_sizes_original.to_string()
     };
     print!("{}", output);
 
