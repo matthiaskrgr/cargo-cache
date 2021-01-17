@@ -153,6 +153,7 @@ pub(crate) fn rm_old_crates(
     Ok(())
 }
 
+/// take a list of cache items via cmdline and remove them, invalidate caches too
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_dir_via_cmdline(
     directory: Option<&str>,
@@ -186,6 +187,9 @@ pub(crate) fn remove_dir_via_cmdline(
                     size_changed,
                     Some(size),
                 );
+                if !dry_run {
+                    registry_pkgs_cache.invalidate();
+                }
             }
 
             Component::RegistrySources => {
@@ -197,6 +201,9 @@ pub(crate) fn remove_dir_via_cmdline(
                     size_changed,
                     Some(size),
                 );
+                if !dry_run {
+                    registry_sources_caches.invalidate();
+                }
             }
             Component::RegistryIndex => {
                 // sum the sizes of the separate indices
@@ -209,17 +216,26 @@ pub(crate) fn remove_dir_via_cmdline(
                     dry_run,
                     size_changed,
                     Some(size_of_all_indices),
-                )
+                );
+                if !dry_run {
+                    registry_index_caches.invalidate();
+                }
             }
             Component::GitRepos => {
                 let size = checkouts_cache.total_size();
                 size_removed += size;
                 remove_with_default_message(&ccd.git_checkouts, dry_run, size_changed, Some(size));
+                if !dry_run {
+                    checkouts_cache.invalidate();
+                }
             }
             Component::GitDB => {
                 let size = bare_repos_cache.total_size();
                 size_removed += size;
                 remove_with_default_message(&ccd.git_repos_bare, dry_run, size_changed, Some(size));
+                if !dry_run {
+                    bare_repos_cache.invalidate();
+                }
             }
         }
     }
