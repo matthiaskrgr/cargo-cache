@@ -435,6 +435,7 @@ impl<'a> DirSizes<'a> {
 
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn cmp_v2(
+        cache_sizes_old: &DirSizes<'_>,
         cargo_cache: &CargoCachePaths,
         mut bin_cache: &mut bin::BinaryCache,
         mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
@@ -442,8 +443,7 @@ impl<'a> DirSizes<'a> {
         mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
         mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
         mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-        modify_cache: &dyn Fn() -> (),
-    ) -> String {
+    ) {
         // Total:           x Mb => y MB
         fn cmp_total(old: &DirSizes<'_>, new: &DirSizes<'_>) -> Vec<TableLine> {
             vec![
@@ -655,19 +655,7 @@ impl<'a> DirSizes<'a> {
             );
 
             vec![tl1, tl2, tl3, tl4]
-        }
-
-        let cache_sizes_old = DirSizes::new(
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-            cargo_cache,
-        );
-
-        modify_cache();
+        } // fn regs()
 
         bin_cache.invalidate();
         checkouts_cache.invalidate();
@@ -688,11 +676,11 @@ impl<'a> DirSizes<'a> {
         );
 
         let mut v = Vec::new();
-        v.extend(cmp_total(&cache_sizes_old, &cache_sizes_new));
-        v.extend(regs(&cache_sizes_old, &cache_sizes_new));
-        v.extend(git(&cache_sizes_old, &cache_sizes_new));
+        v.extend(cmp_total(cache_sizes_old, &cache_sizes_new));
+        v.extend(regs(cache_sizes_old, &cache_sizes_new));
+        v.extend(git(cache_sizes_old, &cache_sizes_new));
 
-        two_row_table(3, v, false)
+        println!("{}", two_row_table(3, v, false))
     }
 }
 
