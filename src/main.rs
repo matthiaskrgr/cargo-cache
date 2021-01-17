@@ -327,7 +327,7 @@ fn main() {
         && !(config.is_present("remove-if-younger-than")
             || config.is_present("remove-if-older-than"))
     {
-         let res  = remove_dir_via_cmdline(
+        let res = remove_dir_via_cmdline(
             config.value_of("remove-dir"),
             config.is_present("dry-run"),
             &cargo_cache,
@@ -337,7 +337,7 @@ fn main() {
             &mut registry_index_caches,
             &mut registry_pkgs_cache,
             &mut registry_sources_caches,
-        ) ;
+        );
 
         dirsizes::DirSizes::print_size_difference(
             &dir_sizes_original,
@@ -350,7 +350,6 @@ fn main() {
             &mut registry_sources_caches,
         );
         res.unwrap_or_fatal_error();
-
     }
 
     if config.is_present("fsck-repos") {
@@ -358,7 +357,7 @@ fn main() {
             .exit_or_fatal_error();
     }
     if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
-        let res =  git_gc_everything(
+        let res = git_gc_everything(
             &cargo_cache.git_repos_bare,
             &cargo_cache.registry_pkg_cache,
             config.is_present("dry-run"),
@@ -400,32 +399,28 @@ fn main() {
 
     if config.is_present("keep-duplicate-crates") {
         let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
-        let limit = match clap_val {
-            Ok(x) => x,
-            Err(e) => {
-                eprintln!(
+        let limit = clap_val
+            .map_err(|e| {
+                format!(
                     "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
                     e
-                );
-                process::exit(1);
-            }
-        };
-        match rm_old_crates(
+                )
+            })
+            .unwrap_or_fatal_error();
+
+        if let Err(error) = rm_old_crates(
             limit,
             config.is_present("dry-run"),
             &cargo_cache.registry_pkg_cache,
             &mut size_changed,
         ) {
-            Ok(()) => {}
-            Err(error) => {
-                match error {
-                    Error::MalformedPackageName(_) => {
-                        // force a stacktrace here
-                        panic!("{}", error);
-                    }
-                    _ => unreachable!(),
-                };
-            }
+            match error {
+                Error::MalformedPackageName(_) => {
+                    // force a stacktrace here
+                    panic!("{}", error);
+                }
+                _ => unreachable!(),
+            };
         }
     }
 
