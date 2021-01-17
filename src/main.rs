@@ -401,6 +401,7 @@ fn main() {
             Err(error) => {
                 match error {
                     Error::MalformedPackageName(_) => {
+                        // force a stacktrace here
                         panic!("{}", error);
                     }
                     _ => unreachable!(),
