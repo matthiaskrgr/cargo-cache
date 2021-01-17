@@ -168,7 +168,7 @@ fn main() {
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
     if let Some(trim_config) = config.subcommand_matches("trim") {
-        match trim::trim_cache(
+        trim::trim_cache(
             trim_config.value_of("trim_limit"),
             &mut checkouts_cache,
             &mut bare_repos_cache,
@@ -176,15 +176,8 @@ fn main() {
             &mut registry_sources_caches,
             config.is_present("dry-run"),
             &mut size_changed,
-        ) {
-            Ok(_) => {
-                process::exit(0);
-            }
-            Err(e) => {
-                eprintln!("{:?}", e);
-                process::exit(1);
-            }
-        }
+        )
+        .exit_or_fatal_error();
     }
 
     if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {

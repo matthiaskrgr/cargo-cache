@@ -28,7 +28,7 @@ pub(crate) trait ErrorHandling<T, E: std::fmt::Display> {
 }
 
 impl<T, E: std::fmt::Display> ErrorHandling<T, E> for CargoCacheResult<T, E> {
-    // return the wrapped value or print the contained error and terminate cargo-cache
+    /// return the wrapped value or print the wrapped error and terminate cargo-cache
     fn unwrap_or_fatal_error(self) -> T {
         match self {
             Ok(t) => t,
@@ -39,6 +39,7 @@ impl<T, E: std::fmt::Display> ErrorHandling<T, E> for CargoCacheResult<T, E> {
         }
     }
 
+    /// print the wrapped value or print the wrapped error and exit with 0 or 1 respectively
     fn exit_or_fatal_error(self) {
         match self {
             Ok(_) => {
