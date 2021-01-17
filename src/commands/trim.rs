@@ -11,7 +11,6 @@
 // trim the size of the cargo cache down to a certain limit.
 // note that this does not take account the registry indices and the installed binaries in calculations
 
-use std::fmt;
 use std::path::{Path, PathBuf};
 
 use crate::cache::caches::*;
@@ -21,22 +20,6 @@ use crate::remove::*;
 
 use humansize::{file_size_opts, FileSize};
 use walkdir::WalkDir;
-
-#[derive(Debug, Eq, PartialEq)]
-pub(crate) enum TrimError<'a> {
-    // failed to parse the unit of a `cargo cache trim --limit 123G` argument
-    TrimLimitUnitParseFailure(&'a str),
-}
-
-impl fmt::Display for TrimError<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self {
-            Self::TrimLimitUnitParseFailure(limit) => {
-                write!(f, "Failed to parse limit: \"{}\". Should be of the form 123X where X is one of B,K,M,G or T.", limit)
-            }
-        }
-    }
-}
 
 fn get_last_access_of_item(path: &Path) -> std::time::SystemTime {
     if path.is_file() {
@@ -78,12 +61,12 @@ pub(crate) fn gather_all_cache_items<'a>(
 }
 
 /// figure out how big the cache should remain after trimming
-fn parse_size_limit_to_bytes<'a>(limit: Option<&'a str>) -> Result<u64, TrimError<'a>> {
+fn parse_size_limit_to_bytes(limit: Option<&str>) -> Result<u64, Error> {
     match limit {
         None => unreachable!("No trim --limit was supplied altough clap should enforce that!"),
         Some(limit) => {
             // figure out the unit
-            let unit_multiplicator: Result<u64, TrimError<'a>> = match limit.chars().last() {
+            let unit_multiplicator: Result<u64, Error> = match limit.chars().last() {
                 // we have no limit
                 None => Ok(0),
                 // we expect a unit such as B, K, M, G, T...
@@ -95,10 +78,10 @@ fn parse_size_limit_to_bytes<'a>(limit: Option<&'a str>) -> Result<u64, TrimErro
                             'm' | 'M' => Ok(1024 * 1024),
                             'g' | 'G' => Ok(1024 * 1024 * 1024),
                             't' | 'T' => Ok(1024 * 1024 * 1024 * 1024),
-                            _ => Err(TrimError::TrimLimitUnitParseFailure(limit)),
+                            _ => Err(Error::TrimLimitUnitParseFailure(limit.to_string())),
                         }
                     } else {
-                        Err(TrimError::TrimLimitUnitParseFailure(limit))
+                        Err(Error::TrimLimitUnitParseFailure(limit.to_string()))
                     }
                 }
             };
@@ -125,7 +108,7 @@ pub(crate) fn trim_cache<'a>(
     registry_sources_cache: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
-) -> Result<(), TrimError<'a>> {
+) -> Result<(), Error> {
     // the cache should not exceed this limit
     let size_limit = parse_size_limit_to_bytes(unparsed_size_limit)?;
 

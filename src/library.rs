@@ -129,6 +129,8 @@ pub(crate) enum Error {
     NoSccacheDir,
     // could not get rustup home
     NoRustupHome,
+    // trim failed to parse the given unit
+    TrimLimitUnitParseFailure(String),
 }
 
 impl fmt::Display for Error {
@@ -229,11 +231,18 @@ impl fmt::Display for Error {
                 path.display(),
                 error
             ),
+
             Self::NoSccacheDir => {
                 write!(f,
                 "Could not find sccache cache directory at ~/.cache/sccache or ${{SCCACHE_DIR}}")
             }
             Self::NoRustupHome => write!(f, "Failed to determine rustup home directory"),
+            Self::TrimLimitUnitParseFailure(limit) => write!(
+                f,
+                "Failed to parse limit: \"{}\".\
+                Should be of the form 123X where X is one of B,K,M,G or T.",
+                limit
+            ),
         }
     }
 }
