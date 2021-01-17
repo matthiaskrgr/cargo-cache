@@ -120,15 +120,7 @@ fn main() {
     };
 
     if config.is_present("sc") || config.is_present("sccache") {
-        match sccache::sccache_stats() {
-            Ok(()) => {
-                process::exit(0);
-            }
-            Err(e) => {
-                eprintln!("{}", e);
-                process::exit(1);
-            }
-        }
+        sccache::sccache_stats().exit_or_fatal_error();
     }
 
     if config.subcommand_matches("toolchain").is_some() {
