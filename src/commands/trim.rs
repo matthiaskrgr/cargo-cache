@@ -167,6 +167,13 @@ pub(crate) fn trim_cache<'a>(
                 None,
             )
         });
+
+    // invalidate caches that we might have touched
+    git_checkouts_cache.invalidate();
+    bare_repos_cache.invalidate();
+    registry_pkg_cache.invalidate();
+    registry_sources_cache.invalidate();
+
     println!(
         "Removed {} items totalling {}",
         removed_item_count,
