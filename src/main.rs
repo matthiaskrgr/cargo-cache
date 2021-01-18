@@ -336,10 +336,10 @@ fn main() {
             if !dry_run {
                 bare_repos_cache.invalidate();
                 registry_index_caches.invalidate();
+                size_changed = true;
             }
             // do not terminate cargo cache since gc is part of autoclean-expensive
             res.unwrap_or_fatal_error();
-            size_changed = true;
         }
 
         CargoCacheCommands::AutoClean { dry_run } => {
