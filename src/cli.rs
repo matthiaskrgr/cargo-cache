@@ -10,6 +10,7 @@
 /// This file provides the command line interface of the cargo-cache crate
 use clap::{value_t, App, AppSettings, Arg, ArgMatches, SubCommand};
 
+use crate::library::*;
 use rustc_tools_util::*;
 
 // cargo-cache can perform these operaitons, but only one at a time
@@ -22,6 +23,7 @@ pub(crate) enum CargoCacheCommands<'a> {
     Info,
     KeepDuplicateCrates {
         dry_run: bool,
+        limit: u64,
     },
     ListDirs,
     RemoveDir {
@@ -114,7 +116,16 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     } else if config.is_present("autoclean") {
         CargoCacheCommands::AutoClean { dry_run }
     } else if config.is_present("keep-duplicate-crates") {
-        CargoCacheCommands::KeepDuplicateCrates { dry_run }
+        let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
+        let limit = clap_val
+            .map_err(|e| {
+                format!(
+                    "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
+                    e
+                )
+            })
+            .unwrap_or_fatal_error();
+        CargoCacheCommands::KeepDuplicateCrates { dry_run, limit }
     } else if config.subcommand_matches("registry").is_some()
         || config.subcommand_matches("r").is_some()
         || config.subcommand_matches("registries").is_some()

@@ -74,7 +74,6 @@ cfg_if::cfg_if! {
 
         // use
         use crate::cache::caches::{Cache, RegistrySuperCache};
-        use clap::value_t;
         use std::process;
         use std::time::SystemTime;
         use walkdir::WalkDir;
@@ -162,7 +161,7 @@ fn main() {
     let mut registry_index_caches: registry_index::RegistryIndicesCache =
         registry_index::RegistryIndicesCache::new(p2.registry_index);
 
-    // this should populate the entire cache, not very happy about this...
+    // this should populate the entire cache, not very happy about this, wen we do this more lazily?
     let dir_sizes_original = dirsizes::DirSizes::new(
         &mut bin_cache,
         &mut checkouts_cache,
@@ -268,7 +267,7 @@ fn main() {
                 &mut registry_sources_caches,
                 config.value_of("remove-if-younger-than"), //@FIXME use bunch of enums here?
                 config.value_of("remove-if-older-than"),
-                config.is_present("dry-run"),
+                dry_run,
                 config.value_of("remove-dir"),
                 &mut size_changed,
             );
@@ -295,7 +294,7 @@ fn main() {
         CargoCacheCommands::RemoveDir { dry_run } => {
             let res = remove_dir_via_cmdline(
                 config.value_of("remove-dir"),
-                config.is_present("dry-run"),
+                dry_run,
                 &cargo_cache,
                 &mut size_changed,
                 &mut checkouts_cache,
@@ -326,10 +325,10 @@ fn main() {
             let res = git_gc_everything(
                 &cargo_cache.git_repos_bare,
                 &cargo_cache.registry_pkg_cache,
-                config.is_present("dry-run"),
+                dry_run,
             );
 
-            if !config.is_present("dry-run") {
+            if !dry_run {
                 bare_repos_cache.invalidate();
                 registry_index_caches.invalidate();
             }
@@ -351,7 +350,7 @@ fn main() {
                 if dir.is_dir() {
                     remove_file(
                         dir,
-                        config.is_present("dry-run"),
+                        dry_run,
                         &mut size_changed,
                         None,
                         &DryRunMessage::Default,
@@ -378,10 +377,10 @@ fn main() {
             let res = git_gc_everything(
                 &cargo_cache.git_repos_bare,
                 &cargo_cache.registry_pkg_cache,
-                config.is_present("dry-run"),
+                dry_run,
             );
 
-            if !config.is_present("dry-run") {
+            if !dry_run {
                 bare_repos_cache.invalidate();
                 registry_index_caches.invalidate();
             }
@@ -401,7 +400,7 @@ fn main() {
                 if dir.is_dir() {
                     remove_file(
                         dir,
-                        config.is_present("dry-run"),
+                        dry_run,
                         &mut size_changed,
                         None,
                         &DryRunMessage::Default,
@@ -424,20 +423,10 @@ fn main() {
             );
             std::process::exit(0);
         }
-        CargoCacheCommands::KeepDuplicateCrates { dry_run } => {
-            let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
-            let limit = clap_val
-                .map_err(|e| {
-                    format!(
-                        "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
-                        e
-                    )
-                })
-                .unwrap_or_fatal_error();
-
+        CargoCacheCommands::KeepDuplicateCrates { dry_run, limit } => {
             let res = rm_old_crates(
                 limit,
-                config.is_present("dry-run"),
+                dry_run,
                 &cargo_cache.registry_pkg_cache,
                 &mut size_changed,
             );
