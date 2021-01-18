@@ -13,7 +13,8 @@ use clap::{value_t, App, AppSettings, Arg, ArgMatches, SubCommand};
 use crate::library::*;
 use rustc_tools_util::*;
 
-// cargo-cache can perform these operaitons, but only one at a time
+/// cargo-cache can perform these operaitons, but only one at a time
+#[derive(Debug)]
 pub(crate) enum CargoCacheCommands<'a> {
     FSCKRepos,
 
@@ -43,9 +44,9 @@ pub(crate) enum CargoCacheCommands<'a> {
     Query {
         query_config: &'a ArgMatches<'a>,
     }, // subcommand
-    Local,    // subcommand
-    Registry, // subcommand
-    SCCache,  // subcommand
+    Local,      // subcommand
+    Registries, // subcommand
+    SCCache,    // subcommand
     CleanUnref {
         dry_run: bool,
         manifest_path: Option<&'a str>,
@@ -54,7 +55,7 @@ pub(crate) enum CargoCacheCommands<'a> {
         dry_run: bool,
         trim_limit: Option<&'a str>,
     }, // subcommand
-    Toolchain, // subcommand
+    Toolchain,  // subcommand
     RemoveIfDate {
         dry_run: bool,
     },
@@ -66,7 +67,7 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     let dry_run = config.is_present("dry-run");
 
     // if no args were passed, print the default summary
-    if config.args.is_empty() {
+    if config.args.is_empty() && config.subcommand.is_none() {
         return CargoCacheCommands::DefaultSummary;
     }
 
@@ -131,7 +132,7 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
         || config.subcommand_matches("r").is_some()
         || config.subcommand_matches("registries").is_some()
     {
-        CargoCacheCommands::Registry
+        CargoCacheCommands::Registries
     } else if config.is_present("list-dirs") {
         CargoCacheCommands::ListDirs
     } else if config.is_present("remove-if-younger-than")

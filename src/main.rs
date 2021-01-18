@@ -479,7 +479,7 @@ fn main() {
 
     // no println!() here!
     // print the default summary
-    if matches!(config_enum, CargoCacheCommands::Registry) {
+    if matches!(config_enum, CargoCacheCommands::Registries) {
         // print per-registry summary
         let output = dirsizes::per_registry_summary(
             &dir_sizes_original,
