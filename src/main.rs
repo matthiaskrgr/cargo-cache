@@ -454,6 +454,11 @@ fn main() {
                 };
             }
         }
+        CargoCacheCommands::OnlyDryRun => {
+            if !size_changed {
+                eprintln!("Warning: there is nothing to be dry run!");
+            }
+        }
         _ => (),
     }
 
@@ -470,19 +475,6 @@ fn main() {
             &mut registry_index_caches,
             &mut registry_sources_caches,
         );
-    }
-
-    if !size_changed
-        && config.is_present("dry-run")
-        // none of the flags that do on-disk changes are present
-        && !(config.is_present("keep-duplicate-crates")
-            || config.is_present("autoclean")
-            || config.is_present("autoclean-expensive")
-            || config.is_present("gc-repos")
-            || config.is_present("fsck-repos")
-            || config.is_present("remove-dir"))
-    {
-        eprintln!("Warning: there is nothing to be dry run!");
     }
 
     // no println!() here!

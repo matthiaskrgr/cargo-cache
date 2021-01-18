@@ -58,6 +58,7 @@ pub(crate) enum CargoCacheCommands<'a> {
     RemoveIfDate {
         dry_run: bool,
     },
+    OnlyDryRun,
     DefaultSummary,
 }
 
@@ -137,6 +138,11 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
         || config.is_present("remove-if-older-than")
     {
         CargoCacheCommands::RemoveIfDate { dry_run }
+    } else if dry_run {
+        // none of the flags that do on-disk changes are present
+
+        // we got "cargo cache --dry-run"
+        CargoCacheCommands::OnlyDryRun
     } else {
         unreachable!("Failed to map all clap options to enum?")
     }
