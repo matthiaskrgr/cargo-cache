@@ -17,21 +17,21 @@ pub(crate) enum CargoCacheCommands<'a> {
     FSCKRepos,
 
     GitGCRepos {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     Info,
     KeepDuplicateCrates {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     ListDirs,
     RemoveDir {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     AutoClean {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     AutoCleanExpensive {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     TopCacheItems {
         limit: u32,
@@ -45,30 +45,22 @@ pub(crate) enum CargoCacheCommands<'a> {
     Registry, // subcommand
     SCCache,  // subcommand
     CleanUnref {
-        dry_run: RunMode,
+        dry_run: bool,
         manifest_path: Option<&'a str>,
     }, // subcommand
     Trim {
-        dry_run: RunMode,
+        dry_run: bool,
         trim_limit: Option<&'a str>,
     }, // subcommand
     Toolchain, // subcommand
     RemoveIfDate {
-        dry_run: RunMode,
+        dry_run: bool,
     },
     DefaultSummary,
 }
-pub(crate) enum RunMode {
-    Run,
-    DryRun,
-}
 
 pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheCommands<'b> {
-    let dry_run = if config.is_present("dry-run") {
-        RunMode::DryRun
-    } else {
-        RunMode::Run
-    };
+    let dry_run = config.is_present("dry-run");
 
     // if no args were passed, print the default summary
     if config.args.is_empty() {
@@ -90,13 +82,9 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
             trim_limit: config.value_of("trim_limit"),
         } // take config trim_config.value_of("trim_limit")
     } else if let Some(config) = config.subcommand_matches("clean-unref") {
-        let dry_run = if matches!(RunMode::DryRun, dry_run) || config.is_present("dry-run") {
-            RunMode::DryRun
-        } else {
-            RunMode::Run
-        };
+        let arg_dry_run = dry_run || config.is_present("dry-run");
         CargoCacheCommands::CleanUnref {
-            dry_run,
+            dry_run: arg_dry_run,
             manifest_path: config.value_of("manifest-path"),
         } // clean_unref_cfg.value_of("manifest-path"),
     } else if config.is_present("top-cache-items") {

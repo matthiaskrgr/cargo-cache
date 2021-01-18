@@ -85,7 +85,7 @@ cfg_if::cfg_if! {
         use crate::remove::*;
         use crate::top_items_summary::*;
         use crate::clean_unref::*;
-        use crate::cli::{CargoCacheCommands, RunMode};
+        use crate::cli::{CargoCacheCommands};
     }
 }
 
@@ -175,7 +175,7 @@ fn main() {
 
     match config_enum {
         CargoCacheCommands::Trim {
-            ref dry_run,
+            dry_run,
             trim_limit,
         } => {
             let trim_result = trim::trim_cache(
@@ -184,7 +184,7 @@ fn main() {
                 &mut bare_repos_cache,
                 &mut registry_pkgs_cache,
                 &mut registry_sources_caches,
-                matches!(dry_run, RunMode::DryRun), //  @FIXME
+                dry_run,
                 &mut size_changed,
             );
             dirsizes::DirSizes::print_size_difference(
@@ -200,7 +200,7 @@ fn main() {
             trim_result.exit_or_fatal_error();
         }
         CargoCacheCommands::CleanUnref {
-            ref dry_run,
+            dry_run,
             manifest_path,
         } => {
             let clean_unref_result = clean_unref(
@@ -212,7 +212,7 @@ fn main() {
                 &mut registry_pkgs_cache,
                 &mut registry_index_caches,
                 &mut registry_sources_caches,
-                matches!(dry_run, RunMode::DryRun), //  @FIXME
+                dry_run,
                 &mut size_changed,
             );
             dirsizes::DirSizes::print_size_difference(
@@ -259,7 +259,7 @@ fn main() {
         CargoCacheCommands::Local => {
             local::local_subcmd().exit_or_fatal_error();
         }
-        CargoCacheCommands::RemoveIfDate { ref dry_run } => {
+        CargoCacheCommands::RemoveIfDate { dry_run } => {
             let res = crate::date::remove_files_by_dates(
                 &mut checkouts_cache,
                 &mut bare_repos_cache,
@@ -292,7 +292,7 @@ fn main() {
             process::exit(0);
         }
         // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
-        CargoCacheCommands::RemoveDir { ref dry_run } => {
+        CargoCacheCommands::RemoveDir { dry_run } => {
             let res = remove_dir_via_cmdline(
                 config.value_of("remove-dir"),
                 config.is_present("dry-run"),
@@ -321,7 +321,7 @@ fn main() {
             git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
                 .exit_or_fatal_error();
         }
-        CargoCacheCommands::GitGCRepos { ref dry_run } => {
+        CargoCacheCommands::GitGCRepos { dry_run } => {
             //@TODO deduplicate bewteen autoclean-expensive!
             let res = git_gc_everything(
                 &cargo_cache.git_repos_bare,
@@ -338,7 +338,7 @@ fn main() {
             size_changed = true;
         }
 
-        CargoCacheCommands::AutoClean { ref dry_run } => {
+        CargoCacheCommands::AutoClean { dry_run } => {
             // clean the registry sources and git checkouts
             let reg_srcs = &cargo_cache.registry_sources;
             let git_checkouts = &cargo_cache.git_checkouts;
@@ -374,7 +374,7 @@ fn main() {
             );
             std::process::exit(0);
         }
-        CargoCacheCommands::AutoCleanExpensive { ref dry_run } => {
+        CargoCacheCommands::AutoCleanExpensive { dry_run } => {
             let res = git_gc_everything(
                 &cargo_cache.git_repos_bare,
                 &cargo_cache.registry_pkg_cache,
@@ -424,7 +424,7 @@ fn main() {
             );
             std::process::exit(0);
         }
-        CargoCacheCommands::KeepDuplicateCrates { ref dry_run } => {
+        CargoCacheCommands::KeepDuplicateCrates { dry_run } => {
             let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
             let limit = clap_val
                 .map_err(|e| {
