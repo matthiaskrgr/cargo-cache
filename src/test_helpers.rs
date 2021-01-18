@@ -67,9 +67,8 @@ pub(crate) fn assert_path_end(path: &Path, wanted_vector: &[&str]) {
     let wanted_len = components_vec.len() - wanted_vector.len();
 
     let is: &[&str] = &components_vec[wanted_len..];
-    let wanted: &[&str] = &wanted_vector[..];
 
-    assert_eq!(is, wanted);
+    assert_eq!(is, wanted_vector);
 }
 
 #[allow(dead_code)] // only used in tests
