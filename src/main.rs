@@ -408,12 +408,28 @@ fn main() {
             })
             .unwrap_or_fatal_error();
 
-        if let Err(error) = rm_old_crates(
+        let res = rm_old_crates(
             limit,
             config.is_present("dry-run"),
             &cargo_cache.registry_pkg_cache,
             &mut size_changed,
-        ) {
+        );
+        registry_pkgs_cache.invalidate();
+        registry_sources_caches.invalidate();
+
+
+        dirsizes::DirSizes::print_size_difference(
+            &dir_sizes_original,
+            &cargo_cache,
+            &mut bin_cache,
+            &mut checkouts_cache,
+            &mut bare_repos_cache,
+            &mut registry_pkgs_cache,
+            &mut registry_index_caches,
+            &mut registry_sources_caches,
+        );
+
+        if let Err(error) = res {
             match error {
                 Error::MalformedPackageName(_) => {
                     // force a stacktrace here
