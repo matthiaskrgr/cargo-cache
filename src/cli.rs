@@ -12,6 +12,81 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;
 
+// cargo-cache can perform these operaitons, but only one at a time
+pub(crate) enum CargoCacheCommands {
+    FSCKRepos { dry_run: RunMode },
+    GCRepos { dry_run: RunMode },
+    Info,
+    KeepDuplicateCrates { dry_run: RunMode },
+    ListDirs,
+    RemoveDir { dry_run: RunMode },
+    AutoClean { dry_run: RunMode },
+    AutoCleanExpensive { dry_run: RunMode },
+    TopCacheItems,
+    //Debug,
+    Version,
+    Query,                           // subcommand
+    Local,                           // subcommand
+    Registry,                        // subcommand
+    SCCache,                         // subcommand
+    CleanUnref { dry_run: RunMode }, // subcommand
+    Trim { dry_run: RunMode },       // subcommand
+    Toolchain,                       // subcommand
+    RemoveIfDate { dry_run: RunMode },
+}
+pub(crate) enum RunMode {
+    Run,
+    DryRun,
+}
+
+pub(crate) fn clap_to_enum<'a>(config: &ArgMatches<'a>) -> CargoCacheCommands {
+    let dry_run = if config.is_present("dry-run") {
+        RunMode::DryRun
+    } else {
+        RunMode::Run
+    };
+
+    if config.is_present("version") {
+        CargoCacheCommands::Version
+    } else if config.is_present("debug") {
+        //@FIXME
+        todo!()
+    } else if config.is_present("sccache") || config.is_present("sc") {
+        CargoCacheCommands::SCCache
+    } else if config.subcommand_matches("toolchain").is_some() {
+        CargoCacheCommands::Toolchain
+    } else if let Some(config) = config.subcommand_matches("trim") {
+        CargoCacheCommands::Trim { dry_run } // take config trim_config.value_of("trim_limit")
+    } else if let Some(config) = config.subcommand_matches("clean-unref") {
+        CargoCacheCommands::CleanUnref { dry_run } // clean_unref_cfg.value_of("manifest-path"),
+    } else if config.is_present("top-cache-items") {
+        CargoCacheCommands::TopCacheItems // take config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/)
+    } else if config.is_present("query") || config.is_present("q") {
+        CargoCacheCommands::Query
+    } else if config.is_present("local") || config.is_present("l") {
+        CargoCacheCommands::Local
+    } else if config.is_present("info") {
+        CargoCacheCommands::Info
+    } else if config.is_present("remove-dir") {
+        CargoCacheCommands::RemoveDir { dry_run } //need more info
+    } else if config.is_present("fsck-repos") {
+        CargoCacheCommands::FSCKRepos { dry_run }
+    } else if config.is_present("gc-repos") {
+        CargoCacheCommands::GCRepos { dry_run }
+    } else if config.is_present("autoclean-expensive") {
+        CargoCacheCommands::AutoCleanExpensive { dry_run }
+    } else if config.is_present("keep-duplicate-crates") {
+        CargoCacheCommands::KeepDuplicateCrates { dry_run }
+    } else if config.subcommand_matches("registry").is_some()
+        || config.subcommand_matches("r").is_some()
+        || config.subcommand_matches("registries").is_some()
+    {
+        CargoCacheCommands::Registry
+    } else {
+        unreachable!();
+    }
+}
+
 /// generates the version info with what we have in the build.rs
 pub(crate) fn get_version() -> String {
     // remove the "cargo-cache" since CLAP already adds that by itself
