@@ -85,6 +85,7 @@ cfg_if::cfg_if! {
         use crate::remove::*;
         use crate::top_items_summary::*;
         use crate::clean_unref::*;
+        use crate::cli::{CargoCacheCommands, RunMode};
     }
 }
 
@@ -104,6 +105,8 @@ fn main() {
     // we need this in case we call "cargo-cache" binary directly
     let config = config.subcommand_matches("cache").unwrap_or(&config);
 
+    let config_enum = cli::clap_to_enum(config);
+
     // handle hidden "version" subcommand
     if config.is_present("version") {
         println!("cargo-cache {}", cli::get_version());
@@ -119,13 +122,13 @@ fn main() {
         None
     };
 
-    if config.is_present("sc") || config.is_present("sccache") {
-        sccache::sccache_stats().exit_or_fatal_error();
-    }
-
-    if config.subcommand_matches("toolchain").is_some() {
-        toolchains::toolchain_stats();
-        process::exit(0);
+    match &config_enum {
+        CargoCacheCommands::SCCache => sccache::sccache_stats().exit_or_fatal_error(),
+        CargoCacheCommands::Toolchain => {
+            toolchains::toolchain_stats();
+            process::exit(0);
+        }
+        _ => {}
     }
 
     // indicates if size changed and whether we should print a before/after size diff
@@ -133,7 +136,7 @@ fn main() {
 
     let cargo_cache = CargoCachePaths::default().unwrap_or_fatal_error();
 
-    if config.is_present("list-dirs") {
+    if let CargoCacheCommands::ListDirs = config_enum {
         // only print the directories and exit, don't calculate anything else
         println!("{}", cargo_cache);
         process::exit(0);
@@ -170,266 +173,299 @@ fn main() {
         &cargo_cache,
     );
 
-    if let Some(trim_config) = config.subcommand_matches("trim") {
-        let trim_result = trim::trim_cache(
-            trim_config.value_of("trim_limit"),
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_sources_caches,
-            config.is_present("dry-run"),
-            &mut size_changed,
-        );
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-        trim_result.exit_or_fatal_error();
-    }
-
-    if let Some(clean_unref_cfg) = config.subcommand_matches("clean-unref") {
-        let clean_unref_result = clean_unref(
-            &cargo_cache,
-            clean_unref_cfg.value_of("manifest-path"),
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-            config.is_present("dry-run") || clean_unref_cfg.is_present("dry-run"),
-            &mut size_changed,
-        );
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-        clean_unref_result.exit_or_fatal_error();
-    }
-
-    if config.is_present("top-cache-items") {
-        let limit =
-            value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
-        if limit > 0 {
-            println!(
-                "{}",
-                get_top_crates(
-                    limit,
-                    &cargo_cache,
-                    &mut bin_cache,
-                    &mut checkouts_cache,
-                    &mut bare_repos_cache,
-                    &mut registry_pkgs_cache,
-                    /* &mut registry_index_cache, */
-                    &mut registry_sources_caches,
-                )
+    match config_enum {
+        CargoCacheCommands::Trim {
+            ref dry_run,
+            trim_limit,
+        } => {
+            let trim_result = trim::trim_cache(
+                trim_limit,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_sources_caches,
+                matches!(dry_run, RunMode::DryRun), //  @FIXME
+                &mut size_changed,
             );
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            trim_result.exit_or_fatal_error();
         }
-        process::exit(0);
-    } else if config.is_present("query") || config.is_present("q") {
-        let query_config = if config.is_present("query") {
-            config
-                .subcommand_matches("query")
-                .expect("unwrap failed here")
-        } else {
-            config.subcommand_matches("q").expect("unwrap failed there")
-        };
-
-        query::run_query(
-            query_config,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_sources_caches,
-        )
-        .exit_or_fatal_error();
-    } else if config.is_present("local") || config.is_present("l") {
-        // this is not actually not needed and was previously passed into local_subcmd()
-        /*
-        let local_config = if config.is_present("local") {
-            config
-                .subcommand_matches("local")
-                .expect("unwrap failed here")
-        } else {
-            config.subcommand_matches("l").expect("unwrap failed there")
-        }; */
-
-        local::local_subcmd().exit_or_fatal_error();
-    }
-
-    if config.is_present("remove-if-younger-than") || config.is_present("remove-if-older-than") {
-        let res = crate::date::remove_files_by_dates(
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            /* &mut registry_index_cache, */
-            &mut registry_sources_caches,
-            config.value_of("remove-if-younger-than"),
-            config.value_of("remove-if-older-than"),
-            config.is_present("dry-run"),
-            config.value_of("remove-dir"),
-            &mut size_changed,
-        );
-
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-        // don't run --remove-dir stuff (since we also required that parameter)
-
-        res.exit_or_fatal_error();
-    }
-
-    if config.is_present("info") {
-        println!("{}", get_info(&cargo_cache, &dir_sizes_original));
-        process::exit(0);
-    }
-
-    if config.is_present("remove-dir")
-        && !(config.is_present("remove-if-younger-than")
-            || config.is_present("remove-if-older-than"))
-    {
-        let res = remove_dir_via_cmdline(
-            config.value_of("remove-dir"),
-            config.is_present("dry-run"),
-            &cargo_cache,
-            &mut size_changed,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_index_caches,
-            &mut registry_pkgs_cache,
-            &mut registry_sources_caches,
-        );
-
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-        res.unwrap_or_fatal_error();
-    }
-
-    if config.is_present("fsck-repos") {
-        git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
-            .exit_or_fatal_error();
-    }
-    if config.is_present("gc-repos") || config.is_present("autoclean-expensive") {
-        let res = git_gc_everything(
-            &cargo_cache.git_repos_bare,
-            &cargo_cache.registry_pkg_cache,
-            config.is_present("dry-run"),
-        );
-
-        if !config.is_present("dry-run") {
-            bare_repos_cache.invalidate();
-            registry_index_caches.invalidate();
+        CargoCacheCommands::CleanUnref {
+            ref dry_run,
+            manifest_path,
+        } => {
+            let clean_unref_result = clean_unref(
+                &cargo_cache,
+                manifest_path,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+                matches!(dry_run, RunMode::DryRun), //  @FIXME
+                &mut size_changed,
+            );
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            clean_unref_result.exit_or_fatal_error();
         }
-        // do not terminate cargo cache since gc is part of autoclean-expensive
-        res.unwrap_or_fatal_error();
-        size_changed = true;
-    }
-
-    if config.is_present("autoclean") || config.is_present("autoclean-expensive") {
-        // clean the registry sources and git checkouts
-        let reg_srcs = &cargo_cache.registry_sources;
-        let git_checkouts = &cargo_cache.git_checkouts;
-
-        // depending on the size of the cache and the system (SSD, HDD...) this can take a few seconds.
-        println!("\nClearing cache...");
-
-        for dir in &[reg_srcs, git_checkouts] {
-            let size = cumulative_dir_size(dir);
-            if dir.is_dir() {
-                remove_file(
-                    dir,
-                    config.is_present("dry-run"),
-                    &mut size_changed,
-                    None,
-                    &DryRunMessage::Default,
-                    Some(size.dir_size),
+        CargoCacheCommands::TopCacheItems { limit } => {
+            if limit > 0 {
+                println!(
+                    "{}",
+                    get_top_crates(
+                        limit,
+                        &cargo_cache,
+                        &mut bin_cache,
+                        &mut checkouts_cache,
+                        &mut bare_repos_cache,
+                        &mut registry_pkgs_cache,
+                        /* &mut registry_index_cache, */
+                        &mut registry_sources_caches,
+                    )
                 );
             }
+            process::exit(0);
         }
-        registry_sources_caches.invalidate();
-        checkouts_cache.invalidate();
+        CargoCacheCommands::Query { query_config } => {
+            query::run_query(
+                query_config,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_sources_caches,
+            )
+            .exit_or_fatal_error();
+        }
+        CargoCacheCommands::Local => {
+            local::local_subcmd().exit_or_fatal_error();
+        }
+        CargoCacheCommands::RemoveIfDate { ref dry_run } => {
+            let res = crate::date::remove_files_by_dates(
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                /* &mut registry_index_cache, */
+                &mut registry_sources_caches,
+                config.value_of("remove-if-younger-than"), //@FIXME use bunch of enums here?
+                config.value_of("remove-if-older-than"),
+                config.is_present("dry-run"),
+                config.value_of("remove-dir"),
+                &mut size_changed,
+            );
 
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
-        std::process::exit(0);
-    }
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            // don't run --remove-dir stuff (since we also required that parameter)
 
-    if config.is_present("keep-duplicate-crates") {
-        let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
-        let limit = clap_val
-            .map_err(|e| {
-                format!(
-                    "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
-                    e
-                )
-            })
-            .unwrap_or_fatal_error();
+            res.exit_or_fatal_error();
+        }
+        CargoCacheCommands::Info => {
+            println!("{}", get_info(&cargo_cache, &dir_sizes_original));
+            process::exit(0);
+        }
+        // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
+        CargoCacheCommands::RemoveDir { ref dry_run } => {
+            let res = remove_dir_via_cmdline(
+                config.value_of("remove-dir"),
+                config.is_present("dry-run"),
+                &cargo_cache,
+                &mut size_changed,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_index_caches,
+                &mut registry_pkgs_cache,
+                &mut registry_sources_caches,
+            );
 
-        let res = rm_old_crates(
-            limit,
-            config.is_present("dry-run"),
-            &cargo_cache.registry_pkg_cache,
-            &mut size_changed,
-        );
-        registry_pkgs_cache.invalidate();
-        registry_sources_caches.invalidate();
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            res.unwrap_or_fatal_error();
+        }
+        CargoCacheCommands::FSCKRepos => {
+            git_fsck_everything(&cargo_cache.git_repos_bare, &cargo_cache.registry_pkg_cache)
+                .exit_or_fatal_error();
+        }
+        CargoCacheCommands::GitGCRepos { ref dry_run } => {
+            //@TODO deduplicate bewteen autoclean-expensive!
+            let res = git_gc_everything(
+                &cargo_cache.git_repos_bare,
+                &cargo_cache.registry_pkg_cache,
+                config.is_present("dry-run"),
+            );
 
-        dirsizes::DirSizes::print_size_difference(
-            &dir_sizes_original,
-            &cargo_cache,
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
-        );
+            if !config.is_present("dry-run") {
+                bare_repos_cache.invalidate();
+                registry_index_caches.invalidate();
+            }
+            // do not terminate cargo cache since gc is part of autoclean-expensive
+            res.unwrap_or_fatal_error();
+            size_changed = true;
+        }
 
-        if let Err(error) = res {
-            match error {
-                Error::MalformedPackageName(_) => {
-                    // force a stacktrace here
-                    panic!("{}", error);
+        CargoCacheCommands::AutoClean { ref dry_run } => {
+            // clean the registry sources and git checkouts
+            let reg_srcs = &cargo_cache.registry_sources;
+            let git_checkouts = &cargo_cache.git_checkouts;
+
+            // depending on the size of the cache and the system (SSD, HDD...) this can take a few seconds.
+            println!("\nClearing cache...");
+
+            for dir in &[reg_srcs, git_checkouts] {
+                let size = cumulative_dir_size(dir);
+                if dir.is_dir() {
+                    remove_file(
+                        dir,
+                        config.is_present("dry-run"),
+                        &mut size_changed,
+                        None,
+                        &DryRunMessage::Default,
+                        Some(size.dir_size),
+                    );
                 }
-                _ => unreachable!(),
-            };
+            }
+            registry_sources_caches.invalidate();
+            checkouts_cache.invalidate();
+
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            std::process::exit(0);
         }
+        CargoCacheCommands::AutoCleanExpensive { ref dry_run } => {
+            let res = git_gc_everything(
+                &cargo_cache.git_repos_bare,
+                &cargo_cache.registry_pkg_cache,
+                config.is_present("dry-run"),
+            );
+
+            if !config.is_present("dry-run") {
+                bare_repos_cache.invalidate();
+                registry_index_caches.invalidate();
+            }
+            // do not terminate cargo cache since gc is part of autoclean-expensive
+            res.unwrap_or_fatal_error();
+            size_changed = true;
+
+            // clean the registry sources and git checkouts
+            let reg_srcs = &cargo_cache.registry_sources;
+            let git_checkouts = &cargo_cache.git_checkouts;
+
+            // depending on the size of the cache and the system (SSD, HDD...) this can take a few seconds.
+            println!("\nClearing cache...");
+
+            for dir in &[reg_srcs, git_checkouts] {
+                let size = cumulative_dir_size(dir);
+                if dir.is_dir() {
+                    remove_file(
+                        dir,
+                        config.is_present("dry-run"),
+                        &mut size_changed,
+                        None,
+                        &DryRunMessage::Default,
+                        Some(size.dir_size),
+                    );
+                }
+            }
+            registry_sources_caches.invalidate();
+            checkouts_cache.invalidate();
+
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+            std::process::exit(0);
+        }
+        CargoCacheCommands::KeepDuplicateCrates { ref dry_run } => {
+            let clap_val = value_t!(config.value_of("keep-duplicate-crates"), u64);
+            let limit = clap_val
+                .map_err(|e| {
+                    format!(
+                        "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
+                        e
+                    )
+                })
+                .unwrap_or_fatal_error();
+
+            let res = rm_old_crates(
+                limit,
+                config.is_present("dry-run"),
+                &cargo_cache.registry_pkg_cache,
+                &mut size_changed,
+            );
+            registry_pkgs_cache.invalidate();
+            registry_sources_caches.invalidate();
+
+            dirsizes::DirSizes::print_size_difference(
+                &dir_sizes_original,
+                &cargo_cache,
+                &mut bin_cache,
+                &mut checkouts_cache,
+                &mut bare_repos_cache,
+                &mut registry_pkgs_cache,
+                &mut registry_index_caches,
+                &mut registry_sources_caches,
+            );
+
+            if let Err(error) = res {
+                match error {
+                    Error::MalformedPackageName(_) => {
+                        // force a stacktrace here
+                        panic!("{}", error);
+                    }
+                    _ => unreachable!(),
+                };
+            }
+        }
+        _ => (),
     }
 
     if size_changed && !config.is_present("dry-run") {
@@ -462,10 +498,7 @@ fn main() {
 
     // no println!() here!
     // print the default summary
-    if config.subcommand_matches("registry").is_some()
-        || config.subcommand_matches("r").is_some()
-        || config.subcommand_matches("registries").is_some()
-    {
+    if matches!(config_enum, CargoCacheCommands::Registry) {
         // print per-registry summary
         let output = dirsizes::per_registry_summary(
             &dir_sizes_original,
@@ -474,7 +507,7 @@ fn main() {
             &mut registry_pkgs_cache,
         );
         print!("{}", output);
-    } else {
+    } else if matches!(config_enum, CargoCacheCommands::DefaultSummary) {
         // default summary
         print!("{}", dir_sizes_original);
     }

@@ -8,43 +8,72 @@
 // except according to those terms.
 
 /// This file provides the command line interface of the cargo-cache crate
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
+use clap::{value_t, App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use rustc_tools_util::*;
 
 // cargo-cache can perform these operaitons, but only one at a time
-pub(crate) enum CargoCacheCommands {
-    FSCKRepos { dry_run: RunMode },
-    GCRepos { dry_run: RunMode },
+pub(crate) enum CargoCacheCommands<'a> {
+    FSCKRepos,
+
+    GitGCRepos {
+        dry_run: RunMode,
+    },
     Info,
-    KeepDuplicateCrates { dry_run: RunMode },
+    KeepDuplicateCrates {
+        dry_run: RunMode,
+    },
     ListDirs,
-    RemoveDir { dry_run: RunMode },
-    AutoClean { dry_run: RunMode },
-    AutoCleanExpensive { dry_run: RunMode },
-    TopCacheItems,
+    RemoveDir {
+        dry_run: RunMode,
+    },
+    AutoClean {
+        dry_run: RunMode,
+    },
+    AutoCleanExpensive {
+        dry_run: RunMode,
+    },
+    TopCacheItems {
+        limit: u32,
+    },
     //Debug,
     Version,
-    Query,                           // subcommand
-    Local,                           // subcommand
-    Registry,                        // subcommand
-    SCCache,                         // subcommand
-    CleanUnref { dry_run: RunMode }, // subcommand
-    Trim { dry_run: RunMode },       // subcommand
-    Toolchain,                       // subcommand
-    RemoveIfDate { dry_run: RunMode },
+    Query {
+        query_config: &'a ArgMatches<'a>,
+    }, // subcommand
+    Local,    // subcommand
+    Registry, // subcommand
+    SCCache,  // subcommand
+    CleanUnref {
+        dry_run: RunMode,
+        manifest_path: Option<&'a str>,
+    }, // subcommand
+    Trim {
+        dry_run: RunMode,
+        trim_limit: Option<&'a str>,
+    }, // subcommand
+    Toolchain, // subcommand
+    RemoveIfDate {
+        dry_run: RunMode,
+    },
+    DefaultSummary,
 }
 pub(crate) enum RunMode {
     Run,
     DryRun,
 }
 
-pub(crate) fn clap_to_enum<'a>(config: &ArgMatches<'a>) -> CargoCacheCommands {
+pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheCommands<'b> {
     let dry_run = if config.is_present("dry-run") {
         RunMode::DryRun
     } else {
         RunMode::Run
     };
+
+    // if no args were passed, print the default summary
+    if config.args.is_empty() {
+        return CargoCacheCommands::DefaultSummary;
+    }
 
     if config.is_present("version") {
         CargoCacheCommands::Version
@@ -56,25 +85,46 @@ pub(crate) fn clap_to_enum<'a>(config: &ArgMatches<'a>) -> CargoCacheCommands {
     } else if config.subcommand_matches("toolchain").is_some() {
         CargoCacheCommands::Toolchain
     } else if let Some(config) = config.subcommand_matches("trim") {
-        CargoCacheCommands::Trim { dry_run } // take config trim_config.value_of("trim_limit")
+        CargoCacheCommands::Trim {
+            dry_run,
+            trim_limit: config.value_of("trim_limit"),
+        } // take config trim_config.value_of("trim_limit")
     } else if let Some(config) = config.subcommand_matches("clean-unref") {
-        CargoCacheCommands::CleanUnref { dry_run } // clean_unref_cfg.value_of("manifest-path"),
+        let dry_run = if matches!(RunMode::DryRun, dry_run) || config.is_present("dry-run") {
+            RunMode::DryRun
+        } else {
+            RunMode::Run
+        };
+        CargoCacheCommands::CleanUnref {
+            dry_run,
+            manifest_path: config.value_of("manifest-path"),
+        } // clean_unref_cfg.value_of("manifest-path"),
     } else if config.is_present("top-cache-items") {
-        CargoCacheCommands::TopCacheItems // take config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/)
+        let limit =
+            value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
+        CargoCacheCommands::TopCacheItems { limit }
     } else if config.is_present("query") || config.is_present("q") {
-        CargoCacheCommands::Query
+        let query_config = if config.is_present("query") {
+            config.subcommand_matches("query").unwrap()
+        } else {
+            config.subcommand_matches("q").unwrap()
+        };
+        CargoCacheCommands::Query { query_config }
     } else if config.is_present("local") || config.is_present("l") {
         CargoCacheCommands::Local
     } else if config.is_present("info") {
         CargoCacheCommands::Info
     } else if config.is_present("remove-dir") {
+        // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
         CargoCacheCommands::RemoveDir { dry_run } //need more info
     } else if config.is_present("fsck-repos") {
-        CargoCacheCommands::FSCKRepos { dry_run }
+        CargoCacheCommands::FSCKRepos
     } else if config.is_present("gc-repos") {
-        CargoCacheCommands::GCRepos { dry_run }
+        CargoCacheCommands::GitGCRepos { dry_run }
     } else if config.is_present("autoclean-expensive") {
         CargoCacheCommands::AutoCleanExpensive { dry_run }
+    } else if config.is_present("autoclean") {
+        CargoCacheCommands::AutoClean { dry_run }
     } else if config.is_present("keep-duplicate-crates") {
         CargoCacheCommands::KeepDuplicateCrates { dry_run }
     } else if config.subcommand_matches("registry").is_some()
@@ -82,8 +132,14 @@ pub(crate) fn clap_to_enum<'a>(config: &ArgMatches<'a>) -> CargoCacheCommands {
         || config.subcommand_matches("registries").is_some()
     {
         CargoCacheCommands::Registry
+    } else if config.is_present("list-dirs") {
+        CargoCacheCommands::ListDirs
+    } else if config.is_present("remove-if-younger-than")
+        || config.is_present("remove-if-older-than")
+    {
+        CargoCacheCommands::RemoveIfDate { dry_run }
     } else {
-        unreachable!();
+        unreachable!("Failed to map all clap options to enum?")
     }
 }
 
