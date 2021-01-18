@@ -58,6 +58,9 @@ pub(crate) enum CargoCacheCommands<'a> {
     Toolchain,  // subcommand
     RemoveIfDate {
         dry_run: bool,
+        arg_younger: Option<&'a str>,
+        arg_older: Option<&'a str>,
+        dirs: Option<&'a str>,
     },
     OnlyDryRun,
     DefaultSummary,
@@ -139,7 +142,12 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     } else if config.is_present("remove-if-younger-than")
         || config.is_present("remove-if-older-than")
     {
-        CargoCacheCommands::RemoveIfDate { dry_run }
+        CargoCacheCommands::RemoveIfDate {
+            dry_run,
+            arg_older: config.value_of("remove-if-younger-than"),
+            arg_younger: config.value_of("remove-if-older-than"),
+            dirs: config.value_of("remove-dir"),
+        }
     } else if dry_run {
         // none of the flags that do on-disk changes are present
 

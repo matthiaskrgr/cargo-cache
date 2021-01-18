@@ -258,17 +258,22 @@ fn main() {
         CargoCacheCommands::Local => {
             local::local_subcmd().exit_or_fatal_error();
         }
-        CargoCacheCommands::RemoveIfDate { dry_run } => {
+        CargoCacheCommands::RemoveIfDate {
+            dry_run,
+            arg_younger,
+            arg_older,
+            dirs,
+        } => {
             let res = crate::date::remove_files_by_dates(
                 &mut checkouts_cache,
                 &mut bare_repos_cache,
                 &mut registry_pkgs_cache,
                 /* &mut registry_index_cache, */
                 &mut registry_sources_caches,
-                config.value_of("remove-if-younger-than"), //@FIXME use bunch of enums here?
-                config.value_of("remove-if-older-than"),
+                arg_younger,
+                arg_older,
                 dry_run,
-                config.value_of("remove-dir"),
+                dirs,
                 &mut size_changed,
             );
 
