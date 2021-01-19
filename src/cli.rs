@@ -77,7 +77,7 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     }
 
     // if config.is_present("debug") {
-    // do not check for "--debug" since it is independant of all other flags
+    // do not check for "--debug" since it is independent of all other flags
     if config.is_present("version") {
         CargoCacheCommands::Version
     } else if config.is_present("sccache") || config.is_present("sc") {

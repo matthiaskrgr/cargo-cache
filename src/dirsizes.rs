@@ -23,7 +23,7 @@ use crate::tables::*;
 use humansize::{file_size_opts, FileSize};
 
 /// Holds the sizes and the number of files of the components of the cargo cache
-// usefull for saving a "snapshot" of the current state of the cache
+// useful for saving a "snapshot" of the current state of the cache
 #[derive(Debug)]
 pub(crate) struct DirSizes<'a> {
     /// total size of the cache / .cargo rood directory
@@ -431,7 +431,7 @@ impl<'a> DirSizes<'a> {
         }
 
         v
-    } // registries seperate
+    } // registries separate
 
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn print_size_difference(

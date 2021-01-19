@@ -23,7 +23,7 @@ use walkdir::WalkDir;
 
 fn get_last_access_of_item(path: &Path) -> std::time::SystemTime {
     if path.is_file() {
-        // if we have a file, simply get the accesss time
+        // if we have a file, simply get the access time
         std::fs::metadata(path).unwrap().accessed().unwrap()
     } else {
         // if we have a directory, get the latest access of all files of that directory
@@ -63,7 +63,7 @@ pub(crate) fn gather_all_cache_items<'a>(
 /// figure out how big the cache should remain after trimming
 fn parse_size_limit_to_bytes(limit: Option<&str>) -> Result<u64, Error> {
     match limit {
-        None => unreachable!("No trim --limit was supplied altough clap should enforce that!"),
+        None => unreachable!("No trim --limit was supplied although clap should enforce that!"),
         Some(limit) => {
             // figure out the unit
             let unit_multiplicator: Result<u64, Error> = match limit.chars().last() {
@@ -224,7 +224,7 @@ mod parse_size_limit {
 
     // make sure Size limit None panicss
     #[test]
-    #[should_panic(expected = "No trim --limit was supplied altough clap should enforce that!")]
+    #[should_panic(expected = "No trim --limit was supplied although clap should enforce that!")]
     fn size_limit_none_panics() {
         let _ = parse_size_limit_to_bytes(None);
     }

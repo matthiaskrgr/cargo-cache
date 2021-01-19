@@ -326,7 +326,7 @@ fn main() {
                 .exit_or_fatal_error();
         }
         CargoCacheCommands::GitGCRepos { dry_run } => {
-            //@TODO deduplicate bewteen autoclean-expensive!
+            //@TODO deduplicate between autoclean-expensive!
             let res = git_gc_everything(
                 &cargo_cache.git_repos_bare,
                 &cargo_cache.registry_pkg_cache,
