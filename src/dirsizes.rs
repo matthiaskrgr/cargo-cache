@@ -685,7 +685,7 @@ impl<'a> DirSizes<'a> {
 
             // final summary line
             let final_line = format!(
-                "\nSize changed {}",
+                "Size changed {}",
                 size_diff_format(total_size_old, total_size_new, true)
             );
             summary.push_str(&final_line);

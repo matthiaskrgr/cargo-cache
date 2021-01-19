@@ -129,34 +129,23 @@ osmesa-src      2     166.12 MB 332.24 MB
 #### Do a light cleanup
 This removes extracted tarball sources and repository checkouts.
 The original source archives and git repos are kept and will be extracted as needed by cargo.
+Run `cargo cache --autoclean`:
 ````
-cargo cache --autoclean
+Clearing cache...
 
-Cargo cache '/home/matthias/.cargo/':
+Cargo cache '/home/matthias/.cargo':
 
-Total:                                4.22 GB
-  102 installed binaries:           920.95 MB
-  Registry:                           2.25 GB
-    Registry index:                 227.07 MB
-    4412 crate archives:            684.29 MB
-    2411 crate source checkouts:      1.34 GB
-  Git db:                             1.05 GB
-    113 bare git repos:             993.72 MB
-    9 git repo checkouts:            55.48 MB
+Total:                                     3.38 GB => 3.28 GB
+  62 installed binaries:                            665.64 MB
+  Registry:                                2.03 GB => 2.00 GB
+    2 registry indices:                             444.25 MB
+    10570 crate archives:                             1.55 GB
+    96 => 0 crate source checkouts:          34.81 MB => 0  B
+  Git db:                              685.13 MB => 619.64 MB
+    114 bare git repos:                             619.64 MB
+    7 => 0 git repo checkouts:               65.48 MB => 0  B
 
-Size changed from 4.22 GB to 2.83 GB (-1.39 GB, -33.02%)
-````
-Checking the sizes after cleanup:
-````
-Total:                                2.83 GB
-  102 installed binaries:           920.95 MB
-  Registry:                         911.36 MB
-    Registry index:                 227.07 MB
-    4412 crate archives:            684.29 MB
-    0 crate source checkouts:            0  B
-  Git db:                           993.72 MB
-    113 bare git repos:             993.72 MB
-    0 git repo checkouts:                0  B
+Size changed 3.38 GB => 3.28 GB (-100.29 MB, -2.96%)
 ````
 
 The crate also works if you override the default location of the cargo home via
