@@ -1,5 +1,24 @@
 ## Git
 ````
+Make the summary when sizes change more detailed, it now looks like this:
+
+Clearing cache...
+
+Cargo cache '/home/matthias/.cargo':
+
+Total:                                     3.38 GB => 3.28 GB
+  62 installed binaries:                            665.64 MB
+  Registry:                                2.03 GB => 2.00 GB
+    2 registry indices:                             444.25 MB
+    10570 crate archives:                             1.55 GB
+    96 => 0 crate source checkouts:          34.81 MB => 0  B
+  Git db:                              685.13 MB => 619.64 MB
+    114 bare git repos:                             619.64 MB
+    7 => 0 git repo checkouts:               65.48 MB => 0  B
+
+Size changed 3.38 GB => 3.28 GB (-100.29 MB, -2.96%)
+
+
 Print a more informative error message when "git" is not installed and we run "cargo cache --gc" (#94)
 cargo cache sc: fix detection of `sccache` cache dir on windows (#90)
 
