@@ -73,13 +73,18 @@ OPTIONS:
     -t, --top-cache-items <N>              List the top N items taking most space in the cache
 
 SUBCOMMANDS:
-    help        Prints this message or the help of the given subcommand(s)
-    l           check local build cache (target) of a rust project
-    local       check local build cache (target) of a rust project
-    q           run a query
-    query       run a query
-    r           query each package registry separately
-    registry    query each package registry separately
+    clean-unref    remove crates that are not referenced in a Cargo.toml from the cache
+    help           Prints this message or the help of the given subcommand(s)
+    l              check local build cache (target) of a rust project
+    local          check local build cache (target) of a rust project
+    q              run a query
+    query          run a query
+    r              query each package registry separately
+    registry       query each package registry separately
+    sc             gather stats on a local sccache cache
+    sccache        gather stats on a local sccache cache
+    toolchain      print stats on installed toolchains
+    trim           trim old items from the cache until maximum cache size limit is reached
 ````
 
 #### Show the largest items in the cargo home:
