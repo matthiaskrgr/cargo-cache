@@ -43,7 +43,7 @@ checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
 name = "cargo-cache"
-version = "0.5.1"
+version = "0.6.0"
 dependencies = [
  "cargo_metadata",
  "cfg-if 1.0.0",
