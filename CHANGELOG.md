@@ -21,16 +21,11 @@ Size changed 3.38 GB => 3.28 GB (-100.29 MB, -2.96%)
 
 Print a more informative error message when "git" is not installed and we run "cargo cache --gc" (#94)
 cargo cache sc: fix detection of `sccache` cache dir on windows (#90)
-
 cargo cache clean-unref: print same summary stats as in "cargo cache -a" (#95) 
-
 Changed dependency `dirs` to `dirs-next`, as `dirs` is no longer maintained.
-
 Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.
 	While calculating the cache size, registry indices and installed binaries are skipped.
-
 Add a "toolchain" subcommand which displays stats on rustup-installed toolchains
-
 
 Updated dependencies:
 	cargo-metadata: 0.11.0 -> 0.12.1
