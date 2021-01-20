@@ -1,4 +1,9 @@
-## Version 0.6.0
+## Git
+````
+
+````
+
+## Version 0.6.0 (a55d4db)
 ````
 Make the summary when sizes change more detailed, it now looks like this:
 
