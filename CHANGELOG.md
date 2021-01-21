@@ -1,6 +1,6 @@
 ## Git
 ````
-
+clean-unref: fix bug where some sources were accidentally removed (#96)
 ````
 
 ## Version 0.6.0 (a55d4db)
