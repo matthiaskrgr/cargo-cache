@@ -218,7 +218,7 @@ impl fmt::Display for Error {
             ),
             Self::LocalNoTargetDir(path) => write!(
                 f,
-                "error: \"local\" subcommand tried to read \"target\"\
+                "error: \"local\" subcommand tried to read \"target\" \
                 directory that does not exist: \"{}\"",
                 path.display()
             ),
