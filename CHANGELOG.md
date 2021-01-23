@@ -37,7 +37,17 @@ cargo cache clean-unref: print same summary stats as in "cargo cache -a" (#95)
 Changed dependency `dirs` to `dirs-next`, as `dirs` is no longer maintained.
 Add "trim" subcommand which gets a --limit param and trims the cache down to that size limit.
 	While calculating the cache size, registry indices and installed binaries are skipped.
-Add a "toolchain" subcommand which displays stats on rustup-installed toolchains
+Add a "toolchain" subcommand which displays stats on rustup-installed toolchains:
+
+Toolchain Name                               Files  Size     Percentage
+beta-x86_64-unknown-linux-gnu                23507  1.77 GB  21.75 %
+nightly-x86_64-unknown-linux-gnu             23570  1.75 GB  21.51 %
+nightly-2021-01-15-x86_64-unknown-linux-gnu  23536  1.69 GB  20.68 %
+stable-x86_64-unknown-linux-gnu              19097  1.63 GB  20.02 %
+master                                       3843   1.31 GB  16.04 %
+
+Total                                        93553  8.16 GB  100 %
+
 
 Updated dependencies:
 	cargo-metadata: 0.11.0 -> 0.12.1
