@@ -1,4 +1,4 @@
-## Git
+## Version 0.6.2
 ````
 Start deprecation of -d for --dry-run, use -n instead. (#97)
 Cli: make sure that --autoclean-expensive --gc, --autoclean-expensive --autoclean as well as
