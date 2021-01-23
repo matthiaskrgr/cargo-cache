@@ -1,6 +1,6 @@
 ## Git
 ````
-
+Start deprecation of -d for --dry-run, use -n instead. (#97)
 ````
 
 ## Version 0.6.1 (967cd4a)
