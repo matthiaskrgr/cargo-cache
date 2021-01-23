@@ -118,12 +118,16 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     } else if config.is_present("remove-dir") {
         // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
         CargoCacheCommands::RemoveDir { dry_run } //need more info
+    } else if config.is_present("autoclean-expensive")
+        || (config.is_present("gc-repos") && config.is_present("autoclean"))
+    {
+        // if we pass both --gc and --autoclean-expensive, we want autoclean-expensive to run
+        // since is already includes --gc
+        CargoCacheCommands::AutoCleanExpensive { dry_run }
     } else if config.is_present("fsck-repos") {
         CargoCacheCommands::FSCKRepos
     } else if config.is_present("gc-repos") {
         CargoCacheCommands::GitGCRepos { dry_run }
-    } else if config.is_present("autoclean-expensive") {
-        CargoCacheCommands::AutoCleanExpensive { dry_run }
     } else if config.is_present("autoclean") {
         CargoCacheCommands::AutoClean { dry_run }
     } else if config.is_present("keep-duplicate-crates") {
