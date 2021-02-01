@@ -169,6 +169,7 @@ pub(crate) struct RegistryIndicesCache {
     /// list of indices (from alternative registries or so)
     indices: Vec<RegistryIndex>,
     /// number of indices found
+    #[allow(unused)]
     number_of_indices: usize,
     /// total size of all indices combined
     total_size: Option<u64>,
