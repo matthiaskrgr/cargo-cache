@@ -363,7 +363,9 @@ mod gittest {
         };
         assert!(
             !before > after,
-            format!("git gc is funky: before: {}  after: {}", before, after)
+            "git gc is funky: before: {}  after: {}",
+            before,
+            after
         );
     }
 
@@ -428,6 +430,6 @@ mod gittest {
         );
 
         let res = fsck_repo(&PathBuf::from("target/gitrepo_fsck/"));
-        assert!(res.is_ok(), format!("Failed to fsck git repo: {:?}", res));
+        assert!(res.is_ok(), "Failed to fsck git repo: {:?}", res);
     }
 }

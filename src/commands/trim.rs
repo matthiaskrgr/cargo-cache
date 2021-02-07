@@ -226,6 +226,6 @@ mod parse_size_limit {
     #[test]
     #[should_panic(expected = "No trim --limit was supplied although clap should enforce that!")]
     fn size_limit_none_panics() {
-        let _ = parse_size_limit_to_bytes(None);
+        let _ignore = parse_size_limit_to_bytes(None);
     }
 }

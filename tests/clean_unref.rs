@@ -100,10 +100,9 @@ fn clean_unref() {
     // make sure size was reduced
     assert!(
         cargo_home_size_before_removel > cargo_home_size_after_removel,
-        format!(
-            "CONDITION NOT MET: {} < {}",
-            cargo_home_size_before_removel, cargo_home_size_after_removel
-        )
+        "CONDITION NOT MET: {} < {}",
+        cargo_home_size_before_removel,
+        cargo_home_size_after_removel
     );
 
     let status = cargo_cache_command.unwrap();
