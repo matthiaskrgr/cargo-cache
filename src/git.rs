@@ -37,7 +37,8 @@ fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
     print!("{} => ", sb_human_readable);
 
     // we need to flush stdout manually for incremental print();
-    let _ = stdout().flush(); // ignore errors
+    // ignore errors
+    let _ignore = stdout().flush();
 
     if dry_run {
         // don't do anything on dry run
