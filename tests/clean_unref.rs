@@ -162,7 +162,7 @@ fn clean_unref() {
     let mut desired_output = String::from("Cargo cache .*clean_unref_CARGO_HOME.*:\n\n");
     desired_output.push_str(
         "Total:                          .* MB
-  0 installed binaries:             0  B
+  0 installed binaries:              0  B
   Registry:                     .* MB
     Registry index:             .* MB
     1 crate archives:           .* KB
@@ -174,9 +174,13 @@ fn clean_unref() {
 
     let regex = Regex::new(&desired_output);
 
+    dbg!(&cc_output);
+    dbg!(&desired_output);
+
     assert!(
         regex.clone().unwrap().is_match(&cc_output),
-        "regex: {:?}, cc_output: {}",
+        "regex:\n{:?}
+        cc_output:\n{}",
         regex,
         cc_output
     );
