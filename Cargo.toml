@@ -11,6 +11,7 @@ keywords = ["cargo", "cache", "cli", "manage", "cargo-home"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins", "development-tools"]
 build = "src/build.rs"
 edition = "2018"
+resolver = "2"
 
 [features]
 default = ["cargo_metadata", "chrono", "clap", "dirs-next", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir"]
