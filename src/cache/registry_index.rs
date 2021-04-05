@@ -104,24 +104,22 @@ impl RegistrySubCache for RegistryIndex {
     // return a slice of files belonging to this cache
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
+            // do nothing and return
+        } else if self.path_exists() {
+            let walkdir = WalkDir::new(self.path.display().to_string());
+            let vec = walkdir
+                .into_iter()
+                .map(|direntry| direntry.unwrap().into_path())
+                .collect::<Vec<PathBuf>>();
+
+            self.number_of_files = Some(vec.len());
+
+            self.files = vec;
+            self.files_calculated = true;
         } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let vec = walkdir
-                    .into_iter()
-                    .map(|direntry| direntry.unwrap().into_path())
-                    .collect::<Vec<PathBuf>>();
-
-                self.number_of_files = Some(vec.len());
-
-                self.files = vec;
-                self.files_calculated = true;
-            } else {
-                self.known_to_be_empty();
-            }
-            &self.files
+            self.known_to_be_empty();
         }
+        &self.files
     }
 
     // number of files of the cache

@@ -86,7 +86,7 @@ impl Cache for BinaryCache {
 
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
+            // do nothing and return
         } else {
             self.files = fs::read_dir(&self.path())
                 .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
@@ -94,8 +94,8 @@ impl Cache for BinaryCache {
                 .filter(|f| f.is_file())
                 .collect::<Vec<PathBuf>>();
             self.files_calculated = true;
-            &self.files
         }
+        &self.files
     }
 
     fn files_sorted(&mut self) -> &[PathBuf] {

@@ -97,28 +97,24 @@ impl RegistrySubCache for RegistryPkgCache {
     // return a slice of files belonging to this cache
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
-        } else {
-            if self.path_exists() {
-                let collection = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| {
-                        panic!("Failed to read directory (repo): '{:?}'", &self.path)
-                    })
-                    .map(|cratepath| cratepath.unwrap().path())
-                    .collect::<Vec<_>>();
+            // just return
+        } else if self.path_exists() {
+            let collection = fs::read_dir(&self.path)
+                .unwrap_or_else(|_| panic!("Failed to read directory (repo): '{:?}'", &self.path))
+                .map(|cratepath| cratepath.unwrap().path())
+                .collect::<Vec<_>>();
 
-                self.files_calculated = true;
-                self.number_of_files = Some(collection.len());
-                self.files = collection;
-            } else {
-                // there is no directory
-                // we need to reflect that in the cache
-                self.files = Vec::new();
-                self.files_calculated = true;
-                self.number_of_files = Some(0);
-            }
-            &self.files
+            self.files_calculated = true;
+            self.number_of_files = Some(collection.len());
+            self.files = collection;
+        } else {
+            // there is no directory
+            // we need to reflect that in the cache
+            self.files = Vec::new();
+            self.files_calculated = true;
+            self.number_of_files = Some(0);
         }
+        &self.files
     }
 
     // number of files of the cache

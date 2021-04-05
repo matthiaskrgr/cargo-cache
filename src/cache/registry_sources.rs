@@ -81,26 +81,25 @@ impl RegistrySubCache for RegistrySourceCache {
 
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
-        } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .filter(|d| d.is_file())
-                    .collect::<Vec<PathBuf>>();
-                self.files = v;
-            } else {
-                self.known_to_be_empty();
-            }
-            &self.files
+            // do nothing as everything is already calculated
         }
+        if self.path_exists() {
+            let walkdir = WalkDir::new(self.path.display().to_string());
+            let v = walkdir
+                .into_iter()
+                .map(|d| d.unwrap().into_path())
+                .filter(|d| d.is_file())
+                .collect::<Vec<PathBuf>>();
+            self.files = v;
+        } else {
+            self.known_to_be_empty();
+        }
+        &self.files
     }
 
     fn total_size(&mut self) -> u64 {
         if let Some(size) = self.size {
-            size
+            return size;
         } else if self.path.is_dir() {
             // get the size of all files in path dir
             let size = self
@@ -110,11 +109,10 @@ impl RegistrySubCache for RegistrySourceCache {
                 .map(|f| fs::metadata(f).unwrap().len())
                 .sum();
             self.size = Some(size);
-            self.size.unwrap()
         } else {
             self.known_to_be_empty();
-            self.size.unwrap()
         }
+        self.size.unwrap()
     }
 
     fn files_sorted(&mut self) -> &[PathBuf] {
@@ -139,15 +137,16 @@ impl RegistrySubCache for RegistrySourceCache {
         }
     }
 
+    #[allow(clippy::if_not_else)]
     fn items(&mut self) -> &[PathBuf] {
         if self.items_calculated {
-            &self.items
+            // we can just return them
+        } else if !&self.path.exists() {
+            // if there is no path, init the cache as empty
+            self.items = vec![];
+            self.items_calculated = true;
         } else {
-            if !&self.path.exists() {
-                self.items = vec![];
-                self.items_calculated = true;
-                return &self.items;
-            }
+            // calculate the items
             let folders = std::fs::read_dir(&self.path)
                 .unwrap_or_else(|_| panic!("Failed to read {:?}", self.path.display()))
                 .map(|direntry| direntry.unwrap().path())
@@ -155,8 +154,8 @@ impl RegistrySubCache for RegistrySourceCache {
                 .collect::<Vec<PathBuf>>();
             self.items = folders;
             self.items_calculated = true;
-            &self.items
         }
+        &self.items
     }
 
     fn number_of_items(&mut self) -> usize {

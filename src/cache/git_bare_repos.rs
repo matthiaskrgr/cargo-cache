@@ -84,21 +84,19 @@ impl Cache for GitRepoCache {
     // all files of this cache
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
+            // do nothing and return
+        } else if self.path_exists() {
+            let walkdir = WalkDir::new(self.path.display().to_string());
+            let v = walkdir
+                .into_iter()
+                .map(|d| d.unwrap().into_path())
+                .filter(|d| d.is_file())
+                .collect::<Vec<PathBuf>>();
+            self.files = v;
         } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .filter(|d| d.is_file())
-                    .collect::<Vec<PathBuf>>();
-                self.files = v;
-            } else {
-                self.known_to_be_empty();
-            }
-            &self.files
+            self.known_to_be_empty();
         }
+        &self.files
     }
 
     fn files_sorted(&mut self) -> &[PathBuf] {
@@ -110,22 +108,20 @@ impl Cache for GitRepoCache {
     // list of bare git repos
     fn items(&mut self) -> &[PathBuf] {
         if self.items_calculated {
-            &self.items
-        } else {
-            if self.path_exists() {
-                let repo_list = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
-                    .map(|cratepath| cratepath.unwrap().path())
-                    .filter(|p| p.is_dir())
-                    .collect::<Vec<PathBuf>>();
+            // do nothing and return
+        } else if self.path_exists() {
+            let repo_list = fs::read_dir(&self.path)
+                .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+                .map(|cratepath| cratepath.unwrap().path())
+                .filter(|p| p.is_dir())
+                .collect::<Vec<PathBuf>>();
 
-                self.items_calculated = true;
-                self.items = repo_list;
-            } else {
-                self.known_to_be_empty();
-            }
-            &self.items
+            self.items_calculated = true;
+            self.items = repo_list;
+        } else {
+            self.known_to_be_empty();
         }
+        &self.items
     }
 
     // number of bare git repos

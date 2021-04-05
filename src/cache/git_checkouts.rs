@@ -85,27 +85,25 @@ impl Cache for GitCheckoutCache {
     // all files inside the cache
     fn files(&mut self) -> &[PathBuf] {
         if self.files_calculated {
-            &self.files
+            // do nothing and return
+        } else if self.path_exists() {
+            let walkdir = WalkDir::new(self.path.display().to_string());
+            let v = walkdir
+                .into_iter()
+                .map(|d| d.unwrap().into_path())
+                .filter(|f| f.exists())
+                .collect::<Vec<PathBuf>>();
+            self.files = v;
         } else {
-            if self.path_exists() {
-                let walkdir = WalkDir::new(self.path.display().to_string());
-                let v = walkdir
-                    .into_iter()
-                    .map(|d| d.unwrap().into_path())
-                    .filter(|f| f.exists())
-                    .collect::<Vec<PathBuf>>();
-                self.files = v;
-            } else {
-                // if there is no such directory, we know the cache is empty
-                self.total_size = Some(0);
-                self.files = Vec::new();
-                self.files_calculated = true;
-                self.number_of_items = Some(0);
-                self.items_calculated = true;
-                self.items = Vec::new();
-            }
-            &self.files
+            // if there is no such directory, we know the cache is empty
+            self.total_size = Some(0);
+            self.files = Vec::new();
+            self.files_calculated = true;
+            self.number_of_items = Some(0);
+            self.items_calculated = true;
+            self.items = Vec::new();
         }
+        &self.files
     }
 
     fn files_sorted(&mut self) -> &[PathBuf] {
@@ -117,36 +115,34 @@ impl Cache for GitCheckoutCache {
     // all "items" inside the cache (item == a git checkout)
     fn items(&mut self) -> &[PathBuf] {
         if self.items_calculated {
-            &self.items
-        } else {
-            if self.path_exists() {
-                let mut collection = Vec::new();
+            // do nothin and return
+        } else if self.path_exists() {
+            let mut collection = Vec::new();
 
-                let crate_list = fs::read_dir(&self.path)
-                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+            let crate_list = fs::read_dir(&self.path)
+                .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
+                .map(|cratepath| cratepath.unwrap().path())
+                .filter(|p| p.is_dir())
+                .collect::<Vec<PathBuf>>();
+            // need to take 2 levels into account
+            let mut both_levels_vec: Vec<PathBuf> = Vec::new();
+            for repo in crate_list {
+                for i in fs::read_dir(&repo)
+                    .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &repo))
                     .map(|cratepath| cratepath.unwrap().path())
-                    .filter(|p| p.is_dir())
-                    .collect::<Vec<PathBuf>>();
-                // need to take 2 levels into account
-                let mut both_levels_vec: Vec<PathBuf> = Vec::new();
-                for repo in crate_list {
-                    for i in fs::read_dir(&repo)
-                        .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &repo))
-                        .map(|cratepath| cratepath.unwrap().path())
-                        .filter(|f| f.is_dir())
-                    {
-                        both_levels_vec.push(i);
-                    }
+                    .filter(|f| f.is_dir())
+                {
+                    both_levels_vec.push(i);
                 }
-                collection.extend_from_slice(&both_levels_vec);
-
-                self.items_calculated = true;
-                self.items = collection;
-            } else {
-                self.items = Vec::new();
             }
-            &self.items
+            collection.extend_from_slice(&both_levels_vec);
+
+            self.items_calculated = true;
+            self.items = collection;
+        } else {
+            self.items = Vec::new();
         }
+        &self.items
     }
 
     fn number_of_items(&mut self) -> usize {
