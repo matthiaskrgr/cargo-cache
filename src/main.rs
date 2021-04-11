@@ -56,6 +56,7 @@
 #![allow(clippy::wildcard_imports)] // breaks code, false positives
 #![allow(clippy::option_if_let_else)] // too pedantic, not that useful...
 #![allow(clippy::upper_case_acronyms)] // questionable
+#![allow(clippy::needless_for_each)] // I like my iterators :(
 
 // for the "ci-autoclean" feature, we don't need all these modules so ignore them
 cfg_if::cfg_if! {

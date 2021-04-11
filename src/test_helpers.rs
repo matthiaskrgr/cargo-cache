@@ -14,7 +14,7 @@ use rayon::iter::*;
 use walkdir::WalkDir;
 
 #[allow(dead_code)] // only used in tests
-
+#[allow(clippy::branches_sharing_code)]
 pub(crate) fn bin_path() -> String {
     let target_dir = cargo_metadata::MetadataCommand::new()
         .exec()
