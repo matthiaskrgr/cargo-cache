@@ -190,6 +190,8 @@ jobs:
           toolchain: nightly
           override: true
           profile: default
+      - name: clippy version
+        run: cargo clippy --version
       - name: clippy all targets all features
         run: cargo clippy --all-targets --all-features -- -Dwarnings
       - name: clippy ci_autoclean
