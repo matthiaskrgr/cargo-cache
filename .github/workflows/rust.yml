@@ -184,12 +184,13 @@ jobs:
       RUSTC_BACKTRACE: full
     steps:
       - uses: actions/checkout@v1
+      # we don't need rustfmt or anything here
       - name: install toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
-          profile: default
+          components: clippy
       - name: clippy version
         run: cargo clippy --version
       - name: clippy all targets all features
