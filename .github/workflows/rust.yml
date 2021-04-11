@@ -211,6 +211,6 @@ jobs:
         with:
           toolchain: nightly
           override: true
-          profile: default
+          components: rustfmt
       - name: rustfmt check formatting
         run: cargo fmt --all -- --check
