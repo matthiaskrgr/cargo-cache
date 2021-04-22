@@ -206,7 +206,7 @@ impl RegistrySuperCache for RegistrySourceCaches {
 
         let registries = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
-        #[allow(clippy::filter_map)]
+        #[allow(clippy::manual_filter_map)]
         let registry_folders = registries
             .map(|direntry| direntry.unwrap().path())
             .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))

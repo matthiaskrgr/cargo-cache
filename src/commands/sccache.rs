@@ -91,7 +91,7 @@ pub(crate) fn sccache_stats() -> Result<(), library::Error> {
         unique
     };
 
-    #[allow(clippy::filter_map)]
+    #[allow(clippy::manual_filter_map)]
     let total_size_entire_cache: u64 = files_sorted
         .iter()
         .filter_map(|file| fs::metadata(&file.path).ok())
@@ -112,7 +112,7 @@ pub(crate) fn sccache_stats() -> Result<(), library::Error> {
                 .filter(|file| file.access_date == unique_date.access_date)
                 .count();
 
-            #[allow(clippy::filter_map)]
+            #[allow(clippy::manual_filter_map)]
             let total_size_bytes: u64 = files_sorted
                 .iter()
                 .filter(|file| file.access_date == unique_date.access_date)

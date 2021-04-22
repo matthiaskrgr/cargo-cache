@@ -39,7 +39,7 @@ use crate::tables::*;
 /// Checks if a cargo manifest named "Cargo.toml" is found in the current directory.
 /// If yes, return a path to it, if not, return None
 fn seeing_manifest(path: &Path) -> Option<PathBuf> {
-    #[allow(clippy::filter_map)]
+    #[allow(clippy::manual_filter_map)]
     read_dir(&path)
         .unwrap()
         .filter(Result::is_ok)
@@ -187,7 +187,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     // to find out how big it is.
     // Get the immediate subdirs of the target/ dir, skip the known ones (rls, package, debug, release)
     // and look how big the remaining stuff is
-    #[allow(clippy::filter_map)] // meh
+    #[allow(clippy::manual_filter_map)] // meh
     let size_other: u64 = read_dir(&target_dir)
         .unwrap()
         .filter_map(Result::ok)

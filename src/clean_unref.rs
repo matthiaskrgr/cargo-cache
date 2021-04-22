@@ -112,7 +112,7 @@ pub(crate) fn clean_unref(
     let dependencies = metadata.packages;
 
     // get the path inside the CARGO_HOME of the source of the dependency
-    #[allow(clippy::filter_map)]
+    #[allow(clippy::manual_filter_map)]
     let required_packages = dependencies
         .iter()
         .map(|pkg| &pkg.manifest_path)

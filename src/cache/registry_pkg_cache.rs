@@ -186,7 +186,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
         let cache_dirs = std::fs::read_dir(&path)
             .unwrap_or_else(|_| panic!("failed to read directory {}", path.display()));
         // map the dirs to RegistryIndexCaches and return them as vector
-        #[allow(clippy::filter_map)]
+        #[allow(clippy::manual_filter_map)]
         let caches = cache_dirs
             .map(|direntry| direntry.unwrap().path())
             .filter(|p| p.is_dir() && p.file_name().unwrap().to_str().unwrap().contains('-'))

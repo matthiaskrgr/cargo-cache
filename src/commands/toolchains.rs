@@ -48,7 +48,7 @@ impl<'a> Toolchain {
     fn new(path: PathBuf) -> Self {
         let name = path.file_name().unwrap().to_owned().into_string().unwrap();
         let number_files = WalkDir::new(&path).into_iter().count();
-        #[allow(clippy::filter_map)]
+        #[allow(clippy::manual_filter_map)]
         let size: u64 = WalkDir::new(&path)
             .into_iter()
             .map(|f| {
