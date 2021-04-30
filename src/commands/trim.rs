@@ -85,7 +85,13 @@ fn parse_size_limit_to_bytes(limit: Option<&str>) -> Result<u64, Error> {
                     }
                 }
             };
-            let value: f64 = limit[0..(limit.len() - 1)].parse().unwrap();
+
+            let value: f64 = match limit[0..(limit.len() - 1)].parse() {
+                Ok(val) => val,
+                Err(_) => {
+                    return Err(Error::TrimLimitUnitParseFailure(limit.to_string()));
+                }
+            };
             if value == 0.0 {
                 return Ok(0);
             }

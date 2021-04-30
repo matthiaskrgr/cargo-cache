@@ -354,7 +354,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
     let size_limit = Arg::with_name("trim_limit")
         .long("limit")
         .short("l")
-        .help("size that the cache will be reduced to")
+        .help("size that the cache will be reduced to, for example: '6B', '1K', '4M', '5G' or '1T'")
         .takes_value(true)
         .value_name("LIMIT")
         .required(true);

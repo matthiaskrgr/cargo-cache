@@ -239,7 +239,7 @@ impl fmt::Display for Error {
             Self::NoRustupHome => write!(f, "Failed to determine rustup home directory"),
             Self::TrimLimitUnitParseFailure(limit) => write!(
                 f,
-                "Failed to parse limit: \"{}\".\
+                "Failed to parse limit: \"{}\". \
                 Should be of the form 123X where X is one of B,K,M,G or T.",
                 limit
             ),
