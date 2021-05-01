@@ -89,8 +89,10 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     } else if config.subcommand_matches("toolchain").is_some() {
         CargoCacheCommands::Toolchain
     } else if let Some(config) = config.subcommand_matches("trim") {
+        let trim_dry_run =
+            dry_run || config.is_present("dry-run") || config.is_present("dry-run-deprecated");
         CargoCacheCommands::Trim {
-            dry_run,
+            dry_run: trim_dry_run,
             trim_limit: config.value_of("trim_limit"),
         } // take config trim_config.value_of("trim_limit")
     } else if let Some(config) = config.subcommand_matches("clean-unref") {

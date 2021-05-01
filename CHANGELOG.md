@@ -1,6 +1,7 @@
 ## Git
 ````
-
+Add better explanation what the "limit" arg of --trim accepts
+Fix cargo cache dry-run --trim
 ````
 
 ## Version 0.6.2 (5c15652)
