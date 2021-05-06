@@ -20,7 +20,7 @@ use crate::test_helpers::{bin_path, dir_size};
 
 #[test]
 #[cfg_attr(feature = "offline_tests", ignore)]
-fn clean_unref() {
+fn test_clean_unref() {
     // this tests makes cargo create a new CARGO_HOME and tests the --clean-unref features
     const CARGO_HOME: &str = "target/clean_unref_CARGO_HOME/";
 
@@ -162,7 +162,7 @@ fn clean_unref() {
     let mut desired_output = String::from("Cargo cache .*clean_unref_CARGO_HOME.*:\n\n");
     desired_output.push_str(
         "Total:                          .* MB
-  0 installed binaries:              0  B
+  0 installed binaries:             0  B
   Registry:                     .* MB
     Registry index:             .* MB
     1 crate archives:           .* KB
@@ -180,7 +180,7 @@ fn clean_unref() {
     assert!(
         regex.clone().unwrap().is_match(&cc_output),
         "regex:\n{:?}
-        cc_output:\n{}",
+cc_output:\n{}",
         regex,
         cc_output
     );
