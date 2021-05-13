@@ -9,6 +9,9 @@
 
 // remove all crates from a cache that are not referenced by a Cargo lockfile
 
+//https://github.com/rust-lang/rust-clippy/issues/7202
+#![allow(clippy::needless_collect)]
+
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
