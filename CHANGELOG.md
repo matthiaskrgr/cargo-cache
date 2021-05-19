@@ -2,6 +2,7 @@
 ````
 Add better explanation what the "limit" arg of --trim accepts
 Fix cargo cache dry-run --trim
+Make cargo cache --gc use different git commands to compress a bit better
 ````
 
 ## Version 0.6.2 (5c15652)

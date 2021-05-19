@@ -75,15 +75,32 @@ fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
             return Err(Error::GitPackRefsFailed(path.into(), e));
         }
 
-        // recompress the repo from scratch and ignore all dangling objects
+        // git gc the repo get rid of unneeded objects
         if let Err(e) = Command::new("git")
             .arg("gc")
-            .arg("--aggressive")
             .arg("--prune=now")
             .current_dir(repo_path)
             .output()
         {
             return Err(Error::GitGCFailed(path.into(), e));
+        }
+
+        // git repacḱ the repo get rid of unneeded objects
+        if let Err(e) = Command::new("git")
+            .arg("repack")
+            .arg("-a")
+            .arg("-d")
+            .arg("-f")
+            .arg("--depth=250")
+            .arg("--window=250")
+            // create packs with at most 1G of size.
+            // this should be enough for most projects and can reduce memory problems when recompressing repos
+            .arg("--max-pack-size=1G")
+            .arg("--unpack-unreachable=now")
+            .current_dir(repo_path)
+            .output()
+        {
+            return Err(Error::GitRepackFailed(path.into(), e));
         }
 
         let repo_size_after = cumulative_dir_size(path).dir_size;

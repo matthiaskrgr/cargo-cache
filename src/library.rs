@@ -99,6 +99,8 @@ pub(crate) enum Error {
     GitReflogFailed(PathBuf, std::io::Error),
     /// git fsck errored
     GitFsckFailed(PathBuf, std::io::Error),
+    /// git repack errored
+    GitRepackFailed(PathBuf, std::io::Error),
     /// git seems to be missing from the system
     GitNotInstalled,
     /// a package name inside the cache failed to parse
@@ -171,6 +173,13 @@ impl fmt::Display for Error {
             Self::GitFsckFailed(path, error) => write!(
                 f,
                 "Failed to git fsck repository \"{}\":\n{:?}",
+                path.display(),
+                error
+            ),
+
+            Self::GitRepackFailed(path, error) => write!(
+                f,
+                "Failed to git repack repository \"{}\":\n{:?}",
                 path.display(),
                 error
             ),
