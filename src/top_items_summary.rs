@@ -34,12 +34,12 @@ pub(crate) fn get_top_crates(
     rayon::scope(|s| {
         s.spawn(|_| {
             reg_src =
-                registry_source_stats(&ccd.registry_sources, limit, &mut registry_sources_caches)
+                registry_source_stats(&ccd.registry_sources, limit, &mut registry_sources_caches);
         });
 
         s.spawn(|_| {
             reg_cache =
-                registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, &mut registry_pkg_caches)
+                registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, &mut registry_pkg_caches);
         });
 
         s.spawn(|_| {

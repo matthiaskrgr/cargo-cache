@@ -321,7 +321,7 @@ impl<'a> DirSizes<'a> {
                     .to_str()
                     .unwrap()
                     .to_string(),
-            )
+            );
         });
 
         pkg_caches.caches().iter().for_each(|registry| {
@@ -333,7 +333,7 @@ impl<'a> DirSizes<'a> {
                     .to_str()
                     .unwrap()
                     .to_string(),
-            )
+            );
         });
 
         registry_sources.caches().iter().for_each(|registry| {
@@ -345,7 +345,7 @@ impl<'a> DirSizes<'a> {
                     .to_str()
                     .unwrap()
                     .to_string(),
-            )
+            );
         });
         // we now collected all the folder names of the registries and can match a single registry across multiple
         // caches by this

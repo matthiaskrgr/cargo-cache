@@ -236,7 +236,7 @@ pub(crate) fn remove_files_by_dates(
                     None,
                     &DryRunMessage::Default,
                     None,
-                )
+                );
             });
 
         // invalidate caches that we removed from
@@ -256,7 +256,7 @@ pub(crate) fn remove_files_by_dates(
                     bare_repos_cache.invalidate();
                 }
             }
-        })
+        });
     }
     // summary is printed from inside main()
     Ok(())

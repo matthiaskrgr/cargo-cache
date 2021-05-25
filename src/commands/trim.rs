@@ -171,7 +171,7 @@ pub(crate) fn trim_cache<'a>(
                 None,
                 &DryRunMessage::Default,
                 None,
-            )
+            );
         });
 
     // invalidate caches that we might have touched

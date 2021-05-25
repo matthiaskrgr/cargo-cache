@@ -226,7 +226,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
             repoinfo.counter.to_string(),
             average_size,
             total_size,
-        ])
+        ]);
     }
     format_table(&table_matrix, 0)
 }
