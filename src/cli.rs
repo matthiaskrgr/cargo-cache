@@ -413,6 +413,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
+        .global_setting(AppSettings::ColoredHelp)
         .subcommand(cache_subcmd)
         .subcommand(query)
         .subcommand(query_short)
