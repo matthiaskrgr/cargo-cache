@@ -33,7 +33,6 @@
     clippy::shadow_reuse,
     clippy::shadow_same,
     clippy::shadow_unrelated,
-    clippy::pub_enum_variant_names,
     clippy::string_add,
     clippy::string_add_assign,
     clippy::redundant_clone,
