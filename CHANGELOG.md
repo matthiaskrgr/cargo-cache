@@ -1,7 +1,7 @@
 ## Git
 ````
-Add better explanation what the "limit" arg of --trim accepts
-Fix cargo cache dry-run --trim
+Add better explanation what the "limit" arg of --trim accepts (#99)
+Fix cargo cache dry-run --trim (#100)
 Make cargo cache --gc use different git commands to compress a bit better
 Make cargo cache --help wrap properly and add colors (#101)
 ````
