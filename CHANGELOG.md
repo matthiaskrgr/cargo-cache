@@ -1,4 +1,4 @@
-## Version 0.6.3
+## Version 0.6.3 (7be9257)
 ````
 Add better explanation what the "limit" arg of --trim accepts (#99)
 Fix cargo cache dry-run --trim (#100)
