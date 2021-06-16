@@ -1,4 +1,4 @@
-## Git
+## Version 0.6.3
 ````
 Add better explanation what the "limit" arg of --trim accepts (#99)
 Fix cargo cache dry-run --trim (#100)
