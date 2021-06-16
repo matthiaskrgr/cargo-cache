@@ -56,7 +56,6 @@ pub(crate) fn bin_path() -> String {
     }
 }
 
-
 #[allow(dead_code)] // only used in tests
 pub(crate) fn assert_path_end(path: &Path, wanted_vector: &[&str]) {
     // because windows and linux represent paths differently ( /foo/bar vs C:\\foo\\bar)
