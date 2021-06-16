@@ -798,7 +798,7 @@ mod libtests {
             .unwrap()
             .target_directory;
 
-        let mut cargo_home = target_dir;
+        let mut cargo_home = PathBuf::from(target_dir);
         cargo_home.push("cargo_home_cargo_cache_paths");
         // make sure this worked
         let CH_string = format!("{}", cargo_home.display());
@@ -861,7 +861,7 @@ mod libtests {
             .unwrap()
             .target_directory;
 
-        let mut cargo_home = target_dir;
+        let mut cargo_home = PathBuf::from(target_dir);
         cargo_home.push("cargo_home_cargo_cache_paths_print");
         //make sure this worked
         let CH_string = format!("{}", cargo_home.display());

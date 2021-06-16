@@ -48,13 +48,14 @@ pub(crate) fn bin_path() -> String {
     };
 
     if path_release.is_file() {
-        path_release.display().to_string()
+        path_release.into_string()
     } else if path_debug.is_file() {
-        path_debug.display().to_string()
+        path_debug.into_string()
     } else {
         panic!("No cargo-cache executable found!");
     }
 }
+
 
 #[allow(dead_code)] // only used in tests
 pub(crate) fn assert_path_end(path: &Path, wanted_vector: &[&str]) {

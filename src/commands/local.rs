@@ -97,7 +97,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         });
 
     // get the project target dir from the metadata
-    let target_dir = metadata.target_directory;
+    let target_dir = PathBuf::from(metadata.target_directory);
 
     // the target dir might not exist!
     if !target_dir.is_dir() {
@@ -117,7 +117,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
 
     stdout.push_str(&format!(
         "Project {:?}\n",
-        metadata.workspace_root.to_str().unwrap().to_string()
+        metadata.workspace_root.to_string()
     ));
 
     // If there is no target dir, we can quit

@@ -118,17 +118,17 @@ pub(crate) fn clean_unref(
     #[allow(clippy::manual_filter_map)]
     let required_packages = dependencies
         .iter()
-        .map(|pkg| &pkg.manifest_path)
+        .map(|pkg| PathBuf::from(&pkg.manifest_path))
         // we only care about tomls that are not local, i.e. tomls that are inside the $CARGO_HOME
         .filter(|toml_path| toml_path.starts_with(&cargo_home))
         // map the manifest paths to paths to the roots of the crates inside the cargo_home
         .map(|toml_path| {
             if toml_path.starts_with(&cargo_cache_paths.git_checkouts) {
-                find_crate_name_git(toml_path, cargo_home).unwrap_or_else(|| {
+                find_crate_name_git(&toml_path, cargo_home).unwrap_or_else(|| {
                     panic!("Failed to find 'checkouts' in {} ", toml_path.display())
                 })
             } else if toml_path.starts_with(&cargo_cache_paths.registry_sources) {
-                find_crate_name_crate(toml_path, cargo_home).unwrap_or_else(|| {
+                find_crate_name_crate(&toml_path, cargo_home).unwrap_or_else(|| {
                     panic!("Failed to find 'registry' in {} ", toml_path.display())
                 })
             } else {

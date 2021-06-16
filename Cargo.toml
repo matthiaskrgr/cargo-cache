@@ -21,7 +21,7 @@ offline_tests =  [] # only run tests that do not require internet connection
 # some details: https://github.com/NixOS/nixpkgs/pull/77310
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
-cargo_metadata = { version = "0.12.1", optional = true } # get crate package name
+cargo_metadata = { version = "0.13.1", optional = true } # get crate package name
 
 # https://github.com/alexcrichton/cfg-if
 cfg-if = { version = "1.0.0" } # if cfg(..)  { ...  }

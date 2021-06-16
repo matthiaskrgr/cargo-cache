@@ -7,7 +7,8 @@ Make cargo cache --help wrap properly and add colors (#101)
 
 Updated dependencies:
 	remove_dir_all 0.6.1 -> 0.7.0
-	pretty_assertions 0.6.1 -> 0.7.2  
+	pretty_assertions 0.6.1 -> 0.7.2
+	cargo_metadata 0.12.3 -> 0.13.1
 ````
 
 ## Version 0.6.2 (5c15652)
