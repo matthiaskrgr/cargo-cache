@@ -51,7 +51,7 @@ rayon = { version = "1.5.0", optional = true } # parallelize iterators
 regex = { version = "1.4.2", optional = true } # use regex for matching
 
 # https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = { version = "0.6.1" } # remove_dir_all on windows
+remove_dir_all = { version = "0.7.0" } # remove_dir_all on windows
 
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = { version = "0.2.0", optional = true } # git version information
@@ -65,7 +65,7 @@ walkdir = { version = "2.3.1", optional = true } # walk content of directory/CAR
 path-slash = "0.1.3" # normalize windows paths
 
 # https://github.com/colin-kiegel/rust-pretty-assertions
-pretty_assertions = "0.6.1" # colored diff assertions
+pretty_assertions = "0.7.2" # colored diff assertions
 
 # https://github.com/webdesus/fs_extra
 fs_extra = "1.2.0" # copy directories recursively

@@ -4,6 +4,10 @@ Add better explanation what the "limit" arg of --trim accepts (#99)
 Fix cargo cache dry-run --trim (#100)
 Make cargo cache --gc use different git commands to compress a bit better
 Make cargo cache --help wrap properly and add colors (#101)
+
+Updated dependencies:
+	remove_dir_all 0.6.1 -> 0.7.0
+	pretty_assertions 0.6.1 -> 0.7.2  
 ````
 
 ## Version 0.6.2 (5c15652)
