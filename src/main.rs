@@ -47,6 +47,7 @@
     clippy::let_unit_value,
     clippy::option_option,
     clippy::unnecessary_wraps,
+    clippy::unnested_or_patterns,
 //   clippy::wildcard_enum_match_arm // too many FPS for _ => unreachable!()
 )]
 // suppress these warnings:
