@@ -67,11 +67,7 @@ pub(crate) enum CargoCacheCommands<'a> {
 }
 
 pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheCommands<'b> {
-    let dry_run = config.is_present("dry-run") || config.is_present("dry-run-deprecated");
-    if config.is_present("dry-run-deprecated") {
-        // https://github.com/matthiaskrgr/cargo-cache/issues/97
-        eprintln!("WARNING: using '-d' for '--dry-run' is deprecated, use '-n' instead!\n");
-    }
+    let dry_run = config.is_present("dry-run");
 
     // if no args were passed, or ONLY --debug is passed, print the default summary
     if (config.args.is_empty() && config.subcommand.is_none())
@@ -89,15 +85,13 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     } else if config.subcommand_matches("toolchain").is_some() {
         CargoCacheCommands::Toolchain
     } else if let Some(config) = config.subcommand_matches("trim") {
-        let trim_dry_run =
-            dry_run || config.is_present("dry-run") || config.is_present("dry-run-deprecated");
+        let trim_dry_run = dry_run || config.is_present("dry-run");
         CargoCacheCommands::Trim {
             dry_run: trim_dry_run,
             trim_limit: config.value_of("trim_limit"),
         } // take config trim_config.value_of("trim_limit")
     } else if let Some(config) = config.subcommand_matches("clean-unref") {
-        let arg_dry_run =
-            dry_run || config.is_present("dry-run") || config.is_present("dry-run-deprecated");
+        let arg_dry_run = dry_run || config.is_present("dry-run");
         CargoCacheCommands::CleanUnref {
             dry_run: arg_dry_run,
             manifest_path: config.value_of("manifest-path"),
@@ -221,12 +215,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .short("n")
         .long("dry-run")
         .help("Don't remove anything, just pretend");
-
-    // see https://github.com/matthiaskrgr/cargo-cache/issues/97
-    let dry_run_deprecated = Arg::with_name("dry-run-deprecated")
-        .short("d")
-        .help("Don't remove anything, just pretend")
-        .hidden(true);
 
     let autoclean = Arg::with_name("autoclean")
         .short("a")
@@ -399,7 +387,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&info)
         .arg(&keep_duplicate_crates)
         .arg(&dry_run)
-        .arg(&dry_run_deprecated)
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)
@@ -435,7 +422,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches<'a> {
         .arg(&info)
         .arg(&keep_duplicate_crates)
         .arg(&dry_run)
-        .arg(&dry_run_deprecated)
         .arg(&autoclean)
         .arg(&autoclean_expensive)
         .arg(&list_top_cache_items)

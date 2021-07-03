@@ -470,7 +470,7 @@ fn main() {
         _ => (),
     }
 
-    if size_changed && !config.is_present("dry-run") && !config.is_present("dry-run-deprecated") {
+    if size_changed && !config.is_present("dry-run") {
         // size has changed, print summary of how size has changed
 
         dirsizes::DirSizes::print_size_difference(

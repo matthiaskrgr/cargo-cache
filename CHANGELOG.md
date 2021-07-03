@@ -1,3 +1,9 @@
+## Git
+````
+Fully remove -d for --dry-run, use -n instead (#97)
+
+````
+
 ## Version 0.6.3 (7be9257)
 ````
 Add better explanation what the "limit" arg of --trim accepts (#99)
