@@ -36,7 +36,7 @@ clap = { version = "2.33.3", features = ["wrap_help"], optional = true }  # cmdl
 dirs-next = { version = "2.0.0", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/alexcrichton/git2-rs
-git2 = { version = "0.13.12", default-features = false,  optional = true  } # check if repo is git repo
+git2 = { version = "0.13.22", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
 
 # https://github.com/brson/home
 home = "0.5.3" # get CARGO_HOME
