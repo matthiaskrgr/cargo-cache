@@ -19,7 +19,9 @@ use crate::tables::format_table;
 
 #[derive(Debug, Clone)]
 struct File {
+    #[allow(unused)]
     path: PathBuf,
+    #[allow(unused)]
     access_date: NaiveDate,
 }
 
@@ -39,6 +41,7 @@ fn toolchains() -> Result<std::fs::ReadDir, library::Error> {
 #[derive(Clone, Debug)]
 struct Toolchain {
     name: String,
+    #[allow(unused)]
     path: PathBuf,
     number_files: usize,
     size: u64,

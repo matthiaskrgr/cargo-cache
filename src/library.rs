@@ -61,6 +61,7 @@ pub(crate) struct DirInfo {
     /// size of a directory
     pub(crate) dir_size: u64,
     /// number of files of a directory
+    #[allow(unused)] // used in tests iirc
     pub(crate) file_number: u64,
 }
 /// `CargoCachePaths` contains paths to all the subcomponents of the cargo cache

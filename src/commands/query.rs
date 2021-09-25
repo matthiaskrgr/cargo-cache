@@ -23,6 +23,7 @@ use walkdir::WalkDir;
 
 #[derive(Debug)]
 struct File<'a> {
+    #[allow(unused)]
     path: &'a Path,
     name: String,
     size: u64,

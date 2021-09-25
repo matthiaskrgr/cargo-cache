@@ -169,10 +169,12 @@ impl RegistrySubCache for RegistrySourceCache {
 #[derive(Debug, Clone)]
 pub(crate) struct RegistrySourceCaches {
     /// root path of the cache
+    #[allow(unused)]
     path: PathBuf,
     /// list of pkg caches (from alternative registries or so)
     caches: Vec<RegistrySourceCache>,
     /// number of pkg caches found
+    #[allow(unused)]
     number_of_caches: usize,
     /// total size of all indices combined
     total_size: Option<u64>,

@@ -70,6 +70,7 @@ impl FileDesc {
 #[derive(Debug)]
 pub(crate) struct ChkInfo {
     name: String,
+    #[allow(unused)]
     size: u64,
     counter: u32,
     total_size: u64, // sorted by this
