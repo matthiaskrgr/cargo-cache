@@ -1,6 +1,7 @@
 ## Git
 ````
 Fully remove -d for --dry-run, use -n instead (#97)
+Update git2 dependency and enable static bundling; don't link against system libgit2 (#105)
 
 ````
 
