@@ -19,11 +19,11 @@ use crate::top_items::registry_sources::*;
 pub(crate) fn get_top_crates(
     limit: u32,
     ccd: &CargoCachePaths,
-    mut bin_cache: &mut bin::BinaryCache,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
-    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    bin_cache: &mut bin::BinaryCache,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> String {
     let mut reg_src = String::new();
     let mut reg_cache = String::new();
@@ -33,25 +33,24 @@ pub(crate) fn get_top_crates(
 
     rayon::scope(|s| {
         s.spawn(|_| {
-            reg_src =
-                registry_source_stats(&ccd.registry_sources, limit, &mut registry_sources_caches);
+            reg_src = registry_source_stats(&ccd.registry_sources, limit, registry_sources_caches);
         });
 
         s.spawn(|_| {
             reg_cache =
-                registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, &mut registry_pkg_caches);
+                registry_pkg_cache_stats(&ccd.registry_pkg_cache, limit, registry_pkg_caches);
         });
 
         s.spawn(|_| {
-            bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, &mut bare_repos_cache);
+            bare_repos = git_repos_bare_stats(&ccd.git_repos_bare, limit, bare_repos_cache);
         });
 
         s.spawn(|_| {
-            repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, &mut checkouts_cache);
+            repo_checkouts = git_checkouts_stats(&ccd.git_checkouts, limit, checkouts_cache);
         });
 
         s.spawn(|_| {
-            binaries = binary_stats(&ccd.bin_dir, limit, &mut bin_cache);
+            binaries = binary_stats(&ccd.bin_dir, limit, bin_cache);
         });
     });
 

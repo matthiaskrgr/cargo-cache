@@ -222,7 +222,9 @@ impl RegistrySuperCache for RegistryIndicesCache {
         self.number_of_indices = 0;
         self.total_size = None;
         self.total_number_of_files = None;
-        self.indices.iter_mut().for_each(|index| index.invalidate());
+        self.indices
+            .iter_mut()
+            .for_each(RegistrySubCache::invalidate);
     }
 
     fn files(&mut self) -> Vec<PathBuf> {
@@ -248,7 +250,7 @@ impl RegistrySuperCache for RegistryIndicesCache {
             let total_size = self
                 .indices
                 .iter_mut()
-                .map(|index| index.total_size())
+                .map(RegistrySubCache::total_size)
                 .sum();
 
             self.total_size = Some(total_size);

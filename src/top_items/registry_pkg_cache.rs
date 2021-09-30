@@ -224,7 +224,7 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
 pub(crate) fn registry_pkg_cache_stats(
     path: &Path,
     limit: u32,
-    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
 ) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -241,7 +241,7 @@ pub(crate) fn registry_pkg_cache_stats(
             .unwrap()
     ));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_pkg_caches);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(registry_pkg_caches);
     let summary: Vec<RgchInfo> = stats_from_file_desc_list(file_descs);
     let string = regcache_list_to_string(limit, summary);
     stdout.push_str(&string);

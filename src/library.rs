@@ -692,12 +692,12 @@ pub(crate) fn size_diff_format(
 pub(crate) fn print_size_changed_summary(
     previous_total_size: u64,
     cargo_cache: &CargoCachePaths,
-    mut bin_cache: &mut bin::BinaryCache,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
-    mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
-    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    bin_cache: &mut bin::BinaryCache,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_index_caches: &mut registry_index::RegistryIndicesCache,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) {
     // and invalidate the cache
     bin_cache.invalidate();
@@ -709,12 +709,12 @@ pub(crate) fn print_size_changed_summary(
 
     // and requery it to let it do its thing
     let cache_size_new = DirSizes::new(
-        &mut bin_cache,
-        &mut checkouts_cache,
-        &mut bare_repos_cache,
-        &mut registry_pkgs_cache,
-        &mut registry_index_caches,
-        &mut registry_sources_caches,
+        bin_cache,
+        checkouts_cache,
+        bare_repos_cache,
+        registry_pkgs_cache,
+        registry_index_caches,
+        registry_sources_caches,
         cargo_cache,
     )
     .total_size();

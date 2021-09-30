@@ -236,7 +236,7 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
 pub(crate) fn registry_source_stats(
     path: &Path,
     limit: u32,
-    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> String {
     let mut stdout = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -253,7 +253,7 @@ pub(crate) fn registry_source_stats(
             .unwrap()
     ));
 
-    let file_descs: Vec<FileDesc> = file_desc_list_from_path(&mut registry_sources_caches);
+    let file_descs: Vec<FileDesc> = file_desc_list_from_path(registry_sources_caches);
     let summary: Vec<RgSrcInfo> = stats_from_file_desc_list(file_descs);
     let string = reg_src_list_to_string(limit, summary);
     stdout.push_str(&string);

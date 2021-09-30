@@ -212,7 +212,9 @@ impl RegistrySuperCache for RegistryPkgCaches {
         self.number_of_caches = 0;
         self.total_size = None;
         self.total_number_of_files = None;
-        self.caches.iter_mut().for_each(|index| index.invalidate());
+        self.caches
+            .iter_mut()
+            .for_each(RegistrySubCache::invalidate);
     }
 
     fn files(&mut self) -> Vec<PathBuf> {
@@ -234,7 +236,11 @@ impl RegistrySuperCache for RegistryPkgCaches {
         if let Some(size) = self.total_size {
             size
         } else {
-            let total_size = self.caches.iter_mut().map(|cache| cache.total_size()).sum();
+            let total_size = self
+                .caches
+                .iter_mut()
+                .map(RegistrySubCache::total_size)
+                .sum();
             self.total_size = Some(total_size);
             total_size
         }
@@ -250,7 +256,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
             let number = self
                 .caches
                 .iter_mut()
-                .map(|cache| cache.number_of_files())
+                .map(RegistrySubCache::number_of_files)
                 .sum();
 
             self.total_number_of_files = Some(number);
@@ -262,7 +268,7 @@ impl RegistrySuperCache for RegistryPkgCaches {
         self.items = self
             .caches()
             .iter_mut()
-            .flat_map(|cache| cache.items())
+            .flat_map(RegistrySubCache::items)
             .cloned()
             .collect::<Vec<PathBuf>>();
         &self.items

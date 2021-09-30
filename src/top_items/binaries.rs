@@ -70,11 +70,7 @@ fn bininfo_list_to_string(limit: u32, mut collections_vec: Vec<BinInfo>) -> Stri
 }
 
 #[inline] // only called in one place
-pub(crate) fn binary_stats(
-    path: &Path,
-    limit: u32,
-    mut bin_cache: &mut bin::BinaryCache,
-) -> String {
+pub(crate) fn binary_stats(path: &Path, limit: u32, bin_cache: &mut bin::BinaryCache) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
     if !dir_exists(path) {
@@ -90,7 +86,7 @@ pub(crate) fn binary_stats(
             .unwrap()
     ));
 
-    let collections_vec = bininfo_list_from_path(&mut bin_cache); // this is already sorted
+    let collections_vec = bininfo_list_from_path(bin_cache); // this is already sorted
 
     let bininfo_string = bininfo_list_to_string(limit, collections_vec);
     output.push_str(&bininfo_string);

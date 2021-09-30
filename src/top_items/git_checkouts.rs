@@ -250,7 +250,7 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
 pub(crate) fn git_checkouts_stats(
     path: &Path,
     limit: u32,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
 ) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -267,7 +267,7 @@ pub(crate) fn git_checkouts_stats(
             .unwrap()
     ));
 
-    let collections_vec = file_desc_from_path(&mut checkouts_cache);
+    let collections_vec = file_desc_from_path(checkouts_cache);
     let summary: Vec<ChkInfo> = stats_from_file_desc_list(collections_vec);
 
     let tmp = chkout_list_to_string(limit, summary);

@@ -79,12 +79,12 @@ fn find_crate_name_crate(toml_path: &Path, cargo_home: &Path) -> Option<SourceKi
 pub(crate) fn clean_unref(
     cargo_cache_paths: &CargoCachePaths,
     manifest_path: Option<&str>,
-    mut bin_cache: &mut bin::BinaryCache,
-    mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-    mut registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
-    mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
-    mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    bin_cache: &mut bin::BinaryCache,
+    checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
+    registry_index_caches: &mut registry_index::RegistryIndicesCache,
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
     dry_run: bool,
     size_changed: &mut bool,
 ) -> Result<(), Error> {
@@ -281,12 +281,12 @@ pub(crate) fn clean_unref(
     print_size_changed_summary(
         original_total_cache_size,
         cargo_cache_paths,
-        &mut bin_cache,
-        &mut checkouts_cache,
-        &mut bare_repos_cache,
-        &mut registry_pkg_caches,
-        &mut registry_index_caches,
-        &mut registry_sources_caches,
+        bin_cache,
+        checkouts_cache,
+        bare_repos_cache,
+        registry_pkg_caches,
+        registry_index_caches,
+        registry_sources_caches,
     );
     Ok(())
 }

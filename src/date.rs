@@ -140,7 +140,7 @@ pub(crate) fn remove_files_by_dates(
     arg_older: Option<&str>,
     dry_run: bool,
     dirs: Option<&str>,
-    mut size_changed: &mut bool,
+    size_changed: &mut bool,
 ) -> Result<(), Error> {
     if dirs.is_none() {
         return Err(Error::RemoveDirNoArg);
@@ -232,7 +232,7 @@ pub(crate) fn remove_files_by_dates(
                 remove_file(
                     path,
                     false,
-                    &mut size_changed,
+                    size_changed,
                     None,
                     &DryRunMessage::Default,
                     None,

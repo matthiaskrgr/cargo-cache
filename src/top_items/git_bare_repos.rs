@@ -236,7 +236,7 @@ pub(crate) fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<RepoInf
 pub(crate) fn git_repos_bare_stats(
     path: &Path,
     limit: u32,
-    mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+    bare_repos_cache: &mut git_bare_repos::GitRepoCache,
 ) -> String {
     let mut output = String::new();
     // don't crash if the directory does not exist (issue #9)
@@ -253,7 +253,7 @@ pub(crate) fn git_repos_bare_stats(
             .unwrap()
     ));
 
-    let collections_vec = file_desc_from_path(&mut bare_repos_cache);
+    let collections_vec = file_desc_from_path(bare_repos_cache);
     let summary: Vec<RepoInfo> = stats_from_file_desc_list(collections_vec);
     let tmp = chkout_list_to_string(limit, summary);
 

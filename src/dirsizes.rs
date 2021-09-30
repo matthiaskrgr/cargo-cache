@@ -437,12 +437,12 @@ impl<'a> DirSizes<'a> {
     pub(crate) fn print_size_difference(
         cache_sizes_old: &DirSizes<'_>,
         cargo_cache: &CargoCachePaths,
-        mut bin_cache: &mut bin::BinaryCache,
-        mut checkouts_cache: &mut git_checkouts::GitCheckoutCache,
-        mut bare_repos_cache: &mut git_bare_repos::GitRepoCache,
-        mut registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
-        mut registry_index_caches: &mut registry_index::RegistryIndicesCache,
-        mut registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+        bin_cache: &mut bin::BinaryCache,
+        checkouts_cache: &mut git_checkouts::GitCheckoutCache,
+        bare_repos_cache: &mut git_bare_repos::GitRepoCache,
+        registry_pkgs_cache: &mut registry_pkg_cache::RegistryPkgCaches,
+        registry_index_caches: &mut registry_index::RegistryIndicesCache,
+        registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
     ) {
         // Total:           x Mb => y MB
         fn cmp_total(old: &DirSizes<'_>, new: &DirSizes<'_>) -> Vec<TableLine> {
@@ -659,12 +659,12 @@ impl<'a> DirSizes<'a> {
 
         // and requery it to let it do its thing
         let cache_sizes_new = DirSizes::new(
-            &mut bin_cache,
-            &mut checkouts_cache,
-            &mut bare_repos_cache,
-            &mut registry_pkgs_cache,
-            &mut registry_index_caches,
-            &mut registry_sources_caches,
+            bin_cache,
+            checkouts_cache,
+            bare_repos_cache,
+            registry_pkgs_cache,
+            registry_index_caches,
+            registry_sources_caches,
             cargo_cache,
         );
 
@@ -714,18 +714,14 @@ impl<'a> fmt::Display for DirSizes<'a> {
 /// returns a summary with details on each registry (cmd: "cargo cache registry")
 pub(crate) fn per_registry_summary(
     dir_size: &DirSizes<'_>,
-    mut index_caches: &mut registry_index::RegistryIndicesCache,
-    mut pkg_caches: &mut registry_sources::RegistrySourceCaches,
-    mut registry_sources: &mut registry_pkg_cache::RegistryPkgCaches,
+    index_caches: &mut registry_index::RegistryIndicesCache,
+    pkg_caches: &mut registry_sources::RegistrySourceCaches,
+    registry_sources: &mut registry_pkg_cache::RegistryPkgCaches,
 ) -> String {
     let mut table: Vec<TableLine> = vec![];
     table.extend(dir_size.header());
     table.extend(dir_size.bin());
-    table.extend(dir_size.registries_seperate(
-        &mut index_caches,
-        &mut pkg_caches,
-        &mut registry_sources,
-    ));
+    table.extend(dir_size.registries_seperate(index_caches, pkg_caches, registry_sources));
     table.extend(dir_size.git());
 
     two_row_table(2, table, false)
