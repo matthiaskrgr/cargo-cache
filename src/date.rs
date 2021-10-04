@@ -45,8 +45,8 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
             };
             #[allow(clippy::cast_possible_wrap)]
             let nd =
-                if let Some(date) = NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2]) {
-                    date
+                if let Some(date2) = NaiveDate::from_ymd_opt(split[0] as i32, split[1], split[2]) {
+                    date2
                 } else {
                     return Err(Error::DateParseFailure(
                         format!("{}.{}.{}", split[0], split[1], split[2]),
@@ -67,10 +67,10 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 Err(a) => return Err(Error::DateParseFailure(a.to_string(), "u32".into())),
             };
 
-            let nd = if let Some(date) =
+            let nd = if let Some(date2) =
                 NaiveDate::from_ymd_opt(today.year(), today.month(), today.day())
             {
-                date
+                date2
             } else {
                 return Err(Error::DateParseFailure(
                     format!("{}:{}:{}", today.year(), today.month(), today.day()),

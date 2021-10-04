@@ -31,7 +31,7 @@ fn get_last_access_of_item(path: &Path) -> std::time::SystemTime {
         WalkDir::new(path)
             .into_iter()
             .map(|e| e.unwrap().path().to_owned())
-            .map(|path| std::fs::metadata(path).unwrap().accessed().unwrap()) //@TODO make this an reusable function/method to simplify code
+            .map(|filepath| std::fs::metadata(filepath).unwrap().accessed().unwrap()) //@TODO make this an reusable function/method to simplify code
             .max()
             .unwrap()
     }

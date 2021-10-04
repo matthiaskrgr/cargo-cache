@@ -30,7 +30,7 @@
     clippy::complexity,
     clippy::style,
     clippy::pedantic,
-    clippy::shadow_reuse,
+    //clippy::shadow_reuse,
     clippy::shadow_same,
     clippy::shadow_unrelated,
     clippy::string_add,

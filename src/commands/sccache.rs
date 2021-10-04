@@ -60,8 +60,8 @@ pub(crate) fn sccache_stats() -> Result<(), library::Error> {
     let files = WalkDir::new(sccache_path.display().to_string())
         .into_iter()
         .filter_map(|direntry| {
-            if let Ok(direntry) = direntry {
-                let path = direntry.path().to_path_buf();
+            if let Ok(dir) = direntry {
+                let path = dir.path().to_path_buf();
                 if path.is_file() {
                     if let Ok(metadata) = fs::metadata(&path) {
                         if let Ok(access_time) = metadata.accessed() {

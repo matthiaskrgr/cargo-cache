@@ -52,6 +52,7 @@ pub(crate) fn two_row_table(
     align_first_line: bool,
 ) -> String {
     let mut first_line: Option<String> = None;
+    #[allow(clippy::shadow_same)]
     let mut lines = lines;
     if !align_first_line && !lines.is_empty() {
         // save the first line and remove it from the vec
@@ -176,9 +177,9 @@ pub(crate) fn format_table(table: &[Vec<String>], padding: usize) -> String {
             // add space between each cell
             new_row.push_str(SEPARATOR);
         }
-        let mut row = new_row.trim().to_string();
-        row.push('\n');
-        out.push_str(&row);
+        let mut row2 = new_row.trim().to_string();
+        row2.push('\n');
+        out.push_str(&row2);
         // move on to the next cell
     }
 
