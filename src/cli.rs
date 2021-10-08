@@ -84,17 +84,17 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
         CargoCacheCommands::SCCache
     } else if config.subcommand_matches("toolchain").is_some() {
         CargoCacheCommands::Toolchain
-    } else if let Some(config) = config.subcommand_matches("trim") {
-        let trim_dry_run = dry_run || config.is_present("dry-run");
+    } else if let Some(trimconfig) = config.subcommand_matches("trim") {
+        let trim_dry_run = dry_run || trimconfig.is_present("dry-run");
         CargoCacheCommands::Trim {
             dry_run: trim_dry_run,
-            trim_limit: config.value_of("trim_limit"),
+            trim_limit: trimconfig.value_of("trim_limit"),
         } // take config trim_config.value_of("trim_limit")
-    } else if let Some(config) = config.subcommand_matches("clean-unref") {
-        let arg_dry_run = dry_run || config.is_present("dry-run");
+    } else if let Some(clean_unref_config) = config.subcommand_matches("clean-unref") {
+        let arg_dry_run = dry_run || clean_unref_config.is_present("dry-run");
         CargoCacheCommands::CleanUnref {
             dry_run: arg_dry_run,
-            manifest_path: config.value_of("manifest-path"),
+            manifest_path: clean_unref_config.value_of("manifest-path"),
         } // clean_unref_cfg.value_of("manifest-path"),
     } else if config.is_present("top-cache-items") {
         let limit =
