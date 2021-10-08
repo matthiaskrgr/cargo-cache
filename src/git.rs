@@ -335,29 +335,30 @@ mod gittest {
             git_commit
         );
         // create another commit
-        let mut file = File::create("target/gitrepo_gc/testfile.txt").unwrap();
-        file.write_all(
-            b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
+        let mut file2 = File::create("target/gitrepo_gc/testfile.txt").unwrap();
+        file2
+            .write_all(
+                b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
         \n this is some more text\n
         lorem ipsum",
-        )
-        .unwrap();
-        let git_add = Command::new("git")
+            )
+            .unwrap();
+        let git_add2 = Command::new("git")
             .arg("add")
             .arg("testfile.txt")
             .current_dir("target/gitrepo_gc/")
             .output();
-        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
-        let git_commit = Command::new("git")
+        assert!(git_add2.is_ok(), "git add did not succeed: '{:?}'", git_add);
+        let git_commit2 = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("another commit msg")
             .current_dir("target/gitrepo_gc/")
             .output();
         assert!(
-            git_commit.is_ok(),
+            git_commit2.is_ok(),
             "git commit did not succeed: '{:?}'",
-            git_commit
+            git_commit2
         );
 
         let (dryrun_before, dryrun_after) = match gc_repo(
@@ -421,29 +422,34 @@ mod gittest {
             git_commit
         );
         // create another commit
-        let mut file = File::create("target/gitrepo_fsck/testfile.txt").unwrap();
-        file.write_all(
-            b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
+        let mut file2 = File::create("target/gitrepo_fsck/testfile.txt").unwrap();
+        file2
+            .write_all(
+                b"Hello hello hello this is a test \n bla bla bla bla bla  \n hello
         \n this is some more text\n
         lorem ipsum",
-        )
-        .unwrap();
-        let git_add = Command::new("git")
+            )
+            .unwrap();
+        let git_add2 = Command::new("git")
             .arg("add")
             .arg("testfile.txt")
             .current_dir("target/gitrepo_fsck/")
             .output();
-        assert!(git_add.is_ok(), "git add did not succeed: '{:?}'", git_add);
-        let git_commit = Command::new("git")
+        assert!(
+            git_add2.is_ok(),
+            "git add did not succeed: '{:?}'",
+            git_add2
+        );
+        let git_commit2 = Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg("another commit msg")
             .current_dir("target/gitrepo_fsck/")
             .output();
         assert!(
-            git_commit.is_ok(),
+            git_commit2.is_ok(),
             "git commit did not succeed: '{:?}'",
-            git_commit
+            git_commit2
         );
 
         let res = fsck_repo(&PathBuf::from("target/gitrepo_fsck/"));

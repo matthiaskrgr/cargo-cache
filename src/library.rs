@@ -888,7 +888,7 @@ mod libtests {
         let output = ccp.to_string();
         let mut iter = output.lines().skip(1); // ??
 
-        let cargo_home = iter.next().unwrap();
+        let cargo_home2 = iter.next().unwrap();
 
         assert!(
             Regex::new(if cfg!(windows) {
@@ -897,7 +897,7 @@ mod libtests {
                 r"cargo home:.*/cargo_home_cargo_cache_paths_print"
             })
             .unwrap()
-            .is_match(cargo_home),
+            .is_match(cargo_home2),
             "cargo home: \"{:?}\"",
             cargo_home
         );

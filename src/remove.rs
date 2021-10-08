@@ -347,10 +347,10 @@ mod libtests {
         assert_eq!(name, "heim-runtime");
         assert_eq!(version, "0.1.0-beta.1");
 
-        let (name, version): (String, String) =
+        let (name2, version2): (String, String) =
             parse_version(&PathBuf::from("cargo-cache-0.4.3.crate")).unwrap();
 
-        assert_eq!(name, "cargo-cache");
-        assert_eq!(version, "0.4.3");
+        assert_eq!(name2, "cargo-cache");
+        assert_eq!(version2, "0.4.3");
     }
 }
