@@ -10,7 +10,7 @@ readme = "README.md"
 keywords = ["cargo", "cache", "cli", "manage", "cargo-home"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins", "development-tools"]
 build = "src/build.rs"
-edition = "2018"
+edition = "2021"
 resolver = "2"
 
 [features]
