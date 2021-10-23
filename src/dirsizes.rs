@@ -493,10 +493,7 @@ impl<'a> DirSizes<'a> {
                 TableLine::new(
                     2,
                     &if old.numb_git_repos_bare_repos() == new.numb_git_repos_bare_repos() {
-                        format!(
-                            "{} bare git repos:",
-                            new.numb_git_repos_bare_repos().to_string()
-                        )
+                        format!("{} bare git repos:", new.numb_git_repos_bare_repos())
                     } else {
                         format!(
                             "{} => {} bare git repos: ",
@@ -523,10 +520,7 @@ impl<'a> DirSizes<'a> {
                 TableLine::new(
                     2,
                     &if old.numb_git_checkouts() == new.numb_git_checkouts() {
-                        format!(
-                            "{} git repo checkouts: ",
-                            new.numb_git_checkouts().to_string()
-                        )
+                        format!("{} git repo checkouts: ", new.numb_git_checkouts())
                     } else {
                         format!(
                             "{} => {} git repo checkouts: ",

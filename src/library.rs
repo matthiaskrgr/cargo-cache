@@ -216,11 +216,9 @@ impl fmt::Display for Error {
                 "Failed to Cargo.toml manifest in {} or downwards.",
                 dir.display()
             ),
-            Self::QueryRegexFailedParsing(regex) => write!(
-                f,
-                "Failed to parse regular expression \"{}\"",
-                regex.to_string()
-            ),
+            Self::QueryRegexFailedParsing(regex) => {
+                write!(f, "Failed to parse regular expression \"{}\"", regex)
+            }
             Self::GitGCFile(path) => write!(
                 f,
                 "Tried to \"git gc\" a file instead of a directory: \"{}\"",
