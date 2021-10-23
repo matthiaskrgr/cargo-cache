@@ -175,7 +175,9 @@ jobs:
       - name: install cargo-audit
         run: cargo install cargo-audit --debug
       - name: run cargo-audit
-        run: cargo audit
+        # as far as I see, cargo-cache is not using affected code in critical places
+        # and since there is no new chrono version out yet, there is not a lot I can do
+        run: cargo audit --ignore RUSTSEC-2020-0071 --ignore RUSTSEC-2020-0159
 
   # check code with clippy
   run_clippy:
