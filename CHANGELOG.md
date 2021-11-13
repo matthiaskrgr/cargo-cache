@@ -1,9 +1,8 @@
-## Git
+## Version 0.7.0
 ````
 Fully remove -d for --dry-run, use -n instead (#97)
 Update git2 dependency and enable static bundling; don't link against system libgit2 (#105)
 Switch crate to edition 2021 and specify rust 1.56 as minimum supported rust version.
-
 ````
 
 ## Version 0.6.3 (7be9257)
