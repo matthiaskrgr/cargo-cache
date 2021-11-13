@@ -1,4 +1,9 @@
-## Version 0.7.0
+## Git
+```
+
+```
+
+## Version 0.7.0 (ab0166b)
 ````
 Fully remove -d shorthand for --dry-run, use -n instead (#97)
 Update git2 dependency and enable static bundling; don't link against system libgit2 (#105)
