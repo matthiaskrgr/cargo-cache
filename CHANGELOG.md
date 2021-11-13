@@ -3,6 +3,11 @@
 Fully remove -d for --dry-run, use -n instead (#97)
 Update git2 dependency and enable static bundling; don't link against system libgit2 (#105)
 Switch crate to edition 2021 and specify rust 1.56 as minimum supported rust version.
+
+Updated dependencies:
+	cargo_metadata 0.13.1 -> 0.14.1
+	git2 0.13.12 -> 0.13.22 (+ vendored-libgit2 feat)
+	pretty_assertions 0.7.2 -> 1.0.0
 ````
 
 ## Version 0.6.3 (7be9257)
