@@ -115,7 +115,7 @@ impl Cache for GitCheckoutCache {
     // all "items" inside the cache (item == a git checkout)
     fn items(&mut self) -> &[PathBuf] {
         if self.items_calculated {
-            // do nothin and return
+            // do nothing and return
         } else if self.path_exists() {
             let mut collection = Vec::new();
 
