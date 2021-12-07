@@ -965,7 +965,7 @@ mod libtests {
 
         // should be empty now
         let last = iter.next();
-        assert!(!last.is_some(), "found another directory?!: '{:?}'", last);
+        assert!(last.is_none(), "found another directory?!: '{:?}'", last);
     }
 }
 
