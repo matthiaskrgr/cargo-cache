@@ -69,13 +69,6 @@ pub(crate) enum CargoCacheCommands<'a> {
 pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches) -> CargoCacheCommands<'b> {
     let dry_run = config.is_present("dry-run");
 
-    // if no args were passed, or ONLY --debug is passed, print the default summary
-    if (config.args.is_empty() && config.subcommand().is_none())
-        || (config.subcommand().is_none() && config.is_present("debug") && config.args.len() == 1)
-    {
-        return CargoCacheCommands::DefaultSummary;
-    }
-
     // if config.is_present("debug") {
     // do not check for "--debug" since it is independent of all other flags
     if config.is_present("version") {
