@@ -1,6 +1,7 @@
 ## Git
 ```
-
+Cli: fix bugs where I was implementing a subcommand cargo-cache foo but then actually checking for it as an argument cargo ceche --foo.
+Found during upgrade to clap v3
 ```
 
 ## Version 0.7.0 (ab0166b)

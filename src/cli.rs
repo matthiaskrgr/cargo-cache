@@ -80,7 +80,9 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
     // do not check for "--debug" since it is independent of all other flags
     if config.is_present("version") {
         CargoCacheCommands::Version
-    } else if config.is_present("sccache") || config.is_present("sc") {
+    } else if config.subcommand_matches("sccache").is_some()
+        || config.subcommand_matches("sc").is_some()
+    {
         CargoCacheCommands::SCCache
     } else if config.subcommand_matches("toolchain").is_some() {
         CargoCacheCommands::Toolchain
@@ -100,14 +102,18 @@ pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches<'a>) -> CargoCacheComm
         let limit =
             value_t!(config.value_of("top-cache-items"), u32).unwrap_or(20 /* default*/);
         CargoCacheCommands::TopCacheItems { limit }
-    } else if config.is_present("query") || config.is_present("q") {
+    } else if config.subcommand_matches("query").is_some()
+        || config.subcommand_matches("q").is_some()
+    {
         let query_config = if config.is_present("query") {
             config.subcommand_matches("query").unwrap()
         } else {
             config.subcommand_matches("q").unwrap()
         };
         CargoCacheCommands::Query { query_config }
-    } else if config.is_present("local") || config.is_present("l") {
+    } else if config.subcommand_matches("local").is_some()
+        || config.subcommand_matches("l").is_some()
+    {
         CargoCacheCommands::Local
     } else if config.is_present("info") {
         CargoCacheCommands::Info
