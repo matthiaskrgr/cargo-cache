@@ -80,13 +80,19 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
     // Note: the code above worked in clap2.34 but no longer does in clap3.0 because ArgMatches::args and ::subcommand was made private
     // work around using simple std::env::args()
 
-    if matches!(
-        // skip executable path which is first item
-        std::env::args().nth(2).as_deref(),
-        None | Some("debug"),
-    ) {
-        return CargoCacheCommands::DefaultSummary;
+    // skip executable path which is first item
+    let args: Vec<String> = std::env::args().collect();
+    let args_slice: Vec<&str> = args.iter().map(|s| &**s).collect(); // :(
+
+    match args_slice[..] {
+        // the first item is the executable path, we don't need that
+        [_] | [_, "cache" | "--debug"] | [_, "cache", "--debug"] => {
+            dbg!("returned simple summary NEW");
+            return CargoCacheCommands::DefaultSummary;
+        }
+        _ => {}
     }
+    dbg!(args);
 
     // if config.is_present("debug") {
     // do not check for "--debug" since it is independent of all other flags
