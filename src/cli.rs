@@ -66,7 +66,7 @@ pub(crate) enum CargoCacheCommands<'a> {
     DefaultSummary,
 }
 
-pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches) -> CargoCacheCommands<'b> {
+pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
     let dry_run = config.is_present("dry-run");
 
     /*
@@ -192,7 +192,7 @@ pub(crate) fn get_version() -> String {
 
 /// generates the clap config which is used to control the crate
 #[allow(clippy::too_many_lines)]
-pub(crate) fn gen_clap<'a>() -> ArgMatches {
+pub(crate) fn gen_clap() -> ArgMatches {
     let version_string = get_version();
 
     let list_dirs = Arg::new("list-dirs")
