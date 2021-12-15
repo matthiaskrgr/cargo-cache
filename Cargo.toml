@@ -31,7 +31,7 @@ cfg-if = {version = "1.0.0"}# if cfg(..)  { ...  }
 chrono = {version = "0.4.19", optional = true}# compare dates etc
 
 # https://github.com/kbknapp/clap-rs
-clap = {version = "3.0.0-rc.1", features = ["wrap_help", "derive"], optional = true}# cmdline arg parsing
+clap = {version = "3.0.0-rc.4", features = ["wrap_help", "derive"], optional = true}# cmdline arg parsing
 
 # https://github.com/xdg-rs/dirs
 dirs-next = {version = "2.0.0", optional = true}# get cache dirs to look for sccache cache
