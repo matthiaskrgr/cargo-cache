@@ -273,10 +273,10 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches {
     let debug = Arg::new("debug")
         .long("debug")
         .help("print some debug stats")
-        .hidden(true);
+        .hide(true);
 
     // "version" subcommand which is also hidden, prints crate version
-    let version_subcmd = App::new("version").settings(&[AppSettings::Hidden]);
+    let version_subcmd = App::new("version").setting(AppSettings::Hidden);
 
     /***************************
      *       Subcommands        *
@@ -326,7 +326,7 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches {
     // hidden, but have "cargo cache registries" work too
     let registries_hidden = App::new("registries")
         .about("query each package registry separately")
-        .settings(&[AppSettings::Hidden]);
+        .setting(AppSettings::Hidden);
     //</registry>
 
     //<sccache>
@@ -416,7 +416,6 @@ pub(crate) fn gen_clap<'a>() -> ArgMatches {
         .bin_name("cargo")
         .about("Manage cargo cache")
         .author("matthiaskrgr")
-        .global_setting(AppSettings::ColoredHelp)
         .subcommand(cache_subcmd)
         .subcommand(query)
         .subcommand(query_short)
