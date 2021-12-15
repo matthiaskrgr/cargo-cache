@@ -69,6 +69,25 @@ pub(crate) enum CargoCacheCommands<'a> {
 pub(crate) fn clap_to_enum<'a, 'b>(config: &'b ArgMatches) -> CargoCacheCommands<'b> {
     let dry_run = config.is_present("dry-run");
 
+    /*
+    // if no args were passed, or ONLY --debug is passed, print the default summary
+    if (config.args.is_empty() && config.subcommand.is_none())
+        || (config.subcommand.is_none() && config.is_present("debug") && config.args.len()
+    {
+        return CargoCacheCommands::DefaultSummary;
+    }  */
+
+    // Note: the code above worked in clap2.34 but no longer does in clap3.0 because ArgMatches::args and ::subcommand was made private
+    // work around using simple std::env::args()
+
+    if matches!(
+        // skip executable path which is first item
+        std::env::args().nth(2).as_deref(),
+        None | Some("debug"),
+    ) {
+        return CargoCacheCommands::DefaultSummary;
+    }
+
     // if config.is_present("debug") {
     // do not check for "--debug" since it is independent of all other flags
     if config.is_present("version") {
