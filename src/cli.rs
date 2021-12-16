@@ -299,7 +299,6 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     // arg of query sbcmd
     let human_readable = Arg::new("hr")
-        .short('h')
         .long("human-readable")
         .help("print sizes in human readable format");
 
