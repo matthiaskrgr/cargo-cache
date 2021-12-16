@@ -87,12 +87,10 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
     match args_slice[..] {
         // the first item is the executable path, we don't need that
         [_] | [_, "cache" | "--debug"] | [_, "cache", "--debug"] => {
-            dbg!("returned simple summary NEW");
             return CargoCacheCommands::DefaultSummary;
         }
         _ => {}
     }
-    dbg!(args);
 
     // if config.is_present("debug") {
     // do not check for "--debug" since it is independent of all other flags
