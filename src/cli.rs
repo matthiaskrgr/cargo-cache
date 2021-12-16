@@ -546,33 +546,64 @@ SUBCOMMANDS:
             cc_help
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
+        // eprintln!("{}", help_real);
 
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
-        help_desired.push_str("
-matthiaskrgr
-Manage cargo cache\n
+        help_desired.push_str(
+            "\n\nmatthiaskrgr
+
+Manage cargo cache
+
 USAGE:
-    cargo cache [FLAGS] [OPTIONS] [SUBCOMMAND]\n
-FLAGS:
-    -a, --autoclean              Removes crate source checkouts and git repo checkouts
-    -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
-    -n, --dry-run                Don't remove anything, just pretend
-    -f, --fsck                   Fsck git repositories
-    -g, --gc                     Recompress git repositories (may take some time)
-    -h, --help                   Prints help information
-    -i, --info                   Print information cache directories, what they are for and what can be safely deleted
-    -l, --list-dirs              List all found directory paths
-    -V, --version                Prints version information\n
+    cargo cache [OPTIONS] [SUBCOMMAND]
+
 OPTIONS:
-    -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
-    -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
-                                           registry-sources,registry-crate-cache,registry-index,registry
-    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
-    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
-    -t, --top-cache-items <N>              List the top N items taking most space in the cache\n
+    -a, --autoclean
+            Removes crate source checkouts and git repo checkouts
+
+    -e, --autoclean-expensive
+            As --autoclean, but also recompresses git repositories
+
+    -f, --fsck
+            Fsck git repositories
+
+    -g, --gc
+            Recompress git repositories (may take some time)
+
+    -h, --help
+            Print help information
+
+    -i, --info
+            Print information cache directories, what they are for and what can be safely deleted
+
+    -k, --keep-duplicate-crates <N>
+            Remove all but N versions of crate in the source archives directory
+
+    -l, --list-dirs
+            List all found directory paths
+
+    -n, --dry-run
+            Don't remove anything, just pretend
+
+    -o, --remove-if-older-than <date>
+            Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
+
+    -r, --remove-dir <dir1,dir2,dir3>
+            Remove directories, accepted values: all,git-db,git-repos,
+            registry-sources,registry-crate-cache,registry-index,registry
+
+    -t, --top-cache-items <N>
+            List the top N items taking most space in the cache
+
+    -V, --version
+            Print version information
+
+    -y, --remove-if-younger-than <date>
+            Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
+
 SUBCOMMANDS:
     clean-unref    remove crates that are not referenced in a Cargo.toml from the cache
-    help           Prints this message or the help of the given subcommand(s)
+    help           Print this message or the help of the given subcommand(s)
     l              check local build cache (target) of a rust project
     local          check local build cache (target) of a rust project
     q              run a query
@@ -582,7 +613,8 @@ SUBCOMMANDS:
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
     toolchain      print stats on installed toolchains
-    trim           trim old items from the cache until maximum cache size limit is reached\n");
+    trim           trim old items from the cache until maximum cache size limit is reached\n",
+        );
 
         assert_eq!(help_desired, help_real);
     }
