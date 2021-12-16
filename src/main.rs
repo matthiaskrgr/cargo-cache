@@ -110,7 +110,7 @@ fn main() {
     let config_enum = cli::clap_to_enum(config);
 
     // handle hidden "version" subcommand
-    if config.is_present("version") {
+    if config.is_present("version") || matches!(config_enum, CargoCacheCommands::Version) {
         println!("cargo-cache {}", cli::get_version());
         process::exit(0);
     }

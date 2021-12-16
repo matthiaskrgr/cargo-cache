@@ -94,7 +94,7 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
 
     // if config.is_present("debug") {
     // do not check for "--debug" since it is independent of all other flags
-    if config.is_present("version") {
+    if config.is_present("version") || config.subcommand_matches("version").is_some() {
         CargoCacheCommands::Version
     } else if config.subcommand_matches("sccache").is_some()
         || config.subcommand_matches("sc").is_some()
@@ -601,24 +601,24 @@ SUBCOMMANDS:
         );
         let help_real = String::from_utf8_lossy(&ccq_help.unwrap().stdout).into_owned();
 
+        //eprintln!("{}", help_real);
+
         let mut help_desired = String::new();
         help_desired.push_str(
-            "cargo-cache-query 
+"cargo-cache-query 
+
 run a query
 
 USAGE:
-    cargo cache query [FLAGS] [OPTIONS] [QUERY]
-
-FLAGS:
-        --help              Prints help information
-    -h, --human-readable    print sizes in human readable format
-    -V, --version           Prints version information
-
-OPTIONS:
-    -s, --sort-by <sort>    sort files alphabetically or by file size [possible values: size, name]
+    cargo cache query [OPTIONS] [QUERY]
 
 ARGS:
-    <QUERY>    \n",
+    <QUERY>    
+
+OPTIONS:
+    -h, --help              Print help information
+        --human-readable    print sizes in human readable format
+    -s, --sort-by <sort>    sort files alphabetically or by file size [possible values: size, name]\n"
         );
 
         assert_eq!(help_desired, help_real);
