@@ -443,6 +443,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .arg(&remove_if_younger)
         .arg(&remove_if_older)
         .arg(&debug)
+        //.debug_assert(); todo!();
         .get_matches()
 }
 
