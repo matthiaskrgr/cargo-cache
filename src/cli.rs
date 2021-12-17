@@ -464,8 +464,7 @@ mod clitests {
 
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str(
-            "\n\nmatthiaskrgr
-
+            "\nmatthiaskrgr
 Manage cargo cache
 
 USAGE:
@@ -544,8 +543,7 @@ SUBCOMMANDS:
 
         let mut help_desired = rustc_tools_util::get_version_info!().to_string();
         help_desired.push_str(
-            "\n\nmatthiaskrgr
-
+            "\nmatthiaskrgr
 Manage cargo cache
 
 USAGE:
@@ -632,7 +630,6 @@ SUBCOMMANDS:
         let mut help_desired = String::new();
         help_desired.push_str(
 "cargo-cache-query 
-
 run a query
 
 USAGE:
