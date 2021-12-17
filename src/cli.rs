@@ -121,14 +121,14 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
             .parse()
             .unwrap_or(20 /* default*/);
         CargoCacheCommands::TopCacheItems { limit }
-    } else if config.subcommand_matches("query").is_some()
-        || config.subcommand_matches("q").is_some()
+    } else if let Some(query_config) = &[
+        config.subcommand_matches("query"),
+        config.subcommand_matches("q"),
+    ]
+    .into_iter()
+    .find(Option::is_some)
+    .flatten()
     {
-        let query_config = if config.is_present("query") {
-            config.subcommand_matches("query").unwrap()
-        } else {
-            config.subcommand_matches("q").unwrap()
-        };
         CargoCacheCommands::Query { query_config }
     } else if config.subcommand_matches("local").is_some()
         || config.subcommand_matches("l").is_some()
