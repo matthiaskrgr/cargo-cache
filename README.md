@@ -51,30 +51,28 @@ To learn more about the subdirectories inside the cargo home and what can be saf
 #### Usage:
 ````
 USAGE:
-    cargo cache [FLAGS] [OPTIONS] [SUBCOMMAND]
-
-FLAGS:
-    -a, --autoclean              Removes crate source checkouts and git repo checkouts
-    -e, --autoclean-expensive    As --autoclean, but also recompresses git repositories
-    -d, --dry-run                Don't remove anything, just pretend
-    -f, --fsck                   Fsck git repositories
-    -g, --gc                     Recompress git repositories (may take some time)
-    -h, --help                   Prints help information
-    -i, --info                   Print information cache directories, what they are for and what can be safely deleted
-    -l, --list-dirs              List all found directory paths
-    -V, --version                Prints version information
+    cargo cache [OPTIONS] [SUBCOMMAND]
 
 OPTIONS:
+    -a, --autoclean                        Removes crate source checkouts and git repo checkouts
+    -e, --autoclean-expensive              As --autoclean, but also recompresses git repositories
+    -f, --fsck                             Fsck git repositories
+    -g, --gc                               Recompress git repositories (may take some time)
+    -h, --help                             Print help information
+    -i, --info                             Print information cache directories, what they are for and what can be safely deleted
     -k, --keep-duplicate-crates <N>        Remove all but N versions of crate in the source archives directory
+    -l, --list-dirs                        List all found directory paths
+    -n, --dry-run                          Don't remove anything, just pretend
+    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
     -r, --remove-dir <dir1,dir2,dir3>      Remove directories, accepted values: all,git-db,git-repos,
                                            registry-sources,registry-crate-cache,registry-index,registry
-    -o, --remove-if-older-than <date>      Removes items older than specified date: YYYY.MM.DD or HH:MM:SS
-    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
     -t, --top-cache-items <N>              List the top N items taking most space in the cache
+    -V, --version                          Print version information
+    -y, --remove-if-younger-than <date>    Removes items younger than the specified date: YYYY.MM.DD or HH:MM:SS
 
 SUBCOMMANDS:
     clean-unref    remove crates that are not referenced in a Cargo.toml from the cache
-    help           Prints this message or the help of the given subcommand(s)
+    help           Print this message or the help of the given subcommand(s)
     l              check local build cache (target) of a rust project
     local          check local build cache (target) of a rust project
     q              run a query
