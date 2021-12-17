@@ -116,7 +116,9 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
         } // clean_unref_cfg.value_of("manifest-path"),
     } else if config.is_present("top-cache-items") {
         let limit = config
-            .value_of_t(config.value_of("top-cache-items").unwrap())
+            .value_of("top-cache-items")
+            .unwrap_or("20" /* default*/)
+            .parse()
             .unwrap_or(20 /* default*/);
         CargoCacheCommands::TopCacheItems { limit }
     } else if config.subcommand_matches("query").is_some()
@@ -150,14 +152,9 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
     } else if config.is_present("autoclean") {
         CargoCacheCommands::AutoClean { dry_run }
     } else if config.is_present("keep-duplicate-crates") {
-        let clap_val = config.value_of_t(config.value_of("keep-duplicate-crates").unwrap());
-        let limit = clap_val
-            .map_err(|e| {
-                format!(
-                    "Error: \"--keep-duplicate-crates\" expected an integer argument.\n{}\"",
-                    e
-                )
-            })
+        let limit: u64 = config
+            .value_of_t("keep-duplicate-crates")
+            .map_err(|_| "Error: \"--keep-duplicate-crates\" expected an integer argument")
             .unwrap_or_fatal_error();
         CargoCacheCommands::KeepDuplicateCrates { dry_run, limit }
     } else if config.subcommand_matches("registry").is_some()
