@@ -41,6 +41,7 @@ pub(crate) enum CargoCacheCommands<'a> {
     },
     //Debug,
     Version,
+    Verify,
     Query {
         query_config: &'a ArgMatches,
     }, // subcommand
@@ -169,6 +170,8 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
             arg_younger: config.value_of("remove-if-older-than"),
             dirs: config.value_of("remove-dir"),
         }
+    } else if let Some(_verify_cfg) = config.subcommand_matches("verify") {
+        CargoCacheCommands::Verify
     } else if dry_run {
         // none of the flags that do on-disk changes are present
 
@@ -368,6 +371,9 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     // </trim>
     let toolchain = App::new("toolchain").about("print stats on installed toolchains");
+
+    let verify = App::new("verifify").about("verify crate sources");
+
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
@@ -392,6 +398,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .subcommand(clean_unref.clone())
         .subcommand(toolchain.clone())
         .subcommand(trim.clone())
+        .subcommand(verify.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -426,6 +433,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .subcommand(clean_unref)
         .subcommand(toolchain.clone())
         .subcommand(trim)
+        .subcommand(verify)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)

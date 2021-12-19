@@ -74,6 +74,7 @@ cfg_if::cfg_if! {
         mod top_items_summary;
         mod date;
         mod clean_unref;
+        mod verify;
 
         // use
         use crate::cache::caches::{Cache, RegistrySuperCache};
@@ -88,6 +89,7 @@ cfg_if::cfg_if! {
         use crate::top_items_summary::*;
         use crate::clean_unref::*;
         use crate::cli::{CargoCacheCommands};
+        use crate::verify::*;
     }
 }
 
@@ -466,6 +468,10 @@ fn main() {
             if !size_changed {
                 eprintln!("Warning: there is nothing to be dry run!");
             }
+        }
+        CargoCacheCommands::Verify => {
+            verify::verify_crates();
+            std::process::exit(0);
         }
         _ => (),
     }
