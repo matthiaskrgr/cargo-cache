@@ -372,7 +372,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
     // </trim>
     let toolchain = App::new("toolchain").about("print stats on installed toolchains");
 
-    let verify = App::new("verifify").about("verify crate sources");
+    let verify = App::new("verify").about("verify crate sources");
 
     // now thread all of these together
 
