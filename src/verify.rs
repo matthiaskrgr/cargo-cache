@@ -13,8 +13,8 @@ pub(crate) fn verify_crates(
 ) -> Result<(), ()> {
     // iterate over all the extracted sources that we have
 
-    let crate_gzips_and_sources: Vec<_> = registry_sources_caches
-        .items()
+    let reg_sources = registry_sources_caches.items();
+    let crate_gzips_and_sources: Vec<_> = reg_sources
         .iter()
         .map(|source| {
             // for each directory, find the path to the corresponding .crate archive
@@ -39,17 +39,16 @@ pub(crate) fn verify_crates(
 
             dir.push(&comp1_with_crate_ext); // bytes-0.4.12.crate
             let krate: PathBuf = dir.into_iter().collect::<PathBuf>();
-            dbg!((source, krate))
+            (source, krate)
         })
         // we need both the .crate and the directory for verification
         .filter(|(source, krate)| source.exists() && krate.exists())
         .collect();
 
     // this would fail if we for example have a crate source dir but no corresponding archive
-    assert_eq!(
-        crate_gzips_and_sources.len(),
-        registry_sources_caches.items().len()
-    );
+    assert_eq!(crate_gzips_and_sources.len(), reg_sources.len());
+
+    crate_gzips_and_sources.iter().map(|(source, krate)| {});
 
     if false {
         return Err(());
