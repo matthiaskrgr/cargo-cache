@@ -1,15 +1,12 @@
-use crate::cache::caches::Cache;
-use crate::cache::caches::RegistrySubCache;
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
-use crate::library::*;
 
 use flate2::read::GzDecoder;
 use tar::Archive;
 
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsStr;
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct FileWithSize {
@@ -18,7 +15,7 @@ struct FileWithSize {
 }
 
 impl FileWithSize {
-    fn from_disk(path_orig: &PathBuf) -> Self {
+    fn from_disk(path_orig: &Path) -> Self {
         // we need to cut off .cargo/registry/src/github.com-1ecc6299db9ec823/
         let index = path_orig
             .iter()
@@ -37,7 +34,7 @@ impl FileWithSize {
     }
 
     // TODO: understand this R: Read stuff
-    fn from_archive<'a, R: std::io::Read>(entry: &tar::Entry<'a, R>) -> Self {
+    fn from_archive<R: std::io::Read>(entry: &tar::Entry<'_, R>) -> Self {
         FileWithSize {
             path: entry.path().unwrap().into_owned(),
             size: entry.size(),
@@ -61,14 +58,13 @@ impl Diff {
             files_size_difference: Vec::new(),
         }
     }
-    fn is_ok(&self) -> bool {
+    fn _is_ok(&self) -> bool {
         self.files_missing_in_checkout.is_empty()
             && self.additiona_files_in_checkout.is_empty()
             && self.files_size_difference.is_empty()
     }
 }
 pub(crate) fn verify_crates(
-    registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), ()> {
     // iterate over all the extracted sources that we have
@@ -149,11 +145,10 @@ pub(crate) fn verify_crates(
 
             for archive_file in &files_of_archive {
                 let archive_f_path = &archive_file.path;
-                let size = archive_file.size;
                 if !files_of_source_paths.contains(&archive_f_path) {
                     // the file is contaied in the archive but not in the extracted source
                     diff.files_missing_in_checkout.push(archive_f_path.clone());
-                } else {
+                } else if files_of_source_paths.contains(&archive_f_path) {
                     // file is contained in both, but sizes differ
                     match files_of_source
                         .iter()
@@ -173,21 +168,16 @@ pub(crate) fn verify_crates(
                 files_of_archive.iter().map(|fws| &fws.path).collect();
 
             for source_file in files_of_source.iter().map(|fws| &fws.path) {
-                if files_of_archive
-                    .iter()
-                    .find(|path| **path == source_file)
-                    .is_none()
-                {
+                if !files_of_archive.iter().any(|path| *path == source_file) {
                     diff.additiona_files_in_checkout.push(source_file.clone());
                 }
             }
             dbg!(&diff);
 
-            assert!(diff.files_size_difference.is_empty());
+            // assert!(diff.files_size_difference.is_empty());
             diff
         })
         .collect::<Vec<_>>();
-    //   dbg!(_x);
 
     if false {
         return Err(());

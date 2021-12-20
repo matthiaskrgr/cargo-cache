@@ -470,7 +470,7 @@ fn main() {
             }
         }
         CargoCacheCommands::Verify => {
-            verify::verify_crates(&mut registry_pkgs_cache, &mut registry_sources_caches);
+            verify_crates(&mut registry_sources_caches).expect("verification failed :(");
             std::process::exit(0);
         }
         _ => (),
