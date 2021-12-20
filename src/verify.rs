@@ -44,6 +44,29 @@ impl FileWithSize {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+struct Diff {
+    files_missing_in_checkout: Vec<PathBuf>,
+    additiona_files_in_checkout: Vec<PathBuf>,
+    files_size_difference: Vec<PathBuf>,
+}
+
+impl Diff {
+    //@TODO somehow save the crate name...?
+    fn new() -> Self {
+        Self {
+            files_missing_in_checkout: Vec::new(),
+            additiona_files_in_checkout: Vec::new(),
+            files_size_difference: Vec::new(),
+        }
+    }
+    fn is_ok(&self) -> bool {
+        self.files_missing_in_checkout.is_empty()
+            && self.additiona_files_in_checkout.is_empty()
+            && self.files_size_difference.is_empty()
+    }
+}
 pub(crate) fn verify_crates(
     registry_pkg_caches: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
@@ -85,35 +108,86 @@ pub(crate) fn verify_crates(
     // this would fail if we for example have a crate source dir but no corresponding archive
     assert_eq!(crate_gzips_and_sources.len(), reg_sources.len());
 
-    crate_gzips_and_sources.iter().map(|(source, krate)| {
-        let files_of_archive = {
-            let tar_gz = File::open(krate).unwrap();
-            // extract the tar
-            let tar = GzDecoder::new(tar_gz);
-            let mut archive = Archive::new(tar);
+    let _x = crate_gzips_and_sources
+        .iter()
+        .map(|(source, krate)| {
+            // look into the .gz archive and get all the contained files+sizes
+            let files_of_archive = {
+                let tar_gz = File::open(krate).unwrap();
+                // extract the tar
+                let tar = GzDecoder::new(tar_gz);
+                let mut archive = Archive::new(tar);
 
-            let archive_files = archive.entries().unwrap();
+                let archive_files = archive.entries().unwrap();
 
-            let x: Vec<_> = archive_files
-                .into_iter()
-                /*  .map(|entry| {
-                    let e = entry.unwrap();
-                    e.path().unwrap().into_owned()
-                }) */
-                .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
+                let x: Vec<_> = archive_files
+                    .into_iter()
+                    /*  .map(|entry| {
+                        let e = entry.unwrap();
+                        e.path().unwrap().into_owned()
+                    }) */
+                    .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
+                    .collect();
+                x
+            };
+            // get files + sizes of the crate extracted to disk
+            let files_of_source: Vec<_> = std::fs::read_dir(source)
+                .unwrap()
+                .map(|direntry| {
+                    let x = direntry.unwrap();
+                    x.path()
+                })
+                .map(|p| FileWithSize::from_disk(&p))
                 .collect();
-            x
-        };
 
-        let files_of_source: Vec<_> = std::fs::read_dir(source)
-            .unwrap()
-            .map(|direntry| {
-                let x = direntry.unwrap();
-                x.path()
-            })
-            .map(|p| FileWithSize::from_disk(&p))
-            .collect();
-    });
+            let mut diff = Diff::new();
+
+            // compare
+
+            let files_of_source_paths: Vec<&PathBuf> =
+                files_of_source.iter().map(|fws| &fws.path).collect();
+
+            for archive_file in &files_of_archive {
+                let archive_f_path = &archive_file.path;
+                let size = archive_file.size;
+                if !files_of_source_paths.contains(&archive_f_path) {
+                    // the file is contaied in the archive but not in the extracted source
+                    diff.files_missing_in_checkout.push(archive_f_path.clone());
+                } else {
+                    // file is contained in both, but sizes differ
+                    match files_of_source
+                        .iter()
+                        .find(|fws| fws.path == archive_file.path)
+                    {
+                        Some(fws) => {
+                            if fws.size != archive_file.size {
+                                diff.files_size_difference.push(fws.path.clone());
+                            }
+                        }
+                        None => unreachable!(), // we already checked this
+                    };
+                }
+            }
+
+            let files_of_archive: Vec<&PathBuf> =
+                files_of_archive.iter().map(|fws| &fws.path).collect();
+
+            for source_file in files_of_source.iter().map(|fws| &fws.path) {
+                if files_of_archive
+                    .iter()
+                    .find(|path| **path == source_file)
+                    .is_none()
+                {
+                    diff.additiona_files_in_checkout.push(source_file.clone());
+                }
+            }
+            dbg!(&diff);
+
+            assert!(diff.files_size_difference.is_empty());
+            diff
+        })
+        .collect::<Vec<_>>();
+    //   dbg!(_x);
 
     if false {
         return Err(());
