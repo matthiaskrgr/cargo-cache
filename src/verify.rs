@@ -11,17 +11,28 @@ use std::ffi::{OsStr, OsString};
 use std::fs::File;
 use std::path::PathBuf;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct FileWithSize {
     path: PathBuf,
     size: u64,
 }
 
 impl FileWithSize {
-    fn from_disk(path: &PathBuf) -> Self {
+    fn from_disk(path_orig: &PathBuf) -> Self {
+        // we need to cut off .cargo/registry/src/github.com-1ecc6299db9ec823/
+        let index = path_orig
+            .iter()
+            .enumerate()
+            .position(|e| e.1 == OsStr::new("github.com-1ecc6299db9ec823").to_os_string())
+            // @TODO fix this to be dynamic
+            .unwrap()
+            + 1;
+
+        let path = path_orig.iter().skip(index).collect::<PathBuf>();
+
         FileWithSize {
-            path: path.clone(),
-            size: std::fs::metadata(path).unwrap().len(),
+            path,
+            size: std::fs::metadata(path_orig).unwrap().len(),
         }
     }
 
@@ -74,38 +85,35 @@ pub(crate) fn verify_crates(
     // this would fail if we for example have a crate source dir but no corresponding archive
     assert_eq!(crate_gzips_and_sources.len(), reg_sources.len());
 
-    crate_gzips_and_sources
-        .iter()
-        .map(|(source, krate)| {
-            let files_of_archive = {
-                let tar_gz = File::open(krate).unwrap();
-                // extract the tar
-                let tar = GzDecoder::new(tar_gz);
-                let mut archive = Archive::new(tar);
+    crate_gzips_and_sources.iter().map(|(source, krate)| {
+        let files_of_archive = {
+            let tar_gz = File::open(krate).unwrap();
+            // extract the tar
+            let tar = GzDecoder::new(tar_gz);
+            let mut archive = Archive::new(tar);
 
-                let archive_files = archive.entries().unwrap();
+            let archive_files = archive.entries().unwrap();
 
-                let x: Vec<_> = archive_files
-                    .into_iter()
-                    .map(|entry| {
-                        let e = entry.unwrap();
-                        e.path().unwrap().into_owned()
-                    })
-                    .collect();
-                x
-            };
-
-            let files_of_source: Vec<_> = std::fs::read_dir(source)
-                .unwrap()
-                .map(|direntry| {
-                    let x = direntry.unwrap();
-                    x.path()
-                })
+            let x: Vec<_> = archive_files
+                .into_iter()
+                /*  .map(|entry| {
+                    let e = entry.unwrap();
+                    e.path().unwrap().into_owned()
+                }) */
+                .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
                 .collect();
+            x
+        };
 
-            println!("{:?}|||||{:?}", files_of_archive, files_of_source);
-        })
-        .collect::<Vec<_>>();
+        let files_of_source: Vec<_> = std::fs::read_dir(source)
+            .unwrap()
+            .map(|direntry| {
+                let x = direntry.unwrap();
+                x.path()
+            })
+            .map(|p| FileWithSize::from_disk(&p))
+            .collect();
+    });
 
     if false {
         return Err(());
