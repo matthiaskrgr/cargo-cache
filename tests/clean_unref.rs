@@ -162,7 +162,7 @@ fn test_clean_unref() {
     let mut desired_output = String::from("Cargo cache .*clean_unref_CARGO_HOME.*:\n\n");
     desired_output.push_str(
         "Total:                          .* MB
-  0 installed binaries:              0  B
+  0 installed binaries:             0  B
   Registry:                     .* MB
     Registry index:             .* MB
     1 crate archives:           .* KB
