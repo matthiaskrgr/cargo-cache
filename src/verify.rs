@@ -6,6 +6,7 @@ use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
 
 use flate2::read::GzDecoder;
+use rayon::iter::*;
 use tar::Archive;
 use walkdir::WalkDir;
 
@@ -77,7 +78,7 @@ pub(crate) fn verify_crates(
 
     let reg_sources = registry_sources_caches.items();
     let bad_sources: Vec<_> = reg_sources
-        .iter()
+        .par_iter()
         // get the paths to the source and the .crate for all extracted crates
         .map(|source| {
             // for each directory, find the path to the corresponding .crate archive
