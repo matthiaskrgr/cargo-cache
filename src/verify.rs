@@ -1,4 +1,4 @@
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsStr;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
@@ -45,7 +45,7 @@ impl FileWithSize {
 
 /// The Difference between extracted crate sources and an .crate tar.gz archive
 #[derive(Debug, Clone)]
-struct Diff {
+pub(crate) struct Diff {
     // the crate we are diffing
     krate_name: String,
     files_missing_in_checkout: Vec<PathBuf>,
@@ -72,11 +72,11 @@ impl Diff {
 }
 pub(crate) fn verify_crates(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-) -> Result<(), ()> {
+) -> Result<(), Vec<Diff>> {
     // iterate over all the extracted sources that we have
 
     let reg_sources = registry_sources_caches.items();
-    let _crate_gzips_and_sources: Vec<_> = reg_sources
+    let bad_sources: Vec<_> = reg_sources
         .iter()
         // get the paths to the source and the .crate for all extracted crates
         .map(|source| {
@@ -112,7 +112,7 @@ pub(crate) fn verify_crates(
         //let _x = crate_gzips_and_sources
         //  .iter()
         .map(|(source, krate)| {
-            let krate_name = source.into_iter().last().unwrap();
+            let krate_name = source.iter().last().unwrap();
             //println!("Verifying: {}", &krate_name.to_str().unwrap());
             // look into the .gz archive and get all the contained files+sizes
             let files_of_archive = {
@@ -127,12 +127,7 @@ pub(crate) fn verify_crates(
 
                 let x: Vec<_> = archive_files
                     .into_iter()
-                    .map(|entry| {
-                        let e = entry.unwrap();
-                        //e.path().unwrap().into_owned()
-                        e
-                    })
-                    .map(|entry| FileWithSize::from_archive(&entry))
+                    .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
                     .collect();
                 x
             };
@@ -140,7 +135,7 @@ pub(crate) fn verify_crates(
             // need to skip directories since the are only implicitly inside the tar (via file paths)
             let files_of_source: Vec<_> = WalkDir::new(source)
                 .into_iter()
-                .map(|de| de.unwrap())
+                .map(Result::unwrap)
                 .filter(|de| de.file_type().is_file())
                 .map(|direntry| {
                     let p = direntry.path();
@@ -183,31 +178,30 @@ pub(crate) fn verify_crates(
             // cargo inserts ".cargo-ok" file to indicate that an archive has been fully extracted, ignore that too
             for source_file in files_of_source_paths
                 .iter()
-                .filter(|path| path.file_name().unwrap() != PathBuf::from(".cargo-ok"))
+                .filter(|path| path.file_name().unwrap() != ".cargo-ok")
+                .filter(|path| !path.is_dir() /* skip dirs */)
             {
                 // dbg!(source_file);
-                if !files_of_archive
-                    .iter()
-                    .filter(|path| !source_file.is_dir() /* skip dirs */)
-                    .any(|path| path == source_file)
-                {
+                if !files_of_archive.iter().any(|path| path == source_file) {
                     diff.additional_files_in_checkout
                         .push(source_file.to_path_buf());
                 }
-            }
-            //dbg!(&diff);
-            if !diff.is_ok() {
-                println!("BAD CACHE: {}", diff.krate_name);
-                println!("{:#?}", diff);
             }
 
             // assert!(diff.files_size_difference.is_empty());
             diff
         })
+        // save all the "bad" packages
+        .filter(|diff| !diff.is_ok())
+        .map(|diff| {
+            println!("bad source {}", diff.krate_name);
+            diff
+        })
         .collect::<Vec<_>>();
 
-    if false {
-        return Err(());
+    if bad_sources.is_empty() {
+        Ok(())
+    } else {
+        Err(bad_sources)
     }
-    Ok(())
 }
