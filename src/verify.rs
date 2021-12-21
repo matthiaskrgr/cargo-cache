@@ -77,6 +77,38 @@ impl Diff {
             && self.additional_files_in_checkout.is_empty()
             && self.files_size_difference.is_empty()
     }
+
+    pub(crate) fn details(&self) -> String {
+        let mut s = format!("Crate: {}", self.krate_name);
+        if !self.files_missing_in_checkout.is_empty() {
+            s.push_str(&format!(
+                "missing files:\n{:#?}",
+                self.files_missing_in_checkout
+            ));
+        }
+        if !self.additional_files_in_checkout.is_empty() {
+            s.push_str(&format!(
+                "additional files:\n{:#?}",
+                self.additional_files_in_checkout
+            ));
+        }
+        if !self.files_size_difference.is_empty() {
+            s.push_str("Files with differing size:");
+            self.files_size_difference
+                .iter()
+                .map(|fsd| {
+                    format!(
+                        "File: {}, size in archive: {}, size in checkout: {}",
+                        fsd.path.display(),
+                        fsd.size_archive,
+                        fsd.size_source
+                    )
+                })
+                .for_each(|strg| s.push_str(&strg));
+            s.push('\n');
+        }
+        s
+    }
 }
 pub(crate) fn verify_crates(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
@@ -206,7 +238,7 @@ pub(crate) fn verify_crates(
         // save all the "bad" packages
         .filter(|diff| !diff.is_ok())
         .map(|diff| {
-            println!("bad source {}", diff.krate_name);
+            eprintln!("Possibly corrupted source: {}", diff.krate_name);
             diff
         })
         .collect::<Vec<_>>();
