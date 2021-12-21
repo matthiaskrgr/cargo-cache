@@ -1,13 +1,13 @@
+use std::ffi::{OsStr, OsString};
+use std::fs::File;
+use std::path::{Path, PathBuf};
+
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
 
 use flate2::read::GzDecoder;
 use tar::Archive;
 use walkdir::WalkDir;
-
-use std::ffi::{OsStr, OsString};
-use std::fs::File;
-use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct FileWithSize {
@@ -43,27 +43,30 @@ impl FileWithSize {
     }
 }
 
+/// The Difference between extracted crate sources and an .crate tar.gz archive
 #[derive(Debug, Clone)]
 struct Diff {
-    krate_name: OsString,
+    // the crate we are diffing
+    krate_name: String,
     files_missing_in_checkout: Vec<PathBuf>,
-    additiona_files_in_checkout: Vec<PathBuf>,
+    additional_files_in_checkout: Vec<PathBuf>,
     files_size_difference: Vec<PathBuf>,
 }
 
 impl Diff {
-    //@TODO somehow save the crate name...?
     fn new() -> Self {
         Self {
-            krate_name: OsString::new(),
+            krate_name: String::new(),
             files_missing_in_checkout: Vec::new(),
-            additiona_files_in_checkout: Vec::new(),
+            additional_files_in_checkout: Vec::new(),
             files_size_difference: Vec::new(),
         }
     }
+
+    /// returns true if there is no diff
     fn is_ok(&self) -> bool {
         self.files_missing_in_checkout.is_empty()
-            && self.additiona_files_in_checkout.is_empty()
+            && self.additional_files_in_checkout.is_empty()
             && self.files_size_difference.is_empty()
     }
 }
@@ -147,7 +150,7 @@ pub(crate) fn verify_crates(
                 .collect();
 
             let mut diff = Diff::new();
-            diff.krate_name = krate_name.into();
+            diff.krate_name = krate_name.to_str().unwrap().to_string();
             // compare
 
             let files_of_source_paths: Vec<&PathBuf> =
@@ -188,13 +191,13 @@ pub(crate) fn verify_crates(
                     .filter(|path| !source_file.is_dir() /* skip dirs */)
                     .any(|path| path == source_file)
                 {
-                    diff.additiona_files_in_checkout
+                    diff.additional_files_in_checkout
                         .push(source_file.to_path_buf());
                 }
             }
             //dbg!(&diff);
             if !diff.is_ok() {
-                println!("BAD CACHE: {}", diff.krate_name.to_str().unwrap());
+                println!("BAD CACHE: {}", diff.krate_name);
                 println!("{:#?}", diff);
             }
 
