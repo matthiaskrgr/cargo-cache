@@ -79,26 +79,34 @@ impl Diff {
     }
 
     pub(crate) fn details(&self) -> String {
-        let mut s = format!("Crate: {}", self.krate_name);
+        let mut s = format!("Crate: {}\n", self.krate_name);
         if !self.files_missing_in_checkout.is_empty() {
             s.push_str(&format!(
-                "missing files:\n{:#?}",
+                "\nmissing files:\n{}",
                 self.files_missing_in_checkout
+                    .iter()
+                    .map(|path| path.display().to_string())
+                    .collect::<Vec<String>>()
+                    .join(", ")
             ));
         }
         if !self.additional_files_in_checkout.is_empty() {
             s.push_str(&format!(
-                "additional files:\n{:#?}",
+                "\nadditional files:\n{}",
                 self.additional_files_in_checkout
+                    .iter()
+                    .map(|path| path.display().to_string())
+                    .collect::<Vec<String>>()
+                    .join(", ")
             ));
         }
         if !self.files_size_difference.is_empty() {
-            s.push_str("Files with differing size:");
+            s.push_str("\nFiles with differing size:\n");
             self.files_size_difference
                 .iter()
                 .map(|fsd| {
                     format!(
-                        "File: {}, size in archive: {}, size in checkout: {}",
+                        "File: {}, size in archive: {}b, size in checkout: {}b\n",
                         fsd.path.display(),
                         fsd.size_archive,
                         fsd.size_source
