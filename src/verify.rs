@@ -51,7 +51,14 @@ pub(crate) struct Diff {
     krate_name: String,
     files_missing_in_checkout: Vec<PathBuf>,
     additional_files_in_checkout: Vec<PathBuf>,
-    files_size_difference: Vec<PathBuf>,
+    files_size_difference: Vec<FileSizeDifference>,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct FileSizeDifference {
+    path: PathBuf,
+    size_archive: u64,
+    size_source: u64,
 }
 
 impl Diff {
@@ -165,7 +172,11 @@ pub(crate) fn verify_crates(
                     {
                         Some(fws) => {
                             if fws.size != archive_file.size {
-                                diff.files_size_difference.push(fws.path.clone());
+                                diff.files_size_difference.push(FileSizeDifference {
+                                    path: fws.path.clone(),
+                                    size_archive: archive_file.size,
+                                    size_source: fws.size,
+                                });
                             }
                         }
                         None => unreachable!(), // we already checked this
