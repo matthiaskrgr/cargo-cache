@@ -145,6 +145,39 @@ fn map_src_path_to_cache_path(src_path: &PathBuf) -> PathBuf {
     dir.push(&comp1_with_crate_ext); // bytes-0.4.12.crate
     dir.into_iter().collect::<PathBuf>()
 }
+
+/// look into the .gz archive and get all the contained files+sizes
+
+fn sizes_of_archive_files(path: &PathBuf) -> Vec<FileWithSize> {
+    let tar_gz = File::open(path).unwrap();
+    // extract the tar
+    let tar = GzDecoder::new(tar_gz);
+    let mut archive = Archive::new(tar);
+
+    let archive_files = archive.entries().unwrap();
+    //  println!("files inside the archive");
+    //  archive_files.for_each(|x| println!("{:?}", x.unwrap().path()));
+
+    archive_files
+        .into_iter()
+        .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
+        .collect::<Vec<FileWithSize>>()
+}
+
+/// get the files and their sizes of the extracted .crate sources
+fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
+    WalkDir::new(source)
+        .into_iter()
+        .map(Result::unwrap)
+        // need to skip directories since the are only implicitly inside the tar (via file paths)
+        .filter(|de| de.file_type().is_file())
+        .map(|direntry| {
+            let p = direntry.path();
+            p.to_owned()
+        })
+        .map(|p| FileWithSize::from_disk(&p))
+        .collect()
+}
 pub(crate) fn verify_crates(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Vec<Diff>> {
@@ -158,40 +191,13 @@ pub(crate) fn verify_crates(
         // we need both the .crate and the directory to exist for verification
         .filter(|(source, krate)| source.exists() && krate.exists())
         .map(|(source, krate)| {
-            let krate_name = source.iter().last().unwrap();
-            //println!("Verifying: {}", &krate_name.to_str().unwrap());
             // look into the .gz archive and get all the contained files+sizes
-            let files_of_archive = {
-                let tar_gz = File::open(krate).unwrap();
-                // extract the tar
-                let tar = GzDecoder::new(tar_gz);
-                let mut archive = Archive::new(tar);
-
-                let archive_files = archive.entries().unwrap();
-                //  println!("files inside the archive");
-                //  archive_files.for_each(|x| println!("{:?}", x.unwrap().path()));
-
-                let x: Vec<_> = archive_files
-                    .into_iter()
-                    .map(|entry| FileWithSize::from_archive(&entry.unwrap()))
-                    .collect();
-                x
-            };
+            let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(&krate);
             // get files + sizes of the crate extracted to disk
-            // need to skip directories since the are only implicitly inside the tar (via file paths)
-            let files_of_source: Vec<_> = WalkDir::new(source)
-                .into_iter()
-                .map(Result::unwrap)
-                .filter(|de| de.file_type().is_file())
-                .map(|direntry| {
-                    let p = direntry.path();
-                    p.to_owned()
-                })
-                .map(|p| FileWithSize::from_disk(&p))
-                .collect();
+            let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(&source);
 
             let mut diff = Diff::new();
-            diff.krate_name = krate_name.to_str().unwrap().to_string();
+            diff.krate_name = source.iter().last().unwrap().to_str().unwrap().to_string();
             // compare
 
             let files_of_source_paths: Vec<&PathBuf> =
