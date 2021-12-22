@@ -44,6 +44,14 @@ impl FileWithSize {
     }
 }
 
+/// Size difference of a file in the .gz archive and extracted source
+#[derive(Debug, Clone)]
+pub(crate) struct FileSizeDifference {
+    path: PathBuf,
+    size_archive: u64,
+    size_source: u64,
+}
+
 /// The Difference between extracted crate sources and an .crate tar.gz archive
 #[derive(Debug, Clone)]
 pub(crate) struct Diff {
@@ -52,13 +60,6 @@ pub(crate) struct Diff {
     files_missing_in_checkout: Vec<PathBuf>,
     additional_files_in_checkout: Vec<PathBuf>,
     files_size_difference: Vec<FileSizeDifference>,
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct FileSizeDifference {
-    path: PathBuf,
-    size_archive: u64,
-    size_source: u64,
 }
 
 impl Diff {
