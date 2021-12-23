@@ -178,6 +178,53 @@ fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
         .map(|p| FileWithSize::from_disk(&p))
         .collect()
 }
+
+/// compare files of a .crate gz archive and extracted sources and return a Diff object which describes those changes
+fn diff_crate_and_source(krate: PathBuf, source: &PathBuf) -> Diff {
+    let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(&krate);
+    let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(&source);
+    let mut diff = Diff::new();
+    diff.krate_name = source.iter().last().unwrap().to_str().unwrap().to_string();
+    let files_of_source_paths: Vec<&PathBuf> =
+        files_of_source.iter().map(|fws| &fws.path).collect();
+    for archive_file in &files_of_archive {
+        let archive_f_path = &archive_file.path;
+        if !files_of_source_paths.contains(&archive_f_path) {
+            // the file is contaied in the archive but not in the extracted source
+            diff.files_missing_in_checkout.push(archive_f_path.clone());
+        } else if files_of_source_paths.contains(&archive_f_path) {
+            // file is contained in both, but sizes differ
+            match files_of_source
+                .iter()
+                .find(|fws| fws.path == archive_file.path)
+            {
+                Some(fws) => {
+                    if fws.size != archive_file.size {
+                        diff.files_size_difference.push(FileSizeDifference {
+                            path: fws.path.clone(),
+                            size_archive: archive_file.size,
+                            size_source: fws.size,
+                        });
+                    }
+                }
+                None => unreachable!(), // we already checked this
+            };
+        }
+    }
+    let files_of_archive: Vec<&PathBuf> = files_of_archive.iter().map(|fws| &fws.path).collect();
+    for source_file in files_of_source_paths
+        .iter()
+        .filter(|path| path.file_name().unwrap() != ".cargo-ok")
+        .filter(|path| !path.is_dir() /* skip dirs */)
+    {
+        // dbg!(source_file);
+        if !files_of_archive.iter().any(|path| path == source_file) {
+            diff.additional_files_in_checkout
+                .push(source_file.to_path_buf());
+        }
+    }
+    diff
+}
 pub(crate) fn verify_crates(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Vec<Diff>> {
@@ -190,64 +237,9 @@ pub(crate) fn verify_crates(
         .map(|source| (source, map_src_path_to_cache_path(source)))
         // we need both the .crate and the directory to exist for verification
         .filter(|(source, krate)| source.exists() && krate.exists())
-        .map(|(source, krate)| {
-            // look into the .gz archive and get all the contained files+sizes
-            let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(&krate);
-            // get files + sizes of the crate extracted to disk
-            let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(&source);
-
-            let mut diff = Diff::new();
-            diff.krate_name = source.iter().last().unwrap().to_str().unwrap().to_string();
-            // compare
-
-            let files_of_source_paths: Vec<&PathBuf> =
-                files_of_source.iter().map(|fws| &fws.path).collect();
-
-            for archive_file in &files_of_archive {
-                let archive_f_path = &archive_file.path;
-                if !files_of_source_paths.contains(&archive_f_path) {
-                    // the file is contaied in the archive but not in the extracted source
-                    diff.files_missing_in_checkout.push(archive_f_path.clone());
-                } else if files_of_source_paths.contains(&archive_f_path) {
-                    // file is contained in both, but sizes differ
-                    match files_of_source
-                        .iter()
-                        .find(|fws| fws.path == archive_file.path)
-                    {
-                        Some(fws) => {
-                            if fws.size != archive_file.size {
-                                diff.files_size_difference.push(FileSizeDifference {
-                                    path: fws.path.clone(),
-                                    size_archive: archive_file.size,
-                                    size_source: fws.size,
-                                });
-                            }
-                        }
-                        None => unreachable!(), // we already checked this
-                    };
-                }
-            }
-
-            let files_of_archive: Vec<&PathBuf> =
-                files_of_archive.iter().map(|fws| &fws.path).collect();
-
-            // cargo inserts ".cargo-ok" file to indicate that an archive has been fully extracted, ignore that too
-            for source_file in files_of_source_paths
-                .iter()
-                .filter(|path| path.file_name().unwrap() != ".cargo-ok")
-                .filter(|path| !path.is_dir() /* skip dirs */)
-            {
-                // dbg!(source_file);
-                if !files_of_archive.iter().any(|path| path == source_file) {
-                    diff.additional_files_in_checkout
-                        .push(source_file.to_path_buf());
-                }
-            }
-
-            // assert!(diff.files_size_difference.is_empty());
-            diff
-        })
-        // save all the "bad" packages
+        // look into the .gz archive and get all the contained files+sizes
+        .map(|(source, krate)| diff_crate_and_source(krate, source))
+        // save only the "bad" packages
         .filter(|diff| !diff.is_ok())
         .map(|diff| {
             eprintln!("Possibly corrupted source: {}", diff.krate_name);
