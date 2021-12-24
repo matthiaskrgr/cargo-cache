@@ -83,26 +83,27 @@ impl Diff {
         let mut s = format!("Crate: {}\n", self.krate_name);
         if !self.files_missing_in_checkout.is_empty() {
             s.push_str(&format!(
-                "\nmissing files:\n{}",
+                "Missing from source:\n{}",
                 self.files_missing_in_checkout
                     .iter()
                     .map(|path| path.display().to_string())
                     .collect::<Vec<String>>()
                     .join(", ")
             ));
+            s.push('\n');
         }
         if !self.additional_files_in_checkout.is_empty() {
             s.push_str(&format!(
-                "\nadditional files:\n{}",
+                "Not found in archive/additional:\n{}",
                 self.additional_files_in_checkout
                     .iter()
                     .map(|path| path.display().to_string())
                     .collect::<Vec<String>>()
                     .join(", ")
             ));
+            s.push('\n');
         }
         if !self.files_size_difference.is_empty() {
-            s.push_str("\nFiles with differing size:\n");
             self.files_size_difference
                 .iter()
                 .map(|fsd| {
@@ -114,7 +115,7 @@ impl Diff {
                     )
                 })
                 .for_each(|strg| s.push_str(&strg));
-            s.push('\n');
+            //s.push('\n');
         }
         s
     }

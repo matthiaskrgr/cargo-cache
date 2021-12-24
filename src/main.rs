@@ -470,11 +470,16 @@ fn main() {
             }
         }
         CargoCacheCommands::Verify => {
+            println!("Verifying cache, this may take some time...\n");
             if let Err(failed_verifications) = verify_crates(&mut registry_sources_caches) {
-                eprintln!("Error: some crate sources might be corrupted!\n");
+                eprintln!("\n");
                 failed_verifications
                     .iter()
                     .for_each(|diff| println!("{}", diff.details()));
+                eprintln!(
+                    "\nFound {} possible corrupted sources.",
+                    failed_verifications.len()
+                );
                 std::process::exit(1)
             } else {
                 std::process::exit(0);
