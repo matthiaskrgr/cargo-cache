@@ -41,7 +41,10 @@ pub(crate) enum CargoCacheCommands<'a> {
     },
     //Debug,
     Version,
-    Verify,
+    Verify {
+        clean_corrupted: bool,
+        dry_run: bool,
+    },
     Query {
         query_config: &'a ArgMatches,
     }, // subcommand
@@ -170,8 +173,13 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
             arg_younger: config.value_of("remove-if-older-than"),
             dirs: config.value_of("remove-dir"),
         }
-    } else if let Some(_verify_cfg) = config.subcommand_matches("verify") {
-        CargoCacheCommands::Verify
+    } else if let Some(verify_cfg) = config.subcommand_matches("verify") {
+        let dry_run: bool = verify_cfg.is_present("dry-run");
+        let clean_corrupted: bool = verify_cfg.is_present("clean-corrupted");
+        CargoCacheCommands::Verify {
+            clean_corrupted,
+            dry_run,
+        }
     } else if dry_run {
         // none of the flags that do on-disk changes are present
 
@@ -372,7 +380,19 @@ pub(crate) fn gen_clap() -> ArgMatches {
     // </trim>
     let toolchain = App::new("toolchain").about("print stats on installed toolchains");
 
-    let verify = App::new("verify").about("verify crate sources");
+    // <verify>
+
+    let clean_corrupted = Arg::new("clean-corrupted")
+        .long("clean-corrupted")
+        .short('c')
+        .help("automatically remove corrupted cache entrys");
+
+    let verify = App::new("verify")
+        .about("verify crate sources")
+        .arg(&dry_run)
+        .arg(&clean_corrupted);
+
+    // </verify>
 
     // now thread all of these together
 

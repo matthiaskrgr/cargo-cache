@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use crate::cache::caches::RegistrySuperCache;
 use crate::cache::*;
+use crate::remove::remove_file;
 
 use flate2::read::GzDecoder;
 use rayon::iter::*;
@@ -60,6 +61,7 @@ pub(crate) struct Diff {
     files_missing_in_checkout: Vec<PathBuf>,
     additional_files_in_checkout: Vec<PathBuf>,
     files_size_difference: Vec<FileSizeDifference>,
+    source_path: Option<PathBuf>,
 }
 
 impl Diff {
@@ -69,6 +71,7 @@ impl Diff {
             files_missing_in_checkout: Vec::new(),
             additional_files_in_checkout: Vec::new(),
             files_size_difference: Vec::new(),
+            source_path: None,
         }
     }
 
@@ -115,7 +118,6 @@ impl Diff {
                     )
                 })
                 .for_each(|strg| s.push_str(&strg));
-            //s.push('\n');
         }
         s
     }
@@ -185,6 +187,7 @@ fn diff_crate_and_source(krate: PathBuf, source: &PathBuf) -> Diff {
     let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(&krate);
     let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(&source);
     let mut diff = Diff::new();
+    diff.source_path = Some(source.clone());
     diff.krate_name = source.iter().last().unwrap().to_str().unwrap().to_string();
     let files_of_source_paths: Vec<&PathBuf> =
         files_of_source.iter().map(|fws| &fws.path).collect();
@@ -253,4 +256,32 @@ pub(crate) fn verify_crates(
     } else {
         Err(bad_sources)
     }
+}
+
+pub(crate) fn clean_corrupted(
+    registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
+    diff_list: &Vec<Diff>,
+    dry_run: bool,
+) {
+    // hack because we need a &mut bool in remove_file()
+    let mut bool = false;
+
+    diff_list
+        .iter()
+        .filter_map(|diff| diff.source_path.as_ref())
+        .filter(|path| path.is_dir())
+        .for_each(|path| {
+            remove_file(
+                path,
+                dry_run,
+                &mut bool,
+                Some(format!("removing corrupted source: {}", path.display())), //TODO add msg here
+                &crate::remove::DryRunMessage::Default,
+                // we don't print a summary or anything (yet..)
+                None,
+            );
+        });
+
+    // just in case
+    registry_sources_caches.invalidate();
 }

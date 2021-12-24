@@ -89,7 +89,7 @@ cfg_if::cfg_if! {
         use crate::top_items_summary::*;
         use crate::clean_unref::*;
         use crate::cli::{CargoCacheCommands};
-        use crate::verify::*;
+        //use crate::verify;
     }
 }
 
@@ -469,9 +469,12 @@ fn main() {
                 eprintln!("Warning: there is nothing to be dry run!");
             }
         }
-        CargoCacheCommands::Verify => {
+        CargoCacheCommands::Verify {
+            clean_corrupted,
+            dry_run,
+        } => {
             println!("Verifying cache, this may take some time...\n");
-            if let Err(failed_verifications) = verify_crates(&mut registry_sources_caches) {
+            if let Err(failed_verifications) = verify::verify_crates(&mut registry_sources_caches) {
                 eprintln!("\n");
                 failed_verifications
                     .iter()
@@ -480,6 +483,15 @@ fn main() {
                     "\nFound {} possible corrupted sources.",
                     failed_verifications.len()
                 );
+
+                if clean_corrupted {
+                    verify::clean_corrupted(
+                        &mut registry_sources_caches,
+                        &failed_verifications,
+                        dry_run,
+                    );
+                }
+
                 std::process::exit(1)
             } else {
                 std::process::exit(0);
