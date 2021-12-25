@@ -1,70 +1,71 @@
 [package]
-authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
-build = "src/build.rs"
-categories = ["command-line-utilities", "development-tools::cargo-plugins", "development-tools"]
-description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively"
-edition = "2021"
-homepage = "https://github.com/matthiaskrgr/cargo-cache"
-keywords = ["cargo", "cache", "cli", "manage", "cargo-home"]
-license = "MIT/Apache-2.0"
 name = "cargo-cache"
-readme = "README.md"
+version = "0.7.0"
+authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
+description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively"
+homepage = "https://github.com/matthiaskrgr/cargo-cache"
 repository = "https://github.com/matthiaskrgr/cargo-cache"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+keywords = ["cargo", "cache", "cli", "manage", "cargo-home"]
+categories = ["command-line-utilities", "development-tools::cargo-plugins", "development-tools"]
+build = "src/build.rs"
+edition = "2021"
 resolver = "2"
 rust-version = "1.56"
-version = "0.7.0"
 
 [features]
+default = ["cargo_metadata", "chrono", "clap", "dirs-next", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir", "tar", "flate2"]
 bench = [] # run benchmarks
 ci-autoclean = [] # minimal implementation that builds fast for CI
-default = ["cargo_metadata", "chrono", "clap", "dirs-next", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir", "tar", "flate2"]
-offline_tests = [] # only run tests that do not require internet connection
+offline_tests =  [] # only run tests that do not require internet connection
 # some details: https://github.com/NixOS/nixpkgs/pull/77310
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
-cargo_metadata = {version = "0.14.1", optional = true}# get crate package name
+cargo_metadata = { version = "0.14.1", optional = true } # get crate package name
 
 # https://github.com/alexcrichton/cfg-if
-cfg-if = {version = "1.0.0"}# if cfg(..)  { ...  }
+cfg-if = { version = "1.0.0" } # if cfg(..)  { ...  }
 
 # https://github.com/chronotope/chrono
-chrono = {version = "0.4.19", optional = true}# compare dates etc
+chrono = { version = "0.4.19", optional = true } # compare dates etc
 
 # https://github.com/kbknapp/clap-rs
 clap = {version = "3.0.0-rc.7", features = ["wrap_help"], optional = true}# cmdline arg parsing
 
 # https://github.com/xdg-rs/dirs
-dirs-next = {version = "2.0.0", optional = true}# get cache dirs to look for sccache cache
+dirs-next = { version = "2.0.0", optional = true } # get cache dirs to look for sccache cache
 
 # https://github.com/rust-lang/flate2-rs
 flate2 = {version = "1.0.22", optional = true}# look into gzs
 
 # https://github.com/alexcrichton/git2-rs
-git2 = {version = "0.13.22", default-features = false, optional = true, features = ["vendored-libgit2"]}# check if repo is git repo
+git2 = { version = "0.13.22", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
 
 # https://github.com/brson/home
 home = "0.5.3" # get CARGO_HOME
 
 # https://github.com/LeopoldArkham/humansize
-humansize = {version = "1.1.0", optional = true}# convert digits of bytes to human readable size
+humansize = { version = "1.1.0", optional = true } # convert digits of bytes to human readable size
 
 # https://github.com/rayon-rs/rayon
-rayon = {version = "1.5.0", optional = true}# parallelize iterators
+rayon = { version = "1.5.0", optional = true } # parallelize iterators
 
 # https://github.com/rust-lang/regex
-regex = {version = "1.4.2", optional = true}# use regex for matching
+regex = { version = "1.4.2", optional = true } # use regex for matching
 
 # https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = {version = "0.7.0"}# remove_dir_all on windows
+remove_dir_all = { version = "0.7.0" } # remove_dir_all on windows
 
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
-rustc_tools_util = {version = "0.2.0", optional = true}# git version information
+rustc_tools_util = { version = "0.2.0", optional = true } # git version information
 
 # https://github.com/alexcrichton/tar-rs
-tar = {version = "0.4.38", optional = true}# extract tars
+tar = { version = "0.4.38", optional = true } # extract tars
 
 # https://github.com/BurntSushi/walkdir
-walkdir = {version = "2.3.1", optional = true}# walk content of directory/CARGO_HOME recursively
+walkdir = { version = "2.3.1", optional = true } # walk content of directory/CARGO_HOME recursively
+
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
@@ -84,20 +85,20 @@ tempfile = "3.1.0" # create and rm temporary directories for tests
 rustc_tools_util = "0.2.0" # git version information
 
 [[bin]]
-bench = true
 name = "cargo-cache"
 path = "src/main.rs"
 test = true
+bench = true
 
 [badges]
 #travis-ci = { repository = "matthiaskrgr/cargo-cache", branch = "master" }
 
 [profile.release]
-codegen-units = 8
-incremental = true
-lto = "thin"
-
-[profile.bench]
+lto = true
 codegen-units = 1
 incremental = false
+
+[profile.bench]
 lto = true
+codegen-units = 1
+incremental = false
