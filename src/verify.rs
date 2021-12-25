@@ -18,15 +18,13 @@ struct FileWithSize {
 }
 
 impl FileWithSize {
-    fn from_disk(path_orig: &Path) -> Self {
+    fn from_disk(path_orig: &Path, krate_root: &OsStr) -> Self {
         // we need to cut off .cargo/registry/src/github.com-1ecc6299db9ec823/
         let index = path_orig
             .iter()
             .enumerate()
-            .position(|e| e.1 == OsStr::new("github.com-1ecc6299db9ec823").to_os_string())
-            // @TODO fix this to be dynamic
-            .unwrap()
-            + 1;
+            .position(|e| e.1 == krate_root.to_os_string())
+            .unwrap();
 
         let path = path_orig.iter().skip(index).collect::<PathBuf>();
 
@@ -169,6 +167,7 @@ fn sizes_of_archive_files(path: &PathBuf) -> Vec<FileWithSize> {
 
 /// get the files and their sizes of the extracted .crate sources
 fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
+    let krate_root = source.iter().last().unwrap();
     WalkDir::new(source)
         .into_iter()
         .map(Result::unwrap)
@@ -178,7 +177,7 @@ fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
             let p = direntry.path();
             p.to_owned()
         })
-        .map(|p| FileWithSize::from_disk(&p))
+        .map(|p| FileWithSize::from_disk(&p, &krate_root))
         .collect()
 }
 
