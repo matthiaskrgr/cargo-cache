@@ -159,6 +159,8 @@ jobs:
         run: cargo cache --info
       - name: run "cargo cache --list-dirs"
         run: cargo cache --list-dirs
+      - name: run "cargo cache verify"
+        run: cargo cache verify
       - name: run "cargo cache --keep-duplicate-crates 10 --dry-run"
         run: cargo cache --keep-duplicate-crates 10 --dry-run
       - name: run "cargo cache --keep-duplicate-crates 1  --dry-run"
