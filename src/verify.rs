@@ -274,7 +274,7 @@ pub(crate) fn clean_corrupted(
                 path,
                 dry_run,
                 &mut bool,
-                Some(format!("removing corrupted source: {}", path.display())), //TODO add msg here
+                Some(format!("removing corrupted source: {}", path.display())),
                 &crate::remove::DryRunMessage::Default,
                 // we don't print a summary or anything (yet..)
                 None,
