@@ -490,6 +490,8 @@ fn main() {
                         &failed_verifications,
                         dry_run,
                     );
+                } else {
+                    println!("Hint: use `cargo cache verify --clean-corrupted` to remove them.");
                 }
 
                 std::process::exit(1)
