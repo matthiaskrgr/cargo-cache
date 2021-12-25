@@ -1,5 +1,11 @@
 ## Git
 ```
+Add new subcommand "verify"
+cargo cache verify  tries to check corrupted (modified) crate sources
+The command looks into the .crate archive and compares the contained files with the extracted sources.
+If we find files that are not the same size in both places, the source is considered corrupted.
+cargo cache verify --clean-corrupted will automatically remove the corrupted sources. (supports --dry-run as well)
+
 Upgrade from clap 2.33.3 to 3.0.0
 If you notice any change in behaviour that is not listed here, please let me know!
 

@@ -41,6 +41,10 @@ pub(crate) enum CargoCacheCommands<'a> {
     },
     //Debug,
     Version,
+    Verify {
+        clean_corrupted: bool,
+        dry_run: bool,
+    },
     Query {
         query_config: &'a ArgMatches,
     }, // subcommand
@@ -168,6 +172,13 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
             arg_older: config.value_of("remove-if-younger-than"),
             arg_younger: config.value_of("remove-if-older-than"),
             dirs: config.value_of("remove-dir"),
+        }
+    } else if let Some(verify_cfg) = config.subcommand_matches("verify") {
+        let dry_run2: bool = verify_cfg.is_present("dry-run") || config.is_present("dry-run");
+        let clean_corrupted: bool = verify_cfg.is_present("clean-corrupted");
+        CargoCacheCommands::Verify {
+            clean_corrupted,
+            dry_run: dry_run2,
         }
     } else if dry_run {
         // none of the flags that do on-disk changes are present
@@ -368,6 +379,21 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     // </trim>
     let toolchain = App::new("toolchain").about("print stats on installed toolchains");
+
+    // <verify>
+
+    let clean_corrupted = Arg::new("clean-corrupted")
+        .long("clean-corrupted")
+        .short('c')
+        .help("automatically remove corrupted cache entrys");
+
+    let verify = App::new("verify")
+        .about("verify crate sources")
+        .arg(&dry_run)
+        .arg(&clean_corrupted);
+
+    // </verify>
+
     // now thread all of these together
 
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
@@ -392,6 +418,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .subcommand(clean_unref.clone())
         .subcommand(toolchain.clone())
         .subcommand(trim.clone())
+        .subcommand(verify.clone())
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -426,6 +453,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .subcommand(clean_unref)
         .subcommand(toolchain.clone())
         .subcommand(trim)
+        .subcommand(verify)
         .arg(&list_dirs)
         .arg(&remove_dir)
         .arg(&gc_repos)
@@ -526,7 +554,8 @@ SUBCOMMANDS:
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
     toolchain      print stats on installed toolchains
-    trim           trim old items from the cache until maximum cache size limit is reached\n",
+    trim           trim old items from the cache until maximum cache size limit is reached
+    verify         verify crate sources\n",
         );
         assert_eq!(help_desired, help_real);
     }
@@ -605,7 +634,8 @@ SUBCOMMANDS:
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
     toolchain      print stats on installed toolchains
-    trim           trim old items from the cache until maximum cache size limit is reached\n",
+    trim           trim old items from the cache until maximum cache size limit is reached
+    verify         verify crate sources\n",
         );
 
         assert_eq!(help_desired, help_real);
