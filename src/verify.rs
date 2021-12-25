@@ -122,7 +122,7 @@ impl Diff {
 }
 
 /// take a path to an extracted .crate source and map it to the corresponding .carte archive path
-fn map_src_path_to_cache_path(src_path: &PathBuf) -> PathBuf {
+fn map_src_path_to_cache_path(src_path: &Path) -> PathBuf {
     // for each directory, find the path to the corresponding .crate archive
     // .cargo/registry/src/github.com-1ecc6299db9ec823/bytes-0.4.12
     // corresponds to
@@ -149,7 +149,7 @@ fn map_src_path_to_cache_path(src_path: &PathBuf) -> PathBuf {
 
 /// look into the .gz archive and get all the contained files+sizes
 
-fn sizes_of_archive_files(path: &PathBuf) -> Vec<FileWithSize> {
+fn sizes_of_archive_files(path: &Path) -> Vec<FileWithSize> {
     let tar_gz = File::open(path).unwrap();
     // extract the tar
     let tar = GzDecoder::new(tar_gz);
@@ -166,7 +166,7 @@ fn sizes_of_archive_files(path: &PathBuf) -> Vec<FileWithSize> {
 }
 
 /// get the files and their sizes of the extracted .crate sources
-fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
+fn sizes_of_src_dir(source: &Path) -> Vec<FileWithSize> {
     let krate_root = source.iter().last().unwrap();
     WalkDir::new(source)
         .into_iter()
@@ -177,16 +177,16 @@ fn sizes_of_src_dir(source: &PathBuf) -> Vec<FileWithSize> {
             let p = direntry.path();
             p.to_owned()
         })
-        .map(|p| FileWithSize::from_disk(&p, &krate_root))
+        .map(|p| FileWithSize::from_disk(&p, krate_root))
         .collect()
 }
 
 /// compare files of a .crate gz archive and extracted sources and return a Diff object which describes those changes
-fn diff_crate_and_source(krate: PathBuf, source: &PathBuf) -> Diff {
-    let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(&krate);
-    let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(&source);
+fn diff_crate_and_source(krate: &Path, source: &Path) -> Diff {
+    let files_of_archive: Vec<FileWithSize> = sizes_of_archive_files(krate);
+    let files_of_source: Vec<FileWithSize> = sizes_of_src_dir(source);
     let mut diff = Diff::new();
-    diff.source_path = Some(source.clone());
+    diff.source_path = Some(source.to_path_buf());
     diff.krate_name = source.iter().last().unwrap().to_str().unwrap().to_string();
     let files_of_source_paths: Vec<&PathBuf> =
         files_of_source.iter().map(|fws| &fws.path).collect();
@@ -241,7 +241,7 @@ pub(crate) fn verify_crates(
         // we need both the .crate and the directory to exist for verification
         .filter(|(source, krate)| source.exists() && krate.exists())
         // look into the .gz archive and get all the contained files+sizes
-        .map(|(source, krate)| diff_crate_and_source(krate, source))
+        .map(|(source, krate)| diff_crate_and_source(&krate, source))
         // save only the "bad" packages
         .filter(|diff| !diff.is_ok())
         .map(|diff| {
@@ -259,7 +259,7 @@ pub(crate) fn verify_crates(
 
 pub(crate) fn clean_corrupted(
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
-    diff_list: &Vec<Diff>,
+    diff_list: &[Diff],
     dry_run: bool,
 ) {
     // hack because we need a &mut bool in remove_file()
