@@ -284,3 +284,23 @@ pub(crate) fn clean_corrupted(
     // just in case
     registry_sources_caches.invalidate();
 }
+
+#[cfg(test)]
+mod verification_tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_map_src_path_to_cache_path() {
+        let old_src_path = PathBuf::from(
+            "/home/matthias/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-0.4.12",
+        );
+        let new_archive_path = PathBuf::from(
+            "/home/matthias/.cargo/registry/cache/github.com-1ecc6299db9ec823/bytes-0.4.12.crate",
+        );
+
+        let new = map_src_path_to_cache_path(&old_src_path);
+
+        assert_eq!(new, new_archive_path);
+    }
+}

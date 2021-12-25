@@ -554,7 +554,8 @@ SUBCOMMANDS:
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
     toolchain      print stats on installed toolchains
-    trim           trim old items from the cache until maximum cache size limit is reached\n",
+    trim           trim old items from the cache until maximum cache size limit is reached
+    verify         verify crate sources\n",
         );
         assert_eq!(help_desired, help_real);
     }
@@ -633,7 +634,8 @@ SUBCOMMANDS:
     sc             gather stats on a local sccache cache
     sccache        gather stats on a local sccache cache
     toolchain      print stats on installed toolchains
-    trim           trim old items from the cache until maximum cache size limit is reached\n",
+    trim           trim old items from the cache until maximum cache size limit is reached
+    verify         verify crate sources\n",
         );
 
         assert_eq!(help_desired, help_real);
