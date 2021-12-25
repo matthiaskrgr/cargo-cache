@@ -6,15 +6,14 @@ The command looks into the .crate archive and compares the contained files with 
 If we find files that are not the same size in both places, the source is considered corrupted.
 cargo cache verify --clean-corrupted will automatically remove the corrupted sources. (supports --dry-run as well)
 
-
-Upgrade to from clap 2.33.3 to 3.0.0
+Upgrade from clap 2.33.3 to 3.0.0
 If you notice any change in behaviour that is not listed here, please let me know!
-Cli: removed "cargo cache query -h" for --human-readable because it was ambiguous with -h of --help.
 
+Cli: removed "cargo cache query -h" for --human-readable because it was ambiguous with -h of --help.
 
 Cli: fix bugs where I was implementing a subcommand cargo-cache foo but then actually checking for it as an argument cargo ceche --foo
 or vice versa.
-Found during upgrade to clap v3
+Found during migration to clap v3
 ```
 
 ## Version 0.7.0 (ab0166b)
