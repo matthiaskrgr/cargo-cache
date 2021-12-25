@@ -221,6 +221,7 @@ fn diff_crate_and_source(krate: &Path, source: &Path) -> Diff {
         .filter(|path| !path.is_dir() /* skip dirs */)
     {
         // dbg!(source_file);
+        #[allow(clippy::implicit_clone)]
         if !files_of_archive.iter().any(|path| path == source_file) {
             diff.additional_files_in_checkout
                 .push(source_file.to_path_buf());
