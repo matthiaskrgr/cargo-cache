@@ -174,11 +174,11 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
             dirs: config.value_of("remove-dir"),
         }
     } else if let Some(verify_cfg) = config.subcommand_matches("verify") {
-        let dry_run: bool = verify_cfg.is_present("dry-run");
+        let dry_run2: bool = verify_cfg.is_present("dry-run") || config.is_present("dry-run");
         let clean_corrupted: bool = verify_cfg.is_present("clean-corrupted");
         CargoCacheCommands::Verify {
             clean_corrupted,
-            dry_run,
+            dry_run: dry_run2,
         }
     } else if dry_run {
         // none of the flags that do on-disk changes are present
