@@ -385,7 +385,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
     let clean_corrupted = Arg::new("clean-corrupted")
         .long("clean-corrupted")
         .short('c')
-        .help("automatically remove corrupted cache entrys");
+        .help("automatically remove corrupted cache entries");
 
     let verify = App::new("verify")
         .about("verify crate sources")
