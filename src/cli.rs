@@ -451,7 +451,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .subcommand(sccache)
         .subcommand(sccache_short)
         .subcommand(clean_unref)
-        .subcommand(toolchain.clone())
+        .subcommand(toolchain)
         .subcommand(trim)
         .subcommand(verify)
         .arg(&list_dirs)
