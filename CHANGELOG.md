@@ -1,4 +1,8 @@
-## Version 0.8.0
+## Git
+```
+```
+
+## Version 0.8.0 (e36f9df)
 ```
 Add new subcommand "verify"
 cargo cache verify  tries to check corrupted (modified) crate sources
