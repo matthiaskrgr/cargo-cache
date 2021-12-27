@@ -80,6 +80,7 @@ dependencies = [
  "rustc_tools_util",
  "tar",
  "tempfile",
+ "unicode-normalization",
  "walkdir",
 ]
 

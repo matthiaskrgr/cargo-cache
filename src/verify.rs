@@ -17,19 +17,27 @@ struct FileWithSize {
     size: u64,
 }
 
+fn normalized(path: PathBuf) -> PathBuf {
+    use unicode_normalization::{is_nfkc, UnicodeNormalization};
+    match path.to_str() {
+        Some(path) if !is_nfkc(path) => path.chars().nfc().collect::<String>().into(),
+        _ => path,
+    }
+}
+
 impl FileWithSize {
     fn from_disk(path_orig: &Path, krate_root: &OsStr) -> Self {
         // we need to cut off .cargo/registry/src/github.com-1ecc6299db9ec823/
         let index = path_orig
             .iter()
             .enumerate()
-            .position(|e| e.1 == krate_root.to_os_string())
-            .unwrap();
+            .position(|e| e.1 == krate_root)
+            .expect("must find cargo root in path contained within it");
 
         let path = path_orig.iter().skip(index).collect::<PathBuf>();
 
         FileWithSize {
-            path,
+            path: normalized(path),
             size: std::fs::metadata(path_orig).unwrap().len(),
         }
     }
@@ -37,7 +45,7 @@ impl FileWithSize {
     // TODO: understand this R: Read stuff
     fn from_archive<R: std::io::Read>(entry: &tar::Entry<'_, R>) -> Self {
         FileWithSize {
-            path: entry.path().unwrap().into_owned(),
+            path: normalized(entry.path().unwrap().into_owned()),
             size: entry.size(),
         }
     }
