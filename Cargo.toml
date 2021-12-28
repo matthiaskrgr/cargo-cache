@@ -1,6 +1,6 @@
 [package]
 name = "cargo-cache"
-version = "0.8.0"
+version = "0.8.1"
 authors = ["Matthias Krüger <matthias.krueger@famsik.de>"]
 description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively"
 homepage = "https://github.com/matthiaskrgr/cargo-cache"
@@ -63,6 +63,7 @@ rustc_tools_util = { version = "0.2.0", optional = true } # git version informat
 # https://github.com/alexcrichton/tar-rs
 tar = { version = "0.4.38", optional = true } # extract tars
 
+# https://github.com/unicode-rs/unicode-normalization
 unicode-normalization = { version = "0.1.19" } # handle nfc paths
 
 # https://github.com/BurntSushi/walkdir

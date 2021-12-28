@@ -1,5 +1,9 @@
-## Git
+## Version 0.8.1
 ```
+Fix: 'verify' incorrectly determines paths as missing due to different unicode representations. (#113 / #114)
+
+New deps:
+	unicode-normalization 0.1.19
 ```
 
 ## Version 0.8.0 (e36f9df)
@@ -18,6 +22,10 @@ Cli: removed "cargo cache query -h" for --human-readable because it was ambiguou
 Cli: fix bugs where I was implementing a subcommand cargo-cache foo but then actually checking for it as an argument cargo ceche --foo
 or vice versa.
 Found during migration to clap v3
+
+New deps:
+	flate2 1.0.22
+	tar 0.4.38
 ```
 
 ## Version 0.7.0 (ab0166b)

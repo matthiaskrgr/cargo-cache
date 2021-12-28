@@ -17,6 +17,7 @@ struct FileWithSize {
     size: u64,
 }
 
+// #113 'verify' incorrectly determines paths as missing due to different unicode representations.
 fn normalized(path: PathBuf) -> PathBuf {
     use unicode_normalization::{is_nfkc, UnicodeNormalization};
     match path.to_str() {
