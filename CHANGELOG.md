@@ -1,4 +1,8 @@
-## Version 0.8.1
+## Git
+```
+```
+
+## Version 0.8.1 (1fcffbb)
 ```
 Fix: 'verify' incorrectly determines paths as missing due to different unicode representations. (#113 / #114)
 
