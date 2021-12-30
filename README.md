@@ -169,6 +169,7 @@ To make use of this, you can add these commands to your ci:
 cargo install (--git git://github.com/matthiaskrgr/cargo-cache OR cargo-cache) --no-default-features --features ci-autoclean cargo-cache
 cargo-cache # no further arguments required
 ````
+You can add the `vendored-libgit` feature if you would like to link libgit statically into cargo-cache.
 
 #### FAQ
 Q: Is this project related to [sccache](https://github.com/mozilla/sccache)?
