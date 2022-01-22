@@ -49,6 +49,9 @@
     clippy::unnecessary_wraps,
     clippy::unnested_or_patterns,
 //   clippy::wildcard_enum_match_arm // too many FPS for _ => unreachable!()
+    clippy::index_refutable_slice,
+    clippy::return_self_not_must_use,
+    // clippy::string_slice, // fixme!
 )]
 // suppress these warnings:
 // #![allow(clippy::redundant_pub_crate)] // conflicts with unreachable_pub
