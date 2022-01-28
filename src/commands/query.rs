@@ -135,11 +135,11 @@ fn registry_source_cache_to_file(path: &Path) -> File<'_> {
     }
 }
 
-fn sort_files_by_name(v: &mut Vec<File<'_>>) {
+fn sort_files_by_name(v: &mut [File<'_>]) {
     v.sort_by_key(|f| f.name.clone() /* @TODO: don't clone*/);
 }
 
-fn sort_files_by_size(v: &mut Vec<File<'_>>) {
+fn sort_files_by_size(v: &mut [File<'_>]) {
     v.sort_by_key(|f| f.size);
 }
 
