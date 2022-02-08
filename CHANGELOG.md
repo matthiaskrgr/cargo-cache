@@ -1,4 +1,9 @@
-## Version 0.8.2
+## Git
+```
+
+```
+
+## Version 0.8.2 (b7bf4f4)
 ```
 Fix build with nightly rustc 1.60.0-nightly (734368a20 2022-02-07)
 unreachable!("{}") is no longer accepted: https://github.com/rust-lang/rust/issues/92137
