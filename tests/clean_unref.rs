@@ -182,7 +182,7 @@ fn test_clean_unref() {
         .zip(wanted_output)
         .enumerate()
         .for_each(|(i, (is, wanted))| {
-            let regex = Regex::new(&wanted);
+            let regex = Regex::new(wanted);
             assert!(
                 regex.clone().unwrap().is_match(&cc_output),
                 "\n\nline {i}\n\n, regex:\n{:?}
