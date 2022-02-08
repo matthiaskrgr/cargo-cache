@@ -162,7 +162,7 @@ fn test_clean_unref() {
     let mut desired_output = String::from("Cargo cache .*clean_unref_CARGO_HOME.*:\n\n");
     desired_output.push_str(
         "Total:                          .* MB
-  0 installed binaries:             0  B
+  0 installed binaries:           * 0  B
   Registry:                     .* MB
     Registry index:             .* MB
     1 crate archives:           .* KB
@@ -172,16 +172,23 @@ fn test_clean_unref() {
     1 git repo checkouts:       .* KB",
     );
 
-    let regex = Regex::new(&desired_output);
-
     dbg!(&cc_output);
     dbg!(&desired_output);
 
-    assert!(
-        regex.clone().unwrap().is_match(&cc_output),
-        "regex:\n{:?}
-cc_output:\n{}",
-        regex,
-        cc_output
-    );
+    let cargo_cache_output_iter = cc_output.lines();
+    let wanted_output = desired_output.lines();
+    eprintln!("\n\n\n\n");
+    cargo_cache_output_iter
+        .zip(wanted_output)
+        .enumerate()
+        .for_each(|(i, (is, wanted))| {
+            let regex = Regex::new(&wanted);
+            assert!(
+                regex.clone().unwrap().is_match(&cc_output),
+                "\n\nline {i}\n\n, regex:\n{:?}
+            cc_output:\n{}\n\n",
+                regex.unwrap(),
+                is
+            );
+        });
 }
