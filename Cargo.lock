@@ -60,7 +60,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-cache"
-version = "0.8.1"
+version = "0.8.2"
 dependencies = [
  "cargo_metadata",
  "cfg-if",
