@@ -185,8 +185,9 @@ fn test_clean_unref() {
             let regex = Regex::new(wanted);
             assert!(
                 regex.clone().unwrap().is_match(&cc_output),
-                "\n\nline {i}\n\n, regex:\n{:?}
+                "\n\nline {}\n\n, regex:\n{:?}
             cc_output:\n{}\n\n",
+                i,
                 regex.unwrap(),
                 is
             );
