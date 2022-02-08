@@ -176,7 +176,7 @@ pub(crate) fn remove_files_by_dates(
         (None, Some(younger)) => AgeRelation::FileYoungerThanDate(younger),
         (Some(older), None) => AgeRelation::FileOlderThanDate(older),
         (Some(_older), Some(_younger)) => {
-            unreachable!("passing both, --remove-if-{older,younger}-than was temporarily disabled!")
+            unreachable!("{}", "passing both, --remove-if-{older,younger}-than was temporarily disabled!")
         } // (Some(older), Some(younger)) => DateComparison::OlderOrYounger(older, younger),
     };
 

@@ -1,8 +1,10 @@
 ## Git
 ```
+Fix build with nightly.
+unreachable!("{}") is no longer accepted: https://github.com/rust-lang/rust/issues/92137
+
 Build: add "ventored-libgit" feature that enables libgit2 vendoring (statically link libgit2 into cargo-cache instead of linking agaist the system libgit2)
 The feature is on by default but it can be skipped (using --no-default-features) by distributors who would like cargo-cache to link against system libgit2
-
 ```
 
 ## Version 0.8.1 (1fcffbb)
