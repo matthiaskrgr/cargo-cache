@@ -1,6 +1,6 @@
 ## Git
 ```
-Fix build with nightly.
+Fix build with nightly rustc 1.60.0-nightly (734368a20 2022-02-07)
 unreachable!("{}") is no longer accepted: https://github.com/rust-lang/rust/issues/92137
 
 Build: add "ventored-libgit" feature that enables libgit2 vendoring (statically link libgit2 into cargo-cache instead of linking agaist the system libgit2)
