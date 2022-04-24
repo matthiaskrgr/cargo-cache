@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -232,14 +233,16 @@ pub(crate) fn registry_pkg_cache_stats(
         return stdout;
     }
 
-    stdout.push_str(&format!(
-        "\nSummary of: {} ({} total)\n",
+    writeln!(
+        stdout,
+        "\nSummary of: {} ({} total)",
         path.display(),
         registry_pkg_caches
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
 
     let file_descs: Vec<FileDesc> = file_desc_list_from_path(registry_pkg_caches);
     let summary: Vec<RgchInfo> = stats_from_file_desc_list(file_descs);

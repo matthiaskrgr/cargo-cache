@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -17,7 +18,6 @@ use crate::library::Error;
 use clap::ArgMatches;
 use humansize::{file_size_opts, FileSize};
 use rayon::prelude::*;
-
 use regex::Regex;
 use walkdir::WalkDir;
 
@@ -218,7 +218,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -232,7 +232,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
             // bare git repos
@@ -245,7 +245,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -259,7 +259,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -273,7 +273,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
         }
@@ -289,7 +289,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -303,7 +303,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -317,7 +317,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -331,7 +331,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
 
@@ -345,7 +345,7 @@ pub(crate) fn run_query(
                     } else {
                         b.size.to_string()
                     };
-                    output.push_str(&format!("\t{}: {}\n", b.name, size));
+                    writeln!(output, "\t{}: {}", b.name, size).unwrap();
                 });
             }
         }

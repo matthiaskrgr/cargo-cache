@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -244,14 +245,16 @@ pub(crate) fn git_repos_bare_stats(
         return output;
     }
 
-    output.push_str(&format!(
-        "\nSummary of: {} ({} total)\n",
+    writeln!(
+        output,
+        "\nSummary of: {} ({} total)",
         path.display(),
         bare_repos_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
 
     let collections_vec = file_desc_from_path(bare_repos_cache);
     let summary: Vec<RepoInfo> = stats_from_file_desc_list(collections_vec);

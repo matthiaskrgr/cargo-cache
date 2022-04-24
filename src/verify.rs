@@ -1,4 +1,5 @@
 use std::ffi::OsStr;
+use std::fmt::Write as _;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
@@ -92,25 +93,29 @@ impl Diff {
     pub(crate) fn details(&self) -> String {
         let mut s = format!("Crate: {}\n", self.krate_name);
         if !self.files_missing_in_checkout.is_empty() {
-            s.push_str(&format!(
+            write!(
+                s,
                 "Missing from source:\n{}",
                 self.files_missing_in_checkout
                     .iter()
                     .map(|path| path.display().to_string())
                     .collect::<Vec<String>>()
                     .join(", ")
-            ));
+            )
+            .unwrap();
             s.push('\n');
         }
         if !self.additional_files_in_checkout.is_empty() {
-            s.push_str(&format!(
+            write!(
+                s,
                 "Not found in archive/additional:\n{}",
                 self.additional_files_in_checkout
                     .iter()
                     .map(|path| path.display().to_string())
                     .collect::<Vec<String>>()
                     .join(", ")
-            ));
+            )
+            .unwrap();
             s.push('\n');
         }
         if !self.files_size_difference.is_empty() {

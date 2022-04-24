@@ -25,6 +25,7 @@
 /// ````
 use std::env;
 use std::ffi::OsStr;
+use std::fmt::Write as _;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
@@ -115,10 +116,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
 
     let mut lines = Vec::new();
 
-    stdout.push_str(&format!(
-        "Project {:?}\n",
-        metadata.workspace_root.to_string()
-    ));
+    writeln!(stdout, "Project {:?}", metadata.workspace_root.to_string()).unwrap();
 
     // If there is no target dir, we can quit
     if !target_dir.exists() {
@@ -126,7 +124,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         eprintln!("{}", stdout);
     }
 
-    stdout.push_str(&format!("Target dir: {}\n\n", target_dir.display()));
+    writeln!(stdout, "Target dir: {}\n", target_dir.display()).unwrap();
     lines.push(TableLine::new(0, &"Total Size: ", &size_hr));
 
     // we are going to check these directories:

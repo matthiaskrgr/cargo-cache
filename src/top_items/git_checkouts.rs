@@ -7,11 +7,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::cache::*;
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::cache::caches::Cache;
+use crate::cache::*;
 use crate::tables::format_table;
 use crate::top_items::common::{dir_exists, FileDesc, Pair};
 
@@ -258,14 +259,16 @@ pub(crate) fn git_checkouts_stats(
         return output;
     }
 
-    output.push_str(&format!(
-        "\nSummary of: {} ({} total)\n",
+    writeln!(
+        output,
+        "\nSummary of: {} ({} total)",
         path.display(),
         checkouts_cache
             .total_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
 
     let collections_vec = file_desc_from_path(checkouts_cache);
     let summary: Vec<ChkInfo> = stats_from_file_desc_list(collections_vec);

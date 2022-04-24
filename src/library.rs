@@ -9,6 +9,7 @@
 
 /// This file provides core logic of the crate
 use std::fmt;
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -524,56 +525,68 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     let mut strn = String::with_capacity(1500);
 
     if let Ok(cache_path) = std::env::var("CARGO_HOME") {
-        strn.push_str(&format!(
-            "${{CARGO_HOME}} env var set to '{}', using that!\n",
+        writeln!(
+            strn,
+            "${{CARGO_HOME}} env var set to '{}', using that!",
             cache_path
-        ));
+        )
+        .unwrap();
     } else {
-        strn.push_str(&format!(
-            "Default cache dir found: '{}', using that!\n",
+        writeln!(
+            strn,
+            "Default cache dir found: '{}', using that!",
             c.cargo_home.display()
-        ));
+        )
+        .unwrap();
     };
 
     strn.push('\n');
 
-    strn.push_str(&format!(
-        "Total cache size: {}\n\n",
+    writeln!(
+        strn,
+        "Total cache size: {}\n",
         s.total_size().file_size(file_size_opts::DECIMAL).unwrap()
-    ));
+    )
+    .unwrap();
 
     strn.push_str(&c.bin_dir.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\t{} binaries installed in binary directory, total size: {}\n",
+    writeln!(
+        strn,
+        "\t{} binaries installed in binary directory, total size: {}",
         s.numb_bins(),
         s.total_bin_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tThese are the binaries installed via 'cargo install'.\n");
     strn.push_str("\tUse 'cargo uninstall' to remove binaries if needed.\n");
     strn.push('\n');
 
     strn.push_str(&c.registry.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\tRegistry root dir, size: {}\n",
+    writeln!(
+        strn,
+        "\tRegistry root dir, size: {}",
         s.total_reg_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tCrate registries are stored here.\n");
     strn.push('\n');
 
     strn.push_str(&c.registry_index.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\tRegistry index, size: {}\n",
+    writeln!(
+        strn,
+        "\tRegistry index, size: {}",
         s.total_reg_index_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tA git repo holding information on what crates are available.\n");
     strn.push_str("\tWill be recloned as needed.\n");
 
@@ -582,12 +595,14 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     // source archives are extracted here, will be reextracted from the downloaded source if removed
     strn.push_str(&c.registry_pkg_cache.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\tCrate source package archive, size: {}\n",
+    writeln!(
+        strn,
+        "\tCrate source package archive, size: {}",
         s.total_reg_cache_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
 
     strn.push_str("\tCrates source packages of the registries are downloaded into this folder.\n");
     strn.push_str("\tThey will be redownloaded as needed.\n");
@@ -596,36 +611,42 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     strn.push_str(&c.registry_sources.display().to_string());
     strn.push('\n');
 
-    strn.push_str(&format!(
-        "\tCrate sources, size: {}\n",
+    writeln!(
+        strn,
+        "\tCrate sources, size: {}",
         s.total_reg_src_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tSource archives are extracted into this dir.\n");
     strn.push_str("\tThey will be reextracted from the package archive as needed.\n");
     strn.push('\n');
 
     strn.push_str(&c.git_repos_bare.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\tGit database, size: {}\n",
+    writeln!(
+        strn,
+        "\tGit database, size: {}",
         s.total_git_repos_bare_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tBare repos of git dependencies are stored here.\n");
     strn.push_str("\tRemoved git repositories will be recloned as needed.\n");
     strn.push('\n');
 
     strn.push_str(&c.git_checkouts.display().to_string());
     strn.push('\n');
-    strn.push_str(&format!(
-        "\tGit repo checkouts, size: {}\n",
+    writeln!(
+        strn,
+        "\tGit repo checkouts, size: {}",
         s.total_git_chk_size()
             .file_size(file_size_opts::DECIMAL)
             .unwrap()
-    ));
+    )
+    .unwrap();
     strn.push_str("\tSpecific commits of the bare repos will be checked out into here.\n");
     strn.push_str("\tGit checkouts will be rechecked-out from repo database as needed.");
     //println!("{}", strn.len());
