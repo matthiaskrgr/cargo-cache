@@ -24,7 +24,11 @@ fn CARGO_HOME_subdirs_are_known() {
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
 
     //https://github.com/rust-lang/cargo/pull/10553
-    if version_output.contains("1.60") /*stable */ || version_output.contains("1.61") /* beta*/  {
+    let blacklist = ["1.56", "1.60", "1.61"];
+    if blacklist
+        .iter()
+        .any(|version| version_output.contains(version))
+    {
         return;
     }
 
@@ -121,7 +125,7 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git"));
-            assert!(x
+    assert!(x
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/CACHEDIR.TAG"));
