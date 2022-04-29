@@ -20,11 +20,11 @@ use walkdir::WalkDir;
 #[test]
 #[cfg_attr(feature = "offline_tests", ignore)]
 fn CARGO_HOME_subdirs_are_known() {
-    // stuff is inconsistent until cargo 0.41.0 hits stable
-    // https://github.com/rust-lang/cargo/commit/f7b29716ed0e2d67b38bee23e5acddfc11ea0952
     let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
-    if version_output.contains("1.40") {
+
+    //https://github.com/rust-lang/cargo/pull/10553
+    if version_output.contains("1.60") /*stable */ || version_output.contains("1.61") /* beta*/  {
         return;
     }
 
@@ -121,6 +121,10 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git"));
+            assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/CACHEDIR.TAG"));
     /* assert!(x
     .next()
     .unwrap()
@@ -140,6 +144,10 @@ fn CARGO_HOME_subdirs_are_known() {
         .next()
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/git/db/clippy_travis_test-"));
+    assert!(x
+        .next()
+        .unwrap()
+        .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry"));
     assert!(x
         .next()
         .unwrap()
