@@ -273,7 +273,7 @@ mod libtests {
 
     #[test]
     fn parse_dates() {
-        assert!(parse_date(&String::new()).is_err());
+        assert!(parse_date("").is_err());
         assert!(parse_date(&String::from("a")).is_err());
 
         assert!(parse_date(&String::from("01.01:2002")).is_err());
