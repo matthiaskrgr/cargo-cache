@@ -24,7 +24,7 @@ fn CARGO_HOME_subdirs_are_known() {
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
 
     //https://github.com/rust-lang/cargo/pull/10553
-    let blacklist = ["1.56", "1.60", "1.61"];
+    let blacklist = ["1.57", "1.60", "1.61"];
     if blacklist
         .iter()
         .any(|version| version_output.contains(version))
