@@ -12,7 +12,7 @@ categories = ["command-line-utilities", "development-tools::cargo-plugins", "dev
 build = "src/build.rs"
 edition = "2021"
 resolver = "2"
-rust-version = "1.56"
+rust-version = "1.57"
 
 [features]
 default = ["cargo_metadata", "chrono", "clap", "dirs-next", "git2", "humansize", "rayon", "regex", "rustc_tools_util", "walkdir", "tar", "flate2", "vendored-libgit"]

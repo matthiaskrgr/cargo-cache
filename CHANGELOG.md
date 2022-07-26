@@ -1,6 +1,6 @@
 ## Git
 ```
-
+MSRV: bump from 1.56 to 1.57
 ```
 
 ## Version 0.8.2 (b7bf4f4)
