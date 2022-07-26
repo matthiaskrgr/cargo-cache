@@ -23,7 +23,7 @@ offline_tests =  [] # only run tests that do not require internet connection
 # some details: https://github.com/NixOS/nixpkgs/pull/77310
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
-cargo_metadata = { version = "0.14.1", optional = true } # get crate package name
+cargo_metadata = { version = "0.15.0", optional = true } # get crate package name
 
 # https://github.com/alexcrichton/cfg-if
 cfg-if = { version = "1.0.0" } # if cfg(..)  { ...  }
@@ -41,7 +41,7 @@ dirs-next = { version = "2.0.0", optional = true } # get cache dirs to look for 
 flate2 = {version = "1.0.22", optional = true}# look into gzs
 
 # https://github.com/alexcrichton/git2-rs
-git2 = { version = "0.13.22", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
+git2 = { version = "0.14.4", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
 
 # https://github.com/brson/home
 home = "0.5.3" # get CARGO_HOME
@@ -73,7 +73,7 @@ walkdir = { version = "2.3.1", optional = true } # walk content of directory/CAR
 
 [dev-dependencies]
 # https://github.com/rhysd/path-slash
-path-slash = "0.1.3" # normalize windows paths
+path-slash = "0.2.0" # normalize windows paths
 
 # https://github.com/colin-kiegel/rust-pretty-assertions
 pretty_assertions = "1.0.0" # colored diff assertions

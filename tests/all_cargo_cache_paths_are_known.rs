@@ -69,7 +69,10 @@ fn CARGO_HOME_subdirs_are_known() {
     let walkdir = WalkDir::new(cargo_home).max_depth(3);
     let mut x = walkdir
         .into_iter()
-        .map(|x| x.unwrap().path().to_slash_lossy())
+        .map(|x| {
+            let x = x.unwrap();
+            x.path().to_slash_lossy().into_owned()
+        })
         .collect::<Vec<_>>();
 
     x.sort();
