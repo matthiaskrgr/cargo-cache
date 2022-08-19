@@ -1,6 +1,10 @@
 ## Git
 ```
 MSRV: bump from 1.56 to 1.57
+
+Fix panic when "cargo cache toolchain" runs on a system that does not have rust installed via rustup
+but instead via system distributor for example.
+Instead of crashing, display a nice info message: "Could not find any toolchains installed via rustup!" (#121)
 ```
 
 ## Version 0.8.2 (b7bf4f4)

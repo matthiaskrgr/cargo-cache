@@ -35,7 +35,11 @@ fn toolchains() -> Result<std::fs::ReadDir, library::Error> {
         p
     };
 
-    Ok(std::fs::read_dir(&toolchain_root).unwrap())
+    match std::fs::read_dir(&toolchain_root) {
+        Ok(readdir) => Ok(readdir),
+        // we might be on a system that has rust installed purley via package manager and not via rustup! (#121)
+        _ => Err(library::Error::NoRustupHome),
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -75,8 +79,16 @@ impl Toolchain {
 pub(crate) fn toolchain_stats() {
     // get a list of toolchains, sorted by size
     let toolchains = {
-        let mut tcs = toolchains()
-            .unwrap()
+        let toolchain_readdir = match toolchains() {
+            Ok(readdir) => readdir,
+            Err(library::Error::NoRustupHome) => {
+                eprintln!("Could not find any toolchains installed via rustup!");
+                std::process::exit(0);
+            }
+            Err(e) => unreachable!("encountered unexpected error: '{:?}'", e),
+        };
+
+        let mut tcs = toolchain_readdir
             .map(|dir| dir.unwrap().path())
             .map(Toolchain::new)
             .collect::<Vec<_>>();
