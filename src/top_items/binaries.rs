@@ -28,7 +28,7 @@ struct BinInfo {
 impl BinInfo {
     fn new(path: &Path) -> Self {
         let name = path.file_name().unwrap().to_str().unwrap().to_string();
-        let size = fs::metadata(&path)
+        let size = fs::metadata(path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
         Self { name, size }

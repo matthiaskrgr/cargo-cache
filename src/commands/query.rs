@@ -51,7 +51,7 @@ fn binary_to_file(path: &Path) -> File<'_> {
     File {
         path,
         name: path_to_name_unstemmed(path),
-        size: fs::metadata(&path)
+        size: fs::metadata(path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len(),
     }

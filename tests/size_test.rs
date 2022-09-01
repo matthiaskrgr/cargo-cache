@@ -70,7 +70,7 @@ fn build_and_check_size_test() {
     );
 
     // run it on the fake cargo cache dir
-    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", &fchp).output();
+    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", fchp).output();
     assert!(cargo_cache.is_ok(), "cargo cache failed to run");
     let cc_output = String::from_utf8_lossy(&cargo_cache.unwrap().stdout).into_owned();
     // we need to get the actual path to fake cargo home dir and make it an absolute path

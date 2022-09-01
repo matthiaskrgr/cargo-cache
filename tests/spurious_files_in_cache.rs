@@ -99,7 +99,7 @@ fn spurious_files_in_cache_test() {
     );
 
     // run it on the fake cargo cache dir
-    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", &fchp).output();
+    let cargo_cache = Command::new(bin_path()).env("CARGO_HOME", fchp).output();
     assert!(cargo_cache.is_ok(), "cargo cache failed to run");
     let cmd_out = &cargo_cache.unwrap();
     let cc_output = String::from_utf8_lossy(&cmd_out.stdout).into_owned();

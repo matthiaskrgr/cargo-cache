@@ -78,7 +78,7 @@ impl RepoInfo {
             let mut tmp_name = name_tmp.split('-').collect::<Vec<_>>();
             let _ = tmp_name.pop(); // remove the hash
             name = tmp_name.join("-"); // rejoin with "-"
-            size = fs::metadata(&path)
+            size = fs::metadata(path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
         } else {

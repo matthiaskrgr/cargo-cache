@@ -19,7 +19,7 @@ use std::process::Command;
 use walkdir::WalkDir;
 
 fn dir_size(path: &Path) -> u64 {
-    WalkDir::new(&path)
+    WalkDir::new(path)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
         .filter(|f| f.exists()) // avoid broken symlinks
@@ -103,8 +103,8 @@ fn remove_dirs() {
         println!("CARGO HOME: {:?}", tmp_cargo_home.path());
 
         let cargo_cache = Command::new(bin_path())
-            .env("CARGO_HOME", &tmp_cargo_home.path())
-            .args(&["--remove-dir", param])
+            .env("CARGO_HOME", tmp_cargo_home.path())
+            .args(["--remove-dir", param])
             .output();
         assert!(cargo_cache.is_ok(), "cargo cache failed to run");
         assert!(
@@ -117,7 +117,7 @@ fn remove_dirs() {
 
         let cargo_cache = Command::new(bin_path())
             .env("CARGO_HOME", &cargo_home_path)
-            .args(&["--remove-dir", param])
+            .args(["--remove-dir", param])
             .output();
         assert!(cargo_cache.is_ok(), "cargo cache failed to run");
         assert!(

@@ -46,7 +46,7 @@ fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
         Ok((0, 0))
     } else {
         // validate that the directory is a git repo
-        let repo = match git2::Repository::open(&path) {
+        let repo = match git2::Repository::open(path) {
             Ok(repo) => repo,
             Err(_e) => return Err(Error::GitRepoNotOpened(path.into())),
         };
@@ -132,7 +132,7 @@ pub(crate) fn git_gc_everything(
         let mut size_sum_before: u64 = 0;
         let mut size_sum_after: u64 = 0;
 
-        let mut git_repos: Vec<_> = fs::read_dir(&path)
+        let mut git_repos: Vec<_> = fs::read_dir(path)
             .unwrap()
             .map(|x| x.unwrap().path())
             .collect();
@@ -212,7 +212,7 @@ fn fsck_repo(path: &Path) -> Result<(), Error> {
         return Err(Error::GitRepoDirNotFound(path.into()));
     }
 
-    let repo = match git2::Repository::open(&path) {
+    let repo = match git2::Repository::open(path) {
         Ok(repo) => repo,
         Err(_e) => return Err(Error::GitRepoNotOpened(path.into())),
     };
@@ -248,7 +248,7 @@ pub(crate) fn git_fsck_everything(
             return;
         }
 
-        let mut git_repos: Vec<_> = fs::read_dir(&path)
+        let mut git_repos: Vec<_> = fs::read_dir(path)
             .unwrap()
             .map(|x| x.unwrap().path())
             .collect();

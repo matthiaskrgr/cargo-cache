@@ -249,7 +249,7 @@ mod format_table_tests {
             ],
             vec![
                 String::from("AAAAAA"),
-                String::from(""),
+                String::new(),
                 String::from("I don't get it"),
             ],
         ];

@@ -597,11 +597,11 @@ fn main() {
     } // impl CargoCachePaths
 
     pub(crate) fn remove_file(path: &Path) {
-        if path.is_file() && std::fs::remove_file(&path).is_err() {
+        if path.is_file() && std::fs::remove_file(path).is_err() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         }
 
-        if path.is_dir() && remove_dir_all::remove_dir_all(&path).is_err() {
+        if path.is_dir() && remove_dir_all::remove_dir_all(path).is_err() {
             eprintln!(
                 "Warning: failed to recursively remove directory \"{}\".",
                 path.display()

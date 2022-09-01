@@ -466,7 +466,7 @@ pub(crate) fn size_of_path(path: &Path) -> u64 {
     if path.is_dir() {
         cumulative_dir_size(path).dir_size
     } else {
-        fs::metadata(&path)
+        fs::metadata(path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len()
     }
@@ -511,7 +511,7 @@ pub(crate) fn cumulative_dir_size(dir: &Path) -> DirInfo {
             .into_iter()
             .count()
     } else {
-        fs::read_dir(&dir).unwrap().count()
+        fs::read_dir(dir).unwrap().count()
     } as u64;
 
     DirInfo {

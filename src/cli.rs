@@ -297,7 +297,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .long("sort-by")
         .help("sort files alphabetically or by file size")
         .takes_value(true)
-        .possible_values(&["size", "name"]);
+        .possible_values(["size", "name"]);
 
     // arg of query sbcmd
     let human_readable = Arg::new("hr")

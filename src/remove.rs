@@ -73,7 +73,7 @@ pub(crate) fn rm_old_crates(
     // src can be completely removed since we can always rebuilt it from cache (by extracting packages)
     let mut removed_size = 0;
     // walk registry repos
-    for repo in fs::read_dir(&registry_src_path).unwrap() {
+    for repo in fs::read_dir(registry_src_path).unwrap() {
         let mut crate_list = fs::read_dir(&repo.unwrap().path())
             .unwrap()
             .map(|cratepath| cratepath.unwrap().path())
@@ -313,14 +313,14 @@ pub(crate) fn remove_file(
             println!("{}", msg);
         }
 
-        if path.is_file() && fs::remove_file(&path).is_err() {
+        if path.is_file() && fs::remove_file(path).is_err() {
             eprintln!("Warning: failed to remove file \"{}\".", path.display());
         } else {
             *size_changed = true;
         }
 
         if path.is_dir() {
-            if let Err(error) = remove_dir_all::remove_dir_all(&path) {
+            if let Err(error) = remove_dir_all::remove_dir_all(path) {
                 eprintln!(
                     "Warning: failed to recursively remove directory \"{}\".",
                     path.display()

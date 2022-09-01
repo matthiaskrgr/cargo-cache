@@ -88,7 +88,7 @@ impl Cache for BinaryCache {
         if self.files_calculated {
             // do nothing and return
         } else {
-            self.files = fs::read_dir(&self.path())
+            self.files = fs::read_dir(self.path())
                 .unwrap_or_else(|_| panic!("Failed to read directory: '{:?}'", &self.path))
                 .map(|f| f.unwrap().path())
                 .filter(|f| f.is_file())

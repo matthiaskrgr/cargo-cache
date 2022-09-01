@@ -33,7 +33,7 @@ fn name_from_path(path: &Path) -> String {
 impl FileDesc {
     pub(crate) fn new_from_reg_cache(path: &Path) -> Self {
         let name = name_from_path(path);
-        let size = fs::metadata(&path)
+        let size = fs::metadata(path)
             .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
             .len();
 
@@ -59,7 +59,7 @@ impl RgchInfo {
         let name: String;
         let size: u64;
         if path.exists() {
-            size = fs::metadata(&path)
+            size = fs::metadata(path)
                 .unwrap_or_else(|_| panic!("Failed to get metadata of file '{}'", &path.display()))
                 .len();
             let n = path.file_name().unwrap().to_str().unwrap().to_string();

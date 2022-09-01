@@ -41,7 +41,7 @@ use crate::tables::*;
 /// If yes, return a path to it, if not, return None
 fn seeing_manifest(path: &Path) -> Option<PathBuf> {
     #[allow(clippy::manual_filter_map)]
-    read_dir(&path)
+    read_dir(path)
         .unwrap()
         .filter(Result::is_ok)
         .map(|d| d.unwrap().path())
