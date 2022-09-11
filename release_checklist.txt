@@ -5,9 +5,9 @@ cargo udeps # check for unused deps
 cargo about init
 cargo about generate about.hbs > license.html # make sure all dep licences are ok
 # check build times
-cargo build --release -Ztimings
+cargo build --release --timings
 cargo clean
-cargo build --release -Ztimings --all-targets --all-features
+cargo build --release --timings --all-targets --all-features
 #
 codespell -L mut,crate src tests -i 3 -w
 cargo rustdoc --open
