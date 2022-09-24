@@ -81,7 +81,7 @@ pub(crate) fn rm_old_crates(
         crate_list.sort();
         crate_list.reverse();
 
-        let mut versions_of_this_package = 0;
+        let mut versions_of_this_package = 1;
         let mut last_pkgname = String::new();
 
         // iterate over all crates and extract name and version
@@ -113,10 +113,10 @@ pub(crate) fn rm_old_crates(
                 continue;
             }
             // println!("pkgname: {:?}, pkgver: {:?}", pkgname, pkgver);
-
+            // same package again
             if last_pkgname == pkgname {
                 versions_of_this_package += 1;
-                if versions_of_this_package == amount_to_keep {
+                if versions_of_this_package > amount_to_keep {
                     // we have seen this package too many times, queue for deletion
                     removed_size += fs::metadata(pkgpath)
                         .unwrap_or_else(|_| {
@@ -141,7 +141,7 @@ pub(crate) fn rm_old_crates(
                 }
             } else {
                 // last_pkgname != pkgname, we got to a new package, reset counter
-                versions_of_this_package = 0;
+                versions_of_this_package = 1;
                 last_pkgname = pkgname;
             } // if last_pkgname == pkgname
         } // for pkgpath in &crate_list

@@ -1,5 +1,6 @@
 ## Git
 ```
+Fix --keep-duplicate-crates which was counting wrong and only removing package == <N> and not every package bigger than <N> (#122)
 
 ```
 
