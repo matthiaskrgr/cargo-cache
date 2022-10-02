@@ -122,10 +122,10 @@ jobs:
 
       # install cargo cache
       - name: install cargo-cache
-        run: cargo install --force --path .
+        run: cargo install --force --path . --locked
         if: matrix.release
       - name: install cargo-cache --debug
-        run: cargo install --force --path . --debug
+        run: cargo install --force --path . --debug --locked
         if: matrix.debug
 
       # in release mode, run the benchmarks, otherwise just test them
