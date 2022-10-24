@@ -35,7 +35,7 @@ fn toolchains() -> Result<std::fs::ReadDir, library::Error> {
         p
     };
 
-    match std::fs::read_dir(&toolchain_root) {
+    match std::fs::read_dir(toolchain_root) {
         Ok(readdir) => Ok(readdir),
         // we might be on a system that has rust installed purley via package manager and not via rustup! (#121)
         _ => Err(library::Error::NoRustupHome),
@@ -64,7 +64,7 @@ impl Toolchain {
                 z
             })
             .filter(|f| f.is_file())
-            .map(|f| std::fs::metadata(&f).unwrap().len())
+            .map(|f| std::fs::metadata(f).unwrap().len())
             .sum();
 
         Toolchain {
