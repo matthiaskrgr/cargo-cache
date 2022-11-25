@@ -106,8 +106,8 @@ fn parse_size_limit_to_bytes(limit: Option<&str>) -> Result<u64, Error> {
 }
 
 /// trim the cache to a certain limit and invalidate caches
-pub(crate) fn trim_cache<'a>(
-    unparsed_size_limit: Option<&'a str>,
+pub(crate) fn trim_cache(
+    unparsed_size_limit: Option<&str>,
     git_checkouts_cache: &mut git_checkouts::GitCheckoutCache,
     bare_repos_cache: &mut git_bare_repos::GitRepoCache,
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
