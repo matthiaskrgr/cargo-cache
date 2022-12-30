@@ -85,7 +85,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     // and fill the cargo_home with the alternative registry
     let fetch_cmd = Command::new("cargo")
         .arg("fetch")
-        .current_dir(&project_path)
+        .current_dir(project_path)
         .env("CARGO_HOME", cargo_home_path_absolute.display().to_string())
         .output()
         .unwrap();

@@ -28,7 +28,7 @@ fn spurious_files_in_cache_test() {
     let fchp = "target/spurious_files_test"; // fake cargo_home path
     let status = Command::new("cargo")
         .arg("fetch")
-        .current_dir(&crate_path)
+        .current_dir(crate_path)
         .env("CARGO_HOME", "../../target/spurious_files_test")
         .output();
     // make sure the build succeeded

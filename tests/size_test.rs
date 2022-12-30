@@ -27,7 +27,7 @@ fn build_and_check_size_test() {
     let fchp = "target/fake_cargo_home"; // fake cargo_home path
     let status = Command::new("cargo")
         .arg("fetch")
-        .current_dir(&crate_path)
+        .current_dir(crate_path)
         .env("CARGO_HOME", "../../target/fake_cargo_home")
         .output();
     // make sure the build succeeded

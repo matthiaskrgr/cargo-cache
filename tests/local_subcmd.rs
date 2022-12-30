@@ -63,7 +63,7 @@ fn cargo_new_and_run_local() {
 
     let cc_binary = {
         let mut cwd = std::env::current_dir().expect("Could not get cwd!");
-        cwd.push(&bin_path());
+        cwd.push(bin_path());
         cwd
     };
 
