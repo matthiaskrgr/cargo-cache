@@ -136,7 +136,10 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
         CargoCacheCommands::Local
     } else if config.is_present("info") {
         CargoCacheCommands::Info
-    } else if config.is_present("remove-dir") {
+    } else if config.is_present("remove-dir")
+        && !(config.is_present("remove-if-younger-than")
+            || config.is_present("remove-if-older-than"))
+    {
         // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
         CargoCacheCommands::RemoveDir { dry_run } //need more info
     } else if config.is_present("autoclean-expensive")

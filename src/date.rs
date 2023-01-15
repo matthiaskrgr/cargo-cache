@@ -80,7 +80,7 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
 
             nd.and_hms(split[0], split[1], split[2])
         } else {
-            return Err(Error::DateParseFailure(date.into(), "a valid date".into()));
+            return Err(Error::DateParseFailure(date.into(), String::new()));
         }
     };
     Ok(date_to_compare)

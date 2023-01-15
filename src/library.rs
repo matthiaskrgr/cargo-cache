@@ -232,7 +232,11 @@ impl fmt::Display for Error {
                 path.display()
             ),
             Self::DateParseFailure(date, error) => {
-                write!(f, "ERROR failed to parse {} as date {}", date, error)
+                write!(
+                    f,
+                    "ERROR failed to parse '{}' as date {}, expected YYYY.MM.DD or HH:MM:SS ",
+                    date, error
+                )
             }
             Self::UnparsableManifest(path, error) => write!(
                 f,
