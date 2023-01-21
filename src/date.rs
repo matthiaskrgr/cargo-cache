@@ -54,12 +54,15 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                     ));
                 };
 
-            nd.and_hms(now.hour(), now.minute(), now.second())
+            match nd.and_hms_opt(now.hour(), now.minute(), now.second()) {
+                Some(nd) => nd,
+                None => return Err(Error::DateParseFailure(format!("{now:?}"), "date".into())),
+            }
 
         // xx:xx:xx => hh::mm::ss
         } else if Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap().is_match(date) {
             // probably a time
-            let today = Local::today();
+            let today = Local::now();
 
             let split: Result<Vec<u32>, _> = date.split(':').map(str::parse).collect();
             let split = match split {
@@ -78,7 +81,15 @@ fn parse_date(date: &str) -> Result<NaiveDateTime, Error> {
                 ));
             };
 
-            nd.and_hms(split[0], split[1], split[2])
+            match nd.and_hms_opt(split[0], split[1], split[2]) {
+                Some(nd) => nd,
+                None => {
+                    return Err(Error::DateParseFailure(
+                        format!("{}:{}:{}", split[0], split[1], split[2]),
+                        "date".into(),
+                    ))
+                }
+            }
         } else {
             return Err(Error::DateParseFailure(date.into(), String::new()));
         }
