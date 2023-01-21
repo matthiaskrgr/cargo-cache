@@ -106,8 +106,6 @@ fn build_and_check_size_test() {
 
     assert!(
         regex.clone().unwrap().is_match(&cc_output),
-        "regex: {:?}, cc_output: {}",
-        regex,
-        cc_output
+        "regex: {:?regex}, cc_output: {cc_output}",
     );
 }
