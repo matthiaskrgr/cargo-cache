@@ -4,7 +4,7 @@ Fix --keep-duplicate-crates which was counting wrong and only removing package =
 
 Fix --remove-if.. --remove-dir=x which was treated like just --remove-dir, skipped validating the remove-if date and removed everything (#127)
 
-MSRV: bump from 1.57 to 1.60
+MSRV: bump from 1.57 to 1.61
 
 Deps:
 	Update git2 0.14 -> 0.16
