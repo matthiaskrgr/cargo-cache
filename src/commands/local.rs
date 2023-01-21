@@ -30,7 +30,7 @@ use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
 use cargo_metadata::MetadataCommand;
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use walkdir::WalkDir;
 
 use crate::library;
@@ -110,7 +110,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     // get the size
     let dirinfo = library::cumulative_dir_size(&target_dir);
     // and the human readable size
-    let size_hr = dirinfo.dir_size.file_size(file_size_opts::DECIMAL).unwrap();
+    let size_hr = dirinfo.dir_size.format_size(DECIMAL);
 
     let mut stdout = String::new();
 
@@ -141,7 +141,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"debug: ".to_string(),
-            &size_debug.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_debug.format_size(DECIMAL),
         ));
     }
 
@@ -150,7 +150,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"rls: ".to_string(),
-            &size_rls.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_rls.format_size(DECIMAL),
         ));
     }
 
@@ -159,7 +159,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"release: ".to_string(),
-            &size_release.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_release.format_size(DECIMAL),
         ));
     }
 
@@ -168,7 +168,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"package: ".to_string(),
-            &size_package.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_package.format_size(DECIMAL),
         ));
     }
 
@@ -177,7 +177,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"doc: ".to_string(),
-            &size_doc.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_doc.format_size(DECIMAL),
         ));
     }
 
@@ -217,7 +217,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
         lines.push(TableLine::new(
             0,
             &"other: ".to_string(),
-            &size_other.file_size(file_size_opts::DECIMAL).unwrap(),
+            &size_other.format_size(DECIMAL),
         ));
     }
 

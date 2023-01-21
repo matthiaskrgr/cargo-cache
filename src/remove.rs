@@ -14,7 +14,7 @@ use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
 use crate::library::*;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 
 /// dry run message setting
 pub(crate) enum DryRunMessage<'a> {
@@ -148,7 +148,7 @@ pub(crate) fn rm_old_crates(
     }
     println!(
         "Removed {} of compressed crate sources.",
-        removed_size.file_size(file_size_opts::DECIMAL).unwrap()
+        removed_size.format_size(DECIMAL)
     );
     Ok(())
 }
@@ -243,7 +243,7 @@ pub(crate) fn remove_dir_via_cmdline(
     if dry_run {
         println!(
             "dry-run: would remove in total: {}",
-            size_removed.file_size(file_size_opts::DECIMAL).unwrap()
+            size_removed.format_size(DECIMAL)
         );
     }
 
@@ -295,7 +295,7 @@ pub(crate) fn remove_file(
                 match total_size_from_cache {
                     Some(size) => {
                         // print the size that is saved from the cache before removing
-                        let size_hr = size.file_size(file_size_opts::DECIMAL).unwrap();
+                        let size_hr = size.format_size(DECIMAL);
                         println!("dry-run: would remove: '{}' ({})", path.display(), size_hr);
                     }
                     None => {

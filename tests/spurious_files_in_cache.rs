@@ -113,7 +113,7 @@ fn spurious_files_in_cache_test() {
       0 installed binaries:                  0  B
       Registry:                          69.94 MB
         Registry index:                  67.50 MB
-        6 crate archives:               407.74 KB
+        6 crate archives:               407.74 kB
         4 crate source checkouts:         2.04 MB
       Git db:                                0  B
         0 bare git repos:                    0  B
@@ -125,7 +125,7 @@ fn spurious_files_in_cache_test() {
   0 installed binaries:        .*  B
   Registry:                    .* MB
     Registry index:            .* MB
-   .. crate archives:          .* KB
+   .. crate archives:          .* kB
    .. crate source checkouts:  .* MB
   Git db:                            0  B
     0 bare git repos:                0  B

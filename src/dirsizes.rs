@@ -20,7 +20,7 @@ use crate::cache::*;
 use crate::library::*;
 use crate::tables::*;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 
 /// Holds the sizes and the number of files of the components of the cargo cache
 // useful for saving a "snapshot" of the current state of the cache
@@ -204,10 +204,7 @@ impl<'a> DirSizes<'a> {
             TableLine::new(
                 0,
                 &"Total: ".to_string(),
-                &self
-                    .total_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
+                &self.total_size().format_size(DECIMAL),
             ),
         ]
     }
@@ -217,10 +214,7 @@ impl<'a> DirSizes<'a> {
         vec![TableLine::new(
             1,
             &format!("{} installed binaries: ", self.numb_bins()),
-            &self
-                .total_bin_size()
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
+            &self.total_bin_size().format_size(DECIMAL),
         )]
     }
 
@@ -230,26 +224,17 @@ impl<'a> DirSizes<'a> {
             TableLine::new(
                 1,
                 &"Git db: ".to_string(),
-                &self
-                    .total_git_db_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
+                &self.total_git_db_size().format_size(DECIMAL),
             ),
             TableLine::new(
                 2,
                 &format!("{} bare git repos: ", self.numb_git_repos_bare_repos()),
-                &self
-                    .total_git_repos_bare_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
+                &self.total_git_repos_bare_size().format_size(DECIMAL),
             ),
             TableLine::new(
                 2,
                 &format!("{} git repo checkouts: ", self.numb_git_checkouts()),
-                &self
-                    .total_git_chk_size()
-                    .file_size(file_size_opts::DECIMAL)
-                    .unwrap(),
+                &self.total_git_chk_size().format_size(DECIMAL),
             ),
         ]
     }
@@ -259,10 +244,7 @@ impl<'a> DirSizes<'a> {
         let tl1 = TableLine::new(
             1,
             &"Registry: ".to_string(),
-            &self
-                .total_reg_size()
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
+            &self.total_reg_size().format_size(DECIMAL),
         );
 
         let left = if let 1 = self.total_reg_index_num {
@@ -270,31 +252,18 @@ impl<'a> DirSizes<'a> {
         } else {
             format!("{} registry indices: ", &self.total_reg_index_num())
         };
-        let tl2 = TableLine::new(
-            2,
-            &left,
-            &self
-                .total_reg_index_size()
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
-        );
+        let tl2 = TableLine::new(2, &left, &self.total_reg_index_size().format_size(DECIMAL));
 
         let tl3 = TableLine::new(
             2,
             &format!("{} crate archives: ", self.numb_reg_cache_entries()),
-            &self
-                .total_reg_cache_size()
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
+            &self.total_reg_cache_size().format_size(DECIMAL),
         );
 
         let tl4 = TableLine::new(
             2,
             &format!("{} crate source checkouts: ", self.numb_reg_src_checkouts()),
-            &self
-                .total_reg_src_size()
-                .file_size(file_size_opts::DECIMAL)
-                .unwrap(),
+            &self.total_reg_src_size().format_size(DECIMAL),
         );
 
         vec![tl1, tl2, tl3, tl4]
@@ -372,10 +341,7 @@ impl<'a> DirSizes<'a> {
                 temp_vec.push(TableLine::new(
                     2,
                     &String::from("Registry index:"),
-                    &index
-                        .total_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap(),
+                    &index.total_size().format_size(DECIMAL),
                 ));
                 total_size += index.total_size();
                 if registry_name.is_none() {
@@ -389,10 +355,7 @@ impl<'a> DirSizes<'a> {
                 temp_vec.push(TableLine::new(
                     2,
                     &format!("{} crate archives: ", pkg_cache.number_of_files()),
-                    &pkg_cache
-                        .total_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap(),
+                    &pkg_cache.total_size().format_size(DECIMAL),
                 ));
                 total_size += pkg_cache.total_size();
                 if registry_name.is_none() {
@@ -409,10 +372,7 @@ impl<'a> DirSizes<'a> {
                         "{} crate source checkouts: ",
                         registry_source.number_of_items()
                     ),
-                    &registry_source
-                        .total_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap(),
+                    &registry_source.total_size().format_size(DECIMAL),
                 ));
                 total_size += registry_source.total_size();
                 if registry_name.is_none() {
@@ -423,7 +383,7 @@ impl<'a> DirSizes<'a> {
             let header_line = TableLine::new(
                 1,
                 &format!("Registry: {}", registry_name.unwrap_or_default()),
-                &total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+                &total_size.format_size(DECIMAL),
             );
 
             v.push(header_line);
@@ -456,12 +416,12 @@ impl<'a> DirSizes<'a> {
                     0,
                     &"Total: ".to_string(),
                     &if old.total_size() == new.total_size() {
-                        old.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+                        old.total_size().format_size(DECIMAL)
                     } else {
                         format!(
                             "{} => {}",
-                            &old.total_size().file_size(file_size_opts::DECIMAL).unwrap(),
-                            &new.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+                            &old.total_size().format_size(DECIMAL),
+                            &new.total_size().format_size(DECIMAL),
                         )
                     },
                 ),
@@ -475,18 +435,12 @@ impl<'a> DirSizes<'a> {
                     1,
                     &"Git db: ".to_string(),
                     &if old.total_git_db_size() == new.total_git_db_size() {
-                        new.total_git_db_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap()
+                        new.total_git_db_size().format_size(DECIMAL)
                     } else {
                         format!(
                             "{} => {}",
-                            &old.total_git_db_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap(),
-                            &new.total_git_db_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap()
+                            &old.total_git_db_size().format_size(DECIMAL),
+                            &new.total_git_db_size().format_size(DECIMAL)
                         )
                     },
                 ),
@@ -502,18 +456,12 @@ impl<'a> DirSizes<'a> {
                         )
                     },
                     &if old.total_git_repos_bare_size() == new.total_git_repos_bare_size() {
-                        new.total_git_repos_bare_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap()
+                        new.total_git_repos_bare_size().format_size(DECIMAL)
                     } else {
                         format!(
                             "{} => {}",
-                            &old.total_git_repos_bare_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap(),
-                            &new.total_git_repos_bare_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap()
+                            &old.total_git_repos_bare_size().format_size(DECIMAL),
+                            &new.total_git_repos_bare_size().format_size(DECIMAL)
                         )
                     },
                 ),
@@ -529,18 +477,12 @@ impl<'a> DirSizes<'a> {
                         )
                     },
                     &if old.total_git_chk_size() == new.total_git_chk_size() {
-                        new.total_git_chk_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap()
+                        new.total_git_chk_size().format_size(DECIMAL)
                     } else {
                         format!(
                             "{} => {}",
-                            &old.total_git_chk_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap(),
-                            &new.total_git_chk_size()
-                                .file_size(file_size_opts::DECIMAL)
-                                .unwrap()
+                            &old.total_git_chk_size().format_size(DECIMAL),
+                            &new.total_git_chk_size().format_size(DECIMAL)
                         )
                     },
                 ),
@@ -552,18 +494,12 @@ impl<'a> DirSizes<'a> {
                 1,
                 &"Registry: ".to_string(),
                 &if old.total_reg_size() == new.total_reg_size() {
-                    new.total_reg_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap()
+                    new.total_reg_size().format_size(DECIMAL)
                 } else {
                     format!(
                         "{} => {}",
-                        &old.total_reg_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
-                        &new.total_reg_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap()
+                        &old.total_reg_size().format_size(DECIMAL),
+                        &new.total_reg_size().format_size(DECIMAL)
                     )
                 },
             );
@@ -576,18 +512,12 @@ impl<'a> DirSizes<'a> {
                     format!("{} registry indices: ", &old.total_reg_index_num())
                 },
                 &if old.total_reg_index_size() == new.total_reg_index_size() {
-                    old.total_reg_index_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap()
+                    old.total_reg_index_size().format_size(DECIMAL)
                 } else {
                     format!(
                         "{} => {}",
-                        &old.total_reg_index_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
-                        &new.total_reg_index_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap()
+                        &old.total_reg_index_size().format_size(DECIMAL),
+                        &new.total_reg_index_size().format_size(DECIMAL)
                     )
                 },
             );
@@ -604,18 +534,12 @@ impl<'a> DirSizes<'a> {
                     )
                 },
                 &if old.total_reg_cache_size() == new.total_reg_cache_size() {
-                    new.total_reg_cache_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap()
+                    new.total_reg_cache_size().format_size(DECIMAL)
                 } else {
                     format!(
                         "{} => {}",
-                        &old.total_reg_cache_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
-                        &new.total_reg_cache_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
+                        &old.total_reg_cache_size().format_size(DECIMAL),
+                        &new.total_reg_cache_size().format_size(DECIMAL),
                     )
                 },
             );
@@ -632,18 +556,12 @@ impl<'a> DirSizes<'a> {
                     )
                 },
                 &if old.total_reg_src_size() == new.total_reg_src_size() {
-                    old.total_reg_src_size()
-                        .file_size(file_size_opts::DECIMAL)
-                        .unwrap()
+                    old.total_reg_src_size().format_size(DECIMAL)
                 } else {
                     format!(
                         "{} => {}",
-                        &old.total_reg_src_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
-                        &new.total_reg_src_size()
-                            .file_size(file_size_opts::DECIMAL)
-                            .unwrap(),
+                        &old.total_reg_src_size().format_size(DECIMAL),
+                        &new.total_reg_src_size().format_size(DECIMAL),
                     )
                 },
             );
@@ -824,14 +742,14 @@ mod libtests {
         let output_should = "Cargo cache '/home/user/.cargo':
 
 Total:                                    1.94 GB
-  31 installed binaries:                121.21 KB
+  31 installed binaries:                121.21 kB
   Registry:                               1.94 GB
     Registry index:                         23  B
     23445 crate archives:                   89  B
     123909849 crate source checkouts:     1.94 GB
-  Git db:                               156.20 KB
-    37 bare git repos:                  121.21 KB
-    8 git repo checkouts:                34.98 KB\n";
+  Git db:                               156.20 kB
+    37 bare git repos:                  121.21 kB
+    8 git repo checkouts:                34.98 kB\n";
 
         assert_eq!(output_is, output_should);
     }

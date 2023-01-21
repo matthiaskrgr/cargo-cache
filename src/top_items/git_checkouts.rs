@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::tables::format_table;
 use crate::top_items::common::{dir_exists, FileDesc, Pair};
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
@@ -228,13 +228,8 @@ fn chkout_list_to_string(limit: u32, mut collections_vec: Vec<ChkInfo>) -> Strin
 
     for chkout in collections_vec.into_iter().take(limit as usize) {
         #[allow(clippy::integer_division)]
-        let average_size = (chkout.total_size / u64::from(chkout.counter))
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
-        let total_size = chkout
-            .total_size
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
+        let average_size = (chkout.total_size / u64::from(chkout.counter)).format_size(DECIMAL);
+        let total_size = chkout.total_size.format_size(DECIMAL);
 
         table_matrix.push(vec![
             chkout.name,
@@ -263,10 +258,7 @@ pub(crate) fn git_checkouts_stats(
         output,
         "\nSummary of: {} ({} total)",
         path.display(),
-        checkouts_cache
-            .total_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        checkouts_cache.total_size().format_size(DECIMAL)
     )
     .unwrap();
 

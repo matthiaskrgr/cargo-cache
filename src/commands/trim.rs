@@ -18,7 +18,7 @@ use crate::cache::*;
 use crate::library::*;
 use crate::remove::*;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use walkdir::WalkDir;
 
 fn get_last_access_of_item(path: &Path) -> std::time::SystemTime {
@@ -183,7 +183,7 @@ pub(crate) fn trim_cache(
     println!(
         "Removed {} items totalling {}",
         removed_item_count,
-        removed_size.file_size(file_size_opts::DECIMAL).unwrap()
+        removed_size.format_size(DECIMAL)
     );
     Ok(())
 }

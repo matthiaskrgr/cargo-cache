@@ -12,7 +12,7 @@ use std::io::{stdout, Write};
 use std::path::Path;
 use std::process::Command;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 
 use crate::library::Error;
 use crate::library::*;
@@ -33,7 +33,7 @@ fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
 
     // get size before
     let repo_size_before = cumulative_dir_size(path).dir_size;
-    let sb_human_readable = repo_size_before.file_size(file_size_opts::DECIMAL).unwrap();
+    let sb_human_readable = repo_size_before.format_size(DECIMAL);
     print!("{} => ", sb_human_readable);
 
     // we need to flush stdout manually for incremental print();
@@ -189,9 +189,7 @@ pub(crate) fn git_gc_everything(
 
     println!(
         "\nCompressed {} to {}",
-        total_size_before
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap(),
+        total_size_before.format_size(DECIMAL),
         size_diff_format(total_size_before, total_size_after, false)
     );
     Ok(())

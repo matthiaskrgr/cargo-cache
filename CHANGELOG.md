@@ -17,6 +17,7 @@ Deps:
 	Update path-slash 0.2.0 -> 0.2.1
 	Update pretty_assertions 1.0.0 -> 1.3.0
 	Update tempfile 3.1.0 -> 3.3.0
+	Update humansize 1.1.0 -> 2.1.0
 ```
 
 
@@ -311,8 +312,8 @@ Total:                               4.06 GB
   Registry:                        163.43 MB
     Registry index:                156.47 MB
     5 crate archives:                6.96 MB
-  Registry: dl.cloudsmith.io         4.18 KB
-    Registry index:                  3.21 KB
+  Registry: dl.cloudsmith.io         4.18 kB
+    Registry index:                  3.21 kB
     1 crate archives:                 971  B
   Registry: github.com               1.40 GB
     Registry index:                 94.28 MB

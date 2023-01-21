@@ -10,7 +10,7 @@
 use std::path::PathBuf;
 
 use chrono::prelude::*;
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use walkdir::WalkDir;
 
 use crate::library;
@@ -107,7 +107,7 @@ pub(crate) fn toolchain_stats() {
             vec![
                 toolchain.name.clone(),
                 toolchain.number_files.to_string(),
-                toolchain.size.file_size(file_size_opts::DECIMAL).unwrap(),
+                toolchain.size.format_size(DECIMAL),
                 percentage_of_as_string(toolchain.size, total_size),
             ]
         })
@@ -143,7 +143,7 @@ pub(crate) fn toolchain_stats() {
     table_vec.push(vec![
         String::from("Total"),
         number_of_files.to_string(),
-        total_size.file_size(file_size_opts::DECIMAL).unwrap(),
+        total_size.format_size(DECIMAL),
         "100 %".into(),
     ]);
 

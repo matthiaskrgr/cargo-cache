@@ -83,7 +83,7 @@ fn build_and_check_size_test() {
       0 installed binaries:                  0  B
       Registry:                         103.68 MB
         Registry index:                 101.23 MB
-        4 crate archives:               407.74 KB
+        4 crate archives:               407.74 kB
         4 crate source checkouts:         2.04 MB
       Git db:                                0  B
         0 bare git repos:                    0  B
@@ -95,7 +95,7 @@ fn build_and_check_size_test() {
   0 installed binaries:         .*  B
   Registry:                     .* MB
     Registry index:             .* MB
-   .. crate archives:           .* KB
+   .. crate archives:           .* kB
    .. crate source checkouts:   .* MB
   Git db:                       .* 0  B
     0 bare git repos:           .* 0  B

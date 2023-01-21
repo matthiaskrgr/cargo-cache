@@ -16,7 +16,7 @@ use crate::cache::registry_pkg_cache;
 use crate::tables::format_table;
 use crate::top_items::common::{dir_exists, FileDesc, Pair};
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use rayon::prelude::*;
 
 #[inline]
@@ -202,14 +202,9 @@ pub(crate) fn regcache_list_to_string(limit: u32, mut collections_vec: Vec<RgchI
 
     for regcache in collections_vec.into_iter().take(limit as usize) {
         #[allow(clippy::integer_division)]
-        let average_size = (regcache.total_size / u64::from(regcache.counter))
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
+        let average_size = (regcache.total_size / u64::from(regcache.counter)).format_size(DECIMAL);
 
-        let total_size = regcache
-            .total_size
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
+        let total_size = regcache.total_size.format_size(DECIMAL);
 
         table_matrix.push(vec![
             regcache.name,
@@ -237,10 +232,7 @@ pub(crate) fn registry_pkg_cache_stats(
         stdout,
         "\nSummary of: {} ({} total)",
         path.display(),
-        registry_pkg_caches
-            .total_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        registry_pkg_caches.total_size().format_size(DECIMAL)
     )
     .unwrap();
 

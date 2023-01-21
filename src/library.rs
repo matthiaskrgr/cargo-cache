@@ -17,7 +17,7 @@ use crate::cache::caches::{Cache, RegistrySuperCache};
 use crate::cache::*;
 use crate::dirsizes::DirSizes;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, FormatSizeI, DECIMAL};
 use rayon::iter::*;
 use walkdir::WalkDir;
 
@@ -549,7 +549,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "Total cache size: {}\n",
-        s.total_size().file_size(file_size_opts::DECIMAL).unwrap()
+        s.total_size().format_size(DECIMAL)
     )
     .unwrap();
 
@@ -559,9 +559,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
         strn,
         "\t{} binaries installed in binary directory, total size: {}",
         s.numb_bins(),
-        s.total_bin_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_bin_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tThese are the binaries installed via 'cargo install'.\n");
@@ -573,9 +571,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tRegistry root dir, size: {}",
-        s.total_reg_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_reg_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tCrate registries are stored here.\n");
@@ -586,9 +582,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tRegistry index, size: {}",
-        s.total_reg_index_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_reg_index_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tA git repo holding information on what crates are available.\n");
@@ -602,9 +596,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tCrate source package archive, size: {}",
-        s.total_reg_cache_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_reg_cache_size().format_size(DECIMAL)
     )
     .unwrap();
 
@@ -618,9 +610,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tCrate sources, size: {}",
-        s.total_reg_src_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_reg_src_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tSource archives are extracted into this dir.\n");
@@ -632,9 +622,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tGit database, size: {}",
-        s.total_git_repos_bare_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_git_repos_bare_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tBare repos of git dependencies are stored here.\n");
@@ -646,9 +634,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     writeln!(
         strn,
         "\tGit repo checkouts, size: {}",
-        s.total_git_chk_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        s.total_git_chk_size().format_size(DECIMAL)
     )
     .unwrap();
     strn.push_str("\tSpecific commits of the bare repos will be checked out into here.\n");
@@ -667,13 +653,10 @@ pub(crate) fn size_diff_format(
     #[allow(clippy::cast_possible_wrap)]
     let size_diff: i64 = size_after as i64 - size_before as i64;
     let sign = if size_diff > 0 { "+" } else { "" };
-    let size_after_human_readable = size_after.file_size(file_size_opts::DECIMAL).unwrap();
-    let humansize_opts = file_size_opts::FileSizeOpts {
-        allow_negative: true,
-        ..file_size_opts::DECIMAL
-    };
-    let size_diff_human_readable = size_diff.file_size(humansize_opts).unwrap();
-    let size_before_human_readabel = size_before.file_size(file_size_opts::DECIMAL).unwrap();
+    let size_after_human_readable = size_after.format_size(DECIMAL);
+
+    let size_diff_human_readable = size_diff.format_size_i(DECIMAL);
+    let size_before_human_readabel = size_before.format_size(DECIMAL);
     // calculate change in percentage
     // when printing, we are going to cut off everything but a few decimal places anyway, so
     // precision is not much of an issue.
@@ -742,9 +725,7 @@ pub(crate) fn print_size_changed_summary(
     )
     .total_size();
 
-    let size_old_human_readable = previous_total_size
-        .file_size(file_size_opts::DECIMAL)
-        .unwrap();
+    let size_old_human_readable = previous_total_size.format_size(DECIMAL);
     println!(
         "\nSize changed from {} to {}",
         size_old_human_readable,

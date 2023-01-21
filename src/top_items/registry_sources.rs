@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::tables::format_table;
 use crate::top_items::common::{dir_exists, FileDesc, Pair};
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
@@ -215,14 +215,9 @@ pub(crate) fn reg_src_list_to_string(limit: u32, mut collections_vec: Vec<RgSrcI
 
     for regsrc in collections_vec.into_iter().take(limit as usize) {
         #[allow(clippy::integer_division)]
-        let average_size = (regsrc.total_size / u64::from(regsrc.counter))
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
+        let average_size = (regsrc.total_size / u64::from(regsrc.counter)).format_size(DECIMAL);
 
-        let total_size = regsrc
-            .total_size
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap();
+        let total_size = regsrc.total_size.format_size(DECIMAL);
 
         table_matrix.push(vec![
             regsrc.name,
@@ -249,10 +244,7 @@ pub(crate) fn registry_source_stats(
         stdout,
         "\nSummary of: {} ({} total)",
         path.display(),
-        registry_sources_caches
-            .total_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        registry_sources_caches.total_size().format_size(DECIMAL)
     )
     .unwrap();
 

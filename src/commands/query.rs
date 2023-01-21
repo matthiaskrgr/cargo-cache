@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::library::Error;
 
 use clap::ArgMatches;
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use rayon::prelude::*;
 use regex::Regex;
 use walkdir::WalkDir;
@@ -200,11 +200,6 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
-    let humansize_opts = file_size_opts::FileSizeOpts {
-        allow_negative: true,
-        ..file_size_opts::DECIMAL
-    };
-
     match sorting {
         // make "name" the default
         Some("name") | None => {
@@ -214,7 +209,7 @@ pub(crate) fn run_query(
                 output.push_str("Binaries sorted by name:\n");
                 binary_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -228,7 +223,7 @@ pub(crate) fn run_query(
                 output.push_str("\nGit checkouts sorted by name:\n");
                 git_checkout_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -241,7 +236,7 @@ pub(crate) fn run_query(
                 output.push_str("\nBare git repos sorted by name:\n");
                 bare_repos_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -255,7 +250,7 @@ pub(crate) fn run_query(
                 output.push_str("\nRegistry cache sorted by name:\n");
                 registry_pkg_cache_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -269,7 +264,7 @@ pub(crate) fn run_query(
                 output.push_str("\nRegistry source cache sorted by name:\n");
                 registry_source_caches_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -285,7 +280,7 @@ pub(crate) fn run_query(
                 output.push_str("\nBinaries sorted by size:\n");
                 binary_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -299,7 +294,7 @@ pub(crate) fn run_query(
                 output.push_str("\nGit checkouts sorted by size:\n");
                 git_checkout_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -313,7 +308,7 @@ pub(crate) fn run_query(
                 output.push_str("\nBare git repos sorted by size:\n");
                 bare_repos_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -327,7 +322,7 @@ pub(crate) fn run_query(
                 output.push_str("\nRegistry cache sorted by size:\n");
                 registry_pkg_cache_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };
@@ -341,7 +336,7 @@ pub(crate) fn run_query(
                 output.push_str("\nRegistry source cache sorted by size:\n");
                 registry_source_caches_matches.iter().for_each(|b| {
                     let size = if hr_size {
-                        b.size.file_size(&humansize_opts).unwrap()
+                        b.size.format_size(DECIMAL)
                     } else {
                         b.size.to_string()
                     };

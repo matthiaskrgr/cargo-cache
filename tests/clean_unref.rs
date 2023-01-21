@@ -147,7 +147,7 @@ fn test_clean_unref() {
     assert!(regex::Regex::new("registry.src").unwrap().is_match(&stdout));
     // we should also see that size was reduced during the operation
     // should have something like:
-    // Size changed from 59.95 MB to 59.96 MB (+14.95 KB, 0.02%)
+    // Size changed from 59.95 MB to 59.96 MB (+14.95 kB, 0.02%)
     assert!(regex::Regex::new(r#"Size changed from.*to.*.*MB"#)
         .unwrap()
         .is_match(&stdout));
@@ -165,11 +165,11 @@ fn test_clean_unref() {
   0 installed binaries:           * 0  B
   Registry:                     .* MB
     Registry index:             .* MB
-    1 crate archives:           .* KB
-    1 crate source checkouts:   .* KB
-  Git db:                       .* KB
-    1 bare git repos:           .* KB
-    1 git repo checkouts:       .* KB",
+    1 crate archives:           .* kB
+    1 crate source checkouts:   .* kB
+  Git db:                       .* kB
+    1 bare git repos:           .* kB
+    1 git repo checkouts:       .* kB",
     );
 
     dbg!(&cc_output);

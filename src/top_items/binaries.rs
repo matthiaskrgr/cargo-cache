@@ -16,7 +16,7 @@ use crate::cache::*;
 use crate::tables::format_table;
 use crate::top_items::common::*;
 
-use humansize::{file_size_opts, FileSize};
+use humansize::{FormatSize, DECIMAL};
 use rayon::prelude::*;
 
 #[derive(Debug)]
@@ -35,7 +35,7 @@ impl BinInfo {
     }
 
     fn size_string(&self) -> String {
-        self.size.file_size(file_size_opts::DECIMAL).unwrap()
+        self.size.format_size(DECIMAL)
     }
 }
 
@@ -82,10 +82,7 @@ pub(crate) fn binary_stats(path: &Path, limit: u32, bin_cache: &mut bin::BinaryC
         output,
         "\nSummary of: {} ({} total)",
         path.display(),
-        bin_cache
-            .total_size()
-            .file_size(file_size_opts::DECIMAL)
-            .unwrap()
+        bin_cache.total_size().format_size(DECIMAL)
     )
     .unwrap();
 

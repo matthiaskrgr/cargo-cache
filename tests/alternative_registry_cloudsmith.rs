@@ -134,8 +134,8 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
   0 installed binaries:      .* 0  B
   Registry:                    .* MB
     2 registry indices:        .* MB
-    2 crate archives:          .* KB
-    2 crate source checkouts:  .* KB
+    2 crate archives:          .* kB
+    2 crate source checkouts:  .* kB
   Git db:                    .* 0  B
     0 bare git repos:        .* 0  B
     0 git repo checkouts:    .* 0  B",
@@ -157,14 +157,14 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     Total:                          80.41 MB
       0 installed binaries:             0  B
-      Registry: dl.cloudsmith.io     5.52 KB
-        Registry index:              3.21 KB
+      Registry: dl.cloudsmith.io     5.52 kB
+        Registry index:              3.21 kB
         1 crate archives:             971  B
-        1 crate source checkouts:    1.34 KB
+        1 crate source checkouts:    1.34 kB
       Registry: github.com          80.40 MB
         Registry index:             80.39 MB
-        1 crate archives:            2.79 KB
-        1 crate source checkouts:    7.76 KB
+        1 crate archives:            2.79 kB
+        1 crate source checkouts:    7.76 kB
       Git db:                           0  B
         0 bare git repos:               0  B
         0 git repo checkouts:           0  B
@@ -196,14 +196,14 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     desired_output.push_str(
         "Total:                 .* MB
   0 installed binaries:      .*  0  B
-  Registry: dl.cloudsmith.io    .* KB
-    Registry index:             .* KB
+  Registry: dl.cloudsmith.io    .* kB
+    Registry index:             .* kB
     1 crate archives:           .*  B
-    1 crate source checkouts:   .* KB
+    1 crate source checkouts:   .* kB
   Registry: github.com          .* MB
     Registry index:             .* MB
-    1 crate archives:           .* KB
-    1 crate source checkouts:   .* KB
+    1 crate archives:           .* kB
+    1 crate source checkouts:   .* kB
   Git db:                    .*  0  B
     0 bare git repos:        .*  0  B
     0 git repo checkouts:    .*  0  B",
