@@ -5,7 +5,18 @@ Fix --keep-duplicate-crates which was counting wrong and only removing package =
 Fix --remove-if.. --remove-dir=x which was treated like just --remove-dir, skipped validating the remove-if date and removed everything (#127)
 
 Deps:
-	Update git2 from 0.14 -> 0.16
+	Update git2 0.14 -> 0.16
+	Update cargo_metadata 0.15.0 ->0.15.2
+	Update chrono 0.4.19 -> 0.4.23
+	Update flate2 1.0.22 -> 1.0.25
+	Update home 0.5.3 -> 0.5.4
+	Update rayon 1.5.0 -> 1.6.1
+	Update regex 1.4.2 -> 1.7.1
+	Update unicode-normalizsation 0.1.19 -> 0.1.22
+	Update walkdir 2.3.1 -> 2.3.2
+	Update path-slash 0.2.0 -> 0.2.1
+	Update pretty_assertions 1.0.0 -> 1.3.0
+	Update tempfile 3.1.0 -> 3.3.0
 ```
 
 
