@@ -4,6 +4,8 @@ Fix --keep-duplicate-crates which was counting wrong and only removing package =
 
 Fix --remove-if.. --remove-dir=x which was treated like just --remove-dir, skipped validating the remove-if date and removed everything (#127)
 
+Deps:
+	Update git2 from 0.14 -> 0.16
 ```
 
 

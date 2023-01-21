@@ -41,7 +41,7 @@ dirs-next = { version = "2.0.0", optional = true } # get cache dirs to look for 
 flate2 = {version = "1.0.22", optional = true}# look into gzs
 
 # https://github.com/alexcrichton/git2-rs
-git2 = { version = "0.14", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
+git2 = { version = "0.16", default-features = false, optional = true, features = ["vendored-libgit2"] } # check if repo is git repo
 
 # https://github.com/brson/home
 home = "0.5.3" # get CARGO_HOME
