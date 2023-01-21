@@ -72,7 +72,7 @@ impl Cache for BinaryCache {
                 .par_iter()
                 .map(|f| {
                     fs::metadata(f)
-                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{:?}'", f))
+                        .unwrap_or_else(|_| panic!("Failed to get size of file: '{f:?}'"))
                         .len()
                 })
                 .sum();

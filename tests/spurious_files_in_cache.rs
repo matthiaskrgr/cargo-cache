@@ -136,8 +136,6 @@ fn spurious_files_in_cache_test() {
 
     assert!(
         regex.unwrap().is_match(&cc_output),
-        "regex: {:?}, cc_output: {}",
-        desired_output,
-        cc_output
+        "regex: {desired_output:?}, cc_output: {cc_output}"
     );
 }

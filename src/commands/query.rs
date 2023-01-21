@@ -69,7 +69,7 @@ fn git_checkout_to_file(path: &Path) -> File<'_> {
             .par_iter()
             .map(|f| {
                 fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{f:?}'"))
                     .len()
             })
             .sum(),
@@ -88,7 +88,7 @@ fn bare_repo_to_file(path: &Path) -> File<'_> {
             .par_iter()
             .map(|f| {
                 fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{f:?}'"))
                     .len()
             })
             .sum(),
@@ -108,7 +108,7 @@ fn registry_pkg_cache_to_file(path: &Path) -> File<'_> {
             .par_iter()
             .map(|f| {
                 fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{f:?}'"))
                     .len()
             })
             .sum(),
@@ -128,7 +128,7 @@ fn registry_source_cache_to_file(path: &Path) -> File<'_> {
             .par_iter()
             .map(|f| {
                 fs::metadata(f)
-                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{:?}'", f))
+                    .unwrap_or_else(|_| panic!("Failed to read size of file: '{f:?}'"))
                     .len()
             })
             .sum(),
@@ -352,7 +352,7 @@ pub(crate) fn run_query(
 
     let trimmed = output.trim();
     if !trimmed.is_empty() {
-        println!("{}", trimmed);
+        println!("{trimmed}");
     }
     Ok(())
 }
@@ -367,8 +367,7 @@ mod query_tests {
         let query_cmd = Command::new(bin_path()).arg("query").output();
         assert!(
             query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
+            "cargo-cache query failed: '{query_cmd:?}'"
         );
     }
 
@@ -377,8 +376,7 @@ mod query_tests {
         let query_cmd = Command::new(bin_path()).arg("q").output();
         assert!(
             query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
+            "cargo-cache query failed: '{query_cmd:?}'"
         );
     }
 
@@ -387,8 +385,7 @@ mod query_tests {
         let query_cmd = Command::new(bin_path()).arg("cache-query").output();
         assert!(
             query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
+            "cargo-cache query failed: '{query_cmd:?}'"
         );
     }
 
@@ -397,8 +394,7 @@ mod query_tests {
         let query_cmd = Command::new(bin_path()).arg("cache-q").output();
         assert!(
             query_cmd.is_ok(),
-            "cargo-cache query failed: '{:?}'",
-            query_cmd
+            "cargo-cache query failed: '{query_cmd:?}'"
         );
     }
 }

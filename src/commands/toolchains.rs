@@ -150,5 +150,5 @@ pub(crate) fn toolchain_stats() {
     // generate the table and print it
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
     let table_trimmed = table.trim();
-    println!("{}", table_trimmed);
+    println!("{table_trimmed}");
 }

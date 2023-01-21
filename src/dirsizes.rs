@@ -603,7 +603,7 @@ impl<'a> DirSizes<'a> {
             summary.push_str(&final_line);
         }
 
-        println!("{}", summary);
+        println!("{summary}");
     }
 } // print_size_difference()
 
@@ -618,7 +618,7 @@ impl<'a> fmt::Display for DirSizes<'a> {
 
         let string: String = two_row_table(2, table, false);
 
-        write!(f, "{}", string)?;
+        write!(f, "{string}")?;
         Ok(())
     }
 }
@@ -737,7 +737,7 @@ mod libtests {
             &pb,
         );
 
-        let output_is = format!("{}", dirSizes);
+        let output_is = format!("{dirSizes}");
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
@@ -795,7 +795,7 @@ Total:                                    1.94 GB
             &pb,
         );
 
-        let output_is = format!("{}", dirSizes);
+        let output_is = format!("{dirSizes}");
 
         let output_should = "Cargo cache '/home/user/.cargo':
 
@@ -854,7 +854,7 @@ Total:                               6.33 GB
             &pb,
         );
 
-        let output_is = format!("{}", dirSizes);
+        let output_is = format!("{dirSizes}");
 
         let output_should = "Cargo cache '/home/user/.cargo':
 

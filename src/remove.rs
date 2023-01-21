@@ -288,7 +288,7 @@ pub(crate) fn remove_file(
     if dry_run {
         match dry_run_msg {
             DryRunMessage::Custom(msg) => {
-                println!("{}", msg);
+                println!("{msg}");
             }
             DryRunMessage::Default => {
                 #[allow(clippy::single_match_else)]
@@ -310,7 +310,7 @@ pub(crate) fn remove_file(
         // no dry run
         // print deletion message if we have one
         if let Some(msg) = deletion_msg {
-            println!("{}", msg);
+            println!("{msg}");
         }
 
         if path.is_file() && fs::remove_file(path).is_err() {
@@ -325,7 +325,7 @@ pub(crate) fn remove_file(
                     "Warning: failed to recursively remove directory \"{}\".",
                     path.display()
                 );
-                eprintln!("error: {:?}", error);
+                eprintln!("error: {error:?}");
             } else {
                 *size_changed = true;
             }

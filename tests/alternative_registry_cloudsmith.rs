@@ -41,8 +41,7 @@ fn alternative_registry_works() {
     };
 
     println!(
-        "DEBUG: cargo config file path: '{:?}'",
-        cargo_config_file_path
+        "DEBUG: cargo config file path: '{cargo_config_file_path:?}'"
     );
 
     // next we need to set up the alternative registry inside the ${CARGO_HOME}/config
@@ -57,7 +56,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 "#,
     );
 
-    println!("DEBUG: config text:\n{}\n", config_text);
+    println!("DEBUG: config text:\n{config_text}\n");
     // write the content into the config file
     cfg_file_handle
         .write_all(config_text.as_bytes())
@@ -97,14 +96,14 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     // @TODO handle all  command::new() calls that way!
     if !fetch_cmd.status.success() {
         println!("error while cargo building test crate");
-        println!("stderr:\n{:?}", stderr);
-        println!("stdout:\n{:?}", stdout);
-        println!("status: {:?}", status);
+        println!("stderr:\n{stderr:?}");
+        println!("stdout:\n{stdout:?}");
+        println!("status: {status:?}");
         panic!("error while building test crate");
     }
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    println!("ERR {stderr:?}");
+    println!("OUT {stdout:?}");
 
     // run cargo cache on the new cargo_home
     let cargo_cache_cmd = Command::new(bin_path())
@@ -115,15 +114,15 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     if !cargo_cache_cmd.status.success() {
         println!("error running cargo-cache on alt reg $CARGO_HOME");
-        println!("stderr:\n{:?}", stderr);
-        println!("stdout:\n{:?}", stdout);
-        println!("status: {:?}", status);
+        println!("stderr:\n{stderr:?}");
+        println!("stdout:\n{stdout:?}");
+        println!("status: {status:?}");
         panic!("error while running cargo-home with alt regs");
     }
 
     let stdout = String::from_utf8_lossy(&cargo_cache_cmd.stdout).to_string();
 
-    println!("DEBUG: cargo-cache output:\n\n{}", stdout);
+    println!("DEBUG: cargo-cache output:\n\n{stdout}");
     // check if the output is what we expect
 
     let mut desired_output =
@@ -145,9 +144,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     assert!(
         regex.is_match(&stdout),
-        "ERROR: regex did not match!\n\nregex:\n{:?}\n\ncc_output:\n{:?}",
-        regex,
-        stdout
+        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout:?}"
     );
 
     // test "cargo cache registry" output
@@ -179,15 +176,15 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     if !cargo_cache_registry_cmd.status.success() {
         println!("error running cargo-cache on alt reg $CARGO_HOME");
-        println!("stderr:\n{:?}", stderr);
-        println!("stdout:\n{:?}", stdout);
-        println!("status: {:?}", status);
+        println!("stderr:\n{stderr:?}");
+        println!("stdout:\n{stdout:?}");
+        println!("status: {status:?}");
         panic!("error while running cargo-home with alt regs");
     }
 
     let stdout = String::from_utf8_lossy(&cargo_cache_registry_cmd.stdout).to_string();
 
-    println!("DEBUG: cargo-cache output:\n\n{}", stdout);
+    println!("DEBUG: cargo-cache output:\n\n{stdout}");
     // check if the output is what we expect
 
     let mut desired_output =
@@ -213,8 +210,6 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     assert!(
         regex.is_match(&stdout),
-        "ERROR: regex did not match!\n\nregex:\n{:?}\n\ncc_output:\n{:?}",
-        regex,
-        stdout
+        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout:?}"
     );
 }

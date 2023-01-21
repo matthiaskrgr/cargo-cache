@@ -58,8 +58,8 @@ fn CARGO_HOME_subdirs_are_known() {
     let stderr = String::from_utf8_lossy(&status.stderr).to_string();
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
 
-    println!("ERR {:?}", stderr);
-    println!("OUT {:?}", stdout);
+    println!("ERR {stderr:?}");
+    println!("OUT {stdout:?}");
 
     assert!(
         PathBuf::from(&cargo_home).is_dir(),
@@ -76,7 +76,7 @@ fn CARGO_HOME_subdirs_are_known() {
         .collect::<Vec<_>>();
 
     x.sort();
-    x.iter().for_each(|x| println!("{:?}", x));
+    x.iter().for_each(|x| println!("{x:?}"));
     /*
     "target/cargo_home_subdirs_known_CARGO_HOME/"
     "target/cargo_home_subdirs_known_CARGO_HOME/.crates.toml"
@@ -184,5 +184,5 @@ fn CARGO_HOME_subdirs_are_known() {
         .unwrap()
         .starts_with("target/cargo_home_subdirs_known_CARGO_HOME/registry/src/github.com"));
     let last = x.next(); // should have reached the end
-    assert!(last.is_none(), "last iterator item is not none: {:?}", last);
+    assert!(last.is_none(), "last iterator item is not none: {last:?}");
 }

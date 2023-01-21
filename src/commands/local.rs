@@ -121,7 +121,7 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     // If there is no target dir, we can quit
     if !target_dir.exists() {
         stdout.push_str("No target dir found!");
-        eprintln!("{}", stdout);
+        eprintln!("{stdout}");
     }
 
     writeln!(stdout, "Target dir: {}\n", target_dir.display()).unwrap();
@@ -224,6 +224,6 @@ pub(crate) fn local_subcmd() -> Result<(), Error> {
     // add the formatted table to the output
     stdout.push_str(&two_row_table(MIN_PADDING, lines, true));
     // and finally print it
-    println!("{}", stdout);
+    println!("{stdout}");
     Ok(())
 }

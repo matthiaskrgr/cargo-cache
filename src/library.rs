@@ -34,7 +34,7 @@ impl<T, E: std::fmt::Display> ErrorHandling<T, E> for CargoCacheResult<T, E> {
         match self {
             Ok(t) => t,
             Err(e) => {
-                eprintln!("{}", e);
+                eprintln!("{e}");
                 std::process::exit(1);
             }
         }
@@ -47,7 +47,7 @@ impl<T, E: std::fmt::Display> ErrorHandling<T, E> for CargoCacheResult<T, E> {
                 std::process::exit(0);
             }
             Err(e) => {
-                eprintln!("{}", e);
+                eprintln!("{e}");
                 std::process::exit(1);
             }
         }
@@ -189,7 +189,7 @@ impl fmt::Display for Error {
             Self::GitNotInstalled => write!(f, "Could not find 'git' binary. Is 'git' installed?",),
 
             Self::MalformedPackageName(pkgname) => {
-                write!(f, "Error:  \"{}\" is not a valid package name", pkgname)
+                write!(f, "Error:  \"{pkgname}\" is not a valid package name")
             }
 
             Self::GetCargoHomeFailed => write!(f, "Failed to get CARGO_HOME!"),
@@ -202,14 +202,12 @@ impl fmt::Display for Error {
 
             Self::InvalidDeletableDirs(dirs) => write!(
                 f,
-                "\"{}\" are not valid removable directories! Chose one or several from {}",
-                dirs, valid_deletable_dirs
+                "\"{dirs}\" are not valid removable directories! Chose one or several from {valid_deletable_dirs}"
             ),
 
             Self::RemoveDirNoArg => write!(
                 f,
-                "No argument passed to \"--remove-dir\"! Chose one or several from {}",
-                valid_deletable_dirs
+                "No argument passed to \"--remove-dir\"! Chose one or several from {valid_deletable_dirs}"
             ),
             Self::NoCWD => write!(f, "Failed to find current working directory!",),
             Self::NoCargoManifest(dir) => write!(
@@ -218,7 +216,7 @@ impl fmt::Display for Error {
                 dir.display()
             ),
             Self::QueryRegexFailedParsing(regex) => {
-                write!(f, "Failed to parse regular expression \"{}\"", regex)
+                write!(f, "Failed to parse regular expression \"{regex}\"")
             }
             Self::GitGCFile(path) => write!(
                 f,
@@ -234,8 +232,7 @@ impl fmt::Display for Error {
             Self::DateParseFailure(date, error) => {
                 write!(
                     f,
-                    "ERROR failed to parse '{}' as date {}, expected YYYY.MM.DD or HH:MM:SS ",
-                    date, error
+                    "ERROR failed to parse '{date}' as date {error}, expected YYYY.MM.DD or HH:MM:SS "
                 )
             }
             Self::UnparsableManifest(path, error) => write!(
@@ -252,9 +249,8 @@ impl fmt::Display for Error {
             Self::NoRustupHome => write!(f, "Failed to determine rustup home directory"),
             Self::TrimLimitUnitParseFailure(limit) => write!(
                 f,
-                "Failed to parse limit: \"{}\". \
-                Should be of the form 123X where X is one of B,K,M,G or T.",
-                limit
+                "Failed to parse limit: \"{limit}\". \
+                Should be of the form 123X where X is one of B,K,M,G or T."
             ),
         }
     }
@@ -531,8 +527,7 @@ pub(crate) fn get_info(c: &CargoCachePaths, s: &DirSizes<'_>) -> String {
     if let Ok(cache_path) = std::env::var("CARGO_HOME") {
         writeln!(
             strn,
-            "${{CARGO_HOME}} env var set to '{}', using that!",
-            cache_path
+            "${{CARGO_HOME}} env var set to '{cache_path}', using that!"
         )
         .unwrap();
     } else {
@@ -670,25 +665,18 @@ pub(crate) fn size_diff_format(
     if size_before == size_after {
         if display_size_before {
             format!(
-                "{} => {}",
-                size_before_human_readabel, size_after_human_readable
+                "{size_before_human_readabel} => {size_after_human_readable}"
             )
         } else {
             size_after_human_readable
         }
     } else if display_size_before {
         format!(
-            "{} => {} ({}{}, {}%)",
-            size_before_human_readabel,
-            size_after_human_readable,
-            sign,
-            size_diff_human_readable,
-            percentage
+            "{size_before_human_readabel} => {size_after_human_readable} ({sign}{size_diff_human_readable}, {percentage}%)"
         )
     } else {
         format!(
-            "{} ({}{}, {}%)",
-            size_after_human_readable, sign, size_diff_human_readable, percentage
+            "{size_after_human_readable} ({sign}{size_diff_human_readable}, {percentage}%)"
         )
     }
 }
@@ -789,7 +777,7 @@ mod libtests {
     fn test_CargoCachePaths_gen() {
         // set cargo cache root dir to /tmp
         let dir_paths = CargoCachePaths::new(env::temp_dir());
-        assert!(dir_paths.is_ok(), "dir paths: {:?}", dir_paths);
+        assert!(dir_paths.is_ok(), "dir paths: {dir_paths:?}");
     }
 
     #[allow(non_snake_case)]
@@ -902,8 +890,7 @@ mod libtests {
             })
             .unwrap()
             .is_match(cargo_home2),
-            "cargo home: \"{:?}\"",
-            cargo_home
+            "cargo home: \"{cargo_home:?}\""
         );
 
         let bins = iter.next().unwrap();
@@ -971,7 +958,7 @@ mod libtests {
 
         // should be empty now
         let last = iter.next();
-        assert!(last.is_none(), "found another directory?!: '{:?}'", last);
+        assert!(last.is_none(), "found another directory?!: '{last:?}'");
     }
 }
 

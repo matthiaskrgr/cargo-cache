@@ -175,6 +175,6 @@ pub(crate) fn sccache_stats() -> Result<(), library::Error> {
     // generate the table and print it
     let table = format_table(&table_vec, 1); // need so strip whitespaces added by the padding
     let table_trimmed = table.trim();
-    println!("{}", table_trimmed);
+    println!("{table_trimmed}");
     Ok(())
 }

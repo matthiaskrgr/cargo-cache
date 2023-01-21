@@ -485,8 +485,7 @@ mod clitests {
         let cc_help = Command::new(bin_path()).arg("--help").output();
         assert!(
             cc_help.is_ok(),
-            "cargo-cache --help failed: '{:?}'",
-            cc_help
+            "cargo-cache --help failed: '{cc_help:?}'"
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
         // DEBUG:
@@ -566,8 +565,7 @@ SUBCOMMANDS:
         let cc_help = Command::new(bin_path()).arg("cache").arg("--help").output();
         assert!(
             cc_help.is_ok(),
-            "cargo-cache --help failed: '{:?}'",
-            cc_help
+            "cargo-cache --help failed: '{cc_help:?}'"
         );
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
         // eprintln!("{}", help_real);
@@ -652,8 +650,7 @@ SUBCOMMANDS:
             .output();
         assert!(
             ccq_help.is_ok(),
-            "cargo-cache query --help failed: '{:?}'",
-            ccq_help
+            "cargo-cache query --help failed: '{ccq_help:?}'"
         );
         let help_real = String::from_utf8_lossy(&ccq_help.unwrap().stdout).into_owned();
 
@@ -706,11 +703,7 @@ OPTIONS:
 
         assert!(
             v1_s == v2_s && v2_s == v3_s && v3_s == v4_s,
-            "version outputs do not match!\n v1 {}\nv2 {}\nv3 {}\nv4 {}",
-            v1_s,
-            v2_s,
-            v3_s,
-            v4_s
+            "version outputs do not match!\n v1 {v1_s}\nv2 {v2_s}\nv3 {v3_s}\nv4 {v4_s}"
         );
     }
 
@@ -722,8 +715,7 @@ OPTIONS:
             .output();
         assert!(
             cc_dryrun.is_ok(),
-            "cargo-cache --dry-run failed: '{:?}'",
-            cc_dryrun
+            "cargo-cache --dry-run failed: '{cc_dryrun:?}'"
         );
 
         let stderr = String::from_utf8_lossy(&cc_dryrun.unwrap().stderr).into_owned();

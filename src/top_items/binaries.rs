@@ -179,9 +179,9 @@ mod bininfo_struct {
         v.sort_by_key(|b| b.size);
         let mut order_string = String::new();
         for bi in v {
-            write!(order_string, "{:?}", bi).unwrap();
+            write!(order_string, "{bi:?}").unwrap();
         }
-        println!("{}", order_string);
+        println!("{order_string}");
         let mut wanted = String::new();
         for i in &[
             r#"BinInfo { name: "b", size: 3 }"#,
@@ -213,9 +213,9 @@ mod bininfo_struct {
         v.par_sort_by_key(|b| b.size);
         let mut order_string = String::new();
         for bi in v {
-            write!(order_string, "{:?}", bi).unwrap();
+            write!(order_string, "{bi:?}").unwrap();
         }
-        println!("{}", order_string);
+        println!("{order_string}");
         let mut wanted = String::new();
         for i in &[
             r#"BinInfo { name: "a", size: 5 }"#,

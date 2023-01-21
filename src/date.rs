@@ -218,8 +218,8 @@ pub(crate) fn remove_files_by_dates(
             "dry-run: would delete {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
-                AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
+                AgeRelation::FileYoungerThanDate(date) => format!("younger than {date}"),
+                AgeRelation::FileOlderThanDate(date) => format!("older than {date}"),
                 AgeRelation::None => unreachable!(
                     "DateComparisonOlder and Younger or None not supported right now (dry run)"
                 ),
@@ -231,8 +231,8 @@ pub(crate) fn remove_files_by_dates(
             "Deleting {} items that are {}...",
             filtered_files.len(),
             match date_comp {
-                AgeRelation::FileYoungerThanDate(date) => format!("younger than {}", date),
-                AgeRelation::FileOlderThanDate(date) => format!("older than {}", date),
+                AgeRelation::FileYoungerThanDate(date) => format!("younger than {date}"),
+                AgeRelation::FileOlderThanDate(date) => format!("older than {date}"),
                 AgeRelation::None => unreachable!(
                     "DateComparisonOlder and Younger or None not supported right now (no dry run)"
                 ),

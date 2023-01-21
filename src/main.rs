@@ -146,7 +146,7 @@ fn main() {
 
     if let CargoCacheCommands::ListDirs = config_enum {
         // only print the directories and exit, don't calculate anything else
-        println!("{}", cargo_cache);
+        println!("{cargo_cache}");
         process::exit(0);
     }
 
@@ -531,10 +531,10 @@ fn main() {
             &mut registry_sources_caches,
             &mut registry_pkgs_cache,
         );
-        print!("{}", output);
+        print!("{output}");
     } else if matches!(config_enum, CargoCacheCommands::DefaultSummary) {
         // default summary
-        print!("{}", dir_sizes_original);
+        print!("{dir_sizes_original}");
     }
 
     if debug_mode {
@@ -548,11 +548,11 @@ fn main() {
         let file_count = wd.into_iter().count();
         let time_as_milis = time_elasped.as_millis();
         let time_as_nanos = time_elasped.as_nanos();
-        println!("processed {} files in {} ms", file_count, time_as_milis);
+        println!("processed {file_count} files in {time_as_milis} ms");
         let files_per_ms = file_count as u128 / time_as_milis;
         let ns_per_file = time_as_nanos / file_count as u128;
-        println!("{} files per ms", files_per_ms);
-        println!("{} ns per file", ns_per_file);
+        println!("{files_per_ms} files per ms");
+        println!("{ns_per_file} ns per file");
     }
 }
 
