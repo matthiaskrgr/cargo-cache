@@ -664,9 +664,7 @@ pub(crate) fn size_diff_format(
 
     if size_before == size_after {
         if display_size_before {
-            format!(
-                "{size_before_human_readabel} => {size_after_human_readable}"
-            )
+            format!("{size_before_human_readabel} => {size_after_human_readable}")
         } else {
             size_after_human_readable
         }
@@ -675,9 +673,7 @@ pub(crate) fn size_diff_format(
             "{size_before_human_readabel} => {size_after_human_readable} ({sign}{size_diff_human_readable}, {percentage}%)"
         )
     } else {
-        format!(
-            "{size_after_human_readable} ({sign}{size_diff_human_readable}, {percentage}%)"
-        )
+        format!("{size_after_human_readable} ({sign}{size_diff_human_readable}, {percentage}%)")
     }
 }
 

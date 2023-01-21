@@ -306,10 +306,7 @@ mod gittest {
             .arg("gitrepo_gc")
             .current_dir("target")
             .output();
-        assert!(
-            git_init.is_ok(),
-            "git_init did not succeed: '{git_init:?}'"
-        );
+        assert!(git_init.is_ok(), "git_init did not succeed: '{git_init:?}'");
         // create a file and add some text
         let mut file = File::create("target/gitrepo_gc/testfile.txt").unwrap();
         file.write_all(b"Hello hello hello this is a test \n hello \n hello")
@@ -388,10 +385,7 @@ mod gittest {
             .arg("gitrepo_fsck")
             .current_dir("target")
             .output();
-        assert!(
-            git_init.is_ok(),
-            "git_init did not succeed: '{git_init:?}'"
-        );
+        assert!(git_init.is_ok(), "git_init did not succeed: '{git_init:?}'");
         // create a file and add some text
         let mut file = File::create("target/gitrepo_fsck/testfile.txt").unwrap();
         file.write_all(b"Hello hello hello this is a test \n hello \n hello")
@@ -426,10 +420,7 @@ mod gittest {
             .arg("testfile.txt")
             .current_dir("target/gitrepo_fsck/")
             .output();
-        assert!(
-            git_add2.is_ok(),
-            "git add did not succeed: '{git_add2:?}'"
-        );
+        assert!(git_add2.is_ok(), "git add did not succeed: '{git_add2:?}'");
         let git_commit2 = Command::new("git")
             .arg("commit")
             .arg("-m")

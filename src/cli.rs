@@ -483,10 +483,7 @@ mod clitests {
     #[test]
     fn run_help() {
         let cc_help = Command::new(bin_path()).arg("--help").output();
-        assert!(
-            cc_help.is_ok(),
-            "cargo-cache --help failed: '{cc_help:?}'"
-        );
+        assert!(cc_help.is_ok(), "cargo-cache --help failed: '{cc_help:?}'");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
         // DEBUG:
         //eprintln!("{}", help_real);
@@ -563,10 +560,7 @@ SUBCOMMANDS:
     #[test]
     fn run_help_subcommand() {
         let cc_help = Command::new(bin_path()).arg("cache").arg("--help").output();
-        assert!(
-            cc_help.is_ok(),
-            "cargo-cache --help failed: '{cc_help:?}'"
-        );
+        assert!(cc_help.is_ok(), "cargo-cache --help failed: '{cc_help:?}'");
         let help_real = String::from_utf8_lossy(&cc_help.unwrap().stdout).into_owned();
         // eprintln!("{}", help_real);
 

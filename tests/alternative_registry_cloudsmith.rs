@@ -40,9 +40,7 @@ fn alternative_registry_works() {
         path
     };
 
-    println!(
-        "DEBUG: cargo config file path: '{cargo_config_file_path:?}'"
-    );
+    println!("DEBUG: cargo config file path: '{cargo_config_file_path:?}'");
 
     // next we need to set up the alternative registry inside the ${CARGO_HOME}/config
 
