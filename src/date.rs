@@ -333,19 +333,16 @@ mod libtests {
     }
 
     #[test]
-    #[should_panic(expected = "invalid time")]
     fn parse_dates_panic1() {
         assert!(parse_date(&String::from("24:00:00")).is_err());
     }
 
     #[test]
-    #[should_panic(expected = "invalid time")]
     fn parse_dates_panic2() {
         assert!(parse_date(&String::from("24:30:24")).is_err());
     }
 
     #[test]
-    #[should_panic(expected = "invalid time")]
     fn parse_dates_panic3() {
         assert!(parse_date(&String::from("30:30:24")).is_err());
     }
