@@ -11,6 +11,7 @@ use std::fs;
 use std::io::{stdout, Write};
 use std::path::Path;
 use std::process::Command;
+use std::time::SystemTime;
 
 use humansize::{FormatSize, DECIMAL};
 
@@ -18,6 +19,8 @@ use crate::library::Error;
 use crate::library::*;
 
 fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
+    let start_time = SystemTime::now();
+
     // get name of the repo (last item of path)
     let repo_name = match path.iter().last() {
         Some(name) => name.to_str().unwrap().to_string(),
@@ -104,8 +107,11 @@ fn gc_repo(path: &Path, dry_run: bool) -> Result<(u64, u64), Error> {
         }
 
         let repo_size_after = cumulative_dir_size(path).dir_size;
+
+        let seconds_spent_compressing = start_time.elapsed().unwrap().as_secs();
+
         println!(
-            "{}",
+            "{}, {seconds_spent_compressing}s",
             size_diff_format(repo_size_before, repo_size_after, false)
         );
 
