@@ -18,8 +18,9 @@ Deps:
 	Update walkdir 2.3.1 -> 2.3.2
 	Update path-slash 0.2.0 -> 0.2.1
 	Update pretty_assertions 1.0.0 -> 1.3.0
-	Update tempfile 3.1.0 -> 3.3.0
+	Update tempfile 3.1.0 -> 3.4.0
 	Update humansize 1.1.0 -> 2.1.0
+	Update remove_dir_all 0.7.0 -> 0.8.1 (RUSTSEC-2023-0018)
 ```
 
 
