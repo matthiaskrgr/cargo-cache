@@ -34,11 +34,11 @@ jobs:
         include:
           - build: linux-msrv-release
             os: ubuntu-latest
-            toolchain: 1.61
+            toolchain: 1.62
             release: true
           - build: linux-msrv-debug
             os: ubuntu-latest
-            toolchain: 1.61
+            toolchain: 1.62
             debug: true
 
           - build: linux-nightly-release
