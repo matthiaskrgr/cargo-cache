@@ -109,7 +109,7 @@ fn test_clean_unref() {
     dbg!(&stderr);
     dbg!(&stdout);
     eprintln!("running debug stuff");
-    walkdir::WalkDir::new(CARGO_HOME)
+    walkdir::WalkDir::new("target")
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
         .for_each(|p| eprintln!("{}", p.display()));
