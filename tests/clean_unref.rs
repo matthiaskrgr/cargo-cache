@@ -109,7 +109,7 @@ fn test_clean_unref() {
     dbg!(&stderr);
     dbg!(&stdout);
     eprintln!("running debug stuff");
-    walkdir::WalkDir::new("target/clean_unref_CARGO_HOME/git/checkouts")
+    walkdir::WalkDir::new(CARGO_HOME)
         .into_iter()
         .map(|e| e.unwrap().path().to_owned())
         .for_each(|p| eprintln!("{}", p.display()));
