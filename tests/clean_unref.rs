@@ -109,10 +109,9 @@ fn test_clean_unref() {
     dbg!(&stderr);
     dbg!(&stdout);
     eprintln!("running debug stuff");
-    walkdir::WalkDir::new("target")
-        .into_iter()
-        .map(|e| e.unwrap().path().to_owned())
-        .for_each(|p| eprintln!("{}", p.display()));
+    walkdir::WalkDir::new("target").into_iter().for_each(|p| {
+        dbg!(p);
+    });
     eprintln!("end running debug stuff");
     assert_eq!("", stderr);
 
