@@ -108,6 +108,12 @@ fn test_clean_unref() {
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
     dbg!(&stderr);
     dbg!(&stdout);
+    eprintln!("running debug stuff");
+    walkdir::WalkDir::new("target/clean_unref_CARGO_HOME/git/checkouts")
+        .into_iter()
+        .map(|e| e.unwrap().path().to_owned())
+        .for_each(|p| eprintln!("{}", p.display()));
+    eprintln!("end running debug stuff");
     assert_eq!("", stderr);
 
     // run with dry-run again, but this time make sure we would remove nothing
