@@ -108,11 +108,11 @@ fn test_clean_unref() {
     let stdout = String::from_utf8_lossy(&status.stdout).to_string();
     dbg!(&stderr);
     dbg!(&stdout);
-    /*  eprintln!("running debug stuff");
+    eprintln!("running debug stuff");
     walkdir::WalkDir::new("target").into_iter().for_each(|p| {
         dbg!(p);
     });
-    eprintln!("end running debug stuff"); */
+    eprintln!("end running debug stuff");
     assert_eq!("", stderr);
 
     // run with dry-run again, but this time make sure we would remove nothing

@@ -185,15 +185,14 @@ pub(crate) fn clean_unref(
 
     // remove the git checkout cache since it is not needed
 
-    /*     eprintln!("WHATS IN THE CACHE");
-        walkdir::WalkDir::new(&cargo_cache_paths.git_checkouts)
-            .into_iter()
-            .for_each(|p| {
-                dbg!(p);
-            });
-        eprintln!("THATS IN THE CACHE");
+    eprintln!("WHATS IN THE CACHE");
+    walkdir::WalkDir::new(&cargo_cache_paths.git_checkouts)
+        .into_iter()
+        .for_each(|p| {
+            dbg!(p);
+        });
+    eprintln!("THATS IN THE CACHE");
 
-    */
     remove_file(
         &cargo_cache_paths.git_checkouts,
         dry_run,
