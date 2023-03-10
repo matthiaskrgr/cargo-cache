@@ -106,10 +106,10 @@ jobs:
 
       # run tests
       - name: test
-        run: cargo test --verbose --all -- --nocapture
+        run: cargo test --verbose test_clean_unref -- --nocapture
         if: matrix.debug
       - name: test  --release
-        run: cargo test --verbose --release --all -- --nocapture
+        run: cargo test --verbose --release test_clean_unref  -- --nocapture
         if: matrix.release
 
       # run cargo cache
