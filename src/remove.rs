@@ -320,15 +320,8 @@ pub(crate) fn remove_file(
         }
 
         if path.is_dir() {
-            if let Err(error) = remove_dir_all::remove_dir_all(path) {
-                eprintln!(
-                    "Warning: failed to recursively remove directory \"{}\".",
-                    path.display()
-                );
-                eprintln!("error: {error:?}");
-            } else {
-                *size_changed = true;
-            }
+            
+            remove_dir_all::remove_dir_all(path).unwrap();
         }
     }
 }
