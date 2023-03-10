@@ -70,7 +70,7 @@ rayon = {version = "1.6.1", optional = true}# parallelize iterators
 regex = {version = "1.7.1", optional = true}# use regex for matching
 
 # https://github.com/XAMPPRocky/remove_dir_all
-remove_dir_all = {version = "0.8.1", path = "remove_dir_all"}# remove_dir_all on windows
+remove_dir_all = {version = "0.8.1", path = "remove_dir_all", features = ["log"]}# remove_dir_all on windows
 
 # https://github.com/rust-lang/rust-clippy/tree/master/rustc_tools_util
 rustc_tools_util = {version = "=0.2.0", optional = true}# git version information

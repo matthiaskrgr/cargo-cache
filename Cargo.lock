@@ -869,6 +869,7 @@ dependencies = [
  "fs_at",
  "lazy_static",
  "libc",
+ "log",
  "normpath",
  "windows-sys 0.45.0",
 ]
