@@ -1,0 +1,46 @@
+name: Rust
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build-unix:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        channel: [stable, beta, nightly]
+        os: [ubuntu, macos]
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup default ${{ matrix.channel }}
+      - run: cargo build --verbose --all-targets
+      - run: cargo test
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [i686, x86_64, aarch64]
+        variant: [gnu, msvc]
+        channel: [stable, beta, nightly]
+        exclude:
+          - arch: aarch64
+            variant: gnu
+          - arch: i686
+            variant: gnu
+    steps:
+      - uses: actions/checkout@v2
+      - run: choco install msys2
+        if: matrix.variant == 'gnu'
+      - run: rustup default ${{ matrix.channel }}
+      - run: rustup target add ${{ matrix.arch }}-pc-windows-${{ matrix.variant }}
+      - name: Build
+        run: cargo build --verbose --target ${{ matrix.arch }}-pc-windows-${{ matrix.variant }}
+      - name: Run tests (nightly)
+        if: (matrix.arch != 'aarch64') && (matrix.channel == 'nightly')
+        run: cargo test --verbose --target ${{ matrix.arch }}-pc-windows-${{ matrix.variant }}
+      - name: Run tests
+        if: (matrix.arch != 'aarch64') && (matrix.channel != 'nightly')
+        run: cargo test --verbose --target ${{ matrix.arch }}-pc-windows-${{ matrix.variant }}
