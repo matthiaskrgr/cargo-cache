@@ -137,8 +137,7 @@ fn remove_dir_contents_recursive<I: io::Io>(
         if !is_dir {
             eprintln!("unlink: {}", &dir_debug_root);
             opts.unlink_at(&dirfd, name).map_err(|e| {
-                #[cfg(feature = "log")]
-                log::debug!("error removing {}", dir_debug_root);
+                eprintln!("error removing {}", dir_debug_root);
                 e
             })?;
         }
