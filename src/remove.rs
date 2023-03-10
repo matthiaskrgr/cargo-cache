@@ -320,7 +320,7 @@ pub(crate) fn remove_file(
         }
 
         if path.is_dir() {
-            
+            eprintln!("removing '{}'", path.display());
             remove_dir_all::remove_dir_all(path).unwrap();
         }
     }

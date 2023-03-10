@@ -198,6 +198,7 @@ pub fn remove_dir_contents<P: AsRef<Path>>(path: P) -> Result<()> {
 /// /etc). Consider using [`RemoveDir::remove_dir_contents`] instead.
 pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> Result<()> {
     let path = path.as_ref().normalize()?;
+    dbg!(&path);
     _impl::remove_dir_all_path::<_impl::OsIo, _>(path)
 }
 

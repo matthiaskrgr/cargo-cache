@@ -82,8 +82,7 @@ fn remove_dir_contents_recursive<I: io::Io>(
     mut d: File,
     debug_root: &PathComponents<'_>,
 ) -> Result<()> {
-    #[cfg(feature = "log")]
-    log::trace!("scanning {}", &debug_root);
+    eprintln!("scanning {}", &debug_root);
     // We take a os level clone of the FD so that there are no lifetime
     // concerns. It would *not* be ok to do readdir on one file twice
     // concurrently because of shared kernel state.
@@ -125,12 +124,10 @@ fn remove_dir_contents_recursive<I: io::Io>(
 
                 if is_dir {
                     remove_dir_contents_recursive::<I>(child_file, &dir_debug_root)?;
-                    #[cfg(feature = "log")]
-                    log::trace!("rmdir: {}", &dir_debug_root);
+                    eprintln!("rmdir: {}", &dir_debug_root);
                     let opts = fs_at::OpenOptions::default();
                     opts.rmdir_at(&dirfd, name).map_err(|e| {
-                        #[cfg(feature = "log")]
-                        log::debug!("error removing {}", dir_debug_root);
+                        eprintln!("error removing {}", dir_debug_root);
                         e
                     })?;
                 }
@@ -138,8 +135,7 @@ fn remove_dir_contents_recursive<I: io::Io>(
             }
         };
         if !is_dir {
-            #[cfg(feature = "log")]
-            log::trace!("unlink: {}", &dir_debug_root);
+            eprintln!("unlink: {}", &dir_debug_root);
             opts.unlink_at(&dirfd, name).map_err(|e| {
                 #[cfg(feature = "log")]
                 log::debug!("error removing {}", dir_debug_root);
@@ -147,11 +143,9 @@ fn remove_dir_contents_recursive<I: io::Io>(
             })?;
         }
 
-        #[cfg(feature = "log")]
-        log::trace!("removed {}", dir_debug_root);
+        eprintln!("removed {}", dir_debug_root);
         Ok(())
     })?;
-    #[cfg(feature = "log")]
-    log::trace!("scanned {}", &debug_root);
+    eprintln!("scanned {}", &debug_root);
     Ok(())
 }
