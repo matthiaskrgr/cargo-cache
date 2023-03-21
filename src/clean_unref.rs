@@ -189,7 +189,20 @@ pub(crate) fn clean_unref(
     walkdir::WalkDir::new(&cargo_cache_paths.git_checkouts)
         .into_iter()
         .for_each(|p| {
-            dbg!(p);
+            let p = p.unwrap();
+            eprintln!(
+                "{: <3$}{}/{}",
+                "",
+                p.path()
+                    .parent()
+                    .unwrap()
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy(),
+                p.file_name().to_string_lossy(),
+                p.depth()
+            );
+            // dbg!(p.file_name());
         });
     eprintln!("THATS IN THE CACHE");
 
