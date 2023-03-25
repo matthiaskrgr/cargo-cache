@@ -23,6 +23,20 @@ use regex::Regex;
 fn alternative_registry_works() {
     // make sure alternative registries work
 
+    let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
+    let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
+
+    //https://github.com/rust-lang/cargo/pull/10553
+    let disallowed_versions = ["1.57", "1.60", "1.61", "1.68", "1.69"];
+    if disallowed_versions
+        .iter()
+        .any(|version| version_output.contains(version))
+    {
+        return;
+    }
+
+    // ^  new sparse index moved from github to index.crates.io
+
     // first create a $CARGO_HOME with a config file
     let cargo_home_path = {
         let mut path = PathBuf::from("target");
