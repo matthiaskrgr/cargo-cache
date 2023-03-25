@@ -22,6 +22,18 @@ use walkdir::WalkDir;
 #[test]
 #[cfg_attr(feature = "offline_tests", ignore)]
 fn spurious_files_in_cache_test() {
+    let cargo_v = Command::new("cargo").arg("--version").output().unwrap();
+    let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
+
+    //https://github.com/rust-lang/cargo/pull/10553
+    let disallowed_versions = ["1.57", "1.60", "1.61", "1.62", "1.68", "1.69"];
+    if disallowed_versions
+        .iter()
+        .any(|version| version_output.contains(version))
+    {
+        return;
+    }
+
     // move into the directory of our dummy crate
     // set a fake CARGO_HOME and build the dummy crate there
     let crate_path = PathBuf::from("tests/size_test/");
