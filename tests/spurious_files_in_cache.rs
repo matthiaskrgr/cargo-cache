@@ -41,6 +41,13 @@ fn spurious_files_in_cache_test() {
         PathBuf::from(&fchp).is_dir(),
         "fake cargo home was not created!"
     );
+
+    /*
+        let wd = WalkDir::new("target/spurious_files_test/");
+        let files = wd.into_iter().collect::<Vec<_>>();
+         dbg!(files);
+    */
+
     // add some files here and there
     File::create("target/spurious_files_test/file1.txt").unwrap();
     File::create("target/spurious_files_test/file2").unwrap();
@@ -50,14 +57,20 @@ fn spurious_files_in_cache_test() {
     File::create("target/spurious_files_test/registry/index/file5").unwrap();
     File::create("target/spurious_files_test/registry/src/file6").unwrap();
 
-    File::create("target/spurious_files_test/registry/cache/github.com-1ecc6299db9ec823/file7")
+    File::create(
+        "target/spurious_files_test/registry/cache/index.crates.io-6f17d22bba15001f/file7",
+    )
+    .unwrap();
+    File::create(
+        "target/spurious_files_test/registry/index/index.crates.io-6f17d22bba15001f/file8",
+    )
+    .unwrap();
+    File::create("target/spurious_files_test/registry/src/index.crates.io-6f17d22bba15001f/file9")
         .unwrap();
-    File::create("target/spurious_files_test/registry/index/github.com-1ecc6299db9ec823/file8")
-        .unwrap();
-    File::create("target/spurious_files_test/registry/src/github.com-1ecc6299db9ec823/file9")
-        .unwrap();
-    create_dir_all("target/spurious_files_test/registry/cache/github.com-1ecc6299db9ec823/foo_dir")
-        .unwrap();
+    create_dir_all(
+        "target/spurious_files_test/registry/cache/index.crates.io-6f17d22bba15001f/foo_dir",
+    )
+    .unwrap();
 
     // git:
     create_dir_all("target/spurious_files_test/git/checkouts").unwrap();
@@ -124,7 +137,7 @@ fn spurious_files_in_cache_test() {
         "Total:                    .* MB
   0 installed binaries:        .*  B
   Registry:                    .* MB
-    Registry index:            .* MB
+    Registry index:            .* kB
    .. crate archives:          .* kB
    .. crate source checkouts:  .* MB
   Git db:                            0  B

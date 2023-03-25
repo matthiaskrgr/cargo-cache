@@ -94,7 +94,7 @@ fn build_and_check_size_test() {
         "Total:                     .* MB
   0 installed binaries:         .*  B
   Registry:                     .* MB
-    Registry index:             .* MB
+    Registry index:             .* kB
    .. crate archives:           .* kB
    .. crate source checkouts:   .* MB
   Git db:                       .* 0  B

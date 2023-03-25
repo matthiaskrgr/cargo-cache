@@ -199,7 +199,7 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
     Registry index:             .* kB
     1 crate archives:           .*  B
     1 crate source checkouts:   .* kB
-  Registry: github.com          .* kB
+  Registry: index.crates.io     .* kB
     Registry index:             .* kB
     1 crate archives:           .* kB
     1 crate source checkouts:   .* kB
