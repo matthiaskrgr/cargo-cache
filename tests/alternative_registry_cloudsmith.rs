@@ -127,23 +127,27 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         String::from("Cargo cache .*target.*alt_reg_cloudsmith_CARGO_HOME.*\n\n");
 
     desired_output.push_str(
-        "Total:                        .* MB
-  0 installed binaries:      .* 0  B
-  Registry:                    .* MB
-    2 registry indices:        .* MB
-    2 crate archives:          .* kB
-    2 crate source checkouts:  .* kB
-  Git db:                    .* 0  B
-    0 bare git repos:        .* 0  B
-    0 git repo checkouts:    .* 0  B",
+        "Total:                         .* kB
+  0 installed binaries:       .* 0  B
+  Registry:                     .* kB
+    2 registry indices:         .* kB
+    2 crate archives:           .* kB
+    2 crate source checkouts:   .* kB
+  Git db:                     .* 0  B
+    0 bare git repos:         .* 0  B
+    0 git repo checkouts:     .* 0  B",
     );
 
     let regex = Regex::new(&desired_output).unwrap();
 
     assert!(
         regex.is_match(&stdout),
-        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout:?}"
+        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout}"
     );
+
+    println!("================================");
+    println!("cargo cache registry   test");
+    println!("================================");
 
     // test "cargo cache registry" output
 
@@ -189,14 +193,14 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
         String::from("Cargo cache .*target.*alt_reg_cloudsmith_CARGO_HOME.*\n\n");
 
     desired_output.push_str(
-        "Total:                 .* MB
+        "Total:                 .* kB
   0 installed binaries:      .*  0  B
   Registry: dl.cloudsmith.io    .* kB
     Registry index:             .* kB
     1 crate archives:           .*  B
     1 crate source checkouts:   .* kB
-  Registry: github.com          .* MB
-    Registry index:             .* MB
+  Registry: github.com          .* kB
+    Registry index:             .* kB
     1 crate archives:           .* kB
     1 crate source checkouts:   .* kB
   Git db:                    .*  0  B
@@ -208,6 +212,6 @@ cloudsmith = { index = "https://dl.cloudsmith.io/public/matthias-kruger/ccart/ca
 
     assert!(
         regex.is_match(&stdout),
-        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout:?}"
+        "ERROR: regex did not match!\n\nregex:\n{regex:?}\n\ncc_output:\n{stdout}"
     );
 }
