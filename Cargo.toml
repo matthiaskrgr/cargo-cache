@@ -21,6 +21,8 @@ ci-autoclean = [] # minimal implementation that builds fast for CI
 vendored-libgit = ["git2/vendored-libgit2"]
 offline_tests =  [] # only run tests that do not require internet connection
 # some details: https://github.com/NixOS/nixpkgs/pull/77310
+rayon = ["dep:rayon", "remove_dir_all/parallel"]
+
 [dependencies]
 # https://github.com/oli-obk/cargo_metadata
 cargo_metadata = { version = "0.15.2", optional = true } # get crate package name
