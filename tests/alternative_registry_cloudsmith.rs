@@ -27,7 +27,7 @@ fn alternative_registry_works() {
     let version_output = String::from_utf8_lossy(&cargo_v.stdout).to_string();
 
     //https://github.com/rust-lang/cargo/pull/10553
-    let disallowed_versions = ["1.57", "1.60", "1.61", "1.68", "1.69"];
+    let disallowed_versions = ["1.57", "1.60", "1.61", "1.62", "1.68", "1.69"];
     if disallowed_versions
         .iter()
         .any(|version| version_output.contains(version))
