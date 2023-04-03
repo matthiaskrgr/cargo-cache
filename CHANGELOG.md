@@ -3,6 +3,7 @@
 Fix --keep-duplicate-crates which was counting wrong and only removing package == <N> and not every package bigger than <N> (#122)
 Fix --remove-if.. --remove-dir=x which was treated like just --remove-dir, skipped validating the remove-if date and removed everything (#127)
 Show time in seconds needed to gc each repo for --gc
+Build remove_dir_all with parallelism support if rayon is used as dep (#131)
 
 MSRV: bump from 1.57 to 1.62
 
