@@ -8,7 +8,7 @@
 // except according to those terms.
 
 /// This file provides the command line interface of the cargo-cache crate
-use clap::{Arg, ArgAction, ArgMatches};
+use clap::{Arg, ArgAction, ArgMatches, Command, Subcommand};
 
 use crate::library::*;
 use rustc_tools_util::*;
@@ -286,7 +286,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .hide(true);
 
     // "version" subcommand which is also hidden, prints crate version
-    let version_subcmd = Arg::new("version").hide(true);
+    let version_subcmd = Command::new("version").hide(true);
 
     /***************************
      *       Subcommands        *
@@ -299,7 +299,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .long("sort-by")
         .help("sort files alphabetically or by file size")
         .action(ArgAction::Set)
-        .possible_values(["size", "name"]);
+        .value_parser(["size", "name"]);
 
     // arg of query sbcmd
     let human_readable = Arg::new("hr")
@@ -307,15 +307,15 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .help("print sizes in human readable format");
 
     // query subcommand to allow querying
-    let query = Arg::new("query")
-        .help("run a query")
+    let query = Command::new("query")
+        .about("run a query")
         .arg(Arg::new("QUERY"))
         .arg(&query_order)
         .arg(&human_readable);
 
     // short q (shorter query sbcmd)
-    let query_short = Arg::new("q")
-        .help("run a query")
+    let query_short = Command::new("q")
+        .about("run a query")
         .arg(Arg::new("QUERY"))
         .arg(&query_order)
         .arg(&human_readable);
@@ -323,26 +323,26 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     //<local>
     // local subcommand
-    let local = Arg::new("local").help("check local build cache (target) of a rust project");
+    let local = Command::new("local").about("check local build cache (target) of a rust project");
     // shorter local subcommand (l)
-    let local_short = Arg::new("l").help("check local build cache (target) of a rust project");
+    let local_short = Command::new("l").about("check local build cache (target) of a rust project");
     //</local>
 
     // <registry>
     // registry subcommand
-    let registry = Arg::new("registry").help("query each package registry separately");
-    let registry_short = Arg::new("r").help("query each package registry separately");
+    let registry = Command::new("registry").about("query each package registry separately");
+    let registry_short = Command::new("r").about("query each package registry separately");
     // hidden, but have "cargo cache registries" work too
-    let registries_hidden = Arg::new("registries")
-        .help("query each package registry separately")
+    let registries_hidden = Command::new("registries")
+        .about("query each package registry separately")
         .hide(true);
     //</registry>
 
     //<sccache>
     // local subcommand
-    let sccache = Arg::new("sccache").help("gather stats on a local sccache cache");
+    let sccache = Command::new("sccache").about("gather stats on a local sccache cache");
     // shorter local subcommand (l)
-    let sccache_short = Arg::new("sc").help("gather stats on a local sccache cache");
+    let sccache_short = Command::new("sc").about("gather stats on a local sccache cache");
     //</sccache>
 
     //<clean-unref>
@@ -356,11 +356,11 @@ pub(crate) fn gen_clap() -> ArgMatches {
     let manifest_path = Arg::new("manifest-path")
         .long("manifest-path")
         .help("Path to Cargo.toml")
-        .takes_value(true)
+        // fixme   .takes_value(true)
         .value_name("PATH");
 
-    let clean_unref = Arg::new("clean-unref")
-        .help("remove crates that are not referenced in a Cargo.toml from the cache")
+    let clean_unref = Command::new("clean-unref")
+        .about("remove crates that are not referenced in a Cargo.toml from the cache")
         .arg(&manifest_path)
         .arg(&dry_run);
     //</clean-unref>
@@ -370,17 +370,17 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .long("limit")
         .short('l')
         .help("size that the cache will be reduced to, for example: '6B', '1K', '4M', '5G' or '1T'")
-        .takes_value(true)
+        // fixme .takes_value(true)
         .value_name("LIMIT")
         .required(true);
 
-    let trim = Arg::new("trim")
-        .help("trim old items from the cache until maximum cache size limit is reached")
+    let trim = Command::new("trim")
+        .about("trim old items from the cache until maximum cache size limit is reached")
         .arg(&size_limit)
         .arg(&dry_run);
 
     // </trim>
-    let toolchain = Arg::new("toolchain").help("print stats on installed toolchains");
+    let toolchain = Command::new("toolchain").about("print stats on installed toolchains");
 
     // <verify>
 
@@ -389,8 +389,8 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .short('c')
         .help("automatically remove corrupted cache entries");
 
-    let verify = Arg::new("verify")
-        .help("verify crate sources")
+    let verify = Command::new("verify")
+        .about("verify crate sources")
         .arg(&dry_run)
         .arg(&clean_corrupted);
 
@@ -401,11 +401,11 @@ pub(crate) fn gen_clap() -> ArgMatches {
     // subcommand hack to have "cargo cache --foo" and "cargo-cache --foo" work equally
     // "cargo cache foo" works because cargo, since it does not implement the "cache" subcommand
     // itself will look if there is a "cargo-cache" binary and exec that
-    let cache_subcmd = Arg::new("cache")
+    let cache_subcmd = Command::new("cache")
         //.version(&*version_string) // rip?
         //.bin_name("cargo-cache")
-        .help("Manage cargo cache")
-       // .author("matthiaskrgr")
+        .about("Manage cargo cache")
+        // .author("matthiaskrgr")
         // todo: remove all these clones once clap allows it
         .subcommand(query.clone())
         .subcommand(query_short.clone())
@@ -436,10 +436,10 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .arg(&debug)
         .hide(true);
 
-    Arg::new("cargo-cache")
+    Command::new("cargo-cache")
         //.version(&*version_string)
         //.bin_name("cargo")
-        .help("Manage cargo cache")
+        .about("Manage cargo cache")
         .author("matthiaskrgr")
         .subcommand(cache_subcmd)
         .subcommand(query)
