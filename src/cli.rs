@@ -215,7 +215,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     let remove_dir = Arg::new("remove-dir").short('r').long("remove-dir")
         .help("Remove directories, accepted values: all,git-db,git-repos,\nregistry-sources,registry-crate-cache,registry-index,registry")
-        .takes_value(true)
+        .action(clap::ArgAction::Set)
         .value_name("dir1,dir2,dir3");
     let gc_repos = Arg::new("gc-repos")
         .short('g')
@@ -308,14 +308,14 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     // query subcommand to allow querying
     let query = Arg::new("query")
-        .about("run a query")
+        .help("run a query")
         .arg(Arg::new("QUERY"))
         .arg(&query_order)
         .arg(&human_readable);
 
     // short q (shorter query sbcmd)
     let query_short = Arg::new("q")
-        .about("run a query")
+        .help("run a query")
         .arg(Arg::new("QUERY"))
         .arg(&query_order)
         .arg(&human_readable);
@@ -323,26 +323,26 @@ pub(crate) fn gen_clap() -> ArgMatches {
 
     //<local>
     // local subcommand
-    let local = Arg::new("local").about("check local build cache (target) of a rust project");
+    let local = Arg::new("local").help("check local build cache (target) of a rust project");
     // shorter local subcommand (l)
-    let local_short = Arg::new("l").about("check local build cache (target) of a rust project");
+    let local_short = Arg::new("l").help("check local build cache (target) of a rust project");
     //</local>
 
     // <registry>
     // registry subcommand
-    let registry = Arg::new("registry").about("query each package registry separately");
-    let registry_short = Arg::new("r").about("query each package registry separately");
+    let registry = Arg::new("registry").help("query each package registry separately");
+    let registry_short = Arg::new("r").help("query each package registry separately");
     // hidden, but have "cargo cache registries" work too
     let registries_hidden = Arg::new("registries")
-        .about("query each package registry separately")
+        .help("query each package registry separately")
         .hide(true);
     //</registry>
 
     //<sccache>
     // local subcommand
-    let sccache = Arg::new("sccache").about("gather stats on a local sccache cache");
+    let sccache = Arg::new("sccache").help("gather stats on a local sccache cache");
     // shorter local subcommand (l)
-    let sccache_short = Arg::new("sc").about("gather stats on a local sccache cache");
+    let sccache_short = Arg::new("sc").help("gather stats on a local sccache cache");
     //</sccache>
 
     //<clean-unref>
@@ -360,7 +360,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .value_name("PATH");
 
     let clean_unref = Arg::new("clean-unref")
-        .about("remove crates that are not referenced in a Cargo.toml from the cache")
+        .help("remove crates that are not referenced in a Cargo.toml from the cache")
         .arg(&manifest_path)
         .arg(&dry_run);
     //</clean-unref>
@@ -375,12 +375,12 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .required(true);
 
     let trim = Arg::new("trim")
-        .about("trim old items from the cache until maximum cache size limit is reached")
+        .help("trim old items from the cache until maximum cache size limit is reached")
         .arg(&size_limit)
         .arg(&dry_run);
 
     // </trim>
-    let toolchain = Arg::new("toolchain").about("print stats on installed toolchains");
+    let toolchain = Arg::new("toolchain").help("print stats on installed toolchains");
 
     // <verify>
 
@@ -390,7 +390,7 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .help("automatically remove corrupted cache entries");
 
     let verify = Arg::new("verify")
-        .about("verify crate sources")
+        .help("verify crate sources")
         .arg(&dry_run)
         .arg(&clean_corrupted);
 
@@ -402,10 +402,10 @@ pub(crate) fn gen_clap() -> ArgMatches {
     // "cargo cache foo" works because cargo, since it does not implement the "cache" subcommand
     // itself will look if there is a "cargo-cache" binary and exec that
     let cache_subcmd = Arg::new("cache")
-        .version(&*version_string)
-        .bin_name("cargo-cache")
-        .about("Manage cargo cache")
-        .author("matthiaskrgr")
+        //.version(&*version_string) // rip?
+        //.bin_name("cargo-cache")
+        .help("Manage cargo cache")
+       // .author("matthiaskrgr")
         // todo: remove all these clones once clap allows it
         .subcommand(query.clone())
         .subcommand(query_short.clone())
@@ -437,9 +437,9 @@ pub(crate) fn gen_clap() -> ArgMatches {
         .hide(true);
 
     Arg::new("cargo-cache")
-        .version(&*version_string)
-        .bin_name("cargo")
-        .about("Manage cargo cache")
+        //.version(&*version_string)
+        //.bin_name("cargo")
+        .help("Manage cargo cache")
         .author("matthiaskrgr")
         .subcommand(cache_subcmd)
         .subcommand(query)
