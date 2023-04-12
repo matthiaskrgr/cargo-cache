@@ -14,7 +14,7 @@ use crate::library::*;
 use rustc_tools_util::*;
 
 /// cargo-cache can perform these operaitons, but only one at a time
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub(crate) enum CargoCacheCommands<'a> {
     FSCKRepos,
 
@@ -53,18 +53,18 @@ pub(crate) enum CargoCacheCommands<'a> {
     SCCache,    // subcommand
     CleanUnref {
         dry_run: bool,
-        manifest_path: Option<&'a str>,
+        manifest_path: Option<String>,
     }, // subcommand
     Trim {
         dry_run: bool,
-        trim_limit: Option<&'a str>,
+        trim_limit: Option<String>,
     }, // subcommand
     Toolchain,  // subcommand
     RemoveIfDate {
         dry_run: bool,
-        arg_younger: Option<&'a str>,
-        arg_older: Option<&'a str>,
-        dirs: Option<&'a str>,
+        arg_younger: Option<String>,
+        arg_older: Option<String>,
+        dirs: Option<String>,
     },
     OnlyDryRun,
     DefaultSummary,
@@ -110,20 +110,21 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
         let trim_dry_run = dry_run || trimconfig.contains_id("dry-run");
         CargoCacheCommands::Trim {
             dry_run: trim_dry_run,
-            trim_limit: trimconfig
-                .get_one(&"trim_limit".to_string())
-                .action(ArgAction::Set),
+            trim_limit: trimconfig.get_one("trim_limit").map(|x: &String| x.into()),
         } // take config trim_config.get_one("trim_limit")
     } else if let Some(clean_unref_config) = config.subcommand_matches("clean-unref") {
         let arg_dry_run = dry_run || clean_unref_config.contains_id("dry-run");
         CargoCacheCommands::CleanUnref {
             dry_run: arg_dry_run,
-            manifest_path: clean_unref_config.get_one("manifest-path"),
+            manifest_path: clean_unref_config
+                .get_one("manifest-path")
+                .map(|x: &String| x.into()),
         } // clean_unref_cfg.get_one("manifest-path"),y
     } else if config.contains_id("top-cache-items") {
         let limit = config
             .get_one("top-cache-items")
-            .unwrap_or("20" /* default*/)
+            .map(|x: &String| x.to_string())
+            .unwrap_or(String::from("20") /* default*/)
             .parse()
             .unwrap_or(20 /* default*/);
         CargoCacheCommands::TopCacheItems { limit }
@@ -158,9 +159,12 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
         CargoCacheCommands::AutoClean { dry_run }
     } else if config.contains_id("keep-duplicate-crates") {
         let limit: u64 = config
-            .get_one_t("keep-duplicate-crates")
+            .try_get_one("keep-duplicate-crates")
+            // .map(|x: &usize| x.into())
             .map_err(|_| "Error: \"--keep-duplicate-crates\" expected an integer argument")
-            .unwrap_or_fatal_error();
+            .unwrap_or_fatal_error()
+            .map(|x: &u64| *x)
+            .unwrap_or_default();
         CargoCacheCommands::KeepDuplicateCrates { dry_run, limit }
     } else if config.subcommand_matches("registry").is_some()
         || config.subcommand_matches("r").is_some()
@@ -174,9 +178,13 @@ pub(crate) fn clap_to_enum(config: &ArgMatches) -> CargoCacheCommands<'_> {
     {
         CargoCacheCommands::RemoveIfDate {
             dry_run,
-            arg_older: config.get_one("remove-if-younger-than"),
-            arg_younger: config.get_one("remove-if-older-than"),
-            dirs: config.get_one("remove-dir"),
+            arg_older: config
+                .get_one("remove-if-younger-than")
+                .map(|x: &String| x.into()),
+            arg_younger: config
+                .get_one("remove-if-older-than")
+                .map(|x: &String| x.into()),
+            dirs: config.get_one("remove-dir").map(|x: &String| x.into()),
         }
     } else if let Some(verify_cfg) = config.subcommand_matches("verify") {
         let dry_run2: bool = verify_cfg.contains_id("dry-run") || config.contains_id("dry-run");

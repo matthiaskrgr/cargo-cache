@@ -151,14 +151,17 @@ pub(crate) fn run_query(
     registry_pkg_cache: &mut registry_pkg_cache::RegistryPkgCaches,
     registry_sources_caches: &mut registry_sources::RegistrySourceCaches,
 ) -> Result<(), Error> {
-    let sorting = query_config.value_of("sort");
-    let query = query_config.value_of("QUERY").unwrap_or("" /* default */);
-    let hr_size = query_config.is_present("hr");
+    let sorting = query_config.get_one("sort").map(|x: &String| x.to_string());
+    let query = query_config
+        .get_one("QUERY")
+        .map(|x: &String| x.to_string())
+        .unwrap_or_default();
+    let hr_size: bool = query_config.get_one::<Option<bool>>("hr").is_some();
 
     let mut output = String::new();
 
     // make the regex
-    let re = match Regex::new(query) {
+    let re = match Regex::new(&query) {
         Ok(re) => re,
         Err(_e) => {
             return Err(Error::QueryRegexFailedParsing(query.to_string()));
@@ -200,6 +203,7 @@ pub(crate) fn run_query(
         .filter(|f| re.is_match(f.name.as_str())) // filter by regex
         .collect::<Vec<_>>();
 
+    let sorting = sorting.as_deref();
     match sorting {
         // make "name" the default
         Some("name") | None => {

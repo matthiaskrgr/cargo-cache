@@ -117,12 +117,12 @@ fn main() {
     let config_enum = cli::clap_to_enum(config);
 
     // handle hidden "version" subcommand
-    if config.is_present("version") || matches!(config_enum, CargoCacheCommands::Version) {
+    if config.contains_id("version") || matches!(config_enum, CargoCacheCommands::Version) {
         println!("cargo-cache {}", cli::get_version());
         process::exit(0);
     }
 
-    let debug_mode: bool = config.is_present("debug");
+    let debug_mode: bool = config.contains_id("debug");
 
     // if we are in "debug" mode, get the current time
     let time_started = if debug_mode {
@@ -185,10 +185,10 @@ fn main() {
     match config_enum {
         CargoCacheCommands::Trim {
             dry_run,
-            trim_limit,
+            ref trim_limit,
         } => {
             let trim_result = trim::trim_cache(
-                trim_limit,
+                trim_limit.clone().as_deref(),
                 &mut checkouts_cache,
                 &mut bare_repos_cache,
                 &mut registry_pkgs_cache,
@@ -210,11 +210,11 @@ fn main() {
         }
         CargoCacheCommands::CleanUnref {
             dry_run,
-            manifest_path,
+            ref manifest_path,
         } => {
             let clean_unref_result = clean_unref(
                 &cargo_cache,
-                manifest_path,
+                manifest_path.clone().as_deref(),
                 &mut bin_cache,
                 &mut checkouts_cache,
                 &mut bare_repos_cache,
@@ -270,9 +270,9 @@ fn main() {
         }
         CargoCacheCommands::RemoveIfDate {
             dry_run,
-            arg_younger,
-            arg_older,
-            dirs,
+            ref arg_younger,
+            ref arg_older,
+            ref dirs,
         } => {
             let res = crate::date::remove_files_by_dates(
                 &mut checkouts_cache,
@@ -280,10 +280,10 @@ fn main() {
                 &mut registry_pkgs_cache,
                 /* &mut registry_index_cache, */
                 &mut registry_sources_caches,
-                arg_younger,
-                arg_older,
+                arg_younger.as_deref(),
+                arg_older.as_deref(),
                 dry_run,
-                dirs,
+                dirs.as_deref(),
                 &mut size_changed,
             );
 
@@ -308,7 +308,10 @@ fn main() {
         // This one must come BEFORE RemoveIfDate because that one also uses --remove dir
         CargoCacheCommands::RemoveDir { dry_run } => {
             let res = remove_dir_via_cmdline(
-                config.value_of("remove-dir"),
+                config
+                    .get_one("remove-dir")
+                    .map(|x: &String| x.to_string())
+                    .as_deref(),
                 dry_run,
                 &cargo_cache,
                 &mut size_changed,
@@ -507,7 +510,7 @@ fn main() {
         _ => (),
     }
 
-    if size_changed && !config.is_present("dry-run") {
+    if size_changed && !config.get_one::<Option<&str>>("dry-run").is_some() {
         // size has changed, print summary of how size has changed
 
         dirsizes::DirSizes::print_size_difference(
