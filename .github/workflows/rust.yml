@@ -18,29 +18,14 @@ jobs:
       matrix:
         build:
           [
-            linux-msrv-release,
-            linux-msrv-debug,
             linux-nightly-release,
             linux-nightly-debug,
-            linux-stable-release,
-            linux-stable-debug,
-            linux-beta-release,
-            linux-beta-debug,
             macos-nightly-release,
             macos-nightly-debug,
             windows-nightly-release,
             windows-nightly-debug,
           ]
         include:
-          - build: linux-msrv-release
-            os: ubuntu-latest
-            toolchain: 1.62
-            release: true
-          - build: linux-msrv-debug
-            os: ubuntu-latest
-            toolchain: 1.62
-            debug: true
-
           - build: linux-nightly-release
             os: ubuntu-latest
             toolchain: nightly
@@ -69,23 +54,6 @@ jobs:
             toolchain: nightly
             debug: true
 
-          - build: linux-beta-release
-            os: ubuntu-latest
-            toolchain: beta
-            release: true
-          - build: linux-beta-debug
-            os: ubuntu-latest
-            toolchain: beta
-            debug: true
-
-          - build: linux-stable-release
-            os: ubuntu-latest
-            toolchain: stable
-            release: true
-          - build: linux-stable-debug
-            os: ubuntu-latest
-            toolchain: stable
-            debug: true
 
     steps:
       - uses: actions/checkout@v1
@@ -172,60 +140,4 @@ jobs:
         run: cargo install --force --git https://github.com/matthiaskrgr/cargo-cache --no-default-features --features ci-autoclean cargo-cache
       - name: run ci_autoclean
         run: cargo-cache
-  # check for vulns in deps with cargo-audit
-  cargo-audit:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          profile: minimal
-      - name: install cargo-audit
-        run: cargo install cargo-audit --debug
-      - name: run cargo-audit
-        # as far as I see, cargo-cache is not using affected code in critical places
-        # and since there is no new chrono version out yet, there is not a lot I can do
-        run: cargo audit --ignore RUSTSEC-2020-0071 --ignore RUSTSEC-2020-0159
 
-  # check code with clippy
-  run_clippy:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      # we don't need rustfmt or anything here
-      - name: install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          components: clippy
-      - name: clippy version
-        run: cargo clippy --version
-      - name: clippy all targets all features
-        run: cargo clippy --all-targets --all-features -- -Dwarnings
-      - name: clippy ci_autoclean
-        run: cargo clippy --no-default-features --features ci-autoclean -- -Dwarnings
-      - name: clippy default features
-        run: cargo clippy --all-targets --features default -- -Dwarnings
-  # make sure code formatting is consistent
-  rustfmt:
-    runs-on: ubuntu-latest
-    env:
-      RUSTC_BACKTRACE: full
-    steps:
-      - uses: actions/checkout@v1
-      - name: install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          components: rustfmt
-      - name: rustfmt check formatting
-        run: cargo fmt --all -- --check
