@@ -98,7 +98,7 @@ cfg_if::cfg_if! {
     }
 }
 
-#[cfg(all(any(test, feature = "bench", not(feature = "ci-autoclean"))))]
+#[cfg(any(test, feature = "bench", not(feature = "ci-autoclean")))]
 mod test_helpers;
 
 #[cfg(all(test, feature = "bench", not(feature = "ci-autoclean")))]
